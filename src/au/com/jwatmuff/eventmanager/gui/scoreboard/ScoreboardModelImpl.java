@@ -567,6 +567,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         
         for(int i=0; i<2; i++) {
             if(getScore(i, Score.IPPON) == 1) {
+                if((getScore(i, Score.WAZARI) == 2) ||
+                   (getScore(1-i, Score.IPPON) == 1) ||
+                   (getScore(1-i, Score.WAZARI) == 2)) {
+                    setMode(Mode.IDLE);
+                    return;
+                }
                 winningPlayer = i;
                 win = Win.BY_IPPON;
                 stopTimer();
@@ -574,6 +580,11 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                 return;
             }
             if(getScore(i, Score.WAZARI) == 2) {
+                if((getScore(1-i, Score.IPPON) == 1) ||
+                   (getScore(1-i, Score.WAZARI) == 2)) {
+                    setMode(Mode.IDLE);
+                    return;
+                }
                 winningPlayer = i;
                 win = Win.WAZA_ARI_AWESETE_IPPON;
                 stopTimer();
