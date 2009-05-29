@@ -714,10 +714,8 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
     @Override
     public void setTimer(int seconds) {
-        //boolean running = mainTimer.isRunning();
         stopTimer();
         mainTimer.reset(seconds * 1000);
-        //if(running) startTimer();
         notifyListeners(ScoreboardUpdate.TIMER);
     }
 
@@ -728,17 +726,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                 stopTimer();
                 holddownTimer.reset(seconds * 1000);
                 disableCancelHolddownUndo();
-                //startTimer();
                 break;
             case INACTIVE:
-                //boolean running = mainTimer.isRunning();
-                //if(!running) startTimer();
                 startHolddownTimer();
                 stopTimer();
                 holddownTimer.reset(seconds * 1000);
                 disableCancelHolddownUndo();
-                //startTimer();
-                //if(!running) stopTimer();
                 break;
             case PENDING:
         }
