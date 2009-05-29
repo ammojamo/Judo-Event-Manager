@@ -11,6 +11,8 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author James
@@ -157,12 +159,24 @@ public class DecisionDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void winButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_winButton1ActionPerformed
+        int result = JOptionPane.showConfirmDialog(
+                rootPane,
+                "Confirm Winner: " + playerTextField1.getText(),
+                "Confirm Winner",
+                JOptionPane.OK_CANCEL_OPTION);
+        if(result != JOptionPane.OK_OPTION) return;
         success = true;
         player = 0;
         this.dispose();
     }//GEN-LAST:event_winButton1ActionPerformed
 
     private void winButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_winButton2ActionPerformed
+        int result = JOptionPane.showConfirmDialog(
+                rootPane,
+                "Confirm Winner: " + playerTextField2.getText(),
+                "Confirm Winner",
+                JOptionPane.OK_CANCEL_OPTION);
+        if(result != JOptionPane.OK_OPTION) return;
         success = true;
         player = 1;
         this.dispose();
