@@ -109,7 +109,7 @@ public class DivisionResultCache {
                         case 5:
                             playerScores.put(playerID, playerScores.get(playerID)+f.getPoints()[2]);
                             break;
-                        case 3:
+                        case 1:
                             playerScores.put(playerID, playerScores.get(playerID)+f.getPoints()[3]);
                             break;
                         default:

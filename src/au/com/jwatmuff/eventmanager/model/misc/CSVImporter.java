@@ -62,7 +62,7 @@ public class CSVImporter {
         columnMapping.put("iPoints", "ipoints");
         columnMapping.put("wPoints", "wpoints");
         columnMapping.put("yPoints", "ypoints");
-        columnMapping.put("kPoints", "kpoints");
+        columnMapping.put("dPoints", "dpoints");
         columnMapping.put("lPoints", "lpoints");
         
         CSVMapReader mapReader = new CSVMapReader(reader, columnMapping);
@@ -100,7 +100,7 @@ public class CSVImporter {
                 fight.getPoints()[0] = parseInt(fightInfo.get("ipoints"));
                 fight.getPoints()[1] = parseInt(fightInfo.get("wpoints"));
                 fight.getPoints()[2] = parseInt(fightInfo.get("ypoints"));
-                fight.getPoints()[3] = parseInt(fightInfo.get("kpoints"));
+                fight.getPoints()[3] = parseInt(fightInfo.get("dpoints"));
                 fight.getPoints()[4] = parseInt(fightInfo.get("lpoints"));
                 fight.setPoolID(pool.getID());
                 newFights.add(fight);
