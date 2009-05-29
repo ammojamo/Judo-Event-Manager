@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Result List - EventManager</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <style type="text/css">
+#include("resources/html/styles.css")
+    </style>
+    <script type="text/javascript">
+        function p()
+        {
+            window.print();
+        }
+    </script>
+  </head>
+  <body onload="setTimeout('p()', 1500);">
+    <h1>Result List</h1>
+    <h2>${competitionName}</h2>
+
+    <table>
+        <tr>
+            <th>Fight</th>
+            <th>Division</th>
+            <th>Player 1</th>
+            <th>Player 2</th>
+            <th>Score</th>
+            <th>Winner</th>
+            <th>Time Recorded</th>
+        </tr>
+<!--
+#foreach($result in $results)
+<!-- -->
+        <tr>
+            <td>$result.matfight</td>
+            <td>$result.division</td>
+            <td>$result.player1</td>
+            <td>$result.player2</td>
+            <td>$result.score</td>
+            <td>$result.winner</td>
+            <td>$date.format("dd-MM-yy HH:mm:ss", $result.timerec)</td>
+
+        </tr>
+<!--
+#end
+-->
+    </table>
+  </body>
+</html>
+

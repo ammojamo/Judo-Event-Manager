@@ -1,0 +1,267 @@
+/*
+ * ScoreboardWindow.java
+ *
+ * Created on 10 November 2008, 14:18
+ */
+
+package au.com.jwatmuff.eventmanager.gui.scoreboard;
+import au.com.jwatmuff.eventmanager.db.FightDAO;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Mode;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardModelListener;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardUpdate;
+import au.com.jwatmuff.eventmanager.model.info.SessionInfo;
+import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
+import au.com.jwatmuff.eventmanager.model.misc.ResultRecorder;
+import au.com.jwatmuff.eventmanager.model.vo.Fight;
+import au.com.jwatmuff.eventmanager.model.vo.Result;
+import au.com.jwatmuff.eventmanager.model.vo.Session;
+import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.gui.PanelDisplayFrame;
+import au.com.jwatmuff.genericdb.Database;
+import au.com.jwatmuff.genericdb.distributed.DataEvent;
+import au.com.jwatmuff.genericdb.transaction.TransactionListener;
+import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
+import java.awt.Frame;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.util.Collection;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import org.apache.log4j.Logger;
+
+/**
+ *
+ * @author  James
+ */
+public class ScoreboardWindow extends javax.swing.JFrame {
+    private static final Logger log = Logger.getLogger(ScoreboardWindow.class);
+
+    private ScoreboardPanel scoreboard = new ScoreboardPanel();
+    private ScoreboardPanel fullscreen = new ScoreboardPanel();
+    
+    private Database database;
+    private TransactionNotifier notifier;
+    private Session mat;
+    private Fight currentFight;
+    
+    private ScoreboardModel model;
+    
+    private Clip siren;
+    
+    /** Creates new form ScoreboardWindow */
+    public ScoreboardWindow(Database database, TransactionNotifier notifier, Session mat) {        
+        this.mat = mat;
+        this.database = database;
+        this.notifier = notifier;
+        
+        openSirenFile(new File("siren.wav"));
+        
+        initComponents();
+        getContentPane().setLayout(new GridLayout(1,1));
+        getContentPane().add(scoreboard);
+        model = scoreboard.getModel();
+        fullscreen.setModel(model);
+
+        model.addListener(new ScoreboardModelListener() {
+            @Override
+            public void handleScoreboardUpdate(ScoreboardUpdate update, ScoreboardModel model) {
+                switch(update) {
+                    case MODE:
+                        if(model.getMode() == Mode.NO_FIGHT) {
+                            if(currentFight != null) {
+                                Result r = new Result();
+                                r.setFightID(currentFight.getID());
+                                int[] playerScores = new int[2];
+                                playerScores[model.getWinningPlayer()] = model.getWin().score.points;
+                                r.setPlayerScores(playerScores);
+                                ResultRecorder.recordResult(ScoreboardWindow.this.database, r);
+                            }
+                            updateFightFromDatabase();
+                        }
+                        break;
+
+                    case SIREN:
+                        siren.setFramePosition(0);
+                        siren.start();
+                        break;
+                }
+            }
+        });
+
+        model.endFight();
+        updateFightFromDatabase();
+        
+        notifier.addListener(new TransactionListener() {
+            @Override
+            public void handleTransactionEvents(Collection<DataEvent> events, Collection<Class> dataClasses) {
+                if(model.getMode() == Mode.NO_FIGHT)
+                    updateFightFromDatabase();
+            }
+        }, SessionFight.class);
+    }
+    
+    private void openSirenFile(File sirenFile) {
+        Clip oldSiren = siren;
+
+        try {
+            siren = AudioSystem.getClip();
+            siren.open(AudioSystem.getAudioInputStream(sirenFile));
+        } catch(Exception e) {
+            log.error(e);
+            GUIUtils.displayError(this, "Unable to open siren sound file");
+            siren = oldSiren;
+        }
+    }
+    
+    private void updateFightFromDatabase() {
+        if(mat == null) return;
+        SessionInfo si = new SessionInfo(database, mat);
+
+        String[] playerNames = new String[2];
+        
+        while(si.getFollowingMatSessions().size() > 0) {
+            Session following = si.getFollowingMatSessions().iterator().next();
+            Collection<Fight> fights = database.findAll(Fight.class, FightDAO.UNPLAYED_IN_SESSION, following.getID());
+            if(fights.size() == 0)
+                si = new SessionInfo(database, following);
+            else {
+                currentFight = fights.iterator().next();
+
+                for(int i=0; i<2; i++) {
+                    try {
+                        playerNames[i] = PlayerCodeParser.parseCode(database, currentFight.getPlayerCodes()[i], currentFight.getPoolID()).toString();
+                    } catch(DatabaseStateException e) {
+                        playerNames[i] = currentFight.getPlayerCodes()[i];
+                    }
+                }
+                
+                model.reset(30, playerNames);
+                return;
+            }
+        }
+    }
+
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jMenuBar1 = new javax.swing.JMenuBar();
+        fileMenu = new javax.swing.JMenu();
+        closeMenuItem = new javax.swing.JMenuItem();
+        optionsMenu = new javax.swing.JMenu();
+        fullScreenMenuItem = new javax.swing.JMenuItem();
+        swapPlayersMenuItem = new javax.swing.JCheckBoxMenuItem();
+        chooseColorsMenuItem = new javax.swing.JMenuItem();
+        chooseSirenMenuItem = new javax.swing.JMenuItem();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        fileMenu.setText("File");
+
+        closeMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
+        closeMenuItem.setText("Close");
+        closeMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(closeMenuItem);
+
+        jMenuBar1.add(fileMenu);
+
+        optionsMenu.setText("Options");
+
+        fullScreenMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, java.awt.event.InputEvent.ALT_MASK));
+        fullScreenMenuItem.setText("Fullscreen");
+        fullScreenMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fullScreenMenuItemActionPerformed(evt);
+            }
+        });
+        optionsMenu.add(fullScreenMenuItem);
+
+        swapPlayersMenuItem.setText("Swap Players");
+        optionsMenu.add(swapPlayersMenuItem);
+
+        chooseColorsMenuItem.setText("Choose Colors..");
+        optionsMenu.add(chooseColorsMenuItem);
+
+        chooseSirenMenuItem.setText("Choose Siren Sound..");
+        optionsMenu.add(chooseSirenMenuItem);
+
+        jMenuBar1.add(optionsMenu);
+
+        setJMenuBar(jMenuBar1);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 279, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+private void closeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeMenuItemActionPerformed
+    this.dispose();
+}//GEN-LAST:event_closeMenuItemActionPerformed
+
+private void fullScreenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fullScreenMenuItemActionPerformed
+    final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();//GEN-LAST:event_fullScreenMenuItemActionPerformed
+    
+    if(gd.isFullScreenSupported()) {
+        final ScoreboardPanel sp = fullscreen;
+        final Frame w = new PanelDisplayFrame(sp);
+        w.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent evt) {
+                if(evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    w.removeNotify();
+                    w.setUndecorated(false);
+                    w.addNotify();
+                    gd.setFullScreenWindow(null);
+                    w.dispose();
+                }
+            }
+        });
+
+        w.removeNotify();
+        w.setUndecorated(true);
+        w.addNotify();
+        gd.setFullScreenWindow(w);
+    }
+    else
+        GUIUtils.displayMessage(this, "Full Screen Not Supported", "Full Screen Not Supported");
+
+
+}
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem chooseColorsMenuItem;
+    private javax.swing.JMenuItem chooseSirenMenuItem;
+    private javax.swing.JMenuItem closeMenuItem;
+    private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenuItem fullScreenMenuItem;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenu optionsMenu;
+    private javax.swing.JCheckBoxMenuItem swapPlayersMenuItem;
+    // End of variables declaration//GEN-END:variables
+
+}

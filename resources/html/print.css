@@ -1,0 +1,7 @@
+h1 {
+    page-break-before:always;
+}
+
+@page {
+    size: landscape;
+}

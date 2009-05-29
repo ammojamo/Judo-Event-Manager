@@ -1,0 +1,11 @@
+DROP TABLE competition;
+DROP TABLE player_details;
+DROP TABLE player;
+DROP TABLE pool;
+DROP TABLE player_has_pool;
+DROP TABLE fight;
+DROP TABLE session;
+DROP TABLE session_link;
+DROP TABLE session_has_pool;
+DROP TABLE session_has_fight;
+DROP TABLE fight_result;

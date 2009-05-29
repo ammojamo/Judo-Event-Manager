@@ -1,0 +1,6 @@
+peerid.dat
+comps
+build
+dist
+*.log
+nbproject/private

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Player List - EventManager</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <style type="text/css">
+#include("resources/html/styles.css")
+    </style>
+    <script type="text/javascript">
+        function p()
+        {
+            window.print();
+        }
+    </script>
+  </head>
+  <body onload="setTimeout('p()', 1500);">
+    <h1>Player List</h1>
+    <h2>${competitionName}</h2>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>DOB</th>
+            <th>Weight (kg)</th>
+            <th>Grade</th>
+            <th>Gender</th>
+            <th>Status</th>
+        </tr>
+<!--
+#foreach($player in $players)
+#set($weight = $player.weight)
+#if($weight == 0)
+  #set($weight = "--")
+#end
+<!-- -->
+        <tr>
+            <td>$player.visibleID</td>
+            <td>$player.lastName</td>
+            <td>$player.firstName</td>
+            <td>$date.format("dd/MM/yyyy", $player.dob)</td>
+            <td>$!weight</td>
+            <td>$player.grade</td>
+            <td>$player.gender</td>
+            <td>$player.lockedStatus</td>
+        </tr>
+<!--
+#end
+-->
+    </table>
+  </body>
+</html>
