@@ -42,6 +42,7 @@ import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
 
 /**
@@ -576,6 +577,7 @@ private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         if(pool == null) return;
         
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
 
         if(GUIUtils.lastChooserDirectory != null)
             fileChooser.setCurrentDirectory(GUIUtils.lastChooserDirectory);

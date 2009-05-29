@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.log4j.Logger;
 
@@ -364,6 +365,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
 
         if(GUIUtils.lastChooserDirectory != null)
             fileChooser.setCurrentDirectory(GUIUtils.lastChooserDirectory);

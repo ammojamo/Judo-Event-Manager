@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
 
 /**
@@ -441,6 +442,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
         if(GUIUtils.lastChooserDirectory != null)
             fileChooser.setCurrentDirectory(GUIUtils.lastChooserDirectory);
 
