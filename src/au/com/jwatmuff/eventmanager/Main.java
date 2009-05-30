@@ -103,7 +103,6 @@ public class Main {
     public static void main(String args[]) {
         /* Set timeout for RMI connections - TODO: move to external file */
         System.setProperty("sun.rmi.transport.tcp.handshakeTimeout", "2000");
-        //System.setProperty("java.rmi.server.useLocalHostname", "true");
         try {
             System.setProperty("java.rmi.server.hostname", InetAddress.getLocalHost().getHostName());
         } catch(Exception e) {}
