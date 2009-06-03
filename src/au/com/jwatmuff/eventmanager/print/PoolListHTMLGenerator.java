@@ -11,6 +11,7 @@ import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.genericdb.Database;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,14 +24,19 @@ import org.apache.velocity.context.Context;
  */
 public class PoolListHTMLGenerator extends VelocityHTMLGenerator {
     private Database database;
+    private List<Pool> pools;
 
     public PoolListHTMLGenerator(Database database) {
+        this(database, database.findAll(Pool.class, PoolDAO.ALL));
+    }
+
+    public PoolListHTMLGenerator(Database database, List<Pool> pools) {
         this.database = database;
+        this.pools = new ArrayList<Pool>(pools);
     }
 
     @Override
     public void populateContext(Context c) {
-        List<Pool> pools = database.findAll(Pool.class, PoolDAO.ALL);
         c.put("pools", pools);
 
         Map<Integer, List<Player>> players = new HashMap<Integer, List<Player>>();

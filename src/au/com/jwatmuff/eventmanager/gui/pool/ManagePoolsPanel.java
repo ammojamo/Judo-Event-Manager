@@ -6,6 +6,8 @@
 
 package au.com.jwatmuff.eventmanager.gui.pool;
 
+import au.com.jwatmuff.eventmanager.db.PlayerDAO;
+import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
 import au.com.jwatmuff.eventmanager.model.misc.AutoAssign;
@@ -18,6 +20,8 @@ import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.print.PoolListHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.gui.CheckboxListDialog;
+import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
@@ -28,6 +32,7 @@ import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
@@ -500,7 +505,28 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_requestedListMouseClicked
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-    new PoolListHTMLGenerator(database).openInBrowser();
+    /* get all pools */
+    List<Pool> pools = database.findAll(Pool.class, PoolDAO.ALL);
+    
+    /* remove pools with no players */
+    Iterator<Pool> iter = pools.iterator();
+    while(iter.hasNext())
+        if(database.findAll(Player.class, PlayerDAO.FOR_POOL, iter.next().getID(), true).isEmpty())
+            iter.remove();
+
+    /* display pool selection dialog */
+    CheckboxListDialog<Pool> cld = new CheckboxListDialog(
+            parentWindow, true, pools,
+            "Select divisions to print", "Print Divisions");
+    cld.setRenderer(new StringRenderer<Pool>() {
+            public String asString(Pool p) { return p.getDescription(); }
+        }, Icons.POOL);
+    cld.setVisible(true);
+
+    /* print selected pools */
+    if(cld.getSuccess() && !cld.getSelectedItems().isEmpty()) {
+        new PoolListHTMLGenerator(database, cld.getSelectedItems()).openInBrowser();
+    }
 }//GEN-LAST:event_printButtonActionPerformed
 
 private void poolListTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_poolListTableMouseClicked
