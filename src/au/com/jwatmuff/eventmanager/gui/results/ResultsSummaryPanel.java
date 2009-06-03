@@ -267,12 +267,15 @@ private void resultTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
             if(f2.getPosition() <= f1.getPosition()) continue;
 
             for(int i = 0; i < 2; i++) {
-                int n = PlayerCodeParser.getNumber(f2.getPlayerCodes()[i]);
-                if(n == f1.getPosition()) {
-                    List<Result> r = database.findAll(Result.class, ResultDAO.FOR_FIGHT, f2.getID());
-                    if(!r.isEmpty()) {
-                        GUIUtils.displayMessage(null, "Result cannot be changed because a fight depending on this result has been fought.", "Cannot Change Result");
-                        return;
+                String code = f2.getPlayerCodes()[i];
+                if(!PlayerCodeParser.getPrefix(code).equals("P")) {
+                    int n = PlayerCodeParser.getNumber(code);
+                    if(n == f1.getPosition()) {
+                        List<Result> r = database.findAll(Result.class, ResultDAO.FOR_FIGHT, f2.getID());
+                        if(!r.isEmpty()) {
+                            GUIUtils.displayMessage(null, "Result cannot be changed because a fight depending on this result has been fought.", "Cannot Change Result");
+                            return;
+                        }
                     }
                 }
             }
