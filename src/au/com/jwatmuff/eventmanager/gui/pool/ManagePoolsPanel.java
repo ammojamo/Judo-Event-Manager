@@ -515,7 +515,7 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             iter.remove();
 
     /* display pool selection dialog */
-    CheckboxListDialog<Pool> cld = new CheckboxListDialog(
+    CheckboxListDialog<Pool> cld = new CheckboxListDialog<Pool>(
             parentWindow, true, pools,
             "Select divisions to print", "Print Divisions");
     cld.setRenderer(new StringRenderer<Pool>() {
