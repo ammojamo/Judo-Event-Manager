@@ -9,6 +9,7 @@ package au.com.jwatmuff.eventmanager.gui.fightorder;
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
+import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.model.info.FightInfo;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
@@ -22,10 +23,12 @@ import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
-import au.com.jwatmuff.eventmanager.print.DrawHTMLGenerator;
+import au.com.jwatmuff.eventmanager.print.MultipleDrawHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.gui.CheckboxListDialog;
+import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
@@ -571,10 +574,28 @@ public class FightOrderPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_autoAssignButtonActionPerformed
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-    if(getSelectedPool() == null)
-        GUIUtils.displayMessage(this.parentWindow, "Must select a division to print", "Print Draw");
+    /* get list of pools */
+    List<Pool> pools = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.PLAYERS_LOCKED);
+    pools.addAll(database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED));
+    if(pools.size() == 0) {
+        GUIUtils.displayMessage(null, "At least one division with locked players must exist to print results", "Print Results");
+        return;
+    }
 
-    new DrawHTMLGenerator(database, getSelectedPool().getID()).openInBrowser();
+    /* display selection dialog */
+    CheckboxListDialog<Pool> dialog = new CheckboxListDialog<Pool>(parentWindow, true, pools, "Choose Division", "Print Results");
+    dialog.setRenderer(new StringRenderer<Pool>() {
+            @Override
+            public String asString(Pool p) {
+                return p.getDescription();
+            }
+    }, Icons.POOL);
+    dialog.setVisible(true);
+
+    /* print selected pools */
+    if(dialog.getSuccess() && !dialog.getSelectedItems().isEmpty()) {
+        new MultipleDrawHTMLGenerator(database, dialog.getSelectedItems(), false).openInBrowser();
+    }
 }//GEN-LAST:event_printButtonActionPerformed
 
 private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
