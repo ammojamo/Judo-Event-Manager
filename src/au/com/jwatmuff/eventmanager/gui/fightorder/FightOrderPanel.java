@@ -31,12 +31,14 @@ import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
@@ -52,12 +54,16 @@ import org.apache.log4j.Logger;
 public class FightOrderPanel extends javax.swing.JPanel {
     private static final Logger log = Logger.getLogger(FightOrderPanel.class);
 
+    private static final String DEFAULT_IMPORT_FILE ="resources/draw/default-files.properties";
+
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
     
     private LockedPoolListTableModel poolTableModel;
     private PlayerTableModel playerTableModel;
     private FightTableModel fightTableModel;
+
+    private Properties defaultImportFiles = new Properties();
 
     private JFrame parentWindow;
 
@@ -273,6 +279,17 @@ public class FightOrderPanel extends javax.swing.JPanel {
         public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
             updateTableFromDatabase();
         }
+    }
+
+    private Properties getDefaultImportFiles() {
+        if(defaultImportFiles.isEmpty()) {
+            try {
+                defaultImportFiles.load(new FileReader(DEFAULT_IMPORT_FILE));
+            } catch(Exception e) {
+                log.error("Unable to load default import files at " + DEFAULT_IMPORT_FILE);
+            }
+        }
+        return defaultImportFiles;
     }
     
     /** This method is called from within the constructor to
@@ -519,6 +536,8 @@ public class FightOrderPanel extends javax.swing.JPanel {
             GUIUtils.displayMessage(parentWindow, "At least 1 player is required to generate a fight draw.", "Auto Assign");
             return;
         }
+        else if(getDefaultImportFiles().containsKey("" + numPlayers))
+            fileName = getDefaultImportFiles().getProperty("" + numPlayers);
         else if(numPlayers <= 2)
             fileName = "roundrobin2";
         else if(numPlayers <= 3)
