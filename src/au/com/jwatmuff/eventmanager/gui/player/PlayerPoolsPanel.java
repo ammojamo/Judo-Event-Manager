@@ -165,8 +165,14 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
                     }
                     map.put("mat", (mat != null) ? mat.getMat() : "");
 
-                    Result result = database.findAll(Result.class, ResultDAO.FOR_FIGHT, fight.getID()).iterator().next();
-                    map.put("result", result.getPlayerScores()[0] + " : " + result.getPlayerScores()[1]);
+                    List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, fight.getID());
+                    if(!results.isEmpty()) {
+                        Result result = results.iterator().next();
+                        map.put("result", result.getPlayerScores()[0] + " : " + result.getPlayerScores()[1]);
+                    } else {
+                        map.put("result", "");
+                    }
+                    
 
                     return map;
                 }
