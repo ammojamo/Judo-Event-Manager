@@ -24,6 +24,7 @@ import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.SessionLink;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
@@ -317,7 +318,14 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
 
     private void addDivisionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addDivisionButtonActionPerformed
         Pool pool = ((Pool)divisionsComboBox.getSelectedItem());
-        
+        if(pool.getLockedStatus() != Pool.LockedStatus.UNLOCKED) {
+            GUIUtils.displayMessage(
+                    parent,
+                    "This division (" + pool.getDescription() + ") has been locked.\n" +
+                    "No more players may be entered into a locked division.",
+                    "Division Locked");
+            return;
+        }
         PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(playerID, pool.getID()));
         if(pp == null || !pp.isValid()) {
             pp = new PlayerPool();
