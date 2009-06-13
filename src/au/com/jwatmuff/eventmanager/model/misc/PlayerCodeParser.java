@@ -10,6 +10,7 @@ import au.com.jwatmuff.eventmanager.model.info.FightInfo;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
+import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,8 @@ public class PlayerCodeParser {
     public static class FightPlayer {
         public PlayerType type;
         public Player player;
+        public String code;
+        public Pool division;
         
         @Override
         public String toString() {
@@ -42,7 +45,7 @@ public class PlayerCodeParser {
                 case BYE:
                     return "Bye";
                 case UNDECIDED:
-                    return "Undecided";
+                    return code;
             }
             return "Error";
         }
@@ -75,8 +78,13 @@ public class PlayerCodeParser {
     public static FightPlayer parseCode(String code, List<FightInfo> fights, List<PlayerPoolInfo> players) {
         if(!isValidCode(code))
             throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
+        if(players == null || players.isEmpty())
+            throw new IllegalArgumentException("Must supply a non-empty list of PlayerPoolInfos");
         
         FightPlayer fp = new FightPlayer();
+
+        fp.code = code;
+        fp.division = players.get(0).getPool();
         
         String prefix = getPrefix(code);
         int number = getNumber(code);

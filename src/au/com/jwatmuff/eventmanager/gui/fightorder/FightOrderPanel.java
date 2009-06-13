@@ -17,6 +17,7 @@ import au.com.jwatmuff.eventmanager.model.misc.CSVImporter.TooFewPlayersExceptio
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
@@ -154,7 +155,10 @@ public class FightOrderPanel extends javax.swing.JPanel {
                     for(int i = 0; i < 2; i++) {
                         String code = bean.getPlayerCodes()[i];
                         FightPlayer fp = PlayerCodeParser.parseCode(code, fi, ppi);
-                        map.put("player" + (i+1), code + ": " + fp.toString());
+                        if(fp.type == PlayerType.NORMAL)
+                          map.put("player" + (i+1), code + ": " + fp.toString());
+                        else
+                          map.put("player" + (i+1), code + ": " + fp.type);
                     }
 
                     return map;

@@ -99,7 +99,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         c.put(code, "--"); // mark error with --
                         break;
                     case UNDECIDED:
-                        c.put(code, "");
+                        c.put(code, code);
                         break;
                     default:
                         c.put(code, p.type.toString());
