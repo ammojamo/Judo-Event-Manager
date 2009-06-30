@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -174,5 +175,14 @@ public class DivisionResultCache {
 
     public void shutdown() {
         notifier.removeListener(listener);
+    }
+
+    public void filterDivisionsWithoutResults(List<Pool> divisions) {
+        Iterator<Pool> iter = divisions.iterator();
+        while(iter.hasNext()) {
+            Pool division = iter.next();
+            if(getDivisionResults(division.getID()).isEmpty())
+                iter.remove();
+        }
     }
 }

@@ -33,7 +33,7 @@
       <tr>
         <td>$result.player.lastName</td>
         <td>$result.player.firstName</td>
-        <td>($!result.details.club)</td>
+        <td>#if($result.details.club != "")($!result.details.club)#end</td>
         <td>$result.place</td>
       </tr>
 <!--

@@ -6,8 +6,8 @@ import au.com.jwatmuff.eventmanager.model.cache.DivisionResultCache.DivisionResu
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.genericdb.Database;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.velocity.context.Context;
@@ -19,9 +19,17 @@ import org.apache.velocity.context.Context;
 public class DivisionResultHTMLGenerator extends VelocityHTMLGenerator {
     DivisionResultCache cache;
     Database database;
-    public DivisionResultHTMLGenerator(Database database, DivisionResultCache cache) {
+    List<Pool> divisions;
+
+    public DivisionResultHTMLGenerator(Database database, DivisionResultCache cache, List<Pool> divisions)
+    {
         this.database = database;
         this.cache = cache;
+        this.divisions = new ArrayList(divisions);
+    }
+
+    public DivisionResultHTMLGenerator(Database database, DivisionResultCache cache) {
+        this(database, cache, database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED));
     }
 
     @Override
@@ -32,20 +40,14 @@ public class DivisionResultHTMLGenerator extends VelocityHTMLGenerator {
     @Override
     public void populateContext(Context c) {
         Map<Integer, List<DivisionResult>> results = new HashMap<Integer, List<DivisionResult>>();
-        List<Pool> pools = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED);
-
-        Iterator<Pool> iter = pools.iterator();
-        while(iter.hasNext()) {
-            Pool pool = iter.next();
-            List<DivisionResult> drs = cache.getDivisionResults(pool.getID());
-            if(drs.isEmpty()) {
-                iter.remove();
-            } else {
-                results.put(pool.getID(), drs);
-            }
+        cache.filterDivisionsWithoutResults(divisions);
+        for(Pool division : divisions) {
+            List<DivisionResult> drs = cache.getDivisionResults(division.getID());
+            assert(!drs.isEmpty());
+            results.put(division.getID(), drs);
         }
 
-        c.put("pools", pools);
+        c.put("pools", divisions);
         c.put("results", results);
 
         c.put("competitionName", database.get(CompetitionInfo.class, 0).getName());

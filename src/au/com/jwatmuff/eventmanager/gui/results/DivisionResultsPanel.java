@@ -7,6 +7,7 @@
 package au.com.jwatmuff.eventmanager.gui.results;
 
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
+import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.model.cache.DivisionResultCache;
 import au.com.jwatmuff.eventmanager.model.cache.DivisionResultCache.DivisionResult;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
@@ -14,6 +15,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.print.DivisionResultHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
+import au.com.jwatmuff.eventmanager.util.gui.CheckboxListDialog;
+import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
@@ -185,7 +188,16 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
     }// </editor-fold>//GEN-END:initComponents
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-    new DivisionResultHTMLGenerator(database, cache).openInBrowser();
+    List<Pool> divisions = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED);
+    cache.filterDivisionsWithoutResults(divisions);
+    CheckboxListDialog<Pool> dialog = new CheckboxListDialog(null, true, divisions, "Select divisions to print", "Print Division Results");
+    dialog.setRenderer(new StringRenderer<Pool>() {
+            public String asString(Pool p) { return p.getDescription(); }
+        }, Icons.POOL);
+    dialog.setVisible(true);
+    if(dialog.getSuccess()) {
+        new DivisionResultHTMLGenerator(database, cache, dialog.getSelectedItems()).openInBrowser();
+    }
 }//GEN-LAST:event_printButtonActionPerformed
 
     
