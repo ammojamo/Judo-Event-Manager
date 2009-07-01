@@ -13,6 +13,8 @@ package au.com.jwatmuff.eventmanager.util.gui;
 
 import com.jidesoft.swing.DefaultSelectable;
 import java.awt.Component;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,8 +33,14 @@ public class CheckboxListDialog<T> extends javax.swing.JDialog {
     private List<T> selectedItems;
     private boolean success;
 
+    public CheckboxListDialog(java.awt.Frame parent, boolean modal, List<T> items,
+                              String message, String title) {
+        this(parent, modal, items, message, title, false);
+    }
+
     /** Creates new form CheckboxListDialog */
-    public CheckboxListDialog(java.awt.Frame parent, boolean modal, List<T> items, String message, String title) {
+    public CheckboxListDialog(java.awt.Frame parent, boolean modal, List<T> items,
+                              String message, String title, boolean allowEmpty) {
         super(parent, modal);
         initComponents();
 
@@ -40,6 +48,14 @@ public class CheckboxListDialog<T> extends javax.swing.JDialog {
         for(T item : items)
             if(item != null) model.addElement(new DefaultSelectable(item));
         checkBoxList.setModel(model);
+        if(!allowEmpty) {
+            checkBoxList.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {
+                    okButton.setEnabled(checkBoxList.getSelectedObjects().length > 0);
+                }
+            });
+            okButton.setEnabled(false);
+        }
 
         if(items.size() > 0) checkBoxList.setSelectedIndex(0);
 
