@@ -65,6 +65,7 @@ public class AdministrationPanel extends javax.swing.JPanel {
         jLabel6 = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         reviewDataButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel1.setText("Administration tasks");
@@ -79,7 +80,7 @@ public class AdministrationPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel2.setText("Update competition name, location and available pools.");
+        jLabel2.setText("Update competition name, location and available divisions");
 
         managePasswordsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/key.png"))); // NOI18N
         managePasswordsButton.setText("Manage Passwords..");
@@ -91,7 +92,7 @@ public class AdministrationPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel6.setText("Set and change passwords for various tasks.");
+        jLabel6.setText("Set and change passwords for various tasks");
 
         reviewDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/wrench_orange.png"))); // NOI18N
         reviewDataButton.setText("Enter Results..");
@@ -102,6 +103,8 @@ public class AdministrationPanel extends javax.swing.JPanel {
                 reviewDataButtonActionPerformed(evt);
             }
         });
+
+        jLabel3.setText("Manually enter or update results");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -120,7 +123,7 @@ public class AdministrationPanel extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(managePasswordsButton)
                             .addComponent(jLabel6))
-                        .addContainerGap(222, Short.MAX_VALUE))
+                        .addContainerGap(226, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
@@ -130,7 +133,10 @@ public class AdministrationPanel extends javax.swing.JPanel {
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(reviewDataButton)
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addContainerGap(282, Short.MAX_VALUE))))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {enterCompDetailsButton, managePasswordsButton, reviewDataButton});
@@ -156,7 +162,9 @@ public class AdministrationPanel extends javax.swing.JPanel {
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(reviewDataButton)
-                .addContainerGap(94, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addContainerGap(74, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -205,6 +213,7 @@ private void reviewDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//
     private javax.swing.JButton enterCompDetailsButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
