@@ -205,6 +205,7 @@ public class Main {
                     ci.setName(info.name);
                     ci.setStartDate(new Date());
                     ci.setEndDate(new Date());
+                    ci.setPasswordHash(info.passwordHash);
                     database.add(ci);
                 }
 

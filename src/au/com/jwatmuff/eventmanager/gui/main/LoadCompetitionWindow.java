@@ -6,7 +6,6 @@
 
 package au.com.jwatmuff.eventmanager.gui.main;
 
-import au.com.jwatmuff.eventmanager.gui.admin.EnterPasswordDialog;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import java.awt.Component;
@@ -19,7 +18,7 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 /**
- * This interface is the entry point to the EventManager software. It lists
+ * This interface is the entry point to the EventManager program. It lists
  * all local and network competition databases, allowing the user to launch
  * the EventManager for one of these competitions or a brand new competition.
  *

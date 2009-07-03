@@ -7,6 +7,8 @@
 package au.com.jwatmuff.eventmanager.gui.player;
 
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
+import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerLocker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
@@ -190,9 +192,7 @@ public class WeighInDialog extends javax.swing.JDialog {
         Player player = getSelectedPlayer();
         if(player!= null) {
             if(player.getWeight() != 0.0) {
-                CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-                if(!GUIUtils.checkPassword(parent, "Master password required to override previous weigh in.", ci.getPasswordHash()))
-                    return;                
+                if(!PermissionChecker.isAllowed(Action.CHANGE_WEIGH_IN, database)) return;
             }
             
             EnterWeightDialog ewd = new EnterWeightDialog(parent, true, player);

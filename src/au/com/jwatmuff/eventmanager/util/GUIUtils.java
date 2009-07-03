@@ -156,7 +156,8 @@ public class GUIUtils {
                 title,
                 JOptionPane.INFORMATION_MESSAGE);
     }
-    
+
+    @Deprecated
     public static boolean checkPassword(Component parent, String string, int passwordHash) {
         if(passwordHash == 0)
             return true;

@@ -43,6 +43,11 @@ public class EnterPasswordDialog extends javax.swing.JDialog {
         promptTextLabel.setText(text);
         this.pack();        
     }
+
+    public void setActionText(String text) {
+        actionLabel.setText(text);
+        this.pack();
+    }
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -56,13 +61,16 @@ public class EnterPasswordDialog extends javax.swing.JDialog {
         passwordField = new javax.swing.JPasswordField();
         cancelButton = new javax.swing.JButton();
         okButton = new javax.swing.JButton();
+        actionLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Enter Password");
+        setTitle("Password Required");
         setLocationByPlatform(true);
         setResizable(false);
 
+        promptTextLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/key.png"))); // NOI18N
         promptTextLabel.setText("Enter password to continue:");
+        promptTextLabel.setIconTextGap(8);
 
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -78,6 +86,9 @@ public class EnterPasswordDialog extends javax.swing.JDialog {
             }
         });
 
+        actionLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        actionLabel.setText("Action");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -85,12 +96,13 @@ public class EnterPasswordDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(passwordField, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                    .addComponent(actionLabel)
+                    .addComponent(passwordField, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(promptTextLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(okButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
@@ -104,6 +116,8 @@ public class EnterPasswordDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(actionLabel)
+                .addGap(18, 18, 18)
                 .addComponent(promptTextLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -128,6 +142,7 @@ public class EnterPasswordDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_okButtonActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel actionLabel;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton okButton;
     private javax.swing.JPasswordField passwordField;

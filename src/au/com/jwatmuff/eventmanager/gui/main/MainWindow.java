@@ -15,6 +15,8 @@ import au.com.jwatmuff.eventmanager.gui.scoring.CompetitionInterfacesPanel;
 import au.com.jwatmuff.eventmanager.gui.results.ResultsPanel;
 import au.com.jwatmuff.eventmanager.gui.session.ManageSessionsPanel;
 import au.com.jwatmuff.eventmanager.gui.session.SessionFightsPanel;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
+import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
@@ -469,7 +471,7 @@ public class MainWindow extends javax.swing.JFrame {
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         if(ci == null)
             GUIUtils.displayError(this, "Weigh-in information cannot be entered until competition details have been entered.");
-        else if(GUIUtils.checkPassword(this, "Enter weigh-in password to continue.", ci.getWeighInPasswordHash()))
+        else if(PermissionChecker.isAllowed(Action.ENTER_WEIGH_IN, database))
             new WeighInDialog(this, true, database, notifier).setVisible(true);
     }//GEN-LAST:event_weighInButtonActionPerformed
 

@@ -9,6 +9,8 @@ package au.com.jwatmuff.eventmanager.gui.admin;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.pool.PoolDetailsDialog;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
+import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
@@ -525,8 +527,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                         comp.setPasswordHash(cpd.getPasswordHash());
                 }
             } else {
-                if(!GUIUtils.checkPassword(parentWindow, "Master password required", comp.getPasswordHash()))
-                    return;
+                if(!PermissionChecker.isAllowed(Action.UPDATE_COMPETITION_DETAILS, database)) return;
             }
             
             Worker.post(new Job() {

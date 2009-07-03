@@ -6,6 +6,9 @@
 
 package au.com.jwatmuff.eventmanager.gui.admin;
 
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PasswordType;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.Database;
@@ -25,7 +28,12 @@ import org.apache.log4j.Logger;
  * @author  James
  */
 public class ManagePasswordsDialog extends javax.swing.JDialog implements TransactionListener {
-    private static Logger log = Logger.getLogger(ManagePasswordsDialog.class);
+    private static final Logger log = Logger.getLogger(ManagePasswordsDialog.class);
+
+    private static final String ENABLED = "Enabled";
+    private static final String DISABLED = "Disabled";
+    private static final String CHANGE = "Change";
+    private static final String ENABLE = "Enable";
 
     private Database database;
     private TransactionNotifier notifier;
@@ -53,17 +61,17 @@ public class ManagePasswordsDialog extends javax.swing.JDialog implements Transa
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                masterPasswordStatusLabel.setText((ci.getPasswordHash()==0)?"No":"Yes");
-                masterPasswordButton.setText((ci.getPasswordHash()==0)?"Add":"Change");
+                masterPasswordStatusLabel.setText((ci.getPasswordHash()==0)?DISABLED:ENABLED);
+                masterPasswordButton.setText((ci.getPasswordHash()==0)?ENABLE:CHANGE);
 
-                weighInPasswordStatusLabel.setText((ci.getWeighInPasswordHash()==0)?"No":"Yes");
-                weighInPasswordButton.setText((ci.getWeighInPasswordHash()==0)?"Add":"Change");
+                weighInPasswordStatusLabel.setText((ci.getWeighInPasswordHash()==0)?DISABLED:ENABLED);
+                weighInPasswordButton.setText((ci.getWeighInPasswordHash()==0)?ENABLE:CHANGE);
 
-                personalDetailsPasswordStatusLabel.setText((ci.getPersonalDetailsPasswordHash()==0)?"No":"Yes");
-                personalDetailsPasswordButton.setText((ci.getPersonalDetailsPasswordHash()==0)?"Add":"Change");
+                personalDetailsPasswordStatusLabel.setText((ci.getPersonalDetailsPasswordHash()==0)?DISABLED:ENABLED);
+                personalDetailsPasswordButton.setText((ci.getPersonalDetailsPasswordHash()==0)?ENABLE:CHANGE);
 
-                scoreboardPasswordStatusLabel.setText((ci.getScoreboardPasswordHash()==0)?"No":"Yes");
-                scoreboardPasswordButton.setText((ci.getScoreboardPasswordHash()==0)?"Add":"Change");
+                scoreboardPasswordStatusLabel.setText((ci.getScoreboardPasswordHash()==0)?DISABLED:ENABLED);
+                scoreboardPasswordButton.setText((ci.getScoreboardPasswordHash()==0)?ENABLE:CHANGE);
             }
         });
     }
@@ -74,48 +82,46 @@ public class ManagePasswordsDialog extends javax.swing.JDialog implements Transa
         updatePasswordStatus();
     }    
     private void changePassword(PasswordType passwordType) {
-    if(GUIUtils.checkPassword(this, "Enter master password to continue: ", database.get(CompetitionInfo.class, null).getPasswordHash())) {
-            ChangePasswordDialog cpd = new ChangePasswordDialog((Frame)this.getParent(), true);
+        ChangePasswordDialog cpd = new ChangePasswordDialog((Frame)this.getParent(), true);
+        switch(passwordType) {
+            case MASTER:
+                cpd.setTitle("Master Password");
+                break;
+            case WEIGH_IN:
+                cpd.setTitle("Weigh-in Password");
+                break;
+            case PERSONAL_DETAILS:
+                cpd.setTitle("Personal Details Password");
+                break;
+            case SCOREBOARD:
+                cpd.setTitle("Scoreboard Password");
+                break;
+        }
+        cpd.setVisible(true);
+        if(cpd.getSuccess()) {
+            final CompetitionInfo ci = database.get(CompetitionInfo.class, null);
             switch(passwordType) {
                 case MASTER:
-                    cpd.setTitle("Master Password");
+                    ci.setPasswordHash(cpd.getPasswordHash());
                     break;
                 case WEIGH_IN:
-                    cpd.setTitle("Weigh-in Password");
+                    ci.setWeighInPasswordHash(cpd.getPasswordHash());
                     break;
                 case PERSONAL_DETAILS:
-                    cpd.setTitle("Personal Details Password");
+                    ci.setPersonalDetailsPasswordHash(cpd.getPasswordHash());
                     break;
                 case SCOREBOARD:
-                    cpd.setTitle("Scoreboard Password");
+                    ci.setScoreboardPasswordHash(cpd.getPasswordHash());
                     break;
             }
-            cpd.setVisible(true);
-            if(cpd.getSuccess()) {
-                final CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-                switch(passwordType) {
-                    case MASTER:
-                        ci.setPasswordHash(cpd.getPasswordHash());
-                        break;
-                    case WEIGH_IN:
-                        ci.setWeighInPasswordHash(cpd.getPasswordHash());
-                        break;
-                    case PERSONAL_DETAILS:
-                        ci.setPersonalDetailsPasswordHash(cpd.getPasswordHash());
-                        break;
-                    case SCOREBOARD:
-                        ci.setScoreboardPasswordHash(cpd.getPasswordHash());
-                        break;
+
+            Worker.post(new Job() {
+                @Override
+                public Object run() {
+                    database.update(ci);
+                    return null;
                 }
-                
-                Worker.post(new Job() {
-                    @Override
-                    public Object run() {
-                        database.update(ci);
-                        return null;
-                    }
-                });
-            }
+            });
         }    
     }
     
@@ -228,19 +234,19 @@ public class ManagePasswordsDialog extends javax.swing.JDialog implements Transa
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(masterPasswordStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(masterPasswordButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(weighInPasswordStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(weighInPasswordButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(personalDetailsPasswordStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(personalDetailsPasswordButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(scoreboardPasswordStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(scoreboardPasswordButton))))
                     .addComponent(okButton, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
@@ -262,7 +268,7 @@ public class ManagePasswordsDialog extends javax.swing.JDialog implements Transa
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(weighInPasswordStatusLabel)
-                    .addComponent(weighInPasswordButton))
+                    .addComponent(weighInPasswordButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -284,14 +290,17 @@ public class ManagePasswordsDialog extends javax.swing.JDialog implements Transa
     }// </editor-fold>//GEN-END:initComponents
 
     private void scoreboardPasswordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scoreboardPasswordButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.CHANGE_SCOREBOARD_PASSWORD, database)) return;
         changePassword(PasswordType.SCOREBOARD);
     }//GEN-LAST:event_scoreboardPasswordButtonActionPerformed
 
     private void personalDetailsPasswordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_personalDetailsPasswordButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.CHANGE_PERSONAL_DETAILS_PASSWORD, database)) return;
         changePassword(PasswordType.PERSONAL_DETAILS);
     }//GEN-LAST:event_personalDetailsPasswordButtonActionPerformed
 
     private void weighInPasswordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_weighInPasswordButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.CHANGE_WEIGH_IN_PASSWORD, database)) return;
         changePassword(PasswordType.WEIGH_IN);
     }//GEN-LAST:event_weighInPasswordButtonActionPerformed
 
@@ -300,12 +309,9 @@ public class ManagePasswordsDialog extends javax.swing.JDialog implements Transa
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void masterPasswordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_masterPasswordButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.CHANGE_MASTER_PASSWORD, database)) return;
         changePassword(PasswordType.MASTER);
     }//GEN-LAST:event_masterPasswordButtonActionPerformed
-
-    private enum PasswordType {
-        MASTER, WEIGH_IN, PERSONAL_DETAILS, SCOREBOARD
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton5;
