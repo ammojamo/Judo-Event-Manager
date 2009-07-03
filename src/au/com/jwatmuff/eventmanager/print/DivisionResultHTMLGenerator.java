@@ -25,7 +25,7 @@ public class DivisionResultHTMLGenerator extends VelocityHTMLGenerator {
     {
         this.database = database;
         this.cache = cache;
-        this.divisions = new ArrayList(divisions);
+        this.divisions = new ArrayList<Pool>(divisions);
     }
 
     public DivisionResultHTMLGenerator(Database database, DivisionResultCache cache) {

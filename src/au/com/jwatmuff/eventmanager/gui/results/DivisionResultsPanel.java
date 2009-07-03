@@ -190,7 +190,7 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
     List<Pool> divisions = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED);
     cache.filterDivisionsWithoutResults(divisions);
-    CheckboxListDialog<Pool> dialog = new CheckboxListDialog(null, true, divisions, "Select divisions to print", "Print Division Results");
+    CheckboxListDialog<Pool> dialog = new CheckboxListDialog<Pool>(null, true, divisions, "Select divisions to print", "Print Division Results");
     dialog.setRenderer(new StringRenderer<Pool>() {
             public String asString(Pool p) { return p.getDescription(); }
         }, Icons.POOL);
