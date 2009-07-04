@@ -49,7 +49,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
     @Override
     public void populateContext(Context c) {
-        c.put("competitionName", database.get(CompetitionInfo.class, 0).getName());
+        c.put("competitionName", database.get(CompetitionInfo.class, null).getName());
         
         Pool pool = database.get(Pool.class, poolID);
         

@@ -49,7 +49,7 @@ public class PlayerDetailsDialog extends javax.swing.JDialog {
 
         Date censusDate = null;
         try {
-            censusDate = new Date(database.get(CompetitionInfo.class, 0).getStartDate().getTime());
+            censusDate = new Date(database.get(CompetitionInfo.class, null).getStartDate().getTime());
         } catch(Exception e) {}
 
         personalDetailsPanel = new PersonalDetailsPanel(censusDate);

@@ -50,7 +50,7 @@ public class DivisionResultHTMLGenerator extends VelocityHTMLGenerator {
         c.put("pools", divisions);
         c.put("results", results);
 
-        c.put("competitionName", database.get(CompetitionInfo.class, 0).getName());
+        c.put("competitionName", database.get(CompetitionInfo.class, null).getName());
     }
 
 }

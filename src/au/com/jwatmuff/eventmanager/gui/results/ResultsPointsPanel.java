@@ -97,7 +97,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
     private void updateFromDatabase() {
         log.info("updating result table");
-        competitionName = database.get(CompetitionInfo.class, 0).getName();
+        competitionName = database.get(CompetitionInfo.class, null).getName();
 
         List<ResultInfo> ri = new ArrayList<ResultInfo>();
         //for(Result r : database.findAll(Result.class, ResultDAO.ALL)) {
@@ -131,7 +131,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
                     map.put("pool", pool.getDescription());
 
-                    Date censusDate = database.get(CompetitionInfo.class, 0).getStartDate();
+                    Date censusDate = database.get(CompetitionInfo.class, null).getStartDate();
 
                     int[] scores = bean.getResult().getPlayerScores();
 

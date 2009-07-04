@@ -36,7 +36,7 @@ public class PlayerListHTMLGenerator extends VelocityHTMLGenerator {
         else
             c.put("players", players);
 
-        c.put("competitionName", database.get(CompetitionInfo.class, 0).getName());
+        c.put("competitionName", database.get(CompetitionInfo.class, null).getName());
     }
 
     @Override

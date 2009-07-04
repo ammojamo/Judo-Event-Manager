@@ -80,8 +80,8 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         tableModel = new PoolListTableModel(database, notifier);
         poolListTable.setModel(tableModel);
         
-        if(database.get(CompetitionInfo.class, 0) != null)
-            censusDate = database.get(CompetitionInfo.class, 0).getStartDate();
+        if(database.get(CompetitionInfo.class, null) != null)
+            censusDate = database.get(CompetitionInfo.class, null).getStartDate();
         else
             censusDate = new Date();
               
@@ -150,8 +150,8 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         notifier.addListener(new TransactionListener() {
             @Override
             public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
-                if(database.get(CompetitionInfo.class, 0) != null)
-                    censusDate = database.get(CompetitionInfo.class, 0).getStartDate();
+                if(database.get(CompetitionInfo.class, null) != null)
+                    censusDate = database.get(CompetitionInfo.class, null).getStartDate();
                 else
                     censusDate = new Date();
             }

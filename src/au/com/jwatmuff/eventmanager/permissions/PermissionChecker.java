@@ -25,7 +25,7 @@ public class PermissionChecker {
     public static boolean isAllowed(Action action, Database database) {
         if(action.requiredPassword != null) {
             int hash = 0;
-            CompetitionInfo ci = database.get(CompetitionInfo.class, 0);
+            CompetitionInfo ci = database.get(CompetitionInfo.class, null);
             switch(action.requiredPassword) {
                 case MASTER:
                     hash = ci.getPasswordHash(); break;

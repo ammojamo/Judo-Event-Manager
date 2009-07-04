@@ -73,7 +73,7 @@ public class FightOrderHTMLGenerator extends VelocityHTMLGenerator {
         }
         c.put("sessions", sessions);
         c.put("fights", fights);
-        c.put("competitionName", database.get(CompetitionInfo.class, 0).getName());
+        c.put("competitionName", database.get(CompetitionInfo.class, null).getName());
         c.put("fightNumbers", fightNumbers);
     }
 

@@ -21,7 +21,7 @@ public class ResultListHTMLGenerator extends VelocityHTMLGenerator {
     @Override
     public void populateContext(Context c) {
         c.put("results", results);
-        c.put("competitionName", database.get(CompetitionInfo.class, 0).getName());
+        c.put("competitionName", database.get(CompetitionInfo.class, null).getName());
     }
 
     @Override

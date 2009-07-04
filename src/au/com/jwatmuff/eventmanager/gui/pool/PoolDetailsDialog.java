@@ -237,7 +237,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
     private void updatePlayerList() {
         populate();
         populate(pool);
-        CompetitionInfo ci = database.get(CompetitionInfo.class, 0);
+        CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         playerListModel.clear();
 
         for(Player player : database.findAll(Player.class, PlayerDAO.ALL))
