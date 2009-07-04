@@ -15,6 +15,7 @@ import au.com.jwatmuff.eventmanager.gui.main.LoadWindow;
 import au.com.jwatmuff.eventmanager.gui.main.MainWindow;
 import au.com.jwatmuff.eventmanager.gui.main.SynchronizingWindow;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
+import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
@@ -70,9 +71,7 @@ public class Main {
 
 
     private static boolean checkLicense() {
-        Calendar c = new GregorianCalendar();
-
-        c.set(2009, 07, 01);
+        Calendar c = new GregorianCalendar(2009, Calendar.AUGUST, 01);
 
         return (new Date()).before(c.getTime());
     }
@@ -181,11 +180,13 @@ public class Main {
             log.info("Loading Database Manager");
 
             DatabaseManager databaseManager = new SQLiteDatabaseManager(databaseStore, peerManager);
+            LicenseManager licenseManager = new LicenseManager(new File("."));
 
             loadWindow.addMessage("Loading Load Competition Dialog..");
             log.info("Loading Load Competition Dialog");
 
-            LoadCompetitionWindow loadCompetitionWindow = new LoadCompetitionWindow(databaseManager);
+            LoadCompetitionWindow loadCompetitionWindow
+                    = new LoadCompetitionWindow(databaseManager, licenseManager);
 
             loadWindow.dispose();
             log.info("Starting Load Competition Dialog");
@@ -242,6 +243,7 @@ public class Main {
         } catch(Throwable e) {
             log.error("Error in main function", e);
             String message = e.getMessage();
+            if(message == null) message = "";
             if(message.length() > 100)
                 message = message.substring(0,97) + "...";
             GUIUtils.displayError(null, "An unexpected error has occured.\n\n" + e.getClass().getSimpleName() + "\n" + message);

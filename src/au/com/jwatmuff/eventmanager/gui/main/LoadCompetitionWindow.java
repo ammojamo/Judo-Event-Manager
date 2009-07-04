@@ -6,9 +6,14 @@
 
 package au.com.jwatmuff.eventmanager.gui.main;
 
+import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
+import au.com.jwatmuff.eventmanager.permissions.License;
+import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import java.awt.Component;
+import java.io.IOException;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -28,6 +33,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private static Logger log = Logger.getLogger(LoadCompetitionWindow.class);
     
     private DatabaseManager dbManager;
+    private LicenseManager licenseManager;
     
     private DatabaseInfo selected;
     private boolean isNew = false;
@@ -36,11 +42,12 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private DefaultListModel dbListModel = new DefaultListModel();
     
     /** Creates new form LoadCompetitionWindow */
-    public LoadCompetitionWindow(DatabaseManager dbManager) {
+    public LoadCompetitionWindow(DatabaseManager dbManager, LicenseManager licenseManager) {
         initComponents();
         setIconImage(Icons.MAIN_WINDOW.getImage());
 
         this.dbManager = dbManager;
+        this.licenseManager = licenseManager;
         this.getRootPane().setDefaultButton(okButton);
 
         competitionList.setCellRenderer(new DefaultListCellRenderer() {
@@ -62,6 +69,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         
         this.competitionList.setModel(dbListModel);        
         updateDatabaseList();
+        updateLicenseInfo();
         
         dbManager.setListener(new DatabaseManager.Listener() {
             @Override
@@ -87,6 +95,23 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             }
         });   
     }
+
+    private void updateLicenseInfo() {
+        License license = licenseManager.getLicense();
+
+        if(license == null) {
+            licenseNameLabel.setText("N/A");
+            licenseContactLabel.setText("N/A");
+            licenseTypeLabel.setText("FREE");
+            licenseExpiryLabel.setText("Never");
+        } else {
+            licenseNameLabel.setText(license.getName());
+            licenseContactLabel.setText(license.getContactPhoneNumber());
+            licenseTypeLabel.setText(license.getType().toString());
+            licenseExpiryLabel.setText(license.getExpiry().toString());
+        }
+        this.pack();
+    }
     
     public boolean getSuccess() {
         return success;
@@ -110,45 +135,34 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        newCompRadioButton = new javax.swing.JRadioButton();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel3 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         existingCompRadioButton = new javax.swing.JRadioButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         competitionList = new javax.swing.JList();
+        jPanel1 = new javax.swing.JPanel();
+        newCompRadioButton = new javax.swing.JRadioButton();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        licenseNameLabel = new javax.swing.JLabel();
+        licenseContactLabel = new javax.swing.JLabel();
+        licenseTypeLabel = new javax.swing.JLabel();
+        licenseExpiryLabel = new javax.swing.JLabel();
+        loadLicenseButton = new javax.swing.JButton();
+        enterLicenseKeyButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Event Manager");
         setLocationByPlatform(true);
         setResizable(false);
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        buttonGroup1.add(newCompRadioButton);
-        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
-        newCompRadioButton.setSelected(true);
-        newCompRadioButton.setText("Create New Competition");
-        newCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        newCompRadioButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(newCompRadioButton)
-                .addContainerGap(312, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(newCompRadioButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -167,7 +181,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(existingCompRadioButton);
-        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
+        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         existingCompRadioButton.setText("Load Existing Competition");
         existingCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         existingCompRadioButton.setEnabled(false);
@@ -193,7 +207,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
                     .addComponent(existingCompRadioButton))
                 .addContainerGap())
         );
@@ -203,9 +217,180 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(existingCompRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        buttonGroup1.add(newCompRadioButton);
+        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        newCompRadioButton.setSelected(true);
+        newCompRadioButton.setText("Create New Competition");
+        newCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        newCompRadioButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(newCompRadioButton)
+                .addContainerGap(243, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(newCompRadioButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Start Competition", jPanel3);
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 430, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 434, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Manual Interfaces *", jPanel4);
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Current License"));
+
+        jLabel1.setText("Name:");
+
+        jLabel2.setText("Contact Phone:");
+
+        jLabel3.setText("Level:");
+
+        jLabel4.setText("Expiry:");
+
+        licenseNameLabel.setText("N/A");
+
+        licenseContactLabel.setText("N/A");
+
+        licenseTypeLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        licenseTypeLabel.setText("FREE");
+
+        licenseExpiryLabel.setText("N/A");
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(licenseNameLabel))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(licenseContactLabel))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(licenseTypeLabel))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(licenseExpiryLabel)))
+                .addContainerGap(269, Short.MAX_VALUE))
+        );
+
+        jPanel6Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel2, jLabel3, jLabel4});
+
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(licenseNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(licenseContactLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(licenseTypeLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(licenseExpiryLabel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        loadLicenseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/key_add.png"))); // NOI18N
+        loadLicenseButton.setText("Load License File..");
+        loadLicenseButton.setIconTextGap(8);
+
+        enterLicenseKeyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/key_add.png"))); // NOI18N
+        enterLicenseKeyButton.setText("Enter License Key..");
+        enterLicenseKeyButton.setIconTextGap(8);
+        enterLicenseKeyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enterLicenseKeyButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(loadLicenseButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(enterLicenseKeyButton)))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(loadLicenseButton)
+                    .addComponent(enterLicenseKeyButton))
+                .addContainerGap(280, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Licenses", jPanel5);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -213,14 +398,12 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addComponent(okButton)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(cancelButton))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(okButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cancelButton))
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -228,16 +411,14 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
                     .addComponent(okButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -290,15 +471,43 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         if(existingCompRadioButton.isEnabled())
             existingCompRadioButton.setSelected(true);
 }//GEN-LAST:event_competitionListFocusGained
+
+    private void enterLicenseKeyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterLicenseKeyButtonActionPerformed
+        LicenseKeyDialog dialog = new LicenseKeyDialog(null, true);
+        dialog.setVisible(true);
+        if(dialog.getSuccess()) {
+            try {
+                licenseManager.setLicense(dialog.getLicense());
+            } catch(IOException e) {
+                GUIUtils.displayError(null, "Unable to save license file. License will not be remembered after EventManager is closed");
+            }
+            updateLicenseInfo();
+        }
+    }//GEN-LAST:event_enterLicenseKeyButtonActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton cancelButton;
     private javax.swing.JList competitionList;
+    private javax.swing.JButton enterLicenseKeyButton;
     private javax.swing.JRadioButton existingCompRadioButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel licenseContactLabel;
+    private javax.swing.JLabel licenseExpiryLabel;
+    private javax.swing.JLabel licenseNameLabel;
+    private javax.swing.JLabel licenseTypeLabel;
+    private javax.swing.JButton loadLicenseButton;
     private javax.swing.JRadioButton newCompRadioButton;
     private javax.swing.JButton okButton;
     // End of variables declaration//GEN-END:variables

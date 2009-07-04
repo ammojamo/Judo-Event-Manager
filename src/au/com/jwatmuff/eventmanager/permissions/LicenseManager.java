@@ -7,6 +7,7 @@ package au.com.jwatmuff.eventmanager.permissions;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,10 +22,48 @@ import org.apache.log4j.Logger;
 public class LicenseManager {
     private static final Logger log = Logger.getLogger(LicenseManager.class);
 
+    public static final String LICENSE_FILE = "license.lic";
+    private License license;
+    private File directory;
+
+    public LicenseManager(File licenseDirectory) {
+        this.directory = licenseDirectory;
+        loadLicense();
+    }
+
+    public License getLicense() {
+        return license;
+    }
+
+    public void setLicense(License license) throws IOException {
+        this.license = license;
+        saveLicense();
+    }
+
+    private void loadLicense() {
+        File file = new File(directory, LICENSE_FILE);
+        try {
+            license = License.loadFromFile(file);
+        } catch(Exception e) {
+            log.error("FAILED TO LOAD LICENSE", e);
+            license = null;
+        }
+    }
+
+    private void saveLicense() throws IOException {
+        File file = new File(directory, LICENSE_FILE);
+        License.saveToFile(license, file);
+    }
+
+    /******** For Multiple Licenses: ********/
     public static final String LICENSE_EXT = ".lic";
     private List<License> licenses;
 
-    public LicenseManager(File licenseDirectory) {
+    public Collection<License> getLicenses() {
+        return Collections.unmodifiableCollection(licenses);
+    }
+
+    private void loadLicensesInDirectory(File licenseDirectory) {
         licenses = new ArrayList<License>();
 
         for(File file : getLicenseFiles(licenseDirectory)) {
@@ -34,10 +73,6 @@ public class LicenseManager {
                 log.warn("Failed to load license from " + file.getName(), e);
             }
         }
-    }
-
-    public Collection<License> getLicenses() {
-        return Collections.unmodifiableCollection(licenses);
     }
 
     private static List<File> getLicenseFiles(File licenseDirectory) {
