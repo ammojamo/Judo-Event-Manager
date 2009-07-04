@@ -79,8 +79,7 @@ public class SessionLockerTest extends TestCase {
             CSVImporter.importPools(new File("test\\pool_test_data.csv"), database);
 
             CompetitionInfo ci = new CompetitionInfo();
-            Calendar cal = GregorianCalendar.getInstance();
-            cal.set(2008, 1, 1);
+            Calendar cal = new GregorianCalendar(2008, 1, 1);
             ci.setStartDate(cal.getTime());
             cal.roll(GregorianCalendar.DATE, 2);
             ci.setEndDate(cal.getTime());
