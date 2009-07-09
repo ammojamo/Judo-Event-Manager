@@ -100,9 +100,11 @@ public class License {
     }
 
     public static License loadFromFile(File file) {
+        FileReader reader = null;
         try {
             Properties props = new Properties();
-            props.load(new FileReader(file));
+            reader = new FileReader(file);
+            props.load(reader);
 
             String name = props.getProperty(NAME_PROPERTY);
             String contactPhone = props.getProperty(PHONE_PROPERTY);
@@ -121,6 +123,10 @@ public class License {
 
         } catch(Exception e) {
             throw new RuntimeException("Unable to load license from file", e);
+        } finally {
+            try {
+                if(reader != null) reader.close();
+            } catch(IOException e) {}
         }
     }
 
@@ -133,9 +139,14 @@ public class License {
         props.put(TYPE_PROPERTY, license.getType().toString());
         props.put(HASH_PROPERTY, Integer.toString(license.hashCode(), 16));
 
-        props.store(new FileWriter(file),
-                "EventManager License File\n" +
-                "WARNING! Editing this file will cause the license to stop working");
+        FileWriter fileWriter = new FileWriter(file);
+        try {
+            props.store(fileWriter,
+                    "EventManager License File\n" +
+                    "WARNING! Editing this file will cause the license to stop working");
+        } finally {
+            fileWriter.close();
+        }
     }
 
     public static License fromKey(String name, String contactPhone, String key) {
