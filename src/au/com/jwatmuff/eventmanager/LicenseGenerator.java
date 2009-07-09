@@ -14,12 +14,16 @@ package au.com.jwatmuff.eventmanager;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.permissions.License;
 import au.com.jwatmuff.eventmanager.permissions.LicenseType;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -43,7 +47,7 @@ public class LicenseGenerator extends javax.swing.JFrame {
         updateValidity();
     }
 
-    private void updateValidity() {
+    private License createLicense() {
         String name = nameTextField.getText().trim();
         boolean nameValid = !name.isEmpty();
         nameValidLabel.setText(nameValid ? "" : "Name required");
@@ -70,8 +74,15 @@ public class LicenseGenerator extends javax.swing.JFrame {
 
         LicenseType type = (LicenseType)typeComboBox.getSelectedItem();
 
-        if(nameValid && contactValid && dateValid) {
-            License license = new License(name, contact, expiryDate, type);
+        if(nameValid && contactValid && dateValid)
+            return new License(name, contact, expiryDate, type);
+        else
+            return null;
+    }
+
+    private void updateValidity() {
+        License license = createLicense();
+        if(license != null) {
             keyTextField.setText(license.getKey());
             exportButton.setEnabled(true);
         } else {
@@ -274,6 +285,20 @@ public class LicenseGenerator extends javax.swing.JFrame {
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("License File", "lic"));
+        chooser.setSelectedFile(new File("license.lic"));
+        if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            if(!file.getName().toLowerCase().endsWith(".lic")) {
+                file = new File(file.getAbsolutePath() + ".lic");
+            }
+            License license = createLicense();
+            try {
+                License.saveToFile(license, file);
+            } catch(Exception e) {
+                GUIUtils.displayError(this, "An error occured while saving license file:\n" + e.getMessage());
+            }
+        }
 }//GEN-LAST:event_exportButtonActionPerformed
 
     private void nameTextFieldCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_nameTextFieldCaretUpdate
