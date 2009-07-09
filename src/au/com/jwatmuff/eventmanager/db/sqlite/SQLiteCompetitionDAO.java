@@ -40,7 +40,6 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
             WEIGH_IN_PASSWORD_HASH_FIELD = "wi_password_hash",
             PERSONAL_DETAILS_PASSWORD_HASH_FIELD = "pd_password_hash",
             SCOREBOARD_PASSWORD_HASH_FIELD = "sb_password_hash",
-            POOLS_LOCKED_FIELD = "pools_locked",
             CLOSED_FIELD = "closed",
             TIMESTAMP_FIELD = "last_updated";
 
@@ -66,7 +65,6 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
             ci.setWeighInPasswordHash(rs.getInt(WEIGH_IN_PASSWORD_HASH_FIELD));
             ci.setPersonalDetailsPasswordHash(rs.getInt(PERSONAL_DETAILS_PASSWORD_HASH_FIELD));
             ci.setScoreboardPasswordHash(rs.getInt(SCOREBOARD_PASSWORD_HASH_FIELD));
-            ci.setPoolsLocked(rs.getBoolean(POOLS_LOCKED_FIELD));
             ci.setClosed(rs.getBoolean(CLOSED_FIELD));
             ci.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             return ci;
@@ -75,8 +73,8 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
     
     @Override
     public void add(CompetitionInfo ci) {
-        final String sql = "INSERT INTO competition (id, name, location, start_date, end_date, mats, password_hash, wi_password_hash, pd_password_hash, sb_password_hash, pools_locked, closed, last_updated) VALUES " +
-                "(:ID, :name, :location, :startDate, :endDate, :mats, :passwordHash, :weighInPasswordHash, :personalDetailsPasswordHash, :scoreboardPasswordHash, :poolsLocked, :closed, :timestamp)";
+        final String sql = "INSERT INTO competition (id, name, location, start_date, end_date, mats, password_hash, wi_password_hash, pd_password_hash, sb_password_hash, closed, last_updated) VALUES " +
+                "(:ID, :name, :location, :startDate, :endDate, :mats, :passwordHash, :weighInPasswordHash, :personalDetailsPasswordHash, :scoreboardPasswordHash, :closed, :timestamp)";
         
         if(get(null) != null) {
             log.error("Cannot open a competition - a competition is already open.");

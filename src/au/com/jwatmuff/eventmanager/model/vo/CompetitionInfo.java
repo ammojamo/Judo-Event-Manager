@@ -28,6 +28,8 @@ public class CompetitionInfo extends DistributableObject<Integer> implements Ser
     private int weighInPasswordHash;
     private int personalDetailsPasswordHash;
     private int scoreboardPasswordHash;
+
+
     
     private boolean poolsLocked;
     private boolean closed;
@@ -83,14 +85,6 @@ public class CompetitionInfo extends DistributableObject<Integer> implements Ser
 
     public void setPasswordHash(int passwordHash) {
         this.passwordHash = passwordHash;
-    }
-
-    public boolean getPoolsLocked() {
-        return poolsLocked;
-    }
-
-    public void setPoolsLocked(boolean poolsLocked) {
-        this.poolsLocked = poolsLocked;
     }
 
     public boolean isClosed() {

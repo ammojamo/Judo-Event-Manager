@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS competition (
   wi_password_hash INTEGER,
   pd_password_hash INTEGER,
   sb_password_hash INTEGER,
-  pools_locked BOOL NOT NULL DEFAULT 'false',
   closed BOOL NOT NULL DEFAULT 'false',
   last_updated TIME NOT NULL
 );
