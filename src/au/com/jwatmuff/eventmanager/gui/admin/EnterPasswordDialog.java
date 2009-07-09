@@ -132,6 +132,7 @@ public class EnterPasswordDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.success = false;
         this.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
 

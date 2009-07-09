@@ -29,9 +29,12 @@ public class CompetitionInfo extends DistributableObject<Integer> implements Ser
     private int personalDetailsPasswordHash;
     private int scoreboardPasswordHash;
 
-
+    private String licenseName;
+    private String licenseType;
+    private String licenseContact;
+    private String directorName;
+    private String directorContact;
     
-    private boolean poolsLocked;
     private boolean closed;
     
     /** Creates a new instance of Competition */
@@ -117,5 +120,45 @@ public class CompetitionInfo extends DistributableObject<Integer> implements Ser
 
     public void setScoreboardPasswordHash(int scoreboardPasswordHash) {
         this.scoreboardPasswordHash = scoreboardPasswordHash;
+    }
+
+    public String getLicenseName() {
+        return licenseName;
+    }
+
+    public void setLicenseName(String licenseName) {
+        this.licenseName = licenseName;
+    }
+
+    public String getLicenseType() {
+        return licenseType;
+    }
+
+    public void setLicenseType(String licenseType) {
+        this.licenseType = licenseType;
+    }
+
+    public String getLicenseContact() {
+        return licenseContact;
+    }
+
+    public void setLicenseContact(String licenseContact) {
+        this.licenseContact = licenseContact;
+    }
+
+    public String getDirectorName() {
+        return directorName;
+    }
+
+    public void setDirectorName(String directorName) {
+        this.directorName = directorName;
+    }
+
+    public String getDirectorContact() {
+        return directorContact;
+    }
+
+    public void setDirectorContact(String directorContact) {
+        this.directorContact = directorContact;
     }
 }

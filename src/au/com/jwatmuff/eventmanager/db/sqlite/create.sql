@@ -10,6 +10,11 @@ CREATE TABLE IF NOT EXISTS competition (
   wi_password_hash INTEGER,
   pd_password_hash INTEGER,
   sb_password_hash INTEGER,
+  license_name VARCHAR(255),
+  license_type VARCHAR(255),
+  license_contact VARCHAR(255),
+  director_name VARCHAR(255),
+  director_contact VARCHAR(255),
   closed BOOL NOT NULL DEFAULT 'false',
   last_updated TIME NOT NULL
 );

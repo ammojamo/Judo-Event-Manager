@@ -18,6 +18,7 @@ import au.com.jwatmuff.eventmanager.gui.session.SessionFightsPanel;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
+import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -36,6 +37,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
+    private LicenseManager licenseManager;
     
     private ManagePlayersPanel managePlayersPanel;
     private ManagePoolsPanel managePoolsPanel;
@@ -82,6 +84,11 @@ public class MainWindow extends javax.swing.JFrame {
     @Required
     public void setNotifier(TransactionNotifier notifier) {
         this.notifier = notifier;
+    }
+
+    @Required
+    public void setLicenseManager(LicenseManager licenseManager) {
+        this.licenseManager = licenseManager;
     }
     
     @Required
@@ -152,6 +159,7 @@ public class MainWindow extends javax.swing.JFrame {
         administrationPanel.setParentWindow(this);
         administrationPanel.setDatabase(database);
         administrationPanel.setNotifier(notifier);
+        administrationPanel.setLicenseManager(licenseManager);
         administrationPanel.afterPropertiesSet();
 
         mainTabbedPane.insertTab("Administration", null, administrationPanel, null, 1);

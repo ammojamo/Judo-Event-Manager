@@ -40,6 +40,11 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
             WEIGH_IN_PASSWORD_HASH_FIELD = "wi_password_hash",
             PERSONAL_DETAILS_PASSWORD_HASH_FIELD = "pd_password_hash",
             SCOREBOARD_PASSWORD_HASH_FIELD = "sb_password_hash",
+            LICENSE_NAME_FIELD = "license_name",
+            LICENSE_TYPE_FIELD = "license_type",
+            LICENSE_CONTACT_FIELD = "license_contact",
+            DIRECTOR_NAME_FIELD = "director_name",
+            DIRECTOR_CONTACT_FIELD = "director_contact",
             CLOSED_FIELD = "closed",
             TIMESTAMP_FIELD = "last_updated";
 
@@ -65,6 +70,11 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
             ci.setWeighInPasswordHash(rs.getInt(WEIGH_IN_PASSWORD_HASH_FIELD));
             ci.setPersonalDetailsPasswordHash(rs.getInt(PERSONAL_DETAILS_PASSWORD_HASH_FIELD));
             ci.setScoreboardPasswordHash(rs.getInt(SCOREBOARD_PASSWORD_HASH_FIELD));
+            ci.setLicenseName(rs.getString(LICENSE_NAME_FIELD));
+            ci.setLicenseType(rs.getString(LICENSE_TYPE_FIELD));
+            ci.setLicenseContact(rs.getString(LICENSE_CONTACT_FIELD));
+            ci.setDirectorName(rs.getString(DIRECTOR_NAME_FIELD));
+            ci.setDirectorContact(rs.getString(DIRECTOR_CONTACT_FIELD));
             ci.setClosed(rs.getBoolean(CLOSED_FIELD));
             ci.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             return ci;
@@ -73,8 +83,8 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
     
     @Override
     public void add(CompetitionInfo ci) {
-        final String sql = "INSERT INTO competition (id, name, location, start_date, end_date, mats, password_hash, wi_password_hash, pd_password_hash, sb_password_hash, closed, last_updated) VALUES " +
-                "(:ID, :name, :location, :startDate, :endDate, :mats, :passwordHash, :weighInPasswordHash, :personalDetailsPasswordHash, :scoreboardPasswordHash, :closed, :timestamp)";
+        final String sql = "INSERT INTO competition (id, name, location, start_date, end_date, mats, password_hash, wi_password_hash, pd_password_hash, sb_password_hash, license_name, license_type, license_contact, director_name, director_contact, closed, last_updated) VALUES " +
+                "(:ID, :name, :location, :startDate, :endDate, :mats, :passwordHash, :weighInPasswordHash, :personalDetailsPasswordHash, :scoreboardPasswordHash, :licenseName, :licenseType, :licenseContact, :directorName, :directorContact, :closed, :timestamp)";
         
         if(get(null) != null) {
             log.error("Cannot open a competition - a competition is already open.");

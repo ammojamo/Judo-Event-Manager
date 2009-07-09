@@ -16,7 +16,8 @@ public enum Action {
     CHANGE_SCOREBOARD_PASSWORD(MASTER),
     CHANGE_WEIGH_IN(MASTER),
     ENTER_WEIGH_IN(WEIGH_IN),
-    UPDATE_COMPETITION_DETAILS(MASTER);
+    UPDATE_COMPETITION_DETAILS(MASTER),
+    UPDATE_COMPETITION_LICENSE(MASTER);
 
     public final String description;
     public final PasswordType requiredPassword;

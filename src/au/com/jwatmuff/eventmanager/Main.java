@@ -15,6 +15,7 @@ import au.com.jwatmuff.eventmanager.gui.main.LoadWindow;
 import au.com.jwatmuff.eventmanager.gui.main.MainWindow;
 import au.com.jwatmuff.eventmanager.gui.main.SynchronizingWindow;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
+import au.com.jwatmuff.eventmanager.permissions.License;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
@@ -191,54 +192,62 @@ public class Main {
             loadWindow.dispose();
             log.info("Starting Load Competition Dialog");
 
-            GUIUtils.runModalJFrame(loadCompetitionWindow);
+            while(true) {
 
-            if(loadCompetitionWindow.getSuccess()) {
-                DatabaseInfo info = loadCompetitionWindow.getSelectedDatabaseInfo();
+                GUIUtils.runModalJFrame(loadCompetitionWindow);
 
-                SynchronizingWindow syncWindow = new SynchronizingWindow();
-                syncWindow.setVisible(true);
-                DistributedDatabase database = databaseManager.activateDatabase(info.id, info.passwordHash);
-                syncWindow.dispose();
+                if(loadCompetitionWindow.getSuccess()) {
+                    DatabaseInfo info = loadCompetitionWindow.getSelectedDatabaseInfo();
 
-                if(loadCompetitionWindow.isNewDatabase()) {
-                    CompetitionInfo ci = new CompetitionInfo();
-                    ci.setName(info.name);
-                    ci.setStartDate(new Date());
-                    ci.setEndDate(new Date());
-                    ci.setPasswordHash(info.passwordHash);
-                    database.add(ci);
+                    SynchronizingWindow syncWindow = new SynchronizingWindow();
+                    syncWindow.setVisible(true);
+                    DistributedDatabase database = databaseManager.activateDatabase(info.id, info.passwordHash);
+                    syncWindow.dispose();
+
+                    if(loadCompetitionWindow.isNewDatabase()) {
+                        CompetitionInfo ci = new CompetitionInfo();
+                        ci.setName(info.name);
+                        ci.setStartDate(new Date());
+                        ci.setEndDate(new Date());
+                        ci.setPasswordHash(info.passwordHash);
+                        License license = licenseManager.getLicense();
+                        if(license != null) {
+                            ci.setLicenseName(license.getName());
+                            ci.setLicenseType(license.getType().toString());
+                            ci.setLicenseContact(license.getContactPhoneNumber());
+                        }
+                        database.add(ci);
+                    }
+
+                    //DataEventNotifier notifier = new DataEventNotifier();
+                    TransactionNotifier notifier = new TransactionNotifier();
+                    database.setListener(notifier);
+
+                    MainWindow mainWindow = new MainWindow();
+                    mainWindow.setDatabase(database);
+                    mainWindow.setNotifier(notifier);
+                    mainWindow.setPeerManager(peerManager);
+                    mainWindow.setLicenseManager(licenseManager);
+                    mainWindow.afterPropertiesSet();
+
+                    // show main window (modally)
+                    GUIUtils.runModalJFrame(mainWindow);
+
+                    // shutdown procedures
+
+                    // System.exit();
+
+                    database.shutdown();
+
+                    if(mainWindow.getDeleteOnExit()) {
+                        for(File file : info.localDirectory.listFiles())
+                            if(!file.isDirectory())
+                                file.delete();
+                        info.localDirectory.deleteOnExit();
+                    }
+                } else {
+                    System.exit(0);
                 }
-
-                //DataEventNotifier notifier = new DataEventNotifier();
-                TransactionNotifier notifier = new TransactionNotifier();
-                database.setListener(notifier);
-
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.setDatabase(database);
-                mainWindow.setNotifier(notifier);
-                mainWindow.setPeerManager(peerManager);
-                mainWindow.afterPropertiesSet();
-
-                // show main window (modally)
-                GUIUtils.runModalJFrame(mainWindow);
-
-                // shutdown procedures
-
-                // System.exit();
-
-                database.shutdown();
-                
-                if(mainWindow.getDeleteOnExit()) {
-                    for(File file : info.localDirectory.listFiles())
-                        if(!file.isDirectory())
-                            file.delete();
-                    info.localDirectory.deleteOnExit();
-                }
-
-                System.exit(0);
-            } else {
-                System.exit(0);
             }
         } catch(Throwable e) {
             log.error("Error in main function", e);

@@ -9,6 +9,7 @@ package au.com.jwatmuff.eventmanager.gui.admin;
 import au.com.jwatmuff.eventmanager.gui.results.ResultsSummaryPanel;
 import au.com.jwatmuff.eventmanager.gui.results.ResultsWindow;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
+import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.awt.Cursor;
@@ -24,6 +25,7 @@ public class AdministrationPanel extends javax.swing.JPanel {
     private Frame parentWindow;
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
+    private LicenseManager licenseManager;
 
     private ResultInfoCache resultInfoCache;
 
@@ -39,13 +41,17 @@ public class AdministrationPanel extends javax.swing.JPanel {
     public void setNotifier(TransactionNotifier notifier) {
         this.notifier = notifier;
     }
+
+    public void setLicenseManager(LicenseManager licenseManager) {
+        this.licenseManager = licenseManager;
+    }
     
     public void afterPropertiesSet() {
         resultInfoCache = new ResultInfoCache(database, notifier);
     }
           
     public void showCompetitionDetailsDialog() {
-        (new CompetitionDetailsDialog(parentWindow,true,database,notifier)).setVisible(true);
+        (new CompetitionDetailsDialog(parentWindow,true,database,notifier,licenseManager)).setVisible(true);
     }
     
     /** This method is called from within the constructor to

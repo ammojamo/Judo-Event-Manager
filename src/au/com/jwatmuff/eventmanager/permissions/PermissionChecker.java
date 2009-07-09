@@ -8,10 +8,7 @@ package au.com.jwatmuff.eventmanager.permissions;
 import au.com.jwatmuff.eventmanager.gui.admin.EnterPasswordDialog;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
-import au.com.jwatmuff.eventmanager.util.StringUtil;
 import au.com.jwatmuff.genericdb.Database;
-import java.util.Arrays;
-import java.util.Collection;
 import static au.com.jwatmuff.eventmanager.permissions.PasswordType.*;
 import static au.com.jwatmuff.eventmanager.permissions.LicenseType.*;
 

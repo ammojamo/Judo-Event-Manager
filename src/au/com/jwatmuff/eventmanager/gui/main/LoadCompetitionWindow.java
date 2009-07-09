@@ -6,6 +6,7 @@
 
 package au.com.jwatmuff.eventmanager.gui.main;
 
+import au.com.jwatmuff.eventmanager.gui.admin.EnterPasswordDialog;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
 import au.com.jwatmuff.eventmanager.permissions.License;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
@@ -83,6 +84,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         
         // center window on screen
         setLocationRelativeTo(null);
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        if(visible) {
+            success = false;
+            updateLicenseInfo();
+            updateDatabaseList();
+        }
+        super.setVisible(visible);
     }
     
     private void updateDatabaseList() {
@@ -458,17 +469,26 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         if(existingCompRadioButton.isSelected()) {
             selected = (DatabaseInfo)competitionList.getSelectedValue();
             if(selected == null) return;
-            /*
-             * TODO: check password
-             * 
-            if(!selected.local || selected.passwordHash != 0) {
-                EnterPasswordDialog epd = new EnterPasswordDialog();
-                epd.setVisible(true);
-                if(epd.getSuccess()) {
-                    
+
+            /* password check */
+            if(selected.passwordHash != 0) {
+                EnterPasswordDialog epd = new EnterPasswordDialog(this, true);
+                epd.setActionText("Load Competition '" + selected.name + "'");
+                epd.setPromptText("Master password required");
+                while(true) {
+                    epd.setVisible(true);
+                    if(epd.getSuccess()) {
+                        if(epd.getPassword().hashCode() == selected.passwordHash)
+                            break;
+                        else
+                            GUIUtils.displayError(this, "Incorrect password");
+                    } else {
+                        selected = null;
+                        return;
+                    }
                 }
             }
-             */
+
             success = true;
             this.dispose();
             return;

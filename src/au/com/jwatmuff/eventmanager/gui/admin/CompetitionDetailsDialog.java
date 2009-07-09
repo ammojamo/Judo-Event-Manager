@@ -7,6 +7,7 @@
 package au.com.jwatmuff.eventmanager.gui.admin;
 
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
+import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
 import au.com.jwatmuff.eventmanager.gui.pool.PoolDetailsDialog;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
@@ -14,6 +15,8 @@ import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.permissions.License;
+import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
@@ -27,6 +30,7 @@ import foxtrot.Worker;
 import java.awt.Frame;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,6 +51,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     private static Logger log = Logger.getLogger(CompetitionDetailsDialog.class);
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
+    private LicenseManager licenseManager;
     private Frame parentWindow;
     
     private PoolListTableModel tableModel;
@@ -55,11 +60,12 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     private CompetitionInfo compInfo = null;
     
     /** Creates new form CompetitionDetailsDialog */
-    public CompetitionDetailsDialog(Frame parent, boolean modal, TransactionalDatabase database, TransactionNotifier notifier) {
+    public CompetitionDetailsDialog(Frame parent, boolean modal, TransactionalDatabase database, TransactionNotifier notifier, LicenseManager licenseManager) {
         super(parent, modal);
         this.database = database;
         this.parentWindow = parent;
         this.notifier = notifier;
+        this.licenseManager = licenseManager;
         initComponents();
         
         this.setLocationRelativeTo(parent);
@@ -142,6 +148,11 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                 finishDatePicker.setDate(ci.getEndDate());
             } catch(Exception e) {
             }
+            directorNameTextField.setText(ci.getDirectorName());
+            directorContactTextField.setText(ci.getDirectorContact());
+            licenseNameLabel.setText(ci.getLicenseName());
+            licenseTypeLabel.setText(ci.getLicenseType());
+            licenseContactLabel.setText(ci.getLicenseContact());
         }
     }
  
@@ -206,6 +217,15 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             updateTableFromDatabase();
         }
     }
+
+    private void setCompetitionLicense(License license) {
+        CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        ci.setLicenseName(license.getName());
+        ci.setLicenseType(license.getType().toString());
+        ci.setLicenseContact(license.getContactPhoneNumber());
+        database.update(ci);
+        updateFromCompetitionInfo(ci);
+    }
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -217,13 +237,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
 
         cancelButton = new javax.swing.JButton();
         okButton = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        addPoolButton = new javax.swing.JButton();
-        deletePoolButton = new javax.swing.JButton();
-        editPoolButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        poolListTable = new javax.swing.JTable();
-        importButton = new javax.swing.JButton();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -233,6 +247,27 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         locationTextField = new javax.swing.JTextField();
         competitionNameTextField = new javax.swing.JTextField();
         finishDatePicker = new com.michaelbaranov.microba.calendar.DatePicker();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        directorNameTextField = new javax.swing.JTextField();
+        directorContactTextField = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        addPoolButton = new javax.swing.JButton();
+        deletePoolButton = new javax.swing.JButton();
+        editPoolButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        poolListTable = new javax.swing.JTable();
+        importButton = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        licenseNameLabel = new javax.swing.JLabel();
+        licenseContactLabel = new javax.swing.JLabel();
+        licenseTypeLabel = new javax.swing.JLabel();
+        loadLicenseButton = new javax.swing.JButton();
+        enterLicenseKeyButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Competition Details");
@@ -253,7 +288,83 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Divisions"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        jLabel1.setText("Competition Name");
+
+        jLabel2.setText("Location");
+
+        jLabel3.setText("Start Date");
+
+        jLabel4.setText("Finish Date");
+
+        competitionNameTextField.setEditable(false);
+
+        jLabel5.setText("Director Name");
+
+        jLabel6.setText("Director Contact");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(competitionNameTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                            .addComponent(locationTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                            .addComponent(startDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(finishDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(directorNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(directorContactTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel2, jLabel3, jLabel4, jLabel5, jLabel6});
+
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(competitionNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(locationTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(startDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(finishDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(directorNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(directorContactTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(249, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("General", jPanel2);
 
         addPoolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/group_add.png"))); // NOI18N
         addPoolButton.setText("Add Division..");
@@ -328,98 +439,149 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(addPoolButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(editPoolButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(deletePoolButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
                         .addComponent(importButton)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addPoolButton)
                     .addComponent(editPoolButton)
                     .addComponent(deletePoolButton)
                     .addComponent(importButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("General"));
+        jTabbedPane1.addTab("Divisions", jPanel1);
 
-        jLabel1.setText("Competition Name");
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Current License"));
 
-        jLabel2.setText("Location");
+        jLabel7.setText("Name:");
 
-        jLabel3.setText("Start Date");
+        jLabel8.setText("Contact Number:");
 
-        jLabel4.setText("Finish Date");
+        jLabel9.setText("Level:");
 
-        competitionNameTextField.setEditable(false);
+        licenseNameLabel.setText("<name>");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        licenseContactLabel.setText("<number>");
+
+        licenseTypeLabel.setText("<type>");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(startDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(locationTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
-                    .addComponent(competitionNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
-                    .addComponent(finishDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(licenseNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(licenseContactLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(licenseTypeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(competitionNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel7, jLabel8, jLabel9});
+
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(licenseNameLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(locationTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(licenseContactLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(startDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(finishDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(licenseTypeLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        loadLicenseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/key_add.png"))); // NOI18N
+        loadLicenseButton.setText("Load License File..");
+        loadLicenseButton.setIconTextGap(8);
+        loadLicenseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadLicenseButtonActionPerformed(evt);
+            }
+        });
+
+        enterLicenseKeyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/key_add.png"))); // NOI18N
+        enterLicenseKeyButton.setText("Enter License Key..");
+        enterLicenseKeyButton.setIconTextGap(8);
+        enterLicenseKeyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enterLicenseKeyButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(loadLicenseButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(enterLicenseKeyButton)))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(loadLicenseButton)
+                    .addComponent(enterLicenseKeyButton))
+                .addContainerGap(285, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("License", jPanel3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(okButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelButton))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(cancelButton)))
                 .addContainerGap())
         );
 
@@ -429,10 +591,8 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
                     .addComponent(okButton))
@@ -516,6 +676,8 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             comp.setLocation(locationTextField.getText().trim());
             comp.setStartDate(startDatePicker.getDate());
             comp.setEndDate(finishDatePicker.getDate());
+            comp.setDirectorContact(directorContactTextField.getText().trim());
+            comp.setDirectorName(directorNameTextField.getText().trim());
             
             if(newCompetition) {
                 int result = JOptionPane.showConfirmDialog(parentWindow,"Do you wish to set a master password for this competition?","Master Password",JOptionPane.YES_NO_OPTION);
@@ -542,21 +704,70 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_okButtonActionPerformed
 
+    private void loadLicenseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadLicenseButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.UPDATE_COMPETITION_LICENSE, database)) return;
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("License File", "lic"));
+        if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            License license = License.loadFromFile(file);
+            if(license != null)
+                try {
+                    licenseManager.setLicense(license);
+                    setCompetitionLicense(license);
+                } catch(IOException e) {
+                    GUIUtils.displayError(this, "Error updating license. You may need to reload the license next time you start EventManager");
+                }
+            else
+                GUIUtils.displayError(this, "Error while loading license file");
+        }
+    }//GEN-LAST:event_loadLicenseButtonActionPerformed
+
+    private void enterLicenseKeyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterLicenseKeyButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.UPDATE_COMPETITION_LICENSE, database)) return;
+        LicenseKeyDialog dialog = new LicenseKeyDialog(null, true);
+        dialog.setVisible(true);
+        if(dialog.getSuccess()) {
+            try {
+                License license = dialog.getLicense();
+                licenseManager.setLicense(license);
+                setCompetitionLicense(license);
+            } catch(IOException e) {
+                GUIUtils.displayError(null, "Unable to save license file. License will not be remembered after EventManager is closed");
+            }
+        }
+    }//GEN-LAST:event_enterLicenseKeyButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addPoolButton;
     private javax.swing.JButton cancelButton;
     private javax.swing.JTextField competitionNameTextField;
     private javax.swing.JButton deletePoolButton;
+    private javax.swing.JTextField directorContactTextField;
+    private javax.swing.JTextField directorNameTextField;
     private javax.swing.JButton editPoolButton;
+    private javax.swing.JButton enterLicenseKeyButton;
     private com.michaelbaranov.microba.calendar.DatePicker finishDatePicker;
     private javax.swing.JButton importButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel licenseContactLabel;
+    private javax.swing.JLabel licenseNameLabel;
+    private javax.swing.JLabel licenseTypeLabel;
+    private javax.swing.JButton loadLicenseButton;
     private javax.swing.JTextField locationTextField;
     private javax.swing.JButton okButton;
     private javax.swing.JTable poolListTable;
