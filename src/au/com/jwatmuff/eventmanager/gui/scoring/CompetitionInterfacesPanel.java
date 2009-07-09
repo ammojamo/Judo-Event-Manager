@@ -11,6 +11,8 @@ import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardWindow;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.ListDialog;
 import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
@@ -238,6 +240,7 @@ private void fightProgressionButtonActionPerformed(java.awt.event.ActionEvent ev
 }//GEN-LAST:event_fightProgressionButtonActionPerformed
 
 private void scoringButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scoringButtonActionPerformed
+    if(!PermissionChecker.isAllowed(Action.SCOREBOARD_ENTRY, database)) return;
     Session mat = chooseMat("Score Entry");
     if(mat == null) return;
     new SimpleScoringWindow(database, notifier, mat).setVisible(true);

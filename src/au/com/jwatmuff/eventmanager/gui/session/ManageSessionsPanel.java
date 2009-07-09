@@ -18,6 +18,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.Session.SessionType;
 import au.com.jwatmuff.eventmanager.model.vo.SessionLink;
 import au.com.jwatmuff.eventmanager.model.vo.SessionPool;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.ComboBoxDialog;
 import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
@@ -411,6 +413,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
             GUIUtils.displayMessage(parentWindow, "No unlocked sessions to lock.", "Lock Session");
             return;
         }
+        if(!PermissionChecker.isAllowed(Action.LOCK_SESSION, database)) return;
 
         ComboBoxDialog<Session> cbd = new ComboBoxDialog<Session>(parentWindow, true, sessions, "Choose session to lock", "Lock Session");
         cbd.setRenderer(new StringRenderer<Session>() {
@@ -438,6 +441,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
             GUIUtils.displayMessage(parentWindow, "No unlocked contest areas to delete.", "Delete Contest Area");
             return;
         }
+        if(!PermissionChecker.isAllowed(Action.REMOVE_CONTEST_AREA, database)) return;
 
         ComboBoxDialog<Session> cbd = new ComboBoxDialog<Session>(parentWindow, true, unlockedMats, "Choose contest area to delete", "Delete Contest Area");
         cbd.setRenderer(new StringRenderer<Session>() {
@@ -465,6 +469,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
             GUIUtils.displayMessage(parentWindow, "No unlocked sessions to delete.", "Delete Session");
             return;
         }
+        if(!PermissionChecker.isAllowed(Action.REMOVE_SESSION, database)) return;
 
         ComboBoxDialog<Session> cbd = new ComboBoxDialog<Session>(parentWindow, true, sessions, "Choose session to delete", "Delete Session");
         cbd.setRenderer(new StringRenderer<Session>() {
@@ -486,6 +491,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_removeSessionButtonActionPerformed
 
     private void addMatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addMatButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.ADD_CONTEST_AREA, database)) return;
         NewMatDialog nmd = new NewMatDialog(parentWindow, true);
         nmd.setVisible(true);
         if (nmd.getSuccess()) {
@@ -497,6 +503,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_addMatButtonActionPerformed
 
     private void addSessionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSessionButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.ADD_SESSION, database)) return;
         new NewSessionDialog(parentWindow, true, database).setVisible(true);
     }//GEN-LAST:event_addSessionButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

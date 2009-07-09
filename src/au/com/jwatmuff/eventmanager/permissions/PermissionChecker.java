@@ -18,9 +18,22 @@ import static au.com.jwatmuff.eventmanager.permissions.LicenseType.*;
  */
 public class PermissionChecker {
     private static final LicenseType ourLicense = FULL;
+    private static boolean masterUnlocked;
+
+    public static void unlockMaster() {
+        masterUnlocked = true;
+    }
+
+    public static void lockMaster() {
+        masterUnlocked = false;
+    }
+
+    public static boolean isMasterUnlocked() {
+        return masterUnlocked;
+    }
 
     public static boolean isAllowed(Action action, Database database) {
-        if(action.requiredPassword != null) {
+        if(action.requiredPassword != null && !masterUnlocked) {
             int hash = 0;
             CompetitionInfo ci = database.get(CompetitionInfo.class, null);
             switch(action.requiredPassword) {
@@ -37,14 +50,17 @@ public class PermissionChecker {
                 EnterPasswordDialog epd = new EnterPasswordDialog((javax.swing.JFrame)null, true);
                 epd.setActionText(action.description);
                 epd.setPromptText(action.requiredPassword.description + " password required:");
-                epd.setVisible(true);
-                if(epd.getSuccess()) {
-                    if(epd.getPassword().hashCode() != hash) {
-                        GUIUtils.displayError(null, "Incorrect password");
+                while(true) {
+                    epd.setVisible(true);
+                    if(epd.getSuccess()) {
+                        if(epd.getPassword().hashCode() != hash) {
+                            GUIUtils.displayError(null, "Incorrect password");
+                        } else {
+                            break;
+                        }
+                    } else {
                         return false;
                     }
-                } else {
-                    return false;
                 }
             }
         }
@@ -55,7 +71,7 @@ public class PermissionChecker {
                 if(ourLicense.covers(license)) return true;
         }
 
-        GUIUtils.displayMessage(null, "This feature requires a license", "License Required");
+        GUIUtils.displayMessage(null, "This feature requires an upgraded license", "License Required");
         return false;
     }
 }

@@ -24,6 +24,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.print.MultipleDrawHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
@@ -518,7 +520,7 @@ public class FightOrderPanel extends javax.swing.JPanel {
 
         if(pool == null) return;
         if(!GUIUtils.confirmLock(parentWindow, "division")) return;
-
+        if(!PermissionChecker.isAllowed(Action.LOCK_DRAW, database)) return;
         try {
             playerTableModel.savePlayerSequence();
             PoolLocker.lockPoolFights(database, pool);

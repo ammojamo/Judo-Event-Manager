@@ -27,6 +27,9 @@ public class Icons {
     public static ImageIcon POOL = getIcon(SILK, "group.png");
     public static ImageIcon YES = getIcon(SILK, "tick.png");
     public static ImageIcon NO = getIcon(SILK, "cross.png");
+
+    public static ImageIcon LOCK = getIcon(SILK, "lock.png");
+    public static ImageIcon UNLOCK = getIcon(SILK, "lock_open.png");
     
     public static ImageIcon getIcon(String dir, String file) {
         return new ImageIcon(Icons.class.getResource(dir + "/" + file));

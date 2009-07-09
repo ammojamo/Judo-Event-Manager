@@ -18,6 +18,8 @@ import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.print.PoolListHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.CheckboxListDialog;
@@ -37,6 +39,7 @@ import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -410,6 +413,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     private void autoApproveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoApproveButtonActionPerformed
         Pool pool = getSelectedPool();
         if(pool == null || pool.getID() == 0) return;
+        if(!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) return;
         try {
             AutoAssign.autoApprovePlayers(database, pool);
         } catch(DatabaseStateException e) {
@@ -420,6 +424,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     private void lockButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockButtonActionPerformed
         Pool pool = getSelectedPool();
         if(pool != null && pool.getID() != 0)
+            if(!PermissionChecker.isAllowed(Action.LOCK_DIVISION, database)) return;
             if(!GUIUtils.confirmLock(this.parentWindow, "division")) return;
             
             try {
@@ -430,6 +435,12 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_lockButtonActionPerformed
 
     private void autoAssignButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoAssignButtonActionPerformed
+        if(JOptionPane.showConfirmDialog(
+                parentWindow,
+                "CAUTION: All players will be automatically assigned to all divisions they are eligible for.\n\nAre you sure?",
+                "Confirm Auto Assign",
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
+        if(!PermissionChecker.isAllowed(Action.AUTO_ASSIGN_DIVISIONS, database)) return;
         try {
             AutoAssign.assignPlayersToPools(database);
         } catch(DatabaseStateException e) {
@@ -439,6 +450,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_autoAssignButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) return;
         Pool pool = getSelectedPool();
         if(pool == null || pool.getID() == 0) return;
 
@@ -464,12 +476,14 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         //removeButton.setEnabled((index == -1)?false:true);
         //approveButton.setEnabled(false);
         if(evt.getClickCount() == 2 && index != -1) {
+            if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
             Player player = approvedListModel.getPlayerAt(index);
             new PlayerDetailsDialog(parentWindow, true, database, notifier, player).setVisible(true);
         }
     }//GEN-LAST:event_approvedListMouseClicked
 
     private void approveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_approveButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) return;
         Pool pool = getSelectedPool();
         if(pool == null)
             return;
@@ -499,6 +513,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         int index = requestedList.getSelectedIndex();
         approveButton.setEnabled((index == -1)?false:true);
         if(evt.getClickCount() == 2 && index != -1) {
+            if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
             Player player = requestedListModel.getPlayerAt(index);
             new PlayerDetailsDialog(parentWindow, true, database, notifier, player).setVisible(true);
         }
@@ -530,11 +545,14 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_printButtonActionPerformed
 
 private void poolListTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_poolListTableMouseClicked
-    if(evt.getClickCount() == 2 && this.getSelectedPool() != null && this.getSelectedPool().getID() != 0)
+    if(evt.getClickCount() == 2 && this.getSelectedPool() != null && this.getSelectedPool().getID() != 0) {
+        if(!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) return;
         new PoolDetailsDialog(parentWindow, true, database, this.getSelectedPool()).setVisible(true);
+    }
 }//GEN-LAST:event_poolListTableMouseClicked
 
 private void customPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customPoolButtonActionPerformed
+    if(!PermissionChecker.isAllowed(Action.ADD_DIVISION, database)) return;
     new PoolDetailsDialog(parentWindow, true, database, null).setVisible(true);
 }//GEN-LAST:event_customPoolButtonActionPerformed
 

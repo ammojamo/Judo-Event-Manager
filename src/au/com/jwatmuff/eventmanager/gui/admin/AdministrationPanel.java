@@ -9,7 +9,9 @@ package au.com.jwatmuff.eventmanager.gui.admin;
 import au.com.jwatmuff.eventmanager.gui.results.ResultsSummaryPanel;
 import au.com.jwatmuff.eventmanager.gui.results.ResultsWindow;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
+import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.awt.Cursor;
@@ -186,6 +188,7 @@ public class AdministrationPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_enterCompDetailsButtonActionPerformed
 
 private void reviewDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reviewDataButtonActionPerformed
+    if(!PermissionChecker.isAllowed(Action.CHANGE_RESULTS, database)) return;
     try {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         final ResultsSummaryPanel p = new ResultsSummaryPanel(true);

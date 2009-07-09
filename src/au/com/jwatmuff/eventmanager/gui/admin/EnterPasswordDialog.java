@@ -31,6 +31,14 @@ public class EnterPasswordDialog extends javax.swing.JDialog {
         this.setLocationRelativeTo(getParent());
     }
 
+    @Override
+    public void setVisible(boolean visible) {
+        if(visible) {
+            passwordField.setText("");
+        }
+        super.setVisible(visible);
+    }
+
     public boolean getSuccess() {
         return success;
     }

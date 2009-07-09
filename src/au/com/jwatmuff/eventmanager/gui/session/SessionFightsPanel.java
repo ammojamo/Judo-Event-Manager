@@ -17,6 +17,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.Session.SessionType;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.print.FightOrderHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
@@ -515,6 +517,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void lockSessionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockSessionButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.LOCK_SESSION_FIGHT_ORDER, database)) return;
         Session session = getSelectedSession();
         if(session == null) return;
         

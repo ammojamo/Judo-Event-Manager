@@ -603,6 +603,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.IMPORT_DIVISIONS, database)) return;
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
         if(GUIUtils.lastChooserDirectory != null)
@@ -634,6 +635,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     private void deletePoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletePoolButtonActionPerformed
         Pool selected = getSelectedPool();
         if(selected != null) {
+            if(!PermissionChecker.isAllowed(Action.REMOVE_DIVISION, database)) return;
             database.delete(selected);
         }
         tableSelectionChanged();
@@ -641,11 +643,14 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
 
     private void editPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editPoolButtonActionPerformed
         Pool selected = getSelectedPool();
-        if(selected != null)
+        if(selected != null) {
+            if(!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) return;
             new PoolDetailsDialog(parentWindow, true, database, selected).setVisible(true);
+        }
     }//GEN-LAST:event_editPoolButtonActionPerformed
 
     private void addPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPoolButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.ADD_DIVISION, database)) return;
         new PoolDetailsDialog(parentWindow, true, database, null).setVisible(true);
         tableSelectionChanged();
     }//GEN-LAST:event_addPoolButtonActionPerformed

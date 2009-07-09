@@ -11,6 +11,8 @@ import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.print.PlayerListHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.ColorIcon;
@@ -331,6 +333,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportCSVButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportCSVButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.EXPORT_PLAYERS, database)) return;
         try {
             File f = File.createTempFile("players", ".csv");
             OutputStream os = new FileOutputStream(f);
@@ -364,6 +367,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_printButtonActionPerformed
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.IMPORT_PLAYERS, database)) return;
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
 
@@ -388,11 +392,13 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
         Player player = getSelectedPlayer();
         new PlayerDetailsDialog(parentWindow, true, database, notifier, player).setVisible(true);
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.REMOVE_PLAYER, database)) return;
         Player player = getSelectedPlayer();
         if(player != null && player.getLockedStatus() != Player.LockedStatus.LOCKED) {
             database.delete(player);
@@ -412,6 +418,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_playerListTableMouseClicked
 
     private void newButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.ADD_PLAYER, database)) return;
         if(database.get(CompetitionInfo.class, null) == null)
             JOptionPane.showMessageDialog(
                     this,
