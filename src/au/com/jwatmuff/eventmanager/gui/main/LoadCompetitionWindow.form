@@ -431,6 +431,9 @@
                 <Property name="text" type="java.lang.String" value="Load License File.."/>
                 <Property name="iconTextGap" type="int" value="8"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadLicenseButtonActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="enterLicenseKeyButton">
               <Properties>

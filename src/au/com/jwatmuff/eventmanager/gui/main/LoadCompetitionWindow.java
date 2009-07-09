@@ -13,13 +13,16 @@ import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
 
 /**
@@ -181,7 +184,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(existingCompRadioButton);
-        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
         existingCompRadioButton.setText("Load Existing Competition");
         existingCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         existingCompRadioButton.setEnabled(false);
@@ -224,7 +227,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(newCompRadioButton);
-        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
         newCompRadioButton.setSelected(true);
         newCompRadioButton.setText("Create New Competition");
         newCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -297,7 +300,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
         licenseContactLabel.setText("N/A");
 
-        licenseTypeLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        licenseTypeLabel.setFont(new java.awt.Font("Tahoma", 1, 11));
         licenseTypeLabel.setText("FREE");
 
         licenseExpiryLabel.setText("N/A");
@@ -354,6 +357,11 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         loadLicenseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/key_add.png"))); // NOI18N
         loadLicenseButton.setText("Load License File..");
         loadLicenseButton.setIconTextGap(8);
+        loadLicenseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadLicenseButtonActionPerformed(evt);
+            }
+        });
 
         enterLicenseKeyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/key_add.png"))); // NOI18N
         enterLicenseKeyButton.setText("Enter License Key..");
@@ -484,6 +492,24 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             updateLicenseInfo();
         }
     }//GEN-LAST:event_enterLicenseKeyButtonActionPerformed
+
+    private void loadLicenseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadLicenseButtonActionPerformed
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("License File", "lic"));
+        if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            License license = License.loadFromFile(file);
+            if(license != null)
+                try {
+                    licenseManager.setLicense(license);
+                    updateLicenseInfo();
+                } catch(IOException e) {
+                    GUIUtils.displayError(this, "Error updating license. You may need to reload the license next time you start EventManager");
+                }
+            else
+                GUIUtils.displayError(this, "Error while loading license file");
+        }
+    }//GEN-LAST:event_loadLicenseButtonActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
