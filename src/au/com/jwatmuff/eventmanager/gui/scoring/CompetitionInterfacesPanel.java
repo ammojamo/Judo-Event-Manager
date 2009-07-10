@@ -296,6 +296,7 @@ private void displayScoreboardButtonActionPerformed(java.awt.event.ActionEvent e
 }//GEN-LAST:event_displayScoreboardButtonActionPerformed
 
 private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualScoreboardButtonActionPerformed
+    if(!PermissionChecker.isAllowed(Action.MANUAL_SCOREBOARD, database)) return;
     new ScoreboardWindow("Manual Scoreboard", ScoringSystem.NEW).setVisible(true);
 }//GEN-LAST:event_manualScoreboardButtonActionPerformed
 

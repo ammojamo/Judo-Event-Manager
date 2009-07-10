@@ -39,7 +39,12 @@ public enum Action {
     REMOVE_SESSION(MASTER),
     LOCK_SESSION(MASTER),
     LOCK_SESSION_FIGHT_ORDER(MASTER),
-    SCOREBOARD_ENTRY(SCOREBOARD);
+    SCOREBOARD_ENTRY(SCOREBOARD),
+    ADD_MORE_THAN_TWO_MATS(null, D),
+    ADD_MORE_THAN_SIX_MATS(null, Z),
+    MANUAL_SCOREBOARD(null, B),
+    MANUAL_FIGHT_PROGRESSION(null, B),
+    CREATE_COMPETITION(null, C);
 
     public final String description;
     public final PasswordType requiredPassword;

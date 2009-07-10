@@ -8,8 +8,10 @@ package au.com.jwatmuff.eventmanager.gui.main;
 
 import au.com.jwatmuff.eventmanager.gui.admin.EnterPasswordDialog;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
+import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.permissions.License;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
@@ -455,6 +457,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         if(newCompRadioButton.isSelected()) {
+            if(!PermissionChecker.isAllowed(Action.CREATE_COMPETITION, null)) return;
             NewCompetitionDialog ncd = new NewCompetitionDialog(this, true);
             ncd.setVisible(true);
             if(ncd.getSuccess()) {
