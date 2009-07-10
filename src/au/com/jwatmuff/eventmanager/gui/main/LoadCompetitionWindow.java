@@ -18,6 +18,8 @@ import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -46,6 +48,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private boolean success = false;
     
     private DefaultListModel dbListModel = new DefaultListModel();
+
+    private static final int CHECK_DATABASES_PERIOD = 5000; //milliseconds
+
+    private Timer checkDatabasesTimer = new Timer();
+    private TimerTask checkDatabasesTask = new TimerTask() {
+        @Override
+        public void run() {
+            updateDatabaseList();
+        }
+    };
     
     /** Creates new form LoadCompetitionWindow */
     public LoadCompetitionWindow(DatabaseManager dbManager, LicenseManager licenseManager) {
@@ -83,6 +95,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 updateDatabaseList();
             }
         });
+
+        checkDatabasesTimer.schedule(checkDatabasesTask, CHECK_DATABASES_PERIOD, CHECK_DATABASES_PERIOD);
         
         // center window on screen
         setLocationRelativeTo(null);
@@ -102,12 +116,17 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                DatabaseInfo oldSelected = (DatabaseInfo)competitionList.getSelectedValue();
                 dbListModel.clear();
                 for(DatabaseInfo info : dbManager.getDatabases())
                     dbListModel.addElement(info);
                 
                 boolean compsPresent = dbListModel.size() > 0;
                 existingCompRadioButton.setEnabled(compsPresent);
+
+                if(oldSelected != null) {
+                    competitionList.setSelectedValue(oldSelected, true);
+                }
             }
         });   
     }
