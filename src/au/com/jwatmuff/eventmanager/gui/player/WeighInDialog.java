@@ -10,15 +10,18 @@ import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerLocker;
-import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
+import au.com.jwatmuff.eventmanager.print.PlayerListHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.PrintUtilities;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
@@ -221,7 +224,16 @@ public class WeighInDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_okButtonActionPerformed
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-    PrintUtilities.printComponent(playerListTable);
+        if(playerListTable.getRowCount() == 0)
+        JOptionPane.showMessageDialog(this, "No players to print");
+
+        List<Player> players = new ArrayList<Player>();
+
+        for(int row = 0; row < playerListTable.getRowCount(); row++) {
+            int mrow = playerListTable.getRowSorter().convertRowIndexToModel(row);
+            players.add(tableModel.getAtRow(mrow));
+        }
+    new PlayerListHTMLGenerator(database, players).openInBrowser();
 }//GEN-LAST:event_printButtonActionPerformed
 
     
