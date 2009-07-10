@@ -28,7 +28,11 @@ public class LicenseManager {
 
     public LicenseManager(File licenseDirectory) {
         this.directory = licenseDirectory;
-        loadLicense();
+        try {
+            loadLicense();
+            PermissionChecker.setLicenseType(license.getType());
+        } catch(Exception e) {
+        }
     }
 
     public License getLicense() {
@@ -37,15 +41,20 @@ public class LicenseManager {
 
     public void setLicense(License license) throws IOException {
         this.license = license;
+        PermissionChecker.setLicenseType(license.getType());
         saveLicense();
     }
 
     private void loadLicense() {
         File file = new File(directory, LICENSE_FILE);
-        try {
-            license = License.loadFromFile(file);
-        } catch(Exception e) {
-            log.error("FAILED TO LOAD LICENSE", e);
+        if(file.exists()) {
+            try {
+                license = License.loadFromFile(file);
+            } catch(Exception e) {
+                log.error("FAILED TO LOAD LICENSE", e);
+                license = null;
+            }
+        } else {
             license = null;
         }
     }
