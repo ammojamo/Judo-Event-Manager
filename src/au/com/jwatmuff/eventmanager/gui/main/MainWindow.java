@@ -62,18 +62,6 @@ public class MainWindow extends javax.swing.JFrame {
     public void setVisible(boolean b) {
         if(b) this.setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
         super.setVisible(b);
-        
-        // show competition details screen if this is a new competition
-        // it's a bit dodgy doing this in the set visible method, but oh well..
-        if(database.get(CompetitionInfo.class, null) == null) {
-            mainTabbedPane.setSelectedComponent(administrationPanel);
-            administrationPanel.showCompetitionDetailsDialog();
-        }
-        
-        // close window if competition details entry was cancelled
-        if(database.get(CompetitionInfo.class, null) == null) {
-            this.processWindowEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-        }
     }
     
     @Required
