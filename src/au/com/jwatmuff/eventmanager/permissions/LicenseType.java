@@ -11,8 +11,13 @@ public enum LicenseType {
      *
      * See Action.java for defining what actions are allowed for a given license
      */
-    FREE(null),
-    FULL(FREE);
+    A(null),
+    B(A),
+    C(B),
+    D(C),
+    Z(D);
+
+    public static final LicenseType DEFAULT_LICENSE = A;
 
     public final String description;
     private final LicenseType parent;

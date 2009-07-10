@@ -40,7 +40,7 @@ public class LicenseGenerator extends javax.swing.JFrame {
         /* set up license type combo box */
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         for(LicenseType type : LicenseType.values())
-            if(type != LicenseType.FREE)
+            if(type != LicenseType.DEFAULT_LICENSE)
                 model.addElement(type);
         typeComboBox.setModel(model);
 

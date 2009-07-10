@@ -10,14 +10,13 @@ import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.Database;
 import static au.com.jwatmuff.eventmanager.permissions.PasswordType.*;
-import static au.com.jwatmuff.eventmanager.permissions.LicenseType.*;
 
 /**
  *
  * @author James
  */
 public class PermissionChecker {
-    private static final LicenseType ourLicense = FULL;
+    private static LicenseType ourLicenseType = LicenseType.DEFAULT_LICENSE;
     private static boolean masterUnlocked;
 
     public static void unlockMaster() {
@@ -32,8 +31,12 @@ public class PermissionChecker {
         return masterUnlocked;
     }
 
+    public static void setLicenseType(LicenseType licenseType) {
+        ourLicenseType = licenseType;
+    }
+
     public static boolean isAllowed(Action action, Database database) {
-        if(action.requiredPassword != null && !masterUnlocked) {
+        if(action.requiredPassword != null && !masterUnlocked && database != null) {
             int hash = 0;
             CompetitionInfo ci = database.get(CompetitionInfo.class, null);
             switch(action.requiredPassword) {
@@ -68,7 +71,7 @@ public class PermissionChecker {
             return true;
         } else {
             for(LicenseType license : action.requiredLicenses)
-                if(ourLicense.covers(license)) return true;
+                if(ourLicenseType.covers(license)) return true;
         }
 
         GUIUtils.displayMessage(null, "This feature requires an upgraded license", "License Required");
