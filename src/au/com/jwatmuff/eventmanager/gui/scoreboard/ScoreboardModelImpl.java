@@ -728,13 +728,22 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                 disableCancelHolddownUndo();
                 break;
             case INACTIVE:
+                startTimer();
                 startHolddownTimer();
                 stopTimer();
                 holddownTimer.reset(seconds * 1000);
                 disableCancelHolddownUndo();
                 break;
             case PENDING:
+                setHolddownMode(HolddownMode.INACTIVE);
+                startTimer();
+                startHolddownTimer();
+                stopTimer();
+                holddownTimer.reset(seconds * 1000);
+                disableCancelHolddownUndo();
+                break;
         }
+        notifyListeners(ScoreboardUpdate.HOLDDOWN);
     }
 
     @Override
