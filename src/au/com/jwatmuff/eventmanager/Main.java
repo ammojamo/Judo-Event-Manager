@@ -209,7 +209,7 @@ public class Main {
                         ci.setName(info.name);
                         ci.setStartDate(new Date());
                         ci.setEndDate(new Date());
-                        ci.setPasswordHash(info.passwordHash);
+                        //ci.setPasswordHash(info.passwordHash);
                         License license = licenseManager.getLicense();
                         if(license != null) {
                             ci.setLicenseName(license.getName());
@@ -238,6 +238,7 @@ public class Main {
                     // System.exit();
 
                     database.shutdown();
+                    databaseManager.deactivateDatabase();
 
                     if(mainWindow.getDeleteOnExit()) {
                         for(File file : info.localDirectory.listFiles())

@@ -53,6 +53,7 @@ public abstract class DatabaseManager {
                 DatabaseInfo info = new DatabaseInfo();
                 info.name = activeDatabase.getName();
                 info.id = activeDatabase.getID();
+                info.passwordHash = activeDatabase.getPasswordHash();
                 return info;
             }
             else {
@@ -143,7 +144,7 @@ public abstract class DatabaseManager {
         return database;
     }
     
-    private boolean authenticate(DatabaseInfo database, int passwordHash) {
+    public boolean authenticate(DatabaseInfo database, int passwordHash) {
         if(database.local) {
             if(passwordHash == database.passwordHash)
                 return true;
@@ -213,6 +214,17 @@ public abstract class DatabaseManager {
         }
         
         return distDb;
+    }
+
+    public void deactivateDatabase() {
+        activeDatabase = null;
+        for(Peer peer : peerManager.getPeers()) {
+            try {
+                peer.getService(DatabaseInfoService.class).handleDatabaseAnnouncement(peerManager.getUUID(), null);
+            } catch(NoSuchServiceException e) {
+                log.error("Failed to get DatabaseInfoService for peer " + peer.getName(), e);
+            }
+        }
     }
         
     private void updateAllDatabaseInfo() {
