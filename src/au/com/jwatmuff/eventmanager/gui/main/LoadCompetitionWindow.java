@@ -22,7 +22,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -69,15 +68,12 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         this.getRootPane().setDefaultButton(okButton);
 
         competitionList.setCellRenderer(new DefaultListCellRenderer() {
-            private ImageIcon localIcon = new ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/drive.png"));
-            private ImageIcon remoteIcon = new ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/transmit.png"));
-
             @Override
             public Component getListCellRendererComponent(JList list, Object obj, int arg2, boolean arg3, boolean arg4) {
                 if(obj instanceof DatabaseInfo) {
                     DatabaseInfo di = (DatabaseInfo)obj;
                     JLabel label = (JLabel)super.getListCellRendererComponent(list, di.name, arg2, arg3, arg4);
-                    label.setIcon(di.local?localIcon:remoteIcon);
+                    label.setIcon((di.peers > 0) ? Icons.REMOTE : Icons.LOCAL);
                     return label;
                 }
                 return super.getListCellRendererComponent(list, obj, arg2, arg3, arg4);
@@ -181,6 +177,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         newCompRadioButton = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -252,7 +250,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(existingCompRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -305,18 +303,41 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Start Competition", jPanel3);
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
+        jButton1.setText("Manual Scoreboard..");
+        jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jButton1.setIconTextGap(8);
+
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/text_list_numbers.png"))); // NOI18N
+        jButton2.setText("Manual Fight Progression..");
+        jButton2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jButton2.setIconTextGap(8);
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 430, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 434, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addContainerGap(235, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Manual Interfaces *", jPanel4);
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1, jButton2});
+
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
+                .addContainerGap(371, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Manual Interfaces", jPanel4);
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Current License"));
 
@@ -427,7 +448,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadLicenseButton)
                     .addComponent(enterLicenseKeyButton))
-                .addContainerGap(280, Short.MAX_VALUE))
+                .addContainerGap(284, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Licenses", jPanel5);
@@ -493,17 +514,20 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             if(selected == null) return;
 
             /* password check */
-            if(selected.passwordHash != 0) {
+            if(!dbManager.authenticate(selected, 0)) {
                 EnterPasswordDialog epd = new EnterPasswordDialog(this, true);
                 epd.setActionText("Load Competition '" + selected.name + "'");
-                epd.setPromptText("Master password required");
+                epd.setPromptText("Connect password required");
                 while(true) {
                     epd.setVisible(true);
                     if(epd.getSuccess()) {
-                        if(epd.getPassword().hashCode() == selected.passwordHash)
+                        int passwordHash = epd.getPassword().hashCode();
+                        if(dbManager.authenticate(selected, passwordHash)) {
+                            selected.passwordHash = passwordHash;
                             break;
-                        else
+                        } else {
                             GUIUtils.displayError(this, "Incorrect password");
+                        }
                     } else {
                         selected = null;
                         return;
@@ -559,6 +583,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private javax.swing.JList competitionList;
     private javax.swing.JButton enterLicenseKeyButton;
     private javax.swing.JRadioButton existingCompRadioButton;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

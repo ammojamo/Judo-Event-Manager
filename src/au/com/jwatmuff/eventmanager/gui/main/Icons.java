@@ -30,6 +30,9 @@ public class Icons {
 
     public static ImageIcon LOCK = getIcon(SILK, "lock.png");
     public static ImageIcon UNLOCK = getIcon(SILK, "lock_open.png");
+
+    public static ImageIcon REMOTE = getIcon(SILK, "transmit.png");
+    public static ImageIcon LOCAL = getIcon(SILK, "drive.png");
     
     public static ImageIcon getIcon(String dir, String file) {
         return new ImageIcon(Icons.class.getResource(dir + "/" + file));
