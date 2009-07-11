@@ -14,8 +14,6 @@ import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
-import foxtrot.Job;
-import foxtrot.Worker;
 import java.awt.Frame;
 import java.util.Collection;
 import java.util.List;
@@ -113,14 +111,7 @@ public class ManagePasswordsDialog extends javax.swing.JDialog implements Transa
                     ci.setScoreboardPasswordHash(cpd.getPasswordHash());
                     break;
             }
-
-            Worker.post(new Job() {
-                @Override
-                public Object run() {
-                    database.update(ci);
-                    return null;
-                }
-            });
+            database.update(ci);
         }    
     }
     
