@@ -230,8 +230,9 @@ public abstract class DatabaseManager {
             }
         }
     }
-        
-    private void updateAllDatabaseInfo() {
+
+    //Bit of a hack making this public - to help refresh load competition screen
+    public synchronized void updateAllDatabaseInfo() {
         databases.clear();
         updateLocalDatabaseInfo();
         updatePeerDatabaseInfo();
@@ -240,7 +241,10 @@ public abstract class DatabaseManager {
     private void updatePeerDatabaseInfo() {
         Collection<Peer> peers = peerManager.getPeers();
         
+        log.info("Asking for database info from " + peers.size() + " peers");
+
         for(Peer peer : peers) {
+            log.info("Asking for database info from peer " + peer.getName());
             try {
                 DatabaseInfo info = peer.getService(DatabaseInfoService.class).getDatabaseInfo();
                 if(info == null) {

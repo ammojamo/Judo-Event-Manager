@@ -206,7 +206,6 @@ public class MainWindow extends javax.swing.JFrame {
         managePoolsButton = new javax.swing.JButton();
         fightOrderButton = new javax.swing.JButton();
         competitionInterfacesButton = new javax.swing.JButton();
-        deleteButton = new javax.swing.JButton();
         chatParentPanel = new javax.swing.JPanel();
         masterUnlockButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
@@ -318,16 +317,6 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/delete.png"))); // NOI18N
-        deleteButton.setText("Delete and Exit");
-        deleteButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        deleteButton.setIconTextGap(8);
-        deleteButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteButtonActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -338,7 +327,6 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
                     .addComponent(jLabel3)
                     .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(deleteButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(resultsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(registerButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(weighInButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -372,9 +360,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(competitionInterfacesButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultsButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(deleteButton)
-                .addContainerGap(132, Short.MAX_VALUE))
+                .addContainerGap(163, Short.MAX_VALUE))
         );
 
         mainTabbedPane.addTab("Main", mainPanel);
@@ -468,16 +454,6 @@ public class MainWindow extends javax.swing.JFrame {
         mainTabbedPane.setSelectedComponent(fightOrderPanel);
     }//GEN-LAST:event_fightOrderButtonActionPerformed
 
-    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        ConfirmDeleteDialog cdd = new ConfirmDeleteDialog(this, true);
-        cdd.setVisible(true);
-        if(cdd.getSuccess()) {
-            deleteOnExit = true;
-            /* close the window */
-            this.processWindowEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-        }
-    }//GEN-LAST:event_deleteButtonActionPerformed
-
     private void weighInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_weighInButtonActionPerformed
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         if(ci == null)
@@ -536,7 +512,6 @@ private void masterUnlockButtonActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JButton adminButton;
     private javax.swing.JPanel chatParentPanel;
     private javax.swing.JButton competitionInterfacesButton;
-    private javax.swing.JButton deleteButton;
     private javax.swing.JButton fightOrderButton;
     private javax.swing.JMenuItem fileExitMenuItem;
     private javax.swing.JMenu fileMenu;

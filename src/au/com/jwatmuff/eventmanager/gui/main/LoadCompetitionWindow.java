@@ -9,23 +9,34 @@ package au.com.jwatmuff.eventmanager.gui.main;
 import au.com.jwatmuff.eventmanager.Main;
 import au.com.jwatmuff.eventmanager.gui.admin.EnterPasswordDialog;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardWindow;
 import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.permissions.License;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
+import au.com.jwatmuff.eventmanager.util.DirUtils;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.ZipUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import java.awt.Component;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
@@ -39,6 +50,7 @@ import org.apache.log4j.Logger;
  */
 public class LoadCompetitionWindow extends javax.swing.JFrame {
     private static Logger log = Logger.getLogger(LoadCompetitionWindow.class);
+    private SimpleDateFormat dateFormat = new SimpleDateFormat();
     
     private DatabaseManager dbManager;
     private LicenseManager licenseManager;
@@ -51,8 +63,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
     private static final int CHECK_DATABASES_PERIOD = 5000; //milliseconds
 
-    private Timer checkDatabasesTimer = new Timer();
-    private TimerTask checkDatabasesTask = new TimerTask() {
+    private Timer checkDatabasesTimer;
+    private Runnable checkDatabasesTask = new Runnable() {
         @Override
         public void run() {
             updateDatabaseList();
@@ -93,8 +105,6 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 updateDatabaseList();
             }
         });
-
-        checkDatabasesTimer.schedule(checkDatabasesTask, CHECK_DATABASES_PERIOD, CHECK_DATABASES_PERIOD);
         
         // center window on screen
         setLocationRelativeTo(null);
@@ -103,6 +113,17 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     @Override
     public void setVisible(boolean visible) {
         if(visible) {
+            try {
+                checkDatabasesTimer = new Timer();
+                checkDatabasesTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        checkDatabasesTask.run();
+                    }
+                }, CHECK_DATABASES_PERIOD, CHECK_DATABASES_PERIOD);
+            } catch(Exception e ) {
+                log.error(e.getMessage(), e);
+            }
             success = false;
             updateLicenseInfo();
             updateDatabaseList();
@@ -111,9 +132,11 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     }
     
     private void updateDatabaseList() {
+        log.debug("Attempting to update database list");
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                dbManager.updateAllDatabaseInfo();
                 DatabaseInfo oldSelected = (DatabaseInfo)competitionList.getSelectedValue();
                 dbListModel.clear();
                 for(DatabaseInfo info : dbManager.getDatabases())
@@ -157,7 +180,12 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     public boolean isNewDatabase() {
         return isNew;
     }
-    
+
+    @Override
+    public void dispose() {
+        if(checkDatabasesTimer != null) checkDatabasesTimer.cancel();
+        super.dispose();
+    }
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -176,11 +204,14 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         existingCompRadioButton = new javax.swing.JRadioButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         competitionList = new javax.swing.JList();
+        loadBackupButton = new javax.swing.JButton();
+        saveBackupButton = new javax.swing.JButton();
+        deleteCompButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         newCompRadioButton = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        manualScoreboardButton = new javax.swing.JButton();
+        manualFightProgressionButton = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -228,12 +259,41 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 competitionListMouseClicked(evt);
             }
         });
+        competitionList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                competitionListValueChanged(evt);
+            }
+        });
         competitionList.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 competitionListFocusGained(evt);
             }
         });
         jScrollPane1.setViewportView(competitionList);
+
+        loadBackupButton.setText("Load Backup..");
+        loadBackupButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadBackupButtonActionPerformed(evt);
+            }
+        });
+
+        saveBackupButton.setText("Save Backup..");
+        saveBackupButton.setEnabled(false);
+        saveBackupButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveBackupButtonActionPerformed(evt);
+            }
+        });
+
+        deleteCompButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/delete.png"))); // NOI18N
+        deleteCompButton.setText("Delete Competition");
+        deleteCompButton.setEnabled(false);
+        deleteCompButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteCompButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -243,7 +303,13 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
-                    .addComponent(existingCompRadioButton))
+                    .addComponent(existingCompRadioButton)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(loadBackupButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(saveBackupButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteCompButton)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -252,7 +318,12 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(existingCompRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(loadBackupButton)
+                    .addComponent(saveBackupButton)
+                    .addComponent(deleteCompButton))
                 .addContainerGap())
         );
 
@@ -305,15 +376,20 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Start Competition", jPanel3);
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
-        jButton1.setText("Manual Scoreboard..");
-        jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jButton1.setIconTextGap(8);
+        manualScoreboardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
+        manualScoreboardButton.setText("Manual Scoreboard..");
+        manualScoreboardButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        manualScoreboardButton.setIconTextGap(8);
+        manualScoreboardButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualScoreboardButtonActionPerformed(evt);
+            }
+        });
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/text_list_numbers.png"))); // NOI18N
-        jButton2.setText("Manual Fight Progression..");
-        jButton2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jButton2.setIconTextGap(8);
+        manualFightProgressionButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/text_list_numbers.png"))); // NOI18N
+        manualFightProgressionButton.setText("Manual Fight Progression..");
+        manualFightProgressionButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        manualFightProgressionButton.setIconTextGap(8);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -322,21 +398,21 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(manualScoreboardButton)
+                    .addComponent(manualFightProgressionButton))
                 .addContainerGap(235, Short.MAX_VALUE))
         );
 
-        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1, jButton2});
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {manualFightProgressionButton, manualScoreboardButton});
 
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
+                .addComponent(manualScoreboardButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
-                .addContainerGap(371, Short.MAX_VALUE))
+                .addComponent(manualFightProgressionButton)
+                .addContainerGap(373, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Manual Interfaces", jPanel4);
@@ -450,7 +526,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadLicenseButton)
                     .addComponent(enterLicenseKeyButton))
-                .addContainerGap(284, Short.MAX_VALUE))
+                .addContainerGap(286, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Licenses", jPanel5);
@@ -582,15 +658,90 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 GUIUtils.displayError(this, "Error while loading license file");
         }
     }//GEN-LAST:event_loadLicenseButtonActionPerformed
+
+    private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualScoreboardButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.MANUAL_SCOREBOARD, null)) return;
+            new ScoreboardWindow("Manual Scoreboard", ScoringSystem.NEW).setVisible(true);
+    }//GEN-LAST:event_manualScoreboardButtonActionPerformed
+
+    private void competitionListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_competitionListValueChanged
+        DatabaseInfo info = (DatabaseInfo)competitionList.getSelectedValue();
+        boolean local = (info != null && info.local);
+        saveBackupButton.setEnabled(local);
+        deleteCompButton.setEnabled(local);
+    }//GEN-LAST:event_competitionListValueChanged
+
+    private void saveBackupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveBackupButtonActionPerformed
+        DatabaseInfo info = (DatabaseInfo)competitionList.getSelectedValue();
+        if(info == null || !info.local) return;
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("Event Manager Files", "evm"));
+        if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            if(!file.getName().toLowerCase().endsWith(".evm"))
+                file = new File(file.getAbsolutePath() + ".evm");
+            if(file.exists()) {
+                int result = JOptionPane.showConfirmDialog(rootPane, file.getName() + " already exists. Overwrite file?", "Save Backup", JOptionPane.YES_NO_OPTION);
+                if(result != JOptionPane.YES_OPTION) return;
+            }
+            try {
+                ZipUtils.zipFolder(info.localDirectory, file, false);
+            } catch(Exception e) {
+                GUIUtils.displayError(this, "Failed to save file: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_saveBackupButtonActionPerformed
+
+    private void loadBackupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadBackupButtonActionPerformed
+        File databaseStore = new File("comps");
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("Event Manager Files", "evm"));
+        if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            /* input zip file */
+            File file = chooser.getSelectedFile();
+            /* construct output directory */
+            File dir = new File(databaseStore, file.getName());
+            int suffix = 0;
+            while(dir.exists()) {
+                suffix++;
+                dir = new File(databaseStore, file.getName() + "_" + suffix);
+            }
+            /* unzip */
+            try {
+                ZipUtils.unzipFile(dir, file);
+
+                /* change id */
+                Properties props = new Properties();
+                FileReader fr = new FileReader(new File(dir, "info.dat"));
+                props.load(fr);
+                fr.close();
+                props.setProperty("UUID", UUID.randomUUID().toString());
+                props.setProperty("name", props.getProperty("name") + " - " + dateFormat.format(new Date()));
+                FileWriter fw = new FileWriter(new File(dir, "info.dat"));
+                props.store(fw, "");
+                fw.close();
+            } catch(Exception e) {
+                GUIUtils.displayError(null, "Error while opening file: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_loadBackupButtonActionPerformed
+
+    private void deleteCompButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteCompButtonActionPerformed
+        DatabaseInfo info = (DatabaseInfo)competitionList.getSelectedValue();
+        if(info == null || !info.local) return;
+        int result = JOptionPane.showConfirmDialog(rootPane, "Delete " + info.name + " permanently?", "Delete Competition", JOptionPane.YES_NO_OPTION);
+        if(result == JOptionPane.YES_OPTION) {
+            DirUtils.deleteDir(info.localDirectory);
+        }
+    }//GEN-LAST:event_deleteCompButtonActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton cancelButton;
     private javax.swing.JList competitionList;
+    private javax.swing.JButton deleteCompButton;
     private javax.swing.JButton enterLicenseKeyButton;
     private javax.swing.JRadioButton existingCompRadioButton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -607,9 +758,13 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private javax.swing.JLabel licenseExpiryLabel;
     private javax.swing.JLabel licenseNameLabel;
     private javax.swing.JLabel licenseTypeLabel;
+    private javax.swing.JButton loadBackupButton;
     private javax.swing.JButton loadLicenseButton;
+    private javax.swing.JButton manualFightProgressionButton;
+    private javax.swing.JButton manualScoreboardButton;
     private javax.swing.JRadioButton newCompRadioButton;
     private javax.swing.JButton okButton;
+    private javax.swing.JButton saveBackupButton;
     // End of variables declaration//GEN-END:variables
     
 }
