@@ -7,6 +7,7 @@ package au.com.jwatmuff.genericdb.p2p;
 
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.distributed.DataEvent.TransactionStatus;
+import au.com.jwatmuff.genericdb.distributed.Timestamp;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -214,11 +215,12 @@ public class Update implements Serializable {
     public void adjustTimestamps(long amount) {
         for(EventList list : updateMap.values())
             for(DataEvent event : list) {
-                //Timestamp newTime = new Timestamp(event.getTimestamp().getTime() + amount);
-                //log.debug(event.getData().getTimestamp() + " -> " + newTime);
-                event.getData().getTimestamp().setTime(event.getData().getTimestamp().getTime() + amount);
+                Timestamp oldTime = event.getTimestamp();
+                Timestamp newTime = new Timestamp(oldTime.getTime() + amount);
+                log.debug(oldTime + " -> " + newTime);
+                event.getData().setTimestamp(newTime);
             }
-                //event.getTimestamp().setTime(event.getTimestamp().getTime() + amount);
+            //event.getTimestamp().setTime(event.getTimestamp().getTime() + amount);
     }
 
     private String makeWidth(String s, int n) {
