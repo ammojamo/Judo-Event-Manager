@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.genericdb.p2p;
 
+import au.com.jwatmuff.eventmanager.Main;
 import au.com.jwatmuff.genericdb.cache.CachingDatabase;
 import au.com.jwatmuff.genericdb.p2p.AuthenticationUtils.AuthenticationPair;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -54,6 +55,7 @@ public abstract class DatabaseManager {
                 info.name = activeDatabase.getName();
                 info.id = activeDatabase.getID();
                 info.passwordHash = activeDatabase.getPasswordHash();
+                info.version = Main.VERSION;
                 return info;
             }
             else {
@@ -118,6 +120,7 @@ public abstract class DatabaseManager {
         props.setProperty("UUID", "" + database.id);
         props.setProperty("name", database.name);
         props.setProperty("password", "" + database.passwordHash);
+        props.setProperty("version", database.version);
         
         File infoFile = new File(dbDir, "info.dat");
         
@@ -136,6 +139,7 @@ public abstract class DatabaseManager {
         database.id = UUID.randomUUID();
         database.passwordHash = passwordHash;
         database.local = true;
+        database.version = Main.VERSION;
 
         createDatabaseDirectory(database);
         
@@ -289,6 +293,7 @@ public abstract class DatabaseManager {
                         info.localDirectory = dbDir;
                         info.name = props.getProperty("name");
                         info.passwordHash = Integer.parseInt(props.getProperty("password"));
+                        info.version = props.getProperty("version");
                         databases.put(info.id, info);
                     } catch(Exception e) {
                         log.warn("Unable to read competition info from " + dbInfo, e);

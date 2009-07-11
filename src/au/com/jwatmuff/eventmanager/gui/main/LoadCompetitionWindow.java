@@ -6,6 +6,7 @@
 
 package au.com.jwatmuff.eventmanager.gui.main;
 
+import au.com.jwatmuff.eventmanager.Main;
 import au.com.jwatmuff.eventmanager.gui.admin.EnterPasswordDialog;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
 import au.com.jwatmuff.eventmanager.permissions.Action;
@@ -73,7 +74,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 if(obj instanceof DatabaseInfo) {
                     DatabaseInfo di = (DatabaseInfo)obj;
                     JLabel label = (JLabel)super.getListCellRendererComponent(list, di.name, arg2, arg3, arg4);
-                    label.setIcon((di.peers > 0) ? Icons.REMOTE : Icons.LOCAL);
+                    label.setIcon((!Main.VERSION.equals(di.version)) ? Icons.NO :
+                                  (di.peers > 0) ? Icons.REMOTE : Icons.LOCAL);
                     return label;
                 }
                 return super.getListCellRendererComponent(list, obj, arg2, arg3, arg4);
@@ -512,6 +514,10 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         if(existingCompRadioButton.isSelected()) {
             selected = (DatabaseInfo)competitionList.getSelectedValue();
             if(selected == null) return;
+            if(!Main.VERSION.equals(selected.version)) {
+                GUIUtils.displayError(this, "This competition is only compatible with version " + selected.version + ".\nThis copy of EventManager is version " + Main.VERSION + ".");
+                return;
+            }
 
             /* password check */
             if(!dbManager.authenticate(selected, 0)) {

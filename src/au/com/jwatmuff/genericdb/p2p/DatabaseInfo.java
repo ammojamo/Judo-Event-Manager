@@ -20,6 +20,7 @@ public class DatabaseInfo implements Serializable {
     public UUID id;
     public int passwordHash;
     public int peers;
+    public String version = "null";
 
     @Override
     public boolean equals(Object obj) {

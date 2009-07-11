@@ -46,6 +46,8 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 public class Main {
     private static Logger log = Logger.getLogger(Main.class);
     
+    public static final String VERSION = "0.0.1";
+
     /**
      * Creates a run lock file if it does not already exist. Returns false
      * if a run lock is already present and the force argument is false.
