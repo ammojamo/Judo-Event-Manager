@@ -80,34 +80,32 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
         if(showResults) {
             PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
 
-            for(String code : new String[] {
-                "LW5", "LW6", "LW9", "LW10", "LW11", "LW12",
-                "L5", "L6", "L9", "L10", "L11", "L12", "L17", "L18",
-                "W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10",
-                "W11", "W12", "W13", "W14", "W15", "W16", "W17", "W18", "W19", "W20",
-                "W21", "W22", "W23"
-            }) {
-                FightPlayer p = parser.parseCode(code);
-                switch(p.type) {
-                    case NORMAL:
-                        c.put(code,
-                              p.player.getVisibleID() + " " +
-                              p.player.getLastName() + ", " +
-                              p.player.getFirstName().charAt(0));
-                        break;
-                    case ERROR:
-                        c.put(code, "--"); // mark error with --
-                        break;
-                    case UNDECIDED:
-                        c.put(code, code);
-                        break;
-                    default:
-                        c.put(code, p.type.toString());
-                        break;
+            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
+
+
+            for(Fight fight : fights) {
+                for(String code : fight.getPlayerCodes()) {
+                    FightPlayer p = parser.parseCode(code);
+                    switch(p.type) {
+                        case NORMAL:
+                            c.put(code,
+                                  p.player.getVisibleID() + " " +
+                                  p.player.getLastName() + ", " +
+                                  p.player.getFirstName().charAt(0));
+                            break;
+                        case ERROR:
+                            c.put(code, "--"); // mark error with --
+                            break;
+                        case UNDECIDED:
+                            c.put(code, code);
+                            break;
+                        default:
+                            c.put(code, p.type.toString());
+                            break;
+                    }
                 }
             }
 
-            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
             i = 0;
             for(Fight f : fights) {
                 i++;
