@@ -211,7 +211,6 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         newCompRadioButton = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
         manualScoreboardButton = new javax.swing.JButton();
-        manualFightProgressionButton = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -386,33 +385,21 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             }
         });
 
-        manualFightProgressionButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/text_list_numbers.png"))); // NOI18N
-        manualFightProgressionButton.setText("Manual Fight Progression..");
-        manualFightProgressionButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        manualFightProgressionButton.setIconTextGap(8);
-
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(manualScoreboardButton)
-                    .addComponent(manualFightProgressionButton))
-                .addContainerGap(235, Short.MAX_VALUE))
+                .addComponent(manualScoreboardButton)
+                .addContainerGap(263, Short.MAX_VALUE))
         );
-
-        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {manualFightProgressionButton, manualScoreboardButton});
-
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(manualScoreboardButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(manualFightProgressionButton)
-                .addContainerGap(373, Short.MAX_VALUE))
+                .addContainerGap(404, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Manual Interfaces", jPanel4);
@@ -760,7 +747,6 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private javax.swing.JLabel licenseTypeLabel;
     private javax.swing.JButton loadBackupButton;
     private javax.swing.JButton loadLicenseButton;
-    private javax.swing.JButton manualFightProgressionButton;
     private javax.swing.JButton manualScoreboardButton;
     private javax.swing.JRadioButton newCompRadioButton;
     private javax.swing.JButton okButton;
