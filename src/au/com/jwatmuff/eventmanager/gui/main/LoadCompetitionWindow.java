@@ -113,6 +113,9 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     @Override
     public void setVisible(boolean visible) {
         if(visible) {
+            success = false;
+            updateLicenseInfo();
+            updateDatabaseList();
             try {
                 checkDatabasesTimer = new Timer();
                 checkDatabasesTimer.schedule(new TimerTask() {
@@ -124,9 +127,6 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             } catch(Exception e ) {
                 log.error(e.getMessage(), e);
             }
-            success = false;
-            updateLicenseInfo();
-            updateDatabaseList();
         }
         super.setVisible(visible);
     }
