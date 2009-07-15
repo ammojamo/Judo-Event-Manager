@@ -57,6 +57,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
     private Set<Peer> synchronizingPeers = Collections.synchronizedSet(new HashSet<Peer>());
     private Set<Peer> pendingPeers = Collections.synchronizedSet(new HashSet<Peer>());
 
+    private boolean shutdown = false;
+
     public UpdateManager(
             PeerManager     peerManager,
             TransactionalDatabaseUpdater databaseUpdater,
@@ -96,7 +98,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
     private Thread syncBumpThread = new Thread() {
         @Override
         public void run() {
-            while(true) {
+            while(!shutdown) {
                 syncWithPeers();
                 try {
                     Thread.sleep(60000);
@@ -108,7 +110,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
     private Thread syncControlThread = new Thread() {
         @Override
         public void run() {
-            while(true) {
+            while(!shutdown) {
                 /* Gets the next peer that needs synchronizing from the queue*/
                 final Peer peer;
                 try {
@@ -342,5 +344,22 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         } catch(Throwable e) { // we really don't want this thread to die due to uncaught throwable
             log.error("Unable to write updates to file", e);
         }
+    }
+
+    void shutdown() {
+        shutdown = true;
+
+        syncControlThread.interrupt();
+        syncBumpThread.interrupt();
+        /* Give them half a second to shutdown nicely */
+        try {
+            syncControlThread.join(500);
+            syncBumpThread.join(500);
+        } catch(InterruptedException e) {}
+        /* Log if the threads haven't died yet */
+        if(syncControlThread.isAlive())
+            log.warn("Sync control thread didn't shutdown quickly");
+        if(syncBumpThread.isAlive())
+            log.warn("Sync bump thread didn't shutdown quickly");
     }
 }
