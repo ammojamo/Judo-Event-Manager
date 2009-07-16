@@ -28,9 +28,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
@@ -63,13 +64,14 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
     private static final int CHECK_DATABASES_PERIOD = 5000; //milliseconds
 
-    private Timer checkDatabasesTimer;
     private Runnable checkDatabasesTask = new Runnable() {
         @Override
         public void run() {
             updateDatabaseList();
         }
     };
+
+    private ScheduledExecutorService checkDatabasesExecutor;
     
     /** Creates new form LoadCompetitionWindow */
     public LoadCompetitionWindow(DatabaseManager dbManager, LicenseManager licenseManager) {
@@ -99,13 +101,6 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         updateDatabaseList();
         updateLicenseInfo();
         
-        dbManager.setListener(new DatabaseManager.Listener() {
-            @Override
-            public void handleDatabaseManagerEvent() {                
-                updateDatabaseList();
-            }
-        });
-        
         // center window on screen
         setLocationRelativeTo(null);
     }
@@ -115,18 +110,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         if(visible) {
             success = false;
             updateLicenseInfo();
-            updateDatabaseList();
-            try {
-                checkDatabasesTimer = new Timer();
-                checkDatabasesTimer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        checkDatabasesTask.run();
-                    }
-                }, CHECK_DATABASES_PERIOD, CHECK_DATABASES_PERIOD);
-            } catch(Exception e ) {
-                log.error(e.getMessage(), e);
-            }
+            checkDatabasesExecutor = Executors.newSingleThreadScheduledExecutor();
+            checkDatabasesExecutor.scheduleAtFixedRate(
+                    checkDatabasesTask,
+                    0, CHECK_DATABASES_PERIOD, TimeUnit.MILLISECONDS);
+            dbManager.setListener(new DatabaseManager.Listener() {
+                @Override
+                public void handleDatabaseManagerEvent() {
+                    updateDatabaseList();
+                }
+            });
         }
         super.setVisible(visible);
     }
@@ -183,7 +176,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
     @Override
     public void dispose() {
-        if(checkDatabasesTimer != null) checkDatabasesTimer.cancel();
+        dbManager.setListener(null);
+        if(checkDatabasesExecutor != null) checkDatabasesExecutor.shutdownNow();
         super.dispose();
     }
     
@@ -707,6 +701,9 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 FileWriter fw = new FileWriter(new File(dir, "info.dat"));
                 props.store(fw, "");
                 fw.close();
+
+                /* update gui */
+                checkDatabasesExecutor.schedule(checkDatabasesTask, 0, TimeUnit.MILLISECONDS);
             } catch(Exception e) {
                 GUIUtils.displayError(null, "Error while opening file: " + e.getMessage());
             }
@@ -719,6 +716,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         int result = JOptionPane.showConfirmDialog(rootPane, "Delete " + info.name + " permanently?", "Delete Competition", JOptionPane.YES_NO_OPTION);
         if(result == JOptionPane.YES_OPTION) {
             DirUtils.deleteDir(info.localDirectory);
+            checkDatabasesExecutor.schedule(checkDatabasesTask, 0, TimeUnit.MILLISECONDS);
         }
     }//GEN-LAST:event_deleteCompButtonActionPerformed
         
