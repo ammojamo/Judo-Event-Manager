@@ -383,7 +383,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
         }
         
         if(sessionListModel.getSize() == 0 && poolListModel.getSize() == 0) {
-            GUIUtils.displayError(parentWindow, "Cannot create a session with no pools and no preceding sessions.");
+            GUIUtils.displayError(parentWindow, "Cannot create a session with no divisions and no preceding sessions.");
             return;
         }
         

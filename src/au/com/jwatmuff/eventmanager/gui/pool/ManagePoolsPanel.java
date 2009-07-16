@@ -445,7 +445,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             AutoAssign.assignPlayersToPools(database);
         } catch(DatabaseStateException e) {
             log.error(e);
-            GUIUtils.displayError(parentWindow, "Assigning players to pools failed: " + e.getMessage());
+            GUIUtils.displayError(parentWindow, "Assigning players to divisions failed: " + e.getMessage());
         }
     }//GEN-LAST:event_autoAssignButtonActionPerformed
 
@@ -466,8 +466,8 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
             database.delete(pp);
         } catch(Exception e) {
-            GUIUtils.displayError(this, "An error occured while removing the player from the selected pool");
-            log.error("Exception while removing player " + player.getID() + " from pool " + pool.getID(), e);
+            GUIUtils.displayError(this, "An error occured while removing the player from the selected division");
+            log.error("Exception while removing player " + player.getID() + " from division " + pool.getID(), e);
         }
     }//GEN-LAST:event_removeButtonActionPerformed
 
@@ -502,8 +502,8 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                     database.update(pp);
                 }
             } catch(Exception e) {
-                GUIUtils.displayError(this, "An error occured while approving the player for the selected pool");
-                log.error("Exception while updating requested/approved pools for player " + player.getID(), e);
+                GUIUtils.displayError(this, "An error occured while approving the player for the selected division");
+                log.error("Exception while updating requested/approved divisions for player " + player.getID(), e);
             }
         }
         //approveButton.setEnabled(false);

@@ -73,7 +73,7 @@ public class PoolListTableModel extends BeanMapperTableModel<Pool> implements Tr
 
         // add 'no pool'
         Pool nopool = new Pool();
-        nopool.setDescription("No Pool");
+        nopool.setDescription("No Division");
         nopool.setID(0);
         pools.add(nopool);
 
