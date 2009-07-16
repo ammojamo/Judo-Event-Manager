@@ -49,14 +49,11 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
     private FightPlayer player1, player2;
 
     private Result pendingResult;
-
-    private ScoringSystem system;
     
     /** Creates new form FightProgressionPanel */
     public SimpleScoringPanel(Session matSession, final ScoringSystem system) {
         initComponents();
         this.matSession = matSession;
-        this.system = system;
         
         mainPanel.setLayout(new GridLayout(1,2));
         ssp1 = new ScalableScoringPanel(system);
@@ -94,6 +91,8 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
                         pendingResult.setPlayerScores(new int[] {5, 0});
                     else if(evt.getComponent() == ssp1.kButton)
                         pendingResult.setPlayerScores(new int[] {3, 0});
+                    else if(evt.getComponent() == ssp1.dButton)
+                        pendingResult.setPlayerScores(new int[] {1, 0});
                     else {
                         pendingResult = null;
                         return;
@@ -122,6 +121,8 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
         ssp1.yButton.addMouseListener(ml1);
         if(system == ScoringSystem.OLD)
             ssp1.kButton.addMouseListener(ml1);
+        if(system == ScoringSystem.NEW)
+            ssp1.dButton.addMouseListener(ml1);
         ssp1.cancelButton.addMouseListener(ml1);
         ssp1.confirmButton.addMouseListener(ml1);
         
@@ -154,6 +155,8 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
                         pendingResult.setPlayerScores(new int[] {0, 5});
                     else if(evt.getComponent() == ssp2.kButton)
                         pendingResult.setPlayerScores(new int[] {0, 3});
+                    else if(evt.getComponent() == ssp2.dButton)
+                        pendingResult.setPlayerScores(new int[] {0, 1});
                     else {
                         pendingResult = null;
                         return;
@@ -182,6 +185,8 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
         ssp2.yButton.addMouseListener(ml2);
         if(system == ScoringSystem.OLD)
             ssp2.kButton.addMouseListener(ml2);
+        if(system == ScoringSystem.NEW)
+            ssp2.dButton.addMouseListener(ml2);
         ssp2.cancelButton.addMouseListener(ml2);
         ssp2.confirmButton.addMouseListener(ml2);
     }

@@ -26,11 +26,13 @@ public class ScalableScoringPanel extends javax.swing.JPanel {
     private static final String WAZA_ARI = "W";
     private static final String YUKO = "Y";
     private static final String KOKA = "K";
+    private static final String DECISION = "D";
     
     ScalableLabel iButton;
     ScalableLabel wButton;
     ScalableLabel yButton;
     ScalableLabel kButton;
+    ScalableLabel dButton;
     ScalableLabel playerLabel;
     ScalableLabel winnerByLabel;
     ScalableLabel confirmButton;
@@ -43,22 +45,24 @@ public class ScalableScoringPanel extends javax.swing.JPanel {
         initComponents();
         this.system = system;
         ScalableAbsoluteLayout layout = new ScalableAbsoluteLayout(this);
-
-        double offset = (system == ScoringSystem.NEW) ? 1.0/10 : 0.0;
         
         iButton = new ScalableLabel(IPPON, true);   
-        layout.addComponent(iButton, new Rectangle.Double(1.0/10 + offset, 1.0/2, 1.0/5, 1.0/4));
+        layout.addComponent(iButton, new Rectangle.Double(1.0/10, 1.0/2, 1.0/5, 1.0/4));
         this.add(iButton);
 
         wButton = new ScalableLabel(WAZA_ARI);
-        layout.addComponent(wButton, new Rectangle.Double(3.0/10 + offset, 1.0/2, 1.0/5, 1.0/4));
+        layout.addComponent(wButton, new Rectangle.Double(3.0/10, 1.0/2, 1.0/5, 1.0/4));
         
         yButton = new ScalableLabel(YUKO, true);
-        layout.addComponent(yButton, new Rectangle.Double(5.0/10 + offset, 1.0/2, 1.0/5, 1.0/4));
+        layout.addComponent(yButton, new Rectangle.Double(5.0/10, 1.0/2, 1.0/5, 1.0/4));
 
         if(system == ScoringSystem.OLD) {
             kButton = new ScalableLabel(KOKA, true);
-            layout.addComponent(kButton, new Rectangle.Double(7.0/10 + offset, 1.0/2, 1.0/5, 1.0/4));
+            layout.addComponent(kButton, new Rectangle.Double(7.0/10, 1.0/2, 1.0/5, 1.0/4));
+        }
+        if(system == ScoringSystem.NEW) {
+            dButton = new ScalableLabel(DECISION, true);
+            layout.addComponent(dButton, new Rectangle.Double(7.0/10, 1.0/2, 1.0/5, 1.0/4));
         }
         
         playerLabel = new ScalableLabel("Player");
@@ -84,6 +88,7 @@ public class ScalableScoringPanel extends javax.swing.JPanel {
         wButton.setVisible(show);
         yButton.setVisible(show);
         if(system == ScoringSystem.OLD) kButton.setVisible(show);
+        if(system == ScoringSystem.NEW) dButton.setVisible(show);
     }
 
     public void showConfirmButtons(boolean show) {
