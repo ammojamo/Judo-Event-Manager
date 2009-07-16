@@ -174,6 +174,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         return isNew;
     }
 
+    private void updateOkButton() {
+        if(newCompRadioButton.isSelected()) {
+            okButton.setText("Open");
+            okButton.setEnabled(true);
+        } else if(existingCompRadioButton.isSelected()) {
+            okButton.setText("Open");
+            okButton.setEnabled(competitionList.getSelectedIndex() >= 0);
+        }
+    }
+
     @Override
     public void dispose() {
         dbManager.setListener(null);
@@ -223,14 +233,14 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         setLocationByPlatform(true);
         setResizable(false);
 
-        okButton.setText("OK");
+        okButton.setText("Open");
         okButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 okButtonActionPerformed(evt);
             }
         });
 
-        cancelButton.setText("Cancel");
+        cancelButton.setText("Exit");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -240,11 +250,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(existingCompRadioButton);
-        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
-        existingCompRadioButton.setText("Load Existing Competition");
+        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        existingCompRadioButton.setText("Open Existing Competition");
         existingCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         existingCompRadioButton.setEnabled(false);
         existingCompRadioButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        existingCompRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                existingCompRadioButtonActionPerformed(evt);
+            }
+        });
 
         competitionList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         competitionList.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -323,11 +338,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(newCompRadioButton);
-        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
+        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         newCompRadioButton.setSelected(true);
         newCompRadioButton.setText("Create New Competition");
         newCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         newCompRadioButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        newCompRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newCompRadioButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -650,6 +670,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         boolean local = (info != null && info.local);
         saveBackupButton.setEnabled(local);
         deleteCompButton.setEnabled(local);
+        updateOkButton();
     }//GEN-LAST:event_competitionListValueChanged
 
     private void saveBackupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveBackupButtonActionPerformed
@@ -719,6 +740,15 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             checkDatabasesExecutor.schedule(checkDatabasesTask, 0, TimeUnit.MILLISECONDS);
         }
     }//GEN-LAST:event_deleteCompButtonActionPerformed
+
+    private void newCompRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newCompRadioButtonActionPerformed
+        competitionList.clearSelection();
+        updateOkButton();
+    }//GEN-LAST:event_newCompRadioButtonActionPerformed
+
+    private void existingCompRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingCompRadioButtonActionPerformed
+        updateOkButton();
+    }//GEN-LAST:event_existingCompRadioButtonActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
