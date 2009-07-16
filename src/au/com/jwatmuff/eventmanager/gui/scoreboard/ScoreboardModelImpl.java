@@ -641,7 +641,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public int getWinPoints() {
         if(win == null) return 0;
-        if(win == Win.BY_DECISION) return 1;
         /* once golden score has started, any win is awarded as a decision (1 point) */
         if(goldenScoreMode == GoldenScoreMode.ACTIVE ||
            goldenScoreMode == GoldenScoreMode.FINISHED ) {
