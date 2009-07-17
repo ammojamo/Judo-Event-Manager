@@ -19,7 +19,9 @@ import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.velocity.context.Context;
 
 /**
@@ -69,7 +71,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                   p.getLastName() + ", " +
                   p.getFirstName().charAt(0));
         }
-        while(i++ < 32) {
+        while(i++ < 64) { //TODO: this should not be an arbitrary limit
             c.put("player" + i, "BYE");
         }
 
@@ -82,27 +84,36 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
             List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
 
-
+            Set<String> codes = new HashSet<String>();
+            /* add all codes used in any fights */
             for(Fight fight : fights) {
-                for(String code : fight.getPlayerCodes()) {
-                    FightPlayer p = parser.parseCode(code);
-                    switch(p.type) {
-                        case NORMAL:
-                            c.put(code,
-                                  p.player.getVisibleID() + " " +
-                                  p.player.getLastName() + ", " +
-                                  p.player.getFirstName().charAt(0));
-                            break;
-                        case ERROR:
-                            c.put(code, "--"); // mark error with --
-                            break;
-                        case UNDECIDED:
-                            c.put(code, code);
-                            break;
-                        default:
-                            c.put(code, p.type.toString());
-                            break;
-                    }
+                for(String code : fight.getPlayerCodes())
+                    codes.add(code);
+            }
+            /* add winner and loser codes for all fights */
+            for(i = 1; i <= fights.size(); i++) {
+                codes.add("W" + i);
+                codes.add("L" + i);
+            }
+
+            for(String code : codes) {
+                FightPlayer p = parser.parseCode(code);
+                switch(p.type) {
+                    case NORMAL:
+                        c.put(code,
+                              p.player.getVisibleID() + " " +
+                              p.player.getLastName() + ", " +
+                              p.player.getFirstName().charAt(0));
+                        break;
+                    case ERROR:
+                        c.put(code, "--"); // mark error with --
+                        break;
+                    case UNDECIDED:
+                        c.put(code, code);
+                        break;
+                    default:
+                        c.put(code, p.type.toString());
+                        break;
                 }
             }
 
