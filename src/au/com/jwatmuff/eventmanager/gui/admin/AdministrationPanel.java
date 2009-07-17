@@ -103,7 +103,7 @@ public class AdministrationPanel extends javax.swing.JPanel {
         jLabel6.setText("Set and change passwords for various tasks");
 
         reviewDataButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/wrench_orange.png"))); // NOI18N
-        reviewDataButton.setText("Enter Results..");
+        reviewDataButton.setText("Change Results..");
         reviewDataButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         reviewDataButton.setIconTextGap(8);
         reviewDataButton.addActionListener(new java.awt.event.ActionListener() {

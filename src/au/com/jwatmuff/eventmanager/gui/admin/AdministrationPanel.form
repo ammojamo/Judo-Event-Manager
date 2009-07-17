@@ -139,7 +139,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/com/famfamfam/icons/silk/wrench_orange.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Enter Results.."/>
+        <Property name="text" type="java.lang.String" value="Change Results.."/>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="iconTextGap" type="int" value="8"/>
       </Properties>
