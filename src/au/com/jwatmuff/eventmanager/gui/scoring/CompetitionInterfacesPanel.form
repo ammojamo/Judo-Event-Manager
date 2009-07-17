@@ -24,10 +24,7 @@
                   <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jSeparator2" alignment="0" pref="430" max="32767" attributes="0"/>
                   <Component id="jSeparator1" alignment="1" pref="430" max="32767" attributes="0"/>
-                  <Component id="scoringButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
-                  <Component id="fightProgressionButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
                   <Component id="jSeparator3" alignment="0" pref="430" max="32767" attributes="0"/>
-                  <Component id="scoreboardButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jSeparator4" alignment="0" pref="430" max="32767" attributes="0"/>
                   <Component id="displayScoreboardButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -35,6 +32,9 @@
                   <Component id="jSeparator5" alignment="0" pref="430" max="32767" attributes="0"/>
                   <Component id="manualScoreboardButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="scoringButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
+                  <Component id="fightProgressionButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
+                  <Component id="scoreboardButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -48,19 +48,19 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="fightProgressionButton" min="-2" max="-2" attributes="0"/>
+              <Component id="scoringButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="scoringButton" min="-2" max="-2" attributes="0"/>
+              <Component id="scoreboardButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator3" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="scoreboardButton" min="-2" max="-2" attributes="0"/>
+              <Component id="fightProgressionButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -119,14 +119,14 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Display a list of upcoming fights for each contest area"/>
+        <Property name="text" type="java.lang.String" value="Enter winning scores for fights as they are played"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator2">
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Enter winning scores for fights as they are played"/>
+        <Property name="text" type="java.lang.String" value="Score fights using a fully featured scoreboard interface"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator3">
@@ -146,7 +146,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Score fights using a fully featured scoreboard interface"/>
+        <Property name="text" type="java.lang.String" value="Display a list of upcoming fights for each contest area"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator4">

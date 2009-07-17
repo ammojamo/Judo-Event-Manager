@@ -126,9 +126,9 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel1.setText("Competition Interfaces");
 
-        jLabel2.setText("Display a list of upcoming fights for each contest area");
+        jLabel2.setText("Enter winning scores for fights as they are played");
 
-        jLabel3.setText("Enter winning scores for fights as they are played");
+        jLabel3.setText("Score fights using a fully featured scoreboard interface");
 
         scoreboardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
         scoreboardButton.setText("Scoreboard (Entry Mode)..");
@@ -140,7 +140,7 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel4.setText("Score fights using a fully featured scoreboard interface");
+        jLabel4.setText("Display a list of upcoming fights for each contest area");
 
         displayScoreboardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
         displayScoreboardButton.setText("Scoreboard (Display Mode)..");
@@ -178,17 +178,17 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
                     .addComponent(jLabel3)
                     .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
                     .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                    .addComponent(scoringButton)
-                    .addComponent(fightProgressionButton)
                     .addComponent(jSeparator3, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                    .addComponent(scoreboardButton)
                     .addComponent(jLabel4)
                     .addComponent(jSeparator4, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
                     .addComponent(displayScoreboardButton)
                     .addComponent(jLabel5)
                     .addComponent(jSeparator5, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
                     .addComponent(manualScoreboardButton)
-                    .addComponent(jLabel6))
+                    .addComponent(jLabel6)
+                    .addComponent(scoringButton)
+                    .addComponent(fightProgressionButton)
+                    .addComponent(scoreboardButton))
                 .addContainerGap())
         );
 
@@ -202,19 +202,19 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fightProgressionButton)
+                .addComponent(scoringButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scoringButton)
+                .addComponent(scoreboardButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scoreboardButton)
+                .addComponent(fightProgressionButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
