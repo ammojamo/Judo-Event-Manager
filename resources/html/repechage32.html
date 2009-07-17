@@ -1,0 +1,1519 @@
+#if($fullDocument)
+#parse("resources/html/draw-header.html")
+#end
+    <h1>Fight Draw</h1>
+    <h2>
+      ${division} - ${competitionName}
+    </h2>
+
+    <table class="repechage">
+      <tr>
+        <th>&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(1)</td>
+        <td class="border">$player1</td>
+        <td class="border">$!fight1score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>1</b></td>
+        <td class="border">$!W1 &nbsp;</td>
+        <td class="border">$!fight17score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(17)</td>
+        <td class="border">$player17</td>
+        <td class="border">$!fight1score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>17 / A</b></td>
+        <td class="border">$!W17 &nbsp;</td>
+        <td class="border">$!fight25score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(9)</td>
+        <td class="border">$player9</td>
+        <td class="border">$!fight2score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>2</b></td>
+        <td class="border">$!W2 &nbsp;</td>
+        <td class="border">$!fight17score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+     </tr>
+
+      <tr>
+        <td>(25)</td>
+        <td class="border">$player25</td>
+        <td class="border">$!fight2score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>25 / I</b></td>
+        <td class="border">$!W25 &nbsp;</td>
+        <td class="border">$!fight37score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(5)</td>
+        <td class="border">$player5</td>
+        <td class="border">$!fight3score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>3</b></td>
+        <td class="border">$!W3 &nbsp;</td>
+        <td class="border">$!fight18score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(29)</td>
+        <td class="border">$player29</td>
+        <td class="border">$!fight3score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>18 / B</b></td>
+        <td class="border">$!W18 &nbsp;</td>
+        <td class="border">$!fight25score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(13)</td>
+        <td class="border">$player13</td>
+        <td class="border">$!fight4score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>4</b></td>
+        <td class="border">$!W4 &nbsp;</td>
+        <td class="border">$!fight18score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(21)</td>
+        <td class="border">$player21</td>
+        <td class="border">$!fight4score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder"><b>37 / M</b></td>
+        <td class="border">$!W37 &nbsp;</td>
+        <td class="border">$!fight43score1 &nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>(3)</td>
+        <td class="border">$player3</td>
+        <td class="border">$!fight5score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>5</b></td>
+        <td class="border">$!W5 &nbsp;</td>
+        <td class="border">$!fight19score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(31)</td>
+        <td class="border">$player31</td>
+        <td class="border">$!fight5score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>19 / C</b></td>
+        <td class="border">$!W19 &nbsp;</td>
+        <td class="border">$!fight26score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(11)</td>
+        <td class="border">$player11</td>
+        <td class="border">$!fight6score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>6</b></td>
+        <td class="border">$!W6 &nbsp;</td>
+        <td class="border">$!fight19score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(23)</td>
+        <td class="border">$player23</td>
+        <td class="border">$!fight6score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>26 / J</b></td>
+        <td class="border">$!W26 &nbsp;</td>
+        <td class="border">$!fight37score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(7)</td>
+        <td class="border">$player7</td>
+        <td class="border">$!fight7score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>7</b></td>
+        <td class="border">$!W7 &nbsp;</td>
+        <td class="border">$!fight20score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(27)</td>
+        <td class="border">$player27</td>
+        <td class="border">$!fight7score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>20 / D</b></td>
+        <td class="border">$!W20 &nbsp;</td>
+        <td class="border">$!fight26score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(15)</td>
+        <td class="border">$player15</td>
+        <td class="border">$!fight8score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>8</b></td>
+        <td class="border">$!W8 &nbsp;</td>
+        <td class="border">$!fight20score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(19)</td>
+        <td class="border">$player19</td>
+        <td class="border">$!fight8score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder"><b>43</b></td>
+        <td class="border">$!W43 &nbsp;</td>
+      </tr>
+
+
+      <tr>
+        <td>(2)</td>
+        <td class="border">$player2</td>
+        <td class="border">$!fight9score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>FIRST</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>9</b></td>
+        <td class="border">$!W9 &nbsp;</td>
+        <td class="border">$!fight21score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(32)</td>
+        <td class="border">$player32</td>
+        <td class="border">$!fight9score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>21 / E</b></td>
+        <td class="border">$!W21 &nbsp;</td>
+        <td class="border">$!fight27score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(10)</td>
+        <td class="border">$player10</td>
+        <td class="border">$!fight10score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>10</b></td>
+        <td class="border">$!W10 &nbsp;</td>
+        <td class="border">$!fight21score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+     </tr>
+
+      <tr>
+        <td>(24)</td>
+        <td class="border">$player24</td>
+        <td class="border">$!fight10score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>27 / K</b></td>
+        <td class="border">$!W27 &nbsp;</td>
+        <td class="border">$!fight38score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(6)</td>
+        <td class="border">$player6</td>
+        <td class="border">$!fight11score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>11</b></td>
+        <td class="border">$!W11 &nbsp;</td>
+        <td class="border">$!fight22score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(28)</td>
+        <td class="border">$player28</td>
+        <td class="border">$!fight11score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>22 / F</b></td>
+        <td class="border">$!W22 &nbsp;</td>
+        <td class="border">$!fight27score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(14)</td>
+        <td class="border">$player14</td>
+        <td class="border">$!fight12score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>12</b></td>
+        <td class="border">$!W12 &nbsp;</td>
+        <td class="border">$!fight22score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(20)</td>
+        <td class="border">$player20</td>
+        <td class="border">$!fight12score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder"><b>38 / N</b></td>
+        <td class="border">$!W38 &nbsp;</td>
+        <td class="border">$!fight43score2 &nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(4)</td>
+        <td class="border">$player4</td>
+        <td class="border">$!fight13score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>13</b></td>
+        <td class="border">$!W13 &nbsp;</td>
+        <td class="border">$!fight23score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(30)</td>
+        <td class="border">$player30</td>
+        <td class="border">$!fight13score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>23 / G</b></td>
+        <td class="border">$!W23 &nbsp;</td>
+        <td class="border">$!fight28score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(12)</td>
+        <td class="border">$player12</td>
+        <td class="border">$!fight14score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>14</b></td>
+        <td class="border">$!W14 &nbsp;</td>
+        <td class="border">$!fight23score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(22)</td>
+        <td class="border">$player22</td>
+        <td class="border">$!fight14score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>28 / L</b></td>
+        <td class="border">$!W28 &nbsp;</td>
+        <td class="border">$!fight38score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(8)</td>
+        <td class="border">$player8</td>
+        <td class="border">$!fight15score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>15</b></td>
+        <td class="border">$!W15 &nbsp;</td>
+        <td class="border">$!fight24score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(26)</td>
+        <td class="border">$player26</td>
+        <td class="border">$!fight15score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>24 / H</b></td>
+        <td class="border">$!W24 &nbsp;</td>
+        <td class="border">$!fight28score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(16)</td>
+        <td class="border">$player16</td>
+        <td class="border">$!fight16score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>16</b></td>
+        <td class="border">$!W16 &nbsp;</td>
+        <td class="border">$!fight24score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>(18)</td>
+        <td class="border">$player18</td>
+        <td class="border">$!fight16score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+
+
+
+
+
+
+
+
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>1st round loser to winner I</td>
+        <td>&nbsp;</td>
+        <td class="border">$!LWW25 &nbsp;</td>
+        <td class="border">$!fight29score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>29</b></td>
+        <td class="border">$!W29 &nbsp;</td>
+        <td class="border">$!fight33score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>2nd round loser to winner I</td>
+        <td>&nbsp;</td>
+        <td class="border">$!LW25 &nbsp;</td>
+        <td class="border">$!fight29score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>33</b></td>
+        <td class="border">$!W33 &nbsp;</td>
+        <td class="border">$!fight39score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>Loser I</td>
+        <td>&nbsp;</td>
+        <td class="border">$!L25 &nbsp;</td>
+        <td class="border">$!fight33score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>39</b></td>
+        <td class="border">$!W39 &nbsp;</td>
+        <td class="border">$!fight41score1 &nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>1st round loser to winner J</td>
+        <td>&nbsp;</td>
+        <td class="border">$!LWW26 &nbsp;</td>
+        <td class="border">$!fight30score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>30</b></td>
+        <td class="border">$!W30 &nbsp;</td>
+        <td class="border">$!fight34score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>2nd round loser to winner J</td>
+        <td>&nbsp;</td>
+        <td class="border">$!LW26 &nbsp;</td>
+        <td class="border">$!fight30score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>34</b></td>
+        <td class="border">$!W34 &nbsp;</td>
+        <td class="border">$!fight39score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>41</b></td>
+        <td class="border">$!W41 &nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>THIRD &nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>Loser J</td>
+        <td>&nbsp;</td>
+        <td class="border">$!L26 &nbsp;</td>
+        <td class="border">$!fight34score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>Loser N</td>
+        <td>&nbsp;</td>
+        <td class="border">$!L38 &nbsp;</td>
+        <td class="border">$!fight41score2</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+
+
+
+
+
+
+
+
+
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>1st round loser to winner K</td>
+        <td>&nbsp;</td>
+        <td class="border">$!LWW27 &nbsp;</td>
+        <td class="border">$!fight31score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>31</b></td>
+        <td class="border">$!W31 &nbsp;</td>
+        <td class="border">$!fight35score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>2nd round loser to winner K</td>
+        <td>&nbsp;</td>
+        <td class="border">$!LW27 &nbsp;</td>
+        <td class="border">$!fight31score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>35</b></td>
+        <td class="border">$!W35 &nbsp;</td>
+        <td class="border">$!fight40score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>Loser K</td>
+        <td>&nbsp;</td>
+        <td class="border">$!L27 &nbsp;</td>
+        <td class="border">$!fight35score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>40</b></td>
+        <td class="border">$!W40 &nbsp;</td>
+        <td class="border">$!fight42score1 &nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>1st round loser to winner L</td>
+        <td>&nbsp;</td>
+        <td class="border">$!LWW28 &nbsp;</td>
+        <td class="border">$!fight32score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>32</b></td>
+        <td class="border">$!W32 &nbsp;</td>
+        <td class="border">$!fight36score1 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>2nd round loser to winner L</td>
+        <td>&nbsp;</td>
+        <td class="border">$!LW28 &nbsp;</td>
+        <td class="border">$!fight32score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>36</b></td>
+        <td class="border">$!W36 &nbsp;</td>
+        <td class="border">$!fight40score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td><b>42</b></td>
+        <td class="border">$!W42 &nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <td>THIRD &nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>Loser L</td>
+        <td>&nbsp;</td>
+        <td class="border">$!L28 &nbsp;</td>
+        <td class="border">$!fight36score2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="rborder">&nbsp;</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>Loser M</td>
+        <td>&nbsp;</td>
+        <td class="border">$!L37 &nbsp;</td>
+        <td class="border">$!fight42score2</td>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+
+    </table>
+#if($fullDocument)
+#parse("resources/html/draw-footer.html")
+#end
