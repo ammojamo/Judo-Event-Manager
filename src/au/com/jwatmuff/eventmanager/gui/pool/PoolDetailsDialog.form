@@ -30,7 +30,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel2" max="32767" attributes="1"/>
                   <Component id="jPanel1" max="32767" attributes="1"/>
-                  <Component id="jPanel3" alignment="0" min="-2" max="-2" attributes="1"/>
+                  <Component id="jPanel3" alignment="0" min="-2" pref="392" max="-2" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
@@ -302,7 +302,7 @@
             </Property>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="enabled" source="maxGradeCheckBox" sourcePath="${selected}" target="maxGradeComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="maxGradeCheckBox" sourcePath="${selected &amp;&amp; enabled}" target="maxGradeComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="minWeightCheckBox">
@@ -317,12 +317,12 @@
         </Component>
         <Component class="javax.swing.JSpinner" name="maxAgeSpinner">
           <BindingProperties>
-            <BindingProperty name="enabled" source="maxAgeCheckBox" sourcePath="${selected}" target="maxAgeSpinner" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="maxAgeCheckBox" sourcePath="${selected &amp;&amp; enabled}" target="maxAgeSpinner" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
         </Component>
         <Component class="javax.swing.JSpinner" name="minAgeSpinner">
           <BindingProperties>
-            <BindingProperty name="enabled" source="minAgeCheckBox" sourcePath="${selected}" target="minAgeSpinner" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="minAgeCheckBox" sourcePath="${selected &amp;&amp; enabled}" target="minAgeSpinner" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel19">
@@ -342,7 +342,7 @@
             </Property>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="enabled" source="minWeightCheckBox" sourcePath="${selected}" target="minWeightSpinner" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="minWeightCheckBox" sourcePath="${selected &amp;&amp; enabled}" target="minWeightSpinner" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel16">
@@ -357,7 +357,7 @@
             </Property>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="enabled" source="minGradeCheckBox" sourcePath="${selected}" target="minGradeComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="minGradeCheckBox" sourcePath="${selected &amp;&amp; enabled}" target="minGradeComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
         </Component>
         <Component class="javax.swing.JSpinner" name="maxWeightSpinner">
@@ -367,7 +367,7 @@
             </Property>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="enabled" source="maxWeightCheckBox" sourcePath="${selected}" target="maxWeightSpinner" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="maxWeightCheckBox" sourcePath="${selected &amp;&amp; enabled}" target="maxWeightSpinner" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="minAgeCheckBox">

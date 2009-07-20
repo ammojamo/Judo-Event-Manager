@@ -174,6 +174,16 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         breakTimeSecSpinner.setValue(pool.getMinimumBreakTime()%60);
         goldenScoreTimeMinSpinner.setValue(pool.getGoldenScoreTime()/60);
         goldenScoreTimeSecSpinner.setValue(pool.getGoldenScoreTime()%60);
+
+        boolean unlocked = (pool.getLockedStatus() == Pool.LockedStatus.UNLOCKED);
+        maxWeightCheckBox.setEnabled(unlocked);
+        minWeightCheckBox.setEnabled(unlocked);
+        maxAgeCheckBox.setEnabled(unlocked);
+        minAgeCheckBox.setEnabled(unlocked);
+        genderComboBox.setEnabled(unlocked);
+        maxGradeCheckBox.setEnabled(unlocked);
+        minGradeCheckBox.setEnabled(unlocked);
+        playerList.setEnabled(unlocked);
     }
     
     private void populate() {
@@ -386,17 +396,17 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
 
         jLabel20.setText("yrs");
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxGradeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), maxGradeComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxGradeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), maxGradeComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         minWeightCheckBox.setText("Over");
 
         maxWeightCheckBox.setText("Under");
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxAgeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), maxAgeSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxAgeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), maxAgeSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, minAgeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), minAgeSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, minAgeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), minAgeSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         jLabel19.setText("yrs");
@@ -405,17 +415,17 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
 
         minWeightSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, 300.0d, 0.1d));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, minWeightCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), minWeightSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, minWeightCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), minWeightSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         jLabel16.setText("kg");
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, minGradeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), minGradeComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, minGradeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), minGradeComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         maxWeightSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, 300.0d, 0.1d));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxWeightCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), maxWeightSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxWeightCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), maxWeightSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         minAgeCheckBox.setText("Over");
