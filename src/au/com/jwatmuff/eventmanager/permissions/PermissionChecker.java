@@ -49,10 +49,18 @@ public class PermissionChecker {
                 case SCOREBOARD:
                     hash = ci.getScoreboardPasswordHash(); break;
             }
+            
+            /* Default to master if set and other passwords not set */
+            PasswordType requiredPassword = action.requiredPassword;
+            if(hash == 0 && requiredPassword != MASTER) {
+                hash = ci.getPasswordHash();
+                requiredPassword = MASTER;
+            }
+
             if(hash != 0) {
                 EnterPasswordDialog epd = new EnterPasswordDialog((javax.swing.JFrame)null, true);
                 epd.setActionText(action.description);
-                epd.setPromptText(action.requiredPassword.description + " password required:");
+                epd.setPromptText(requiredPassword.description + " password required:");
                 while(true) {
                     epd.setVisible(true);
                     if(epd.getSuccess()) {
