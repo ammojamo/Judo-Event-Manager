@@ -230,14 +230,29 @@ public class CSVImporter {
         final List<PlayerPool> pps = new ArrayList<PlayerPool>();
 
         final List<PlayerDetails> pds = new ArrayList<PlayerDetails>();
-                
+
+        int rowNumber = 0;
         for(Map<String,String> row : rows) {
-            Player p = null;
-            String id = row.get("ID");
+            rowNumber++;
+
+            /* detect and discard empty rows */
+            boolean empty = true;
+            for(String value : row.values()) {
+                if(value != null && !value.isEmpty()) {
+                    empty = false;
+                    break;
+                }
+            }
+            if(empty) {
+                log.debug("Ignoring empty row in CSV file");
+                continue;
+            }
 
             /* attempt to look up ID in database. if that fails, create a new
              * player.
              */
+            Player p = null;
+            String id = row.get("ID");
             try {
                 p = database.find(Player.class, PlayerDAO.FOR_VISIBLE_ID, id);
             } catch(Exception e) {
@@ -388,6 +403,12 @@ public class CSVImporter {
                 pd.setInjuryInfo(injuryInfo);
             
             /************************* end field updates **********************/
+
+            if(p.getVisibleID() == null || p.getVisibleID().isEmpty())
+                throw new RuntimeException("Player ID missing in row " + rowNumber);
+            if(p.getFirstName() == null || p.getFirstName().isEmpty() ||
+               p.getLastName() == null || p.getLastName().isEmpty())
+                throw new RuntimeException("Player first/last name missing in row " + rowNumber);
                         
             /* update database */
             if(!players.contains(p))
