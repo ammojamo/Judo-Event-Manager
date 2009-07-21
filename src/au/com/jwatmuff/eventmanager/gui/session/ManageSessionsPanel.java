@@ -12,6 +12,7 @@ import au.com.jwatmuff.eventmanager.model.info.SessionInfo;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.SessionLinker;
 import au.com.jwatmuff.eventmanager.model.misc.SessionLocker;
+import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
@@ -491,6 +492,10 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_removeSessionButtonActionPerformed
 
     private void addMatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addMatButtonActionPerformed
+        if(database.get(CompetitionInfo.class, null).getPasswordHash() == 0) {
+            GUIUtils.displayMessage(this, "A Master Password must be set before contest areas can be added", "Add Contest Area");
+            return;
+        }
         if(!PermissionChecker.isAllowed(Action.ADD_CONTEST_AREA, database)) return;
 
         /* special case to handle licenses allowing limited number of mats */
@@ -509,6 +514,10 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_addMatButtonActionPerformed
 
     private void addSessionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSessionButtonActionPerformed
+        if(database.get(CompetitionInfo.class, null).getPasswordHash() == 0) {
+            GUIUtils.displayMessage(this, "A Master Password must be set before sessions can be added", "Add Session");
+            return;
+        }
         if(!PermissionChecker.isAllowed(Action.ADD_SESSION, database)) return;
         new NewSessionDialog(parentWindow, true, database).setVisible(true);
     }//GEN-LAST:event_addSessionButtonActionPerformed
