@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Player Grading Points - EventManager</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <style type="text/css">
+#include("resources/html/styles.css")
+    </style>
+    <script type="text/javascript">
+        function p()
+        {
+            window.print();
+        }
+    </script>
+  </head>
+  <body onload="setTimeout('p()', 1500);">
+    <h1>Player Grading Points</h1>
+    <h2>${competitionName}</h2>
+
+    <table>
+<!--
+#foreach($player in $players)
+#set($p = $player.player)
+<!-- -->
+
+      <tr>
+        <th colspan="7"><b>$p.firstName $p.lastName</b></th>
+      </tr>
+
+<!--
+#foreach($fight in $player.fights)
+#set($loser = $fight.losingPlayer)
+<!-- -->
+      <tr>
+        <td>$date.format("dd-MM-yy", $fight.result.result.timestamp)</td>
+        <td>$competitionName</td>
+        <td>$fight.pool.description</td>
+        <td>$loser.firstName $loser.lastName</td>
+        <td>$fight.effectiveLoserGrade</td>
+        <td>$fight.points</td>
+        <td>_________________________</td>
+      </tr>
+<!--
+#end
+-->
+
+<!--
+#end
+-->
+    </table>
+  </body>
+</html>

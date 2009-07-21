@@ -17,18 +17,16 @@ import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Player.Grade;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
+import au.com.jwatmuff.eventmanager.print.GradingPointsHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
-import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import java.awt.Frame;
-import java.awt.print.PrinterException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +36,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JTable;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import org.apache.log4j.Logger;
@@ -279,16 +276,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
     }// </editor-fold>//GEN-END:initComponents
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-        try {
-            //PrintUtilities.printComponent(resultTable);
-            resultTable.print(
-                    JTable.PrintMode.FIT_WIDTH,
-                    new MessageFormat("Competition Results - Page {0}"),
-                    new MessageFormat((new Date()).toString()));
-        } catch (PrinterException e) {
-            GUIUtils.displayError(parentWindow, "An error occurred while printing the results table.");
-            log.error("Exception while printing result table", e);
-        }
+    new GradingPointsHTMLGenerator(database, cache).openInBrowser();
 }//GEN-LAST:event_printButtonActionPerformed
 
     
