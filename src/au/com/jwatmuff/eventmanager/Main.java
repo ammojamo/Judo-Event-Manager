@@ -189,7 +189,7 @@ public class Main {
             log.info("Loading Load Competition Dialog");
 
             LoadCompetitionWindow loadCompetitionWindow
-                    = new LoadCompetitionWindow(databaseManager, licenseManager);
+                    = new LoadCompetitionWindow(databaseManager, licenseManager, peerManager);
 
             loadWindow.dispose();
             log.info("Starting Load Competition Dialog");

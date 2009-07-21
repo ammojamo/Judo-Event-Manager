@@ -21,6 +21,7 @@ import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import java.awt.Frame;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
 /**
@@ -102,6 +103,9 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
         jSeparator5 = new javax.swing.JSeparator();
         manualScoreboardButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        jSeparator6 = new javax.swing.JSeparator();
+        jButton1 = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
 
         fightProgressionButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/text_list_numbers.png"))); // NOI18N
         fightProgressionButton.setText("Show Fight Progression..");
@@ -155,7 +159,7 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
         jLabel5.setText("Display a non-interactive scoreboard by connecting to another scoreboard");
 
         manualScoreboardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
-        manualScoreboardButton.setText("Manual Scoreboard..");
+        manualScoreboardButton.setText("Manual Scoreboard Entry..");
         manualScoreboardButton.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
         manualScoreboardButton.setIconTextGap(8);
         manualScoreboardButton.addActionListener(new java.awt.event.ActionListener() {
@@ -165,6 +169,17 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
         });
 
         jLabel6.setText("Start a manual scoreboard (results will not be automatically recorded)");
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
+        jButton1.setText("Manual Scoreboard Display..");
+        jButton1.setIconTextGap(8);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setText("Connect and display a manual scoreboard (results will not be automatically recorded)");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -188,11 +203,14 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
                     .addComponent(jSeparator5, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
                     .addComponent(fightProgressionButton)
                     .addComponent(manualScoreboardButton)
-                    .addComponent(jLabel6))
+                    .addComponent(jLabel6)
+                    .addComponent(jSeparator6, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                    .addComponent(jButton1)
+                    .addComponent(jLabel7))
                 .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {displayScoreboardButton, fightProgressionButton, manualScoreboardButton, scoreboardButton, scoringButton});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {displayScoreboardButton, fightProgressionButton, jButton1, manualScoreboardButton, scoreboardButton, scoringButton});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,7 +247,13 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
                 .addComponent(manualScoreboardButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel6)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7)
+                .addContainerGap(45, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -297,24 +321,34 @@ private void displayScoreboardButtonActionPerformed(java.awt.event.ActionEvent e
 
 private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualScoreboardButtonActionPerformed
     if(!PermissionChecker.isAllowed(Action.MANUAL_SCOREBOARD, database)) return;
-    new ScoreboardWindow("Manual Scoreboard", ScoringSystem.NEW).setVisible(true);
+    String scoreboardName = JOptionPane.showInputDialog(this, "Enter a name for this scoreboard", "Manual Scoreboard", JOptionPane.QUESTION_MESSAGE);
+    if(scoreboardName == null) return;
+    scoreboardName = "Scoreboard/" + scoreboardName;
+    new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.NEW, peerManager, scoreboardName).setVisible(true);
 }//GEN-LAST:event_manualScoreboardButtonActionPerformed
+
+private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    ScoreboardWindow.selectAndDisplayRemoteScoreboard(this, peerManager);
+}//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton displayScoreboardButton;
     private javax.swing.JButton fightProgressionButton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JSeparator jSeparator6;
     private javax.swing.JButton manualScoreboardButton;
     private javax.swing.JButton scoreboardButton;
     private javax.swing.JButton scoringButton;

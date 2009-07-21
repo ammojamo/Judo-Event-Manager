@@ -13,7 +13,6 @@ import au.com.jwatmuff.eventmanager.model.misc.PlayerLocker;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.print.PlayerListHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
-import au.com.jwatmuff.eventmanager.util.PrintUtilities;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.awt.Frame;

@@ -28,14 +28,18 @@ import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.gui.ListDialog;
 import au.com.jwatmuff.eventmanager.util.gui.PanelDisplayFrame;
+import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
+import au.com.jwatmuff.genericp2p.NoSuchServiceException;
 import au.com.jwatmuff.genericp2p.Peer;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import au.com.jwatmuff.genericp2p.rmi.LookupService;
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -44,9 +48,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.JFileChooser;
@@ -141,6 +148,26 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                     playSiren();
             }
         });
+    }
+
+    /*
+     * DISPLAY the scoreboard over the network for which a scoreboard model
+     * is already obtained. Wraps the given scoreboard model
+     */
+    public ScoreboardWindow(String title, ScoreboardModel model) {
+        interactive = false;
+        initComponents();
+        this.title = title;
+        setTitle(title);
+        scoreboard = new ScoreboardPanel(interactive);
+        fullscreen = new ScoreboardPanel(interactive);
+        setModel(new ScoreboardModelWrapper(model), false);
+
+        getContentPane().setLayout(new GridLayout(1,1));
+        getContentPane().add(scoreboard);
+        openSirenFile(new File("resources/sound/siren.wav"));
+        this.setIconImage(Icons.SCOREBOARD.getImage());
+        setTimeMenuItem.setEnabled(false);
     }
 
     /* creates a window to DISPLAY the scoreboard for the given mat */
@@ -238,6 +265,13 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             }
         };
         this.addKeyListener(keyListener);
+    }
+
+    public ScoreboardWindow(String title, ScoringSystem system, PeerManager peerManager, String serviceName) {
+        this(title, system);
+        this.peerManager = peerManager;
+        this.serviceName = serviceName;
+        peerManager.registerService(serviceName, ScoreboardModel.class, model);
     }
 
     public ScoreboardWindow(String title, ScoringSystem system) {
@@ -639,4 +673,42 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
     private javax.swing.JMenuItem testSirenMenuItem;
     // End of variables declaration//GEN-END:variables
 
+    public static void selectAndDisplayRemoteScoreboard(Component parent, PeerManager peerManager) {
+        Map<String, Peer> scoreboardNames = new HashMap<String, Peer>();
+
+        for(Peer peer : peerManager.getPeers()) {
+            try {
+                LookupService lookup = peer.getService(LookupService.class);
+                Collection<String> scoreboards = lookup.getServices(ScoreboardModel.class);
+                for(String scoreboard : scoreboards)
+                    scoreboardNames.put(scoreboard, peer);
+            } catch(NoSuchServiceException e) {
+                log.warn("Could not find lookup service for peer " + peer);
+            }
+        }
+
+        if(scoreboardNames.isEmpty()) {
+            GUIUtils.displayMessage(parent, "Could not find any scoreboards to display.\nAn entry scoreboard must be opened first.", "Display Scoreboard");
+            return;
+        }
+
+        ListDialog<String> dialog = new ListDialog<String>(null, true, new ArrayList<String>(scoreboardNames.keySet()), "Select a scoreboard", "Scoreboard Display");
+        dialog.setRenderer(new StringRenderer() {
+            public String asString(Object o) {
+                return o.toString();
+            }
+        }, Icons.SCOREBOARD);
+        dialog.setVisible(true);
+        if(!dialog.getSuccess()) return;
+
+        try {
+            String scoreboard = dialog.getSelectedItem();
+            Peer peer = scoreboardNames.get(scoreboard);
+            ScoreboardModel model = peer.getService(scoreboard, ScoreboardModel.class);
+            new ScoreboardWindow("Manual Scoreboard Display - " + scoreboard, model).setVisible(true);
+        } catch(Exception e) {
+            GUIUtils.displayError(parent, "An error occurred while connecting to the requested scoreboard");
+            log.error(e.getMessage(), e);
+        }
+    }
 }

@@ -35,6 +35,9 @@
                   <Component id="fightProgressionButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
                   <Component id="manualScoreboardButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jSeparator6" alignment="0" pref="430" max="32767" attributes="0"/>
+                  <Component id="jButton1" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -75,7 +78,13 @@
               <Component id="manualScoreboardButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="41" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jSeparator6" min="-2" pref="10" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="45" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -176,7 +185,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/com/famfamfam/icons/silk/application_view_tile.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Manual Scoreboard.."/>
+        <Property name="text" type="java.lang.String" value="Manual Scoreboard Entry.."/>
         <Property name="horizontalAlignment" type="int" value="10"/>
         <Property name="iconTextGap" type="int" value="8"/>
       </Properties>
@@ -187,6 +196,25 @@
     <Component class="javax.swing.JLabel" name="jLabel6">
       <Properties>
         <Property name="text" type="java.lang.String" value="Start a manual scoreboard (results will not be automatically recorded)"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JSeparator" name="jSeparator6">
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton1">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/com/famfamfam/icons/silk/application_view_tile.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Manual Scoreboard Display.."/>
+        <Property name="iconTextGap" type="int" value="8"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel7">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Connect and display a manual scoreboard (results will not be automatically recorded)"/>
       </Properties>
     </Component>
   </SubComponents>

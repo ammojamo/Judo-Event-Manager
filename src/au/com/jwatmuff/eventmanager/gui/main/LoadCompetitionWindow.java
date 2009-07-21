@@ -20,6 +20,7 @@ import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.ZipUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
+import au.com.jwatmuff.genericp2p.PeerManager;
 import java.awt.Component;
 import java.io.File;
 import java.io.FileReader;
@@ -52,6 +53,7 @@ import org.apache.log4j.Logger;
 public class LoadCompetitionWindow extends javax.swing.JFrame {
     private static Logger log = Logger.getLogger(LoadCompetitionWindow.class);
     private SimpleDateFormat dateFormat = new SimpleDateFormat();
+    private PeerManager peerManager;
     
     private DatabaseManager dbManager;
     private LicenseManager licenseManager;
@@ -74,12 +76,13 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private ScheduledExecutorService checkDatabasesExecutor;
     
     /** Creates new form LoadCompetitionWindow */
-    public LoadCompetitionWindow(DatabaseManager dbManager, LicenseManager licenseManager) {
+    public LoadCompetitionWindow(DatabaseManager dbManager, LicenseManager licenseManager, PeerManager peerManager) {
         initComponents();
         setIconImage(Icons.MAIN_WINDOW.getImage());
 
         this.dbManager = dbManager;
         this.licenseManager = licenseManager;
+        this.peerManager = peerManager;
         this.getRootPane().setDefaultButton(okButton);
 
         competitionList.setCellRenderer(new DefaultListCellRenderer() {
@@ -215,6 +218,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         newCompRadioButton = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
         manualScoreboardButton = new javax.swing.JButton();
+        displayScoreboardButton = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -250,7 +254,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(existingCompRadioButton);
-        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
         existingCompRadioButton.setText("Open Existing Competition");
         existingCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         existingCompRadioButton.setEnabled(false);
@@ -326,7 +330,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(existingCompRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadBackupButton)
@@ -338,7 +342,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(newCompRadioButton);
-        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
         newCompRadioButton.setSelected(true);
         newCompRadioButton.setText("Create New Competition");
         newCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -390,12 +394,20 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jTabbedPane1.addTab("Start Competition", jPanel3);
 
         manualScoreboardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
-        manualScoreboardButton.setText("Manual Scoreboard..");
+        manualScoreboardButton.setText("Manual Scoreboard Entry..");
         manualScoreboardButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         manualScoreboardButton.setIconTextGap(8);
         manualScoreboardButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 manualScoreboardButtonActionPerformed(evt);
+            }
+        });
+
+        displayScoreboardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/application_view_tile.png"))); // NOI18N
+        displayScoreboardButton.setText("Manual Scoreboard Display..");
+        displayScoreboardButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                displayScoreboardButtonActionPerformed(evt);
             }
         });
 
@@ -405,15 +417,22 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manualScoreboardButton)
-                .addContainerGap(263, Short.MAX_VALUE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(manualScoreboardButton)
+                    .addComponent(displayScoreboardButton))
+                .addContainerGap(231, Short.MAX_VALUE))
         );
+
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {displayScoreboardButton, manualScoreboardButton});
+
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(manualScoreboardButton)
-                .addContainerGap(404, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(displayScoreboardButton)
+                .addContainerGap(365, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Manual Interfaces", jPanel4);
@@ -527,7 +546,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadLicenseButton)
                     .addComponent(enterLicenseKeyButton))
-                .addContainerGap(286, Short.MAX_VALUE))
+                .addContainerGap(290, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Licenses", jPanel5);
@@ -662,7 +681,10 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
     private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualScoreboardButtonActionPerformed
         if(!PermissionChecker.isAllowed(Action.MANUAL_SCOREBOARD, null)) return;
-            new ScoreboardWindow("Manual Scoreboard", ScoringSystem.NEW).setVisible(true);
+        String scoreboardName = JOptionPane.showInputDialog(this, "Enter a name for this scoreboard", "Manual Scoreboard", JOptionPane.QUESTION_MESSAGE);
+        if(scoreboardName == null) return;
+        scoreboardName = "Scoreboard/" + scoreboardName;
+        new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.NEW, peerManager, scoreboardName).setVisible(true);
     }//GEN-LAST:event_manualScoreboardButtonActionPerformed
 
     private void competitionListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_competitionListValueChanged
@@ -749,12 +771,17 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private void existingCompRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingCompRadioButtonActionPerformed
         updateOkButton();
     }//GEN-LAST:event_existingCompRadioButtonActionPerformed
+
+    private void displayScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_displayScoreboardButtonActionPerformed
+        ScoreboardWindow.selectAndDisplayRemoteScoreboard(this, peerManager);
+    }//GEN-LAST:event_displayScoreboardButtonActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton cancelButton;
     private javax.swing.JList competitionList;
     private javax.swing.JButton deleteCompButton;
+    private javax.swing.JButton displayScoreboardButton;
     private javax.swing.JButton enterLicenseKeyButton;
     private javax.swing.JRadioButton existingCompRadioButton;
     private javax.swing.JLabel jLabel1;
