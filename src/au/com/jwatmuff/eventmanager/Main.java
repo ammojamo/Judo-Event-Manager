@@ -29,9 +29,7 @@ import com.apple.dnssd.DNSSDService;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -46,7 +44,7 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 public class Main {
     private static Logger log = Logger.getLogger(Main.class);
     
-    public static final String VERSION = "0.0.1";
+    public static final String VERSION = "0.0.2";
 
     /**
      * Creates a run lock file if it does not already exist. Returns false
@@ -70,13 +68,6 @@ public class Main {
         }
         
         return true;
-    }
-
-
-    private static boolean checkLicense() {
-        Calendar c = new GregorianCalendar(2009, Calendar.AUGUST, 01);
-
-        return (new Date()).before(c.getTime());
     }
 
     private static boolean checkBonjour() {
@@ -117,15 +108,6 @@ public class Main {
         } 
         catch (Exception e) {
            log.info("Failed to set system look and feel");
-        }
-
-        if(!checkLicense()) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "This copy of EventManager has expired. A current valid license is required to use this product.",
-                    "License Expired",
-                    JOptionPane.OK_OPTION);
-            System.exit(0);
         }
 
         /*
