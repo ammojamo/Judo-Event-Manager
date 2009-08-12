@@ -693,8 +693,8 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
         }
 
         ListDialog<String> dialog = new ListDialog<String>(null, true, new ArrayList<String>(scoreboardNames.keySet()), "Select a scoreboard", "Scoreboard Display");
-        dialog.setRenderer(new StringRenderer() {
-            public String asString(Object o) {
+        dialog.setRenderer(new StringRenderer<String>() {
+            public String asString(String o) {
                 return o.toString();
             }
         }, Icons.SCOREBOARD);
