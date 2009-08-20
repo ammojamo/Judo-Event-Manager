@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.genericdb.p2p;
 
+import au.com.jwatmuff.genericdb.distributed.Clock;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.p2p.AuthenticationUtils.AuthenticationPair;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
@@ -174,6 +175,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         syncInfo.senderID = ourID;
         syncInfo.databaseID = databaseID;
         syncInfo.authPrefix = AuthenticationUtils.generatePrefix();
+        syncInfo.senderTime = Clock.getTime();
+        log.debug("our time: " + Clock.getTime());
 
         UpdateSyncInfo peerSyncInfo = updateService.sync(syncInfo);
 
@@ -198,7 +201,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         syncInfo = new UpdateSyncInfo();
 
         syncInfo.senderID = ourID;
-        syncInfo.senderTime = new Date();
+        syncInfo.senderTime = Clock.getTime();
         syncInfo.databaseID = databaseID;
         syncInfo.update = update.afterPosition(peerSyncInfo.position);
         syncInfo.authHash = AuthenticationUtils.getAuthenticationPair(peerSyncInfo.authPrefix, passwordHash).getHash();
@@ -209,6 +212,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         log.info("Sending position:\n" + syncInfo.position);
 
         peerSyncInfo = updateService.sync(syncInfo);
+
+        Clock.setEarliestTime(peerSyncInfo.senderTime);
 
         if(peerSyncInfo.status != UpdateSyncInfo.Status.OK) {
             log.info("Peer " + peer + " does not wish to sync with us (" + peerSyncInfo.status + ") (Stage 2)");
@@ -225,10 +230,12 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
     public UpdateSyncInfo sync(UpdateSyncInfo peerSyncInfo) {
         log.info("Received sync request from peer ID " + peerSyncInfo.senderID);
 
+        Clock.setEarliestTime(peerSyncInfo.senderTime);
+
         UpdateSyncInfo syncInfo = new UpdateSyncInfo();
 
         syncInfo.senderID = ourID;
-        syncInfo.senderTime = new Date();
+        syncInfo.senderTime = Clock.getTime();
         syncInfo.databaseID = databaseID;
 
         /* database IDs must match */
@@ -277,9 +284,10 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
 
 
     private void handlePeerUpdate(UUID peerID, Date peerTime, Update updateFromPeer) {
+        /*
         long timeDiff = (new Date().getTime()) - peerTime.getTime();
-
         updateFromPeer.adjustTimestamps(timeDiff);
+         */
 
         /* add to update table */
         Update mergedUpdate = update.mergeWith(updateFromPeer);

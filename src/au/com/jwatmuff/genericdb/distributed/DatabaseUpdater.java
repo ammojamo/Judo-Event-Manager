@@ -30,6 +30,9 @@ public class DatabaseUpdater implements DataEventListener {
     public void handleDataEvent(DataEvent event) {
         Distributable data = event.getData();
         log.debug(event.getTimestamp() + ": " + event.getType().toString() + " " + event.getDataClass().getSimpleName() + " (" + data.getID() + ")");
+
+        Clock.setEarliestTime(event.getTimestamp());
+
         switch(event.getType()) {
             case DELETE:
                 data.setValid(false);

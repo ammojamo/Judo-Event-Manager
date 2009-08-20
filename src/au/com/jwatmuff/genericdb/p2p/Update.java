@@ -211,7 +211,7 @@ public class Update implements Serializable {
         return position;
     }
 
-
+    /*
     public void adjustTimestamps(long amount) {
         for(EventList list : updateMap.values())
             for(DataEvent event : list) {
@@ -222,7 +222,7 @@ public class Update implements Serializable {
             }
             //event.getTimestamp().setTime(event.getTimestamp().getTime() + amount);
     }
-
+    */
     private String makeWidth(String s, int n) {
         if(s == null)
             s = "";

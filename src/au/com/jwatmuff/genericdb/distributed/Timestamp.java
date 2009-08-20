@@ -26,4 +26,8 @@ public class Timestamp extends Date implements Serializable {
     public Timestamp(long date) {
         super(date);
     }
+
+    public Timestamp(Date t) {
+        this(t.getTime());
+    }
 }
