@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,9 +77,9 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
 
         log.debug("Obtained local ID: " + this.getUUID());
 
-        this.registerService(AnnounceService.class, this);
-        this.registerService(IdentifyService.class, this);
-        this.registerService(LookupService.class, this);
+        registerService(AnnounceService.class, this);
+        registerService(IdentifyService.class, this);
+        registerService(LookupService.class, this);
 
         log.debug("Starting retry thread");
         checkPeerThread.start();
@@ -86,6 +88,17 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     }
 
     public void setName(String name) {
+        /* if this is the first time we have been given a name, add ourselves
+         * to the list of peers using localhost address */
+        if(this.name == null) {
+            try {
+                InetSocketAddress local = new InetSocketAddress(InetAddress.getLocalHost(), registryPort);
+                handlePeerInfo(new PeerInfo(name, local, uuid));
+            } catch(UnknownHostException e) {
+                log.error("Could not find local host", e);
+            }
+        }
+
         this.name = name;
     }
 
