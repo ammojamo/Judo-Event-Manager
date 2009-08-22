@@ -8,6 +8,7 @@ package au.com.jwatmuff.eventmanager.gui.results;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
+import au.com.jwatmuff.eventmanager.export.CSVExporter;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
@@ -20,11 +21,15 @@ import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.print.GradingPointsHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import java.awt.Frame;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -36,8 +41,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JFileChooser;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -219,6 +226,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
         resultTable = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
         printButton = new javax.swing.JButton();
+        exportButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
@@ -253,6 +261,17 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
         });
         jToolBar1.add(printButton);
 
+        exportButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/table_go.png"))); // NOI18N
+        exportButton.setFocusable(false);
+        exportButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        exportButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        exportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(exportButton);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -279,8 +298,28 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     new GradingPointsHTMLGenerator(database, cache).openInBrowser();
 }//GEN-LAST:event_printButtonActionPerformed
 
+private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+        try {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
+        if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            if(!file.getName().toLowerCase().endsWith(".csv")) {
+                file = new File(file.getAbsolutePath() + ".csv");
+            }
+            OutputStream os = new FileOutputStream(file);
+            CSVExporter.generateFromTable(resultTable, os);
+            os.close();
+        }
+    } catch(Exception e) {
+        log.error("Exception while writing to text file", e);
+        GUIUtils.displayError(parentWindow, "Unable to export to CSV file");
+    }
+}//GEN-LAST:event_exportButtonActionPerformed
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton exportButton;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton printButton;
     private javax.swing.JTable resultTable;
