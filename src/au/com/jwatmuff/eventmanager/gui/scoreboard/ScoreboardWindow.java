@@ -638,6 +638,7 @@ private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event
 
 private void setTimeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTimeMenuItemActionPerformed
     if(!interactive) return;
+    model.stopTimer();
     SetTimeDialog dialog = new SetTimeDialog(this, true);
     dialog.setVisible(true);
     if(dialog.isMainTimeSet()) {
