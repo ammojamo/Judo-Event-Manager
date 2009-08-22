@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 
 /**
@@ -220,14 +221,34 @@ public abstract class DatabaseManager {
         return distDb;
     }
 
-    public void deactivateDatabase() {
+    public void deactivateDatabase(long timeoutMillis) {
         activeDatabase = null;
-        for(Peer peer : peerManager.getPeers()) {
-            try {
-                peer.getService(DatabaseInfoService.class).handleDatabaseAnnouncement(peerManager.getUUID(), null);
-            } catch(NoSuchServiceException e) {
-                log.error("Failed to get DatabaseInfoService for peer " + peer.getName(), e);
+        /* Notify peers that we are deactivating the database
+         *
+         * Do this in a seperate thread which we can kill if it takes longer
+         * than specified timeout.
+         */
+        final AtomicBoolean exitFlag = new AtomicBoolean(false);
+        Thread t = new Thread(new Runnable() { 
+            public void run() {
+                for(Peer peer : peerManager.getPeers()) {
+                    try {
+                        peer.getService(DatabaseInfoService.class).handleDatabaseAnnouncement(peerManager.getUUID(), null);
+                    } catch(NoSuchServiceException e) {
+                        log.error("Failed to get DatabaseInfoService for peer " + peer.getName(), e);
+                    }
+                    if(exitFlag.get() || Thread.interrupted()) return;
+                }
             }
+        });
+        t.start();
+        try {
+            t.join(timeoutMillis);
+        } catch(InterruptedException e) {}
+        if(t.isAlive()) {
+            log.warn("Notifying peers of shutdown timed out, giving up and continuing shutdown");
+            exitFlag.set(true);
+            t.interrupt();
         }
     }
 

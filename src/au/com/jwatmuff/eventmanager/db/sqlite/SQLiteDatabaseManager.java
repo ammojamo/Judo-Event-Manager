@@ -44,8 +44,8 @@ public class SQLiteDatabaseManager extends DatabaseManager {
     }
 
     @Override
-    public void deactivateDatabase() {
-        super.deactivateDatabase();
+    public void deactivateDatabase(long timeoutMillis) {
+        super.deactivateDatabase(timeoutMillis);
         try {
             dataSource.close();
         } catch(SQLException e) {

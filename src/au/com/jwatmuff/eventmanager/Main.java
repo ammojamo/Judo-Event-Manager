@@ -222,7 +222,7 @@ public class Main {
                     // System.exit();
 
                     database.shutdown();
-                    databaseManager.deactivateDatabase();
+                    databaseManager.deactivateDatabase(1500);
 
                     if(mainWindow.getDeleteOnExit()) {
                         for(File file : info.localDirectory.listFiles())
