@@ -56,7 +56,6 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     
     private PoolListTableModel tableModel;
 
-    private boolean newCompetition = true;
     private CompetitionInfo compInfo = null;
     
     /** Creates new form CompetitionDetailsDialog */
@@ -71,9 +70,8 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         this.setLocationRelativeTo(parent);
         
         compInfo = database.get(CompetitionInfo.class, null);
-        if(compInfo != null) {
-            newCompetition = false;
-        }
+        if(compInfo == null)
+            throw new RuntimeException("Competition Info must not be null");
         
         updateFromCompetitionInfo(compInfo);
 
@@ -673,10 +671,8 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         if(validateInput()) {
             final CompetitionInfo comp;
-            if(newCompetition)
-                comp = new CompetitionInfo();
-            else
-                comp = compInfo;
+
+            comp = compInfo;
             comp.setName(competitionNameTextField.getText().trim());
             comp.setLocation(locationTextField.getText().trim());
             comp.setStartDate(startDatePicker.getDate());
@@ -684,18 +680,8 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             comp.setDirectorContact(directorContactTextField.getText().trim());
             comp.setDirectorName(directorNameTextField.getText().trim());
             
-            if(newCompetition) {
-                int result = JOptionPane.showConfirmDialog(parentWindow,"Do you wish to set a master password for this competition?","Master Password",JOptionPane.YES_NO_OPTION);
-                if(result == JOptionPane.YES_OPTION) {
-                    ChangePasswordDialog cpd = new ChangePasswordDialog(parentWindow, true);
-                    cpd.setTitle("Master Password");
-                    cpd.setVisible(true);
-                    if(cpd.getSuccess())
-                        comp.setPasswordHash(cpd.getPasswordHash());
-                }
-            } else {
-                if(!PermissionChecker.isAllowed(Action.UPDATE_COMPETITION_DETAILS, database)) return;
-            }
+            if(!PermissionChecker.isAllowed(Action.UPDATE_COMPETITION_DETAILS, database))
+                return;
             
             Worker.post(new Job() {
                 @Override
