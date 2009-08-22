@@ -15,18 +15,20 @@ import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
+import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.genericdb.Database;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Collection;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  *
  * @author James
  */
 public class CSVExporter {
-    
     /** Creates a new instance of TextExporter */
     private CSVExporter() {
     }
@@ -35,15 +37,66 @@ public class CSVExporter {
         Collection<Player> players = database.findAll(Player.class, PlayerDAO.ALL);
         PrintStream ps = new PrintStream(out);
         
+        Object[] columns = new Object[] {
+            "id",
+            "First Name",
+            "Last Name",
+            "Sex",
+            "Grade",
+            "DOB",
+            "Club",
+            "Home Number",
+            "Work Number",
+            "Mobile Number",
+            "Street",
+            "City",
+            "Postcode",
+            "State",
+            "Email",
+            "Emergency Name",
+            "Emergency Phone",
+            "Emergency Mobile",
+            "Medical Conditions",
+            "Medical Info",
+            "Injury Info"};
+
+        outputRow(columns, ps);
+
         for(Player player : players) {
-            ps.print("\"" + player.getLastName().toUpperCase() + "\",");
-            ps.print("\"" + player.getFirstName() + "\",");
-            ps.print(player.getDob() + ",");
-            ps.print("\"" + player.getGender() + "\",");
-            ps.print("\"" + player.getGrade() + "\",");
-//            ps.print("\"" + player.getMedicalConditions() + "\",");
-//            ps.print("\"" + player.getMedicalInfo() + "\",");
-            ps.println();
+            Object[] fields1 = new Object[] {
+                player.getVisibleID(),
+                player.getFirstName(),
+                player.getLastName(),
+                player.getGender(),
+                player.getGrade(),
+                player.getDob()
+            };
+            
+            PlayerDetails details = database.get(PlayerDetails.class, player.getDetailsID());
+            Object[] fields2;
+            if(details != null) {
+                fields2 = new Object[]{
+                            details.getClub(),
+                            details.getHomeNumber(),
+                            details.getWorkNumber(),
+                            details.getMobileNumber(),
+                            details.getStreet(),
+                            details.getCity(),
+                            details.getPostcode(),
+                            details.getState(),
+                            details.getEmail(),
+                            details.getEmergencyName(),
+                            details.getEmergencyPhone(),
+                            details.getEmergencyMobile(),
+                            details.getMedicalConditions(),
+                            details.getMedicalInfo(),
+                            details.getInjuryInfo()};
+            } else {
+                fields2 = new Object[15];
+                Arrays.fill(fields2, null);
+            }
+
+            outputRow(ArrayUtils.addAll(fields1, fields2), ps);
         }
     }
     
@@ -65,5 +118,21 @@ public class CSVExporter {
                 // do nothing
             }
         }
+    }
+
+    private static void outputRow(Object[] fields, PrintStream out) {
+        boolean first = true;
+        for(Object field : fields) {
+            if(!first) out.print(",");
+            if(field != null) {
+                if(field instanceof Number) {
+                    out.print(field);
+                } else {
+                    out.print("\"" + field + "\"");
+                }
+            }
+            first = false;
+        }
+        out.println();
     }
 }
