@@ -95,14 +95,17 @@ public class SQLiteResultDAO implements ResultDAO
 
     @Override
     public void update(Result item) {
-        String sql = "UPDATE fight_result SET fight_id=:fightID, player_score1=:playerScores[0], player_score2=:playerScores[1], player_id1=:playerIDs[0], player_id2=:playerIDs[1], event_log=:eventLog, is_valid=:valid, last_updated=:timestamp WHERE id = ?";
+        throw new RuntimeException("Results should never be updated");
+        /*
+        String sql = "UPDATE fight_result SET fight_id=:fightID, player_score1=:playerScores[0], player_score2=:playerScores[1], player_id1=:playerIDs[0], player_id2=:playerIDs[1], event_log=:eventLog, is_valid=:valid, last_updated=:timestamp WHERE id = :ID";
         SqlParameterSource params = new BeanPropertySqlParameterSource(item);
         template.update(sql, params);
+        */
     }
 
     @Override
     public void delete(Result item) {
-        throw new RuntimeException("Delete not supported");
+        throw new RuntimeException("Results should never be deleted");
     }
 
     @Override
