@@ -47,6 +47,8 @@ import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -675,6 +677,11 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
     // End of variables declaration//GEN-END:variables
 
     public static void selectAndDisplayRemoteScoreboard(Component parent, PeerManager peerManager) {
+        selectAndDisplayRemoteScoreboard(parent, peerManager, null);
+    }
+    
+    public static void selectAndDisplayRemoteScoreboard(Component parent, PeerManager peerManager,
+                                                        Frame parentWindow) {
         Map<String, Peer> scoreboardNames = new HashMap<String, Peer>();
 
         for(Peer peer : peerManager.getPeers()) {
@@ -706,7 +713,17 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
             String scoreboard = dialog.getSelectedItem();
             Peer peer = scoreboardNames.get(scoreboard);
             ScoreboardModel model = peer.getService(scoreboard, ScoreboardModel.class);
-            new ScoreboardWindow("Manual Scoreboard Display - " + scoreboard, model).setVisible(true);
+            final ScoreboardWindow win =
+                    new ScoreboardWindow("Manual Scoreboard Display - " + scoreboard, model);
+            if(parentWindow != null) {
+                parentWindow.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        win.dispose();
+                    }
+                });
+            }
+            win.setVisible(true);
         } catch(Exception e) {
             GUIUtils.displayError(parent, "An error occurred while connecting to the requested scoreboard");
             log.error(e.getMessage(), e);

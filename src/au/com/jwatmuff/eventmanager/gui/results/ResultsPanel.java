@@ -200,7 +200,7 @@ public class ResultsPanel extends javax.swing.JPanel {
 
 private void resultsSummaryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resultsSummaryButtonActionPerformed
     try {
-        ResultsWindow win = new ResultsWindow();
+        final ResultsWindow win = new ResultsWindow();
 
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         final ResultsSummaryPanel p = new ResultsSummaryPanel();
@@ -209,6 +209,12 @@ private void resultsSummaryButtonActionPerformed(java.awt.event.ActionEvent evt)
         p.setNotifier(notifier);
         p.setResultInfoCache(resultInfoCache);
         p.afterPropertiesSet();
+        parentWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                win.dispose();
+            }
+        });
 
         win.getMainPanel().add(p);
         win.setTitle("Event Manager - Results - Summary");
@@ -226,7 +232,7 @@ private void resultsSummaryButtonActionPerformed(java.awt.event.ActionEvent evt)
 
 private void pointsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pointsButtonActionPerformed
     try {
-        ResultsWindow win = new ResultsWindow();
+        final ResultsWindow win = new ResultsWindow();
 
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         final ResultsPointsPanel p = new ResultsPointsPanel();
@@ -235,6 +241,12 @@ private void pointsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         p.setNotifier(notifier);
         p.setResultInfoCache(resultInfoCache);
         p.afterPropertiesSet();
+        parentWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                win.dispose();
+            }
+        });
 
         win.getMainPanel().add(p);
         win.setTitle("Event Manager - Results - Grading Points");
@@ -252,7 +264,7 @@ private void pointsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 private void divisionResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_divisionResultsButtonActionPerformed
     try {
-        ResultsWindow win = new ResultsWindow();
+        final ResultsWindow win = new ResultsWindow();
 
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         DivisionResultsPanel p = new DivisionResultsPanel();
@@ -261,6 +273,12 @@ private void divisionResultsButtonActionPerformed(java.awt.event.ActionEvent evt
         p.setNotifier(notifier);
         p.setDivisionResultCache(divisionResultCache);
         p.afterPropertiesSet();
+        parentWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                win.dispose();
+            }
+        });
 
         win.getMainPanel().add(p);
         win.setTitle("Event Manager - Results - Divisions");

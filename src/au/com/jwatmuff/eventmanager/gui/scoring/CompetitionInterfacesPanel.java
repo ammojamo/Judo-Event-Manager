@@ -20,7 +20,10 @@ import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import java.awt.Frame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
@@ -76,6 +79,16 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
         dialog.setVisible(true);
         if(!dialog.getSuccess()) return null;
         return dialog.getSelectedItem();
+    }
+
+    private void openWindow(final JFrame win) {
+        parentWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                win.dispose();
+            }
+        });
+        win.setVisible(true);
     }
 
     /** This method is called from within the constructor to
@@ -260,14 +273,14 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
 private void fightProgressionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fightProgressionButtonActionPerformed
     Session mat = chooseMat("Fight Progression");
     if(mat == null) return;
-    new FightProgressionWindow(database, notifier, mat).setVisible(true);
+    openWindow(new FightProgressionWindow(database, notifier, mat));
 }//GEN-LAST:event_fightProgressionButtonActionPerformed
 
 private void scoringButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scoringButtonActionPerformed
     if(!PermissionChecker.isAllowed(Action.SCOREBOARD_ENTRY, database)) return;
     Session mat = chooseMat("Score Entry");
     if(mat == null) return;
-    new SimpleScoringWindow(database, notifier, mat).setVisible(true);
+    openWindow(new SimpleScoringWindow(database, notifier, mat));
 }//GEN-LAST:event_scoringButtonActionPerformed
 
 private void scoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scoreboardButtonActionPerformed
@@ -276,47 +289,15 @@ private void scoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//
     String serviceName = "scoreboard" + mat.getID();
     if(peerManager.isRegistered(serviceName))
         GUIUtils.displayError(this.parentWindow, "A scoreboard is already open for this mat.");
-    else
-        new ScoreboardWindow(database, notifier, mat, peerManager, serviceName, ScoringSystem.NEW).setVisible(true);
+    else {
+        openWindow(new ScoreboardWindow(database, notifier, mat, peerManager, serviceName, ScoringSystem.NEW));
+    }
 }//GEN-LAST:event_scoreboardButtonActionPerformed
 
 private void displayScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_displayScoreboardButtonActionPerformed
     Session mat = chooseMat("Scoreboard");
     if(mat == null) return;
-    new ScoreboardWindow(mat, peerManager, ScoringSystem.NEW).setVisible(true);
-    /*
-    List<ScoreboardModel> scoreboards = new ArrayList<ScoreboardModel>();
-    List<String> names = new ArrayList<String>();
-    for(Peer peer : peerManager.getPeers()) {
-        try {
-            for(String name : peer.getService(LookupService.class).getServices(ScoreboardModel.class)) {
-                names.add(name + " - " + peer.getName());
-                scoreboards.add(peer.getService(name, ScoreboardModel.class));
-            }
-        } catch(Exception e) {
-            log.error("Exception while getting scoreboard info", e);
-        }
-    }
-    
-    if(names.size() == 0) {
-        GUIUtils.displayMessage(parentWindow, "No scoreboards found. An entry-mode scoreboard must be created first.", "Scoreboard");
-        return;
-    }
-    
-    ListDialog<String> cbd = new ListDialog<String>(parentWindow, true, names, "Choose a scoreboard to connect to", "Scoreboard");
-    cbd.setRenderer(new StringRenderer<String>() {
-            @Override
-            public String asString(String o) {
-                return o;
-            }
-    }, Icons.SCOREBOARD);
-
-    cbd.setVisible(true);
-    if(!cbd.getSuccess()) return;
-    
-    String name = cbd.getSelectedItem();
-    new ScoreboardWindow(scoreboards.get(names.indexOf(name)), name).setVisible(true);
-   */
+    openWindow(new ScoreboardWindow(mat, peerManager, ScoringSystem.NEW));
 }//GEN-LAST:event_displayScoreboardButtonActionPerformed
 
 private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualScoreboardButtonActionPerformed
@@ -324,11 +305,12 @@ private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent ev
     String scoreboardName = JOptionPane.showInputDialog(this, "Enter a name for this scoreboard", "Manual Scoreboard", JOptionPane.QUESTION_MESSAGE);
     if(scoreboardName == null) return;
     scoreboardName = "Scoreboard/" + scoreboardName;
-    new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.NEW, peerManager, scoreboardName).setVisible(true);
+    openWindow(new ScoreboardWindow("Manual Scoreboard - " + scoreboardName,
+                                    ScoringSystem.NEW, peerManager, scoreboardName));
 }//GEN-LAST:event_manualScoreboardButtonActionPerformed
 
 private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    ScoreboardWindow.selectAndDisplayRemoteScoreboard(this, peerManager);
+    ScoreboardWindow.selectAndDisplayRemoteScoreboard(this, peerManager, parentWindow);
 }//GEN-LAST:event_jButton1ActionPerformed
 
 

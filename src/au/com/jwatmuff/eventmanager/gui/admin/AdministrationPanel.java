@@ -198,7 +198,13 @@ private void reviewDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//
         p.setResultInfoCache(resultInfoCache);
         p.afterPropertiesSet();
 
-        ResultsWindow win = new ResultsWindow();
+        final ResultsWindow win = new ResultsWindow();
+        parentWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                win.dispose();
+            }
+        });
         win.getMainPanel().add(p);
         win.setTitle("Event Manager - Results - Summary");
         win.addWindowListener(new WindowAdapter() {
