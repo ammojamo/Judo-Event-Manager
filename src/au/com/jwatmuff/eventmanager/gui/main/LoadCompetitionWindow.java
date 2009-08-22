@@ -112,6 +112,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     public void setVisible(boolean visible) {
         if(visible) {
             success = false;
+            isNew = false;
             updateLicenseInfo();
             checkDatabasesExecutor = Executors.newSingleThreadScheduledExecutor();
             checkDatabasesExecutor.scheduleAtFixedRate(
@@ -129,10 +130,10 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     
     private void updateDatabaseList() {
         log.debug("Attempting to update database list");
+        dbManager.updateAllDatabaseInfo();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                dbManager.updateAllDatabaseInfo();
                 DatabaseInfo oldSelected = (DatabaseInfo)competitionList.getSelectedValue();
                 dbListModel.clear();
                 for(DatabaseInfo info : dbManager.getDatabases())
