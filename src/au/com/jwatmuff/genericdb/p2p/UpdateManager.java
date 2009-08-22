@@ -301,11 +301,12 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         Update mergedUpdate = update.mergeWith(updateFromPeer);
 
         /* update the database */
-        try {
-            for(DataEvent event : mergedUpdate.getAllEventsOrdered())
+        for(DataEvent event : mergedUpdate.getAllEventsOrdered()) {
+            try {
                 databaseUpdater.handleDataEvent(event);
-        } catch(Exception e) {
-            log.error("Exception while applying peer updates to database", e);
+            } catch(Exception e) {
+                log.error("Exception while applying a peer update to database", e);
+            }
         }
     }
 
