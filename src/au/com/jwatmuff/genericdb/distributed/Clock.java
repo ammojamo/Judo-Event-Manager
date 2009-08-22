@@ -41,6 +41,10 @@ public class Clock {
     }
 
     public static void setEarliestTime(Date time) {
+        if(time == null) {
+            log.error("Time must not be null");
+            return;
+        }
         if(time.getTime() > now()) {
             setTime(time.getTime());
         }

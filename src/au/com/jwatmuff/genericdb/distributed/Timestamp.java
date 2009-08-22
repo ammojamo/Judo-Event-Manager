@@ -20,7 +20,7 @@ public class Timestamp extends Date implements Serializable {
     
     /** Creates a new instance of Timestamp */
     public Timestamp() {
-        super();
+        this(Clock.getTime().getTime());
     }
     
     public Timestamp(long date) {

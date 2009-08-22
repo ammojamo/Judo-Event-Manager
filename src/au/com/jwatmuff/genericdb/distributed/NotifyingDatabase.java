@@ -50,7 +50,7 @@ public class NotifyingDatabase implements Database {
     public <T> void add(T item) {
         if(item instanceof Distributable) {
             Distributable tsItem = (Distributable)item;
-            if(updateTimestamps) tsItem.setTimestamp(Clock.getTime());
+            if(updateTimestamps) tsItem.setTimestamp(new Timestamp());
             if(!readOnly) database.add(item);
             fireEvent(new DataEvent(tsItem, DataEvent.Type.CREATE));
         }
@@ -63,7 +63,7 @@ public class NotifyingDatabase implements Database {
     public <T> void update(T item) {
         if(item instanceof Distributable) {
             Distributable tsItem = (Distributable)item;
-            if(updateTimestamps) tsItem.setTimestamp(Clock.getTime());
+            if(updateTimestamps) tsItem.setTimestamp(new Timestamp());
             if(!readOnly) database.update(item);
             fireEvent(new DataEvent(tsItem, DataEvent.Type.UPDATE));
         }
@@ -76,7 +76,7 @@ public class NotifyingDatabase implements Database {
     public <T> void delete(T item) {
         if(item instanceof Distributable) {
             Distributable tsItem = (Distributable)item;
-            if(updateTimestamps) tsItem.setTimestamp(Clock.getTime());
+            if(updateTimestamps) tsItem.setTimestamp(new Timestamp());
             if(!readOnly) database.delete(item);
             fireEvent(new DataEvent(tsItem, DataEvent.Type.DELETE));
         }

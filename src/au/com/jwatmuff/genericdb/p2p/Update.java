@@ -7,7 +7,6 @@ package au.com.jwatmuff.genericdb.p2p;
 
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.distributed.DataEvent.TransactionStatus;
-import au.com.jwatmuff.genericdb.distributed.Timestamp;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;

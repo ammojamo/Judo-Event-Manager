@@ -7,6 +7,7 @@ package au.com.jwatmuff.genericdb.p2p;
 
 import au.com.jwatmuff.genericdb.distributed.Clock;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
+import au.com.jwatmuff.genericdb.distributed.Timestamp;
 import au.com.jwatmuff.genericdb.p2p.AuthenticationUtils.AuthenticationPair;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabaseUpdater;
@@ -176,8 +177,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         syncInfo.senderID = ourID;
         syncInfo.databaseID = databaseID;
         syncInfo.authPrefix = AuthenticationUtils.generatePrefix();
-        syncInfo.senderTime = Clock.getTime();
-        log.debug("our time: " + Clock.getTime());
+        syncInfo.senderTime = new Timestamp();
+        log.debug("our time: " + new Timestamp());
 
         UpdateSyncInfo peerSyncInfo = null;
         try {
@@ -199,6 +200,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
             return;
         }
 
+        Clock.setEarliestTime(peerSyncInfo.senderTime);
+
         /*** PEER WISHES TO SYNC AND HAS AUTHENTICATED THEMSELF ***/
 
         /*** STAGE 2: SEND UPDATE DATA AND ASK PEER FOR MISSING DATA ***/
@@ -208,7 +211,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         syncInfo = new UpdateSyncInfo();
 
         syncInfo.senderID = ourID;
-        syncInfo.senderTime = Clock.getTime();
+        syncInfo.senderTime = new Timestamp();
         syncInfo.databaseID = databaseID;
         syncInfo.update = update.afterPosition(peerSyncInfo.position);
         syncInfo.authHash = AuthenticationUtils.getAuthenticationPair(peerSyncInfo.authPrefix, passwordHash).getHash();
@@ -219,12 +222,6 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         log.info("Sending position:\n" + syncInfo.position);
 
         peerSyncInfo = updateService.sync(syncInfo);
-
-        if(peerSyncInfo.senderTime == null) {
-            log.warn("No time received from peer");
-        } else {
-            Clock.setEarliestTime(peerSyncInfo.senderTime);
-        }
 
         if(peerSyncInfo.status != UpdateSyncInfo.Status.OK) {
             log.info("Peer " + peer + " does not wish to sync with us (" + peerSyncInfo.status + ") (Stage 2)");
@@ -241,16 +238,10 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
     public UpdateSyncInfo sync(UpdateSyncInfo peerSyncInfo) {
         log.info("Received sync request from peer ID " + peerSyncInfo.senderID);
 
-        if(peerSyncInfo.senderTime == null) {
-            log.warn("No time received from peer");
-        } else {
-            Clock.setEarliestTime(peerSyncInfo.senderTime);
-        }
-
         UpdateSyncInfo syncInfo = new UpdateSyncInfo();
 
         syncInfo.senderID = ourID;
-        syncInfo.senderTime = Clock.getTime();
+        syncInfo.senderTime = new Timestamp();
         syncInfo.databaseID = databaseID;
 
         /* database IDs must match */
@@ -280,6 +271,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         else if(peerSyncInfo.authHash != null) {
             byte[] prefix = peerPrefixes.get(peerSyncInfo.senderID);
             if(AuthenticationUtils.checkAuthenticationPair(new AuthenticationPair(prefix, peerSyncInfo.authHash), passwordHash)) {
+                Clock.setEarliestTime(peerSyncInfo.senderTime);
+
                 syncInfo.status = UpdateSyncInfo.Status.OK;
                 syncInfo.update = update.afterPosition(peerSyncInfo.position);
 
