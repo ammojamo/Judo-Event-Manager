@@ -6,6 +6,7 @@
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
 import au.com.jwatmuff.eventmanager.util.Stopwatch;
+import au.com.jwatmuff.genericdb.distributed.Timestamp;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -167,7 +168,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         for(int i=0; i<2; i++) {
             final int j = i;
             if(lastFights[i] == null) continue;
-            int secsSinceLast = (int) ( ((new Date().getTime()) - lastFights[i].getTime()) / 1000);
+            int secsSinceLast = (int) ( ((new Timestamp().getTime()) - lastFights[i].getTime()) / 1000);
             log.debug("secsSinceLast: " + secsSinceLast);
             if(secsSinceLast < minimumBreak) {
                 ready = false;
