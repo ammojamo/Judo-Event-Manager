@@ -491,7 +491,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             case INACTIVE:
                 //do nothing
         }
-        logEvent("Set Holddown Player: P" + player);
+        logEvent("Set Holddown Player: " + playerNames[player]);
     }
     
     private Score holddownScore(int time) {
@@ -528,7 +528,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return;
         }
         
-        logEvent("P" + player + " " + (up?"+":"-") + type.toString().substring(0,1));
+        logEvent(playerNames[player] + " " + (up?"+":"-") + type.toString().substring(0,1));
         checkForWin();
         notifyListeners(ScoreboardUpdate.SCORE);
     }
@@ -541,7 +541,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         if(s < 0 || s > 4) return;
         shido[player] = s;
         
-        logEvent("P" + player + " " + (up?"+":"-") + "S");
+        logEvent(playerNames[player] + " " + (up?"+":"-") + "S");
         checkForWin();
         notifyListeners(ScoreboardUpdate.SHIDO);
     }
@@ -776,7 +776,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         win = Win.BY_DECISION;
         winningPlayer = player;
 
-        logEvent("Decision: P" + player);
+        logEvent("Decision: " + playerNames[player]);
 
         endFight();
     }
