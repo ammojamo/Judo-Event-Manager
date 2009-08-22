@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
+import org.springframework.remoting.RemoteAccessException;
 
 /**
  *
@@ -178,7 +179,13 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         syncInfo.senderTime = Clock.getTime();
         log.debug("our time: " + Clock.getTime());
 
-        UpdateSyncInfo peerSyncInfo = updateService.sync(syncInfo);
+        UpdateSyncInfo peerSyncInfo = null;
+        try {
+            peerSyncInfo = updateService.sync(syncInfo);
+        } catch(RemoteAccessException e) {
+            log.warn("Exception while communicating with peer, aborting sync: " + e.getMessage());
+            return;
+        }
 
         if(peerSyncInfo.status != UpdateSyncInfo.Status.OK) {
             log.info("Peer " + peer + " does not wish to sync with us (" + peerSyncInfo.status + ")");
