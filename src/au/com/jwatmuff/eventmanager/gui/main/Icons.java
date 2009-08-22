@@ -33,6 +33,9 @@ public class Icons {
 
     public static ImageIcon REMOTE = getIcon(SILK, "transmit.png");
     public static ImageIcon LOCAL = getIcon(SILK, "drive.png");
+
+    public static ImageIcon EDIT = getIcon(SILK, "pencil.png");
+    public static ImageIcon LOG = getIcon(SILK, "information.png");
     
     public static ImageIcon getIcon(String dir, String file) {
         return new ImageIcon(Icons.class.getResource(dir + "/" + file));

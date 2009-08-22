@@ -22,6 +22,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
 import org.apache.commons.lang.ArrayUtils;
 
 /**
@@ -32,7 +34,30 @@ public class CSVExporter {
     /** Creates a new instance of TextExporter */
     private CSVExporter() {
     }
-    
+
+    public static void generateFromTable(JTable t, OutputStream out) {
+        generateFromTable(t.getModel(), out);
+    }
+
+    public static void generateFromTable(TableModel tm, OutputStream out) {
+        int rows = tm.getRowCount();
+        int cols = tm.getColumnCount();
+        Object[][] table = new Object[rows+1][cols];
+        for(int j = 0; j < cols; j++)
+            table[0][j] = tm.getColumnName(j);
+        for(int i = 0; i < rows; i++)
+            for(int j = 0; j < cols; j++)
+                table[i+1][j] = tm.getValueAt(i, j);
+
+        generateFromArray(table, out);
+    }
+
+    public static void generateFromArray(Object[][] table, OutputStream os) {
+        PrintStream ps = new PrintStream(os);
+        for(Object[] row : table)
+            outputRow(row, ps);
+    }
+
     public static void generatePlayerList(Database database, OutputStream out) {
         Collection<Player> players = database.findAll(Player.class, PlayerDAO.ALL);
         PrintStream ps = new PrintStream(out);

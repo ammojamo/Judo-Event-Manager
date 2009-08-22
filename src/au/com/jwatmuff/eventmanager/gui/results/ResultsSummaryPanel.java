@@ -8,6 +8,8 @@ package au.com.jwatmuff.eventmanager.gui.results;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
+import au.com.jwatmuff.eventmanager.export.CSVExporter;
+import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
@@ -23,6 +25,9 @@ import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import java.awt.Frame;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -33,8 +38,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JFileChooser;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -92,6 +99,9 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
         initComponents();
         resultTable.setModel(resultTableModel);
         printButton.setVisible(!changeMode);
+        exportButton.setVisible(!changeMode);
+        actionButton.setText(changeMode ? "Update Result" : "View Fight Log");
+        actionButton.setIcon(changeMode ? Icons.EDIT : Icons.LOG);
     }
     
     @Required
@@ -167,7 +177,52 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
     public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
         updateFromDatabase();
     }
-    
+
+    private void doActionOnSelectedItem() {
+        ResultInfo ri = getSelectedResult();
+        if(ri == null) return;
+
+        if(changeMode) {
+
+            /* determine whether any dependant fights have been fought */
+            Fight f1 = ri.getFight();
+            int poolID = f1.getPoolID();
+            for(Fight f2 : database.findAll(Fight.class, FightDAO.FOR_POOL, poolID)) {
+                if(f2.getPosition() <= f1.getPosition()) continue;
+
+                for(int i = 0; i < 2; i++) {
+                    String code = f2.getPlayerCodes()[i];
+                    if(!PlayerCodeParser.getPrefix(code).equals("P")) {
+                        int n = PlayerCodeParser.getNumber(code);
+                        if(n == f1.getPosition()) {
+                            List<Result> r = database.findAll(Result.class, ResultDAO.FOR_FIGHT, f2.getID());
+                            if(!r.isEmpty()) {
+                                GUIUtils.displayMessage(null, "Result cannot be changed because a fight depending on this result has been fought.", "Cannot Change Result");
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* if we get here, show change result dialog */
+            ChangeResultDialog crd = new ChangeResultDialog(null, true, ri);
+            crd.setVisible(true);
+            if(crd.getSuccess()) {
+                Result r = new Result();
+                r.setFightID(f1.getID());
+                r.setPlayerIDs(ri.getResult().getPlayerIDs());
+                r.setPlayerScores(crd.getPlayerScores());
+                database.add(r);
+            }
+        } else {
+            FightLogDialog dialog = new FightLogDialog(parentWindow, true);
+            String eventLog = ri.getResult().getEventLog();
+            dialog.setText(eventLog);
+            dialog.setVisible(true);
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -180,6 +235,8 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
         resultTable = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
         printButton = new javax.swing.JButton();
+        exportButton = new javax.swing.JButton();
+        actionButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
@@ -219,6 +276,24 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
         });
         jToolBar1.add(printButton);
 
+        exportButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/table_go.png"))); // NOI18N
+        exportButton.setFocusable(false);
+        exportButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        exportButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        exportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(exportButton);
+
+        actionButton.setText("Action");
+        actionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -227,14 +302,19 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
+                        .addComponent(actionButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(actionButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
                 .addContainerGap())
@@ -254,48 +334,38 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_printButtonActionPerformed
 
 private void resultTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_resultTableMouseClicked
-    if(this.changeMode == false) return;
-
     if(evt.getClickCount() == 2) {
-        ResultInfo ri = getSelectedResult();
-        if(ri == null) return;
-
-        /* determine whether any dependant fights have been fought */
-        Fight f1 = ri.getFight();
-        int poolID = f1.getPoolID();
-        for(Fight f2 : database.findAll(Fight.class, FightDAO.FOR_POOL, poolID)) {
-            if(f2.getPosition() <= f1.getPosition()) continue;
-
-            for(int i = 0; i < 2; i++) {
-                String code = f2.getPlayerCodes()[i];
-                if(!PlayerCodeParser.getPrefix(code).equals("P")) {
-                    int n = PlayerCodeParser.getNumber(code);
-                    if(n == f1.getPosition()) {
-                        List<Result> r = database.findAll(Result.class, ResultDAO.FOR_FIGHT, f2.getID());
-                        if(!r.isEmpty()) {
-                            GUIUtils.displayMessage(null, "Result cannot be changed because a fight depending on this result has been fought.", "Cannot Change Result");
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        /* if we get here, show change result dialog */
-        ChangeResultDialog crd = new ChangeResultDialog(null, true, ri);
-        crd.setVisible(true);
-        if(crd.getSuccess()) {
-            Result r = new Result();
-            r.setFightID(f1.getID());
-            r.setPlayerIDs(ri.getResult().getPlayerIDs());
-            r.setPlayerScores(crd.getPlayerScores());
-            database.add(r);
-        }
+        doActionOnSelectedItem();
     }
 }//GEN-LAST:event_resultTableMouseClicked
 
+private void actionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionButtonActionPerformed
+    doActionOnSelectedItem();
+}//GEN-LAST:event_actionButtonActionPerformed
+
+private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+    try {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
+        if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            if(!file.getName().toLowerCase().endsWith(".csv")) {
+                file = new File(file.getAbsolutePath() + ".csv");
+            }
+            OutputStream os = new FileOutputStream(file);
+            CSVExporter.generateFromTable(resultTable, os);
+            os.close();
+        }
+    } catch(Exception e) {
+        log.error("Exception while writing to text file", e);
+        GUIUtils.displayError(parentWindow, "Unable to print to text file");
+    }
+}//GEN-LAST:event_exportButtonActionPerformed
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton actionButton;
+    private javax.swing.JButton exportButton;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton printButton;
     private javax.swing.JTable resultTable;

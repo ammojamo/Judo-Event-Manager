@@ -11,11 +11,9 @@ import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.model.cache.DivisionResultCache;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
-import au.com.jwatmuff.eventmanager.print.DrawHTMLGenerator;
 import au.com.jwatmuff.eventmanager.print.MultipleDrawHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.CheckboxListDialog;
-import au.com.jwatmuff.eventmanager.util.gui.ListDialog;
 import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -202,15 +200,16 @@ public class ResultsPanel extends javax.swing.JPanel {
 
 private void resultsSummaryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resultsSummaryButtonActionPerformed
     try {
+        ResultsWindow win = new ResultsWindow();
+
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         final ResultsSummaryPanel p = new ResultsSummaryPanel();
-        p.setParentWindow(parentWindow);
+        p.setParentWindow(win);
         p.setDatabase(database);
         p.setNotifier(notifier);
         p.setResultInfoCache(resultInfoCache);
         p.afterPropertiesSet();
 
-        ResultsWindow win = new ResultsWindow();
         win.getMainPanel().add(p);
         win.setTitle("Event Manager - Results - Summary");
         win.addWindowListener(new WindowAdapter() {
@@ -227,15 +226,16 @@ private void resultsSummaryButtonActionPerformed(java.awt.event.ActionEvent evt)
 
 private void pointsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pointsButtonActionPerformed
     try {
+        ResultsWindow win = new ResultsWindow();
+
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         final ResultsPointsPanel p = new ResultsPointsPanel();
-        p.setParentWindow(parentWindow);
+        p.setParentWindow(win);
         p.setDatabase(database);
         p.setNotifier(notifier);
         p.setResultInfoCache(resultInfoCache);
         p.afterPropertiesSet();
 
-        ResultsWindow win = new ResultsWindow();
         win.getMainPanel().add(p);
         win.setTitle("Event Manager - Results - Grading Points");
         win.addWindowListener(new WindowAdapter() {
@@ -252,15 +252,16 @@ private void pointsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 private void divisionResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_divisionResultsButtonActionPerformed
     try {
+        ResultsWindow win = new ResultsWindow();
+
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         DivisionResultsPanel p = new DivisionResultsPanel();
-        p.setParentWindow(parentWindow);
+        p.setParentWindow(win);
         p.setDatabase(database);
         p.setNotifier(notifier);
         p.setDivisionResultCache(divisionResultCache);
         p.afterPropertiesSet();
 
-        ResultsWindow win = new ResultsWindow();
         win.getMainPanel().add(p);
         win.setTitle("Event Manager - Results - Divisions");
         win.setVisible(true);
