@@ -335,18 +335,18 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
     private void exportCSVButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportCSVButtonActionPerformed
         if(!PermissionChecker.isAllowed(Action.EXPORT_PLAYERS, database)) return;
         try {
-            File f = File.createTempFile("players", ".csv");
-            OutputStream os = new FileOutputStream(f);
-            CSVExporter.generatePlayerList(database, os);
-            os.close();
 
-            if(Desktop.isDesktopSupported())
-                Desktop.getDesktop().open(f);
-            else if (System.getProperty("os.name").toUpperCase().indexOf("WINDOWS") == 0)
-                Runtime.getRuntime().exec("rundll32 SHELL32.DLL,ShellExec_RunDLL " + f.getAbsolutePath());
-            else
-                GUIUtils.displayMessage(parentWindow, "Unable to open file on this platform", "Platform Unsupported");            
-
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
+            if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File file = chooser.getSelectedFile();
+                if(!file.getName().toLowerCase().endsWith(".csv")) {
+                    file = new File(file.getAbsolutePath() + ".csv");
+                }
+                OutputStream os = new FileOutputStream(file);
+                CSVExporter.generatePlayerList(database, os);
+                os.close();
+            }
         } catch(Exception e) {
             log.error("Exception while writing to text file", e);
             GUIUtils.displayError(parentWindow, "Unable to print to text file");
