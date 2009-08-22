@@ -213,7 +213,11 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
 
         peerSyncInfo = updateService.sync(syncInfo);
 
-        Clock.setEarliestTime(peerSyncInfo.senderTime);
+        if(peerSyncInfo.senderTime == null) {
+            log.warn("No time received from peer");
+        } else {
+            Clock.setEarliestTime(peerSyncInfo.senderTime);
+        }
 
         if(peerSyncInfo.status != UpdateSyncInfo.Status.OK) {
             log.info("Peer " + peer + " does not wish to sync with us (" + peerSyncInfo.status + ") (Stage 2)");
@@ -230,7 +234,11 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
     public UpdateSyncInfo sync(UpdateSyncInfo peerSyncInfo) {
         log.info("Received sync request from peer ID " + peerSyncInfo.senderID);
 
-        Clock.setEarliestTime(peerSyncInfo.senderTime);
+        if(peerSyncInfo.senderTime == null) {
+            log.warn("No time received from peer");
+        } else {
+            Clock.setEarliestTime(peerSyncInfo.senderTime);
+        }
 
         UpdateSyncInfo syncInfo = new UpdateSyncInfo();
 
