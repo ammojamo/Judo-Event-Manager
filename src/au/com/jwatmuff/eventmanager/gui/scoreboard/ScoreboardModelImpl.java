@@ -98,6 +98,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     switch(goldenScoreMode) {
                         case INACTIVE:
                             setGoldenScoreMode(GoldenScoreMode.READY);
+                            logEvent("Stop timer");
                             checkForWin();
                             break;
                         case ACTIVE:
