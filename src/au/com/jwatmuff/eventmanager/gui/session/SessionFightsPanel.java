@@ -225,7 +225,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
                 }
             });
             addColumn("Fight Number", "fight_pos");
-            addColumn("Pool : Fight", "pool_pos");
+            addColumn("Division : Fight", "pool_pos");
             addColumn("Player 1", "player1");
             addColumn("Player 2", "player2");
         }
