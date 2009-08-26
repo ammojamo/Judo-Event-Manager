@@ -32,12 +32,12 @@
 #set($loser = $fight.losingPlayer)
 <!-- -->
       <tr>
-        <td>$date.format("dd-MM-yy", $fight.result.result.timestamp)</td>
+        <td>$date.format("dd-MM-yy", $!fight.result.result.timestamp)</td>
         <td>$competitionName</td>
-        <td>$fight.pool.description</td>
+        <td>$!fight.pool.description</td>
         <td>$loser.firstName $loser.lastName</td>
-        <td>$fight.effectiveLoserGrade</td>
-        <td>$fight.points</td>
+        <td>$!fight.effectiveLoserGrade</td>
+        <td>$!fight.points</td>
         <td>_________________________</td>
       </tr>
 <!--

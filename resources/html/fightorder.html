@@ -29,10 +29,10 @@
 #foreach($fight in $fights.get($session.ID))
 <!-- -->
       <tr>
-        <td>$fightNumbers.get($i)</td>
-        <td>$fight.player1</td>
-        <td>$fight.player2</td>
-        <td>$fight.pool</td>
+        <td>$!fightNumbers.get($i)</td>
+        <td>$!fight.player1</td>
+        <td>$!fight.player2</td>
+        <td>$!fight.pool</td>
       </tr>
 <!--
 #set($i = $i + 1)
