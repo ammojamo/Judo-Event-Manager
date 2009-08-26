@@ -40,12 +40,14 @@ public class MultipleDrawHTMLGenerator extends HTMLGenerator {
 
     @Override
     public void generate(Writer writer) {
-        footerGenerator.generate(writer);
+        headerGenerator.generate(writer);
 
+        boolean first = true;
         for(Pool pool : pools) {
-            new DrawHTMLGenerator(database, pool.getID(), showResults, false).generate(writer);
+            new DrawHTMLGenerator(database, pool.getID(), showResults, false, first).generate(writer);
+            first = false;
         }
 
-        headerGenerator.generate(writer);
+        footerGenerator.generate(writer);
     }
 }

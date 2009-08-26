@@ -1,5 +1,10 @@
 #if($fullDocument)
 #parse("resources/html/draw-header.html")
+#else
+#if($first)
+#set($first=false)
+#else
+<span class="break"></span>
 #end
     <h1>Fight Draw</h1>
     <h2>

@@ -1,4 +1,10 @@
+/*
 h1 {
+    page-break-before:always;
+}
+*/
+
+span.break {
     page-break-before:always;
 }
 

@@ -33,12 +33,18 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
     private int poolID;
     private boolean showResults;
     private boolean fullDocument;
+    private boolean firstPage;
 
-    public DrawHTMLGenerator(Database database, int poolID, boolean showResults, boolean fullDocument) {
+    public DrawHTMLGenerator(Database database, int poolID, boolean showResults, boolean fullDocument, boolean firstPage) {
         this.database = database;
         this.poolID = poolID;
         this.showResults = showResults;
         this.fullDocument = fullDocument;
+        this.firstPage = firstPage;
+    }
+
+    public DrawHTMLGenerator(Database database, int poolID, boolean showResults, boolean fullDocument) {
+        this(database, poolID, showResults, fullDocument, false);
     }
 
     public DrawHTMLGenerator(Database database, int poolID, boolean showResults) {
@@ -78,6 +84,8 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
         c.put("p", ps);
         c.put("pd", pds);
         c.put("division", pool.getDescription());
+
+        if(firstPage) c.put("first", "true");
 
         if(showResults) {
             PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
