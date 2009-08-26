@@ -39,7 +39,11 @@
             <td>$!player.visibleID</td>
             <td>$!player.lastName</td>
             <td>$!player.firstName</td>
+#if($player.dob)
             <td>$date.format("dd/MM/yyyy", $!player.dob)</td>
+#else
+            <td>---</td>
+#end
             <td>$!weight</td>
             <td>$!player.grade</td>
             <td>$!player.gender</td>
