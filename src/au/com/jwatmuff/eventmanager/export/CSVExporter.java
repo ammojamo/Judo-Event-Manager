@@ -20,6 +20,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.genericdb.Database;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.swing.JTable;
@@ -31,6 +33,8 @@ import org.apache.commons.lang.ArrayUtils;
  * @author James
  */
 public class CSVExporter {
+    private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+
     /** Creates a new instance of TextExporter */
     private CSVExporter() {
     }
@@ -94,7 +98,7 @@ public class CSVExporter {
                 player.getLastName(),
                 player.getGender(),
                 player.getGrade(),
-                player.getDob()
+                dateFormat.format(player.getDob())
             };
             
             PlayerDetails details = database.get(PlayerDetails.class, player.getDetailsID());
