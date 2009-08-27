@@ -554,7 +554,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void closeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeMenuItemActionPerformed
-        
+        this.dispose();
     }//GEN-LAST:event_closeMenuItemActionPerformed
 
     private void fullScreenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fullScreenMenuItemActionPerformed
