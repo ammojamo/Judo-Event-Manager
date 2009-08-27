@@ -313,6 +313,10 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     @Override
     public void unregisterService(String serviceName) {
         PeerService service = peerServiceMap.remove(serviceName);
+        if(service == null) {
+            log.warn("Attempt to unregister unknown service: " + serviceName);
+            return;
+        }
         try {
             service.exporter.destroy();
         } catch (RemoteException e) {
