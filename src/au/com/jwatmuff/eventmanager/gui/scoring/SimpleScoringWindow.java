@@ -99,6 +99,7 @@ public class SimpleScoringWindow extends javax.swing.JFrame {
             }
         });
         jMenu2.add(fullScreenMenuItem);
+        jMenu2.remove(fullScreenMenuItem);
 
         swapPlayersMenuItem.setText("Swap Players");
         swapPlayersMenuItem.addActionListener(new java.awt.event.ActionListener() {

@@ -487,6 +487,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             }
         });
         optionsMenu.add(fullScreenMenuItem);
+        optionsMenu.remove(fullScreenMenuItem);
 
         swapPlayersMenuItem.setText("Swap Players");
         swapPlayersMenuItem.addActionListener(new java.awt.event.ActionListener() {
