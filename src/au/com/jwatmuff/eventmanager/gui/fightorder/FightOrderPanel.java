@@ -589,7 +589,7 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
 
     /* display selection dialog */
-    CheckboxListDialog<Pool> dialog = new CheckboxListDialog<Pool>(parentWindow, true, pools, "Choose Division", "Print Results");
+    CheckboxListDialog<Pool> dialog = new CheckboxListDialog<Pool>(parentWindow, true, pools, "Choose Division", "Print Draws");
     dialog.setRenderer(new StringRenderer<Pool>() {
             @Override
             public String asString(Pool p) {
