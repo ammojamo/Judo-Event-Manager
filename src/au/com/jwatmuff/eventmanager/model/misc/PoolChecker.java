@@ -68,7 +68,7 @@ public class PoolChecker {
 
         int maxAge = pool.getMaximumAge();
 
-        if (maxAge > 15) {
+        if (maxAge > 15 || maxAge == 0) {
             if(age <= 15) g = reduceGrade(g, 2);
             if(age <= 12) g = reduceGrade(g, 2);
             if(age <= 9) g = reduceGrade(g, 2);
