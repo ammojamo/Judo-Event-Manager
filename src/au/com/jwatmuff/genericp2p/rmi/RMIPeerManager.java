@@ -52,6 +52,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     }
 
     private int registryPort;
+    private File idFile;
     private UUID uuid;
     private Collection<PeerConnectionListener> listeners = new ArrayList<PeerConnectionListener>();
     private Map<String, PeerService> peerServiceMap = new HashMap<String, PeerService>();
@@ -72,8 +73,9 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
         }
     };
 
-    public RMIPeerManager(int registryPort) {
+    public RMIPeerManager(int registryPort, File idFile) {
         this.registryPort = registryPort;
+        this.idFile = idFile;
 
         log.debug("Obtained local ID: " + this.getUUID());
 
@@ -119,7 +121,6 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
             return uuid;
         }
 
-        File idFile = new File("peerid.dat");
         Properties props = new Properties();
         try {
             props.load(new FileInputStream(idFile));

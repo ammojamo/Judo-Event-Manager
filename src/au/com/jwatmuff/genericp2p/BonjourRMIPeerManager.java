@@ -8,6 +8,7 @@ package au.com.jwatmuff.genericp2p;
 import au.com.jwatmuff.genericp2p.bonjour.BonjourDiscoveryService;
 import au.com.jwatmuff.genericp2p.bonjour.BonjourRegistrationService;
 import au.com.jwatmuff.genericp2p.rmi.RMIPeerManager;
+import java.io.File;
 import java.util.Collection;
 import java.util.UUID;
 import org.apache.log4j.Logger;
@@ -26,13 +27,13 @@ public class BonjourRMIPeerManager implements PeerManager {
 
     private RMIPeerManager manager;
     
-    public BonjourRMIPeerManager(int port) {
+    public BonjourRMIPeerManager(int port, File idFile) {
         registrar = new BonjourRegistrationService(port);
         discoverer = new BonjourDiscoveryService();
 
         log.info("Starting RMI Peer Manager");
 
-        manager = new RMIPeerManager(port);
+        manager = new RMIPeerManager(port, idFile);
         
         log.info("Starting Peer Registration Service");
 

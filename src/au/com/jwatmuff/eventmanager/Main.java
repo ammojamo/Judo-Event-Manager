@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -46,12 +47,14 @@ public class Main {
     
     public static final String VERSION = "0.0.2";
 
+    private static File workingDir = new File(".");
+
     /**
      * Creates a run lock file if it does not already exist. Returns false
      * if a run lock is already present and the force argument is false.
      */
     private static boolean obtainRunLock(boolean force) {
-        File f = new File("eventmanager.run.lock");
+        File f = new File(workingDir, "eventmanager.run.lock");
         if(f.exists() && !force) {
             log.info("Run lock is present");
             return false;
@@ -89,6 +92,10 @@ public class Main {
 
         return true;
     }
+
+    public static File getWorkingDirectory() {
+        return workingDir;
+    }
     
     /**
      * Main method.
@@ -108,6 +115,29 @@ public class Main {
         } 
         catch (Exception e) {
            log.info("Failed to set system look and feel");
+        }
+
+        /*
+         * Set workingDir to a writable folder for storing competitions, settings etc.
+         */
+        String applicationData = System.getenv("APPDATA");
+        if(applicationData != null) {
+            workingDir = new File(applicationData, "EventManager");
+            if(!workingDir.exists() && !workingDir.mkdirs())
+                workingDir = new File(".");
+        }
+
+        /*
+         * Copy license if necessary
+         */
+        File license1 = new File("license.lic");
+        File license2 = new File(workingDir, "license.lic");
+        if(license1.exists() && !license2.exists()) {
+            try {
+                FileUtils.copyFile(license1, license2);
+            } catch(IOException e) {
+                log.warn("Failed to copy license from " + license1 + " to " + license2, e);
+            }
         }
 
         /*
@@ -153,19 +183,19 @@ public class Main {
 
             props.putAll(System.getProperties());
 
-            File databaseStore = new File("comps");
+            File databaseStore = new File(workingDir, "comps");
             int rmiPort = Integer.parseInt(props.getProperty("eventmanager.rmi.port"));
 
             loadWindow.addMessage("Loading Peer Manager..");
             log.info("Loading Peer Manager");
 
-            BonjourRMIPeerManager peerManager = new BonjourRMIPeerManager(rmiPort);
+            BonjourRMIPeerManager peerManager = new BonjourRMIPeerManager(rmiPort, new File(workingDir, "peerid.dat"));
 
             loadWindow.addMessage("Loading Database Manager..");
             log.info("Loading Database Manager");
 
             DatabaseManager databaseManager = new SQLiteDatabaseManager(databaseStore, peerManager);
-            LicenseManager licenseManager = new LicenseManager(new File("."));
+            LicenseManager licenseManager = new LicenseManager(workingDir);
 
             loadWindow.addMessage("Loading Load Competition Dialog..");
             log.info("Loading Load Competition Dialog");
