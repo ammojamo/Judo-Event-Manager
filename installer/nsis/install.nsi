@@ -1,6 +1,3 @@
-; Java Launcher
-;--------------
-
 Name "Event Manager"
 Caption "Event Manager"
 ;Icon "YourProgram.ico"
@@ -9,10 +6,6 @@ OutFile "EventManagerSetup.exe"
 InstallDir $PROGRAMFILES\EventManager
 
 DirText "This will install EventManager on your computer."
-
-;You want to change the next two lines too
-;!define CLASSPATH ".;lib"
-;!define CLASS "au.com.jwatmuff.eventmanager.Main"
 
 Section ""
   SetOutPath $INSTDIR
@@ -58,4 +51,3 @@ Section "Install Bonjour"
   installbonjourdone:
 
 SectionEnd
-
