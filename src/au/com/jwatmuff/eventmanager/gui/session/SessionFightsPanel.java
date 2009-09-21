@@ -540,6 +540,10 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         
         try {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            if(fightsDirty) {
+                setFightsDirty(false);
+                SessionFightSequencer.saveFightSequence(database, fights, true);
+            }
             SessionLocker.lockFights(database, session);
         } catch(Exception e) {
             log.error("Error while locking fights in session " + session.getName(), e);
