@@ -718,7 +718,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_saveBackupButtonActionPerformed
 
     private void loadBackupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadBackupButtonActionPerformed
-        File databaseStore = new File("comps");
+        File databaseStore = new File(Main.getWorkingDirectory(), "comps");
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new FileNameExtensionFilter("Event Manager Files", "evm"));
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
