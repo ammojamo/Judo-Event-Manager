@@ -320,7 +320,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
             for(DataEvent event : events)
                 databaseUpdater.handleDataEvent(event);
         } catch(Exception e) {
-            log.error("Exception whil applying local update to database", e);
+            log.error("Exception while applying local update to database", e);
         }
 
         /* sync with peers */

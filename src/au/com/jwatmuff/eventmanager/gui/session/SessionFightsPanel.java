@@ -547,7 +547,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
             SessionLocker.lockFights(database, session);
         } catch(Exception e) {
             log.error("Error while locking fights in session " + session.getName(), e);
-            GUIUtils.displayError(parentWindow, "Unable to lock ession");
+            GUIUtils.displayError(parentWindow, "Unable to lock session");
         } finally {
             this.setCursor(Cursor.getDefaultCursor());
         }
