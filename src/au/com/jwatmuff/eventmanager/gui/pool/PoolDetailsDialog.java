@@ -24,7 +24,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -250,7 +253,14 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         playerListModel.clear();
 
-        for(Player player : database.findAll(Player.class, PlayerDAO.ALL))
+        List<Player> players = database.findAll(Player.class, PlayerDAO.ALL);
+        Collections.sort(players, new Comparator<Player>() {
+            public int compare(Player p1, Player p2) {
+                return p1.getFirstName().compareTo(p2.getFirstName());
+            }
+        });
+
+        for(Player player : players)
             if(PoolChecker.checkPlayer(player, pool, ci.getStartDate())) {
                 Selectable s = new DefaultSelectable(player);
                 PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
