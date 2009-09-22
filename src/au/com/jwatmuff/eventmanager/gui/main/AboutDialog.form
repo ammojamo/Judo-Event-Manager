@@ -13,6 +13,7 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
@@ -69,12 +70,9 @@
       <SubComponents>
         <Component class="javax.swing.JTextPane" name="jTextPane1">
           <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color type="null"/>
-            </Property>
             <Property name="contentType" type="java.lang.String" value="text/html"/>
             <Property name="editable" type="boolean" value="false"/>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;&#xa;  &lt;head&gt;&#xd;&#xa;&#xd;&#xa;  &lt;/head&gt;&#xd;&#xa;  &lt;body&gt;&#xd;&#xa;    &lt;h1&gt;Event Manager 4&lt;/h1&gt;&#xa;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#xd;&#xa;        &amp;copy; 2008&#xa;    &lt;/p&gt;&#xd;&#xa;&#xa;    &lt;h2&gt;Credits&lt;/h2&gt;&#xa;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#xa;        All icons from the &quot;Silk&quot; icon set by famfamfam.&lt;br&gt;&#xa;        &lt;href=&quot;http://www.famfamfam.com&quot;&gt;http://famfamfam.com&lt;/a&gt;&#xa;    &lt;/p&gt;&#xa;&#xa;  &lt;/body&gt;&#xd;&#xa;&lt;/html&gt;&#xd;&#xa;"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;&#xa;  &lt;head&gt;&#xd;&#xa;&#xd;&#xa;  &lt;/head&gt;&#xd;&#xa;  &lt;body&gt;&#xd;&#xa;    &lt;h1&gt;Event Manager 4&lt;/h1&gt;&#xa;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#xd;&#xa;        &amp;copy; 2008, 2009 James Watmuff and Leonard Hall&#xa;    &lt;/p&gt;&#xd;&#xa;&#xa;    &lt;h2&gt;Credits&lt;/h2&gt;&#xa;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#xa;        All icons from the &quot;Silk&quot; icon set by famfamfam.&lt;br&gt;&#xa;        &lt;href=&quot;http://www.famfamfam.com&quot;&gt;http://famfamfam.com&lt;/a&gt;&#xa;    &lt;/p&gt;&#xa;&#xa;  &lt;/body&gt;&#xd;&#xa;&lt;/html&gt;&#xd;&#xa;"/>
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
         </Component>

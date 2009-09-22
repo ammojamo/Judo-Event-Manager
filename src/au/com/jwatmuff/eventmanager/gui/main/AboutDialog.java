@@ -43,10 +43,9 @@ public class AboutDialog extends javax.swing.JDialog {
             }
         });
 
-        jTextPane1.setBackground(null);
         jTextPane1.setContentType("text/html");
         jTextPane1.setEditable(false);
-        jTextPane1.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n    <h1>Event Manager 4</h1>\n    <p style=\"margin-top: 0\">\r\n        &copy; 2008\n    </p>\r\n\n    <h2>Credits</h2>\n    <p style=\"margin-top: 0\">\n        All icons from the \"Silk\" icon set by famfamfam.<br>\n        <href=\"http://www.famfamfam.com\">http://famfamfam.com</a>\n    </p>\n\n  </body>\r\n</html>\r\n");
+        jTextPane1.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n    <h1>Event Manager 4</h1>\n    <p style=\"margin-top: 0\">\r\n        &copy; 2008, 2009 James Watmuff and Leonard Hall\n    </p>\r\n\n    <h2>Credits</h2>\n    <p style=\"margin-top: 0\">\n        All icons from the \"Silk\" icon set by famfamfam.<br>\n        <href=\"http://www.famfamfam.com\">http://famfamfam.com</a>\n    </p>\n\n  </body>\r\n</html>\r\n");
         jTextPane1.setFocusable(false);
         jScrollPane1.setViewportView(jTextPane1);
 
