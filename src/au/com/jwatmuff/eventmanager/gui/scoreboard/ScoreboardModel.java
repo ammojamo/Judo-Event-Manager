@@ -115,6 +115,8 @@ public interface ScoreboardModel {
 
     void declarePlayerReady(int player);
 
+    void declareFightReady();
+
     void setHolddownPlayer(int player);
 
     void approveGoldenScore();

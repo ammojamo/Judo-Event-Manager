@@ -158,20 +158,18 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         mode = Mode.IDLE;
         eventLog = new StringBuilder();
         notifyListeners(ScoreboardUpdate.ALL);
+        setMode(Mode.FIGHT_PENDING);
     }
 
     @Override
     public void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date lastFights[], int minimumBreak) {
         reset(fightTime, goldenScoreTime, playerNames);
-        mode = Mode.FIGHT_PENDING;
-        boolean ready = true;
         for(int i=0; i<2; i++) {
             final int j = i;
             if(lastFights[i] == null) continue;
             int secsSinceLast = (int) ( ((new Timestamp().getTime()) - lastFights[i].getTime()) / 1000);
             log.debug("secsSinceLast: " + secsSinceLast);
             if(secsSinceLast < minimumBreak) {
-                ready = false;
                 pendingFightTimers[i] = new Stopwatch(10, false, new Runnable() {
                     @Override
                     public void run() {
@@ -179,9 +177,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                         if(getPendingFightTime(j) <= 0) {
                             pendingFightTimers[j].stop();
                             pendingFightTimers[j] = null;
-                            if(getPendingFightTime(1-j) <= 0) {
-                                setMode(Mode.IDLE);
-                            }
                         }
 
                     }
@@ -189,9 +184,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                 pendingFightTimers[i].reset((minimumBreak - secsSinceLast) * 1000);
                 pendingFightTimers[i].start();
             }
-        }
-        if(ready) {
-            setMode(Mode.IDLE);
         }
     }
 
@@ -202,11 +194,14 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             s.stop();
             pendingFightTimers[player] = null;
             notifyListeners(ScoreboardUpdate.FIGHT_PENDING);
-            log.debug("HI " + getPendingFightTime(1-player));
-            if(getPendingFightTime(1-player) <= 0) {
-                setMode(Mode.IDLE);
-            }
         }
+    }
+
+    public void declareFightReady() {
+        assert(getMode() == Mode.FIGHT_PENDING);
+        assert(getPendingFightTime(0) <= 0);
+        assert(getPendingFightTime(1) <= 0);
+        setMode(Mode.IDLE);
     }
 
     @Override
@@ -270,6 +265,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     public void startTimer() {
         /* ignore if one player has already won */
         if(mode == Mode.WIN) return;
+
+        /* ignore if fight is not ready */
+        if(mode == Mode.FIGHT_PENDING) return;
+
+        /* ignore if no fight to start */
+        if(mode == Mode.NO_FIGHT) return;
         
         /* ignore if the timer has run out and golden rule is active */
         if(mainTimer.getTime() <= 0) return;

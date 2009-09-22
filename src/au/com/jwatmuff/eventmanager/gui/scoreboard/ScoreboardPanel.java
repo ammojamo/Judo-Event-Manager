@@ -157,7 +157,13 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
                 });
             }
         }
-        pendingFightLayer.addMouseListener(new MouseAdapter() { });
+        pendingFightLayer.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if(model.getPendingFightTime(0) <= 0 && model.getPendingFightTime(1) <= 0)
+                    model.declareFightReady();
+            }
+        });
 
         /*
          * Winning result layer

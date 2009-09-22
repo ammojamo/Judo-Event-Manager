@@ -191,6 +191,11 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
+    public void declareFightReady() {
+        model.declareFightReady();
+    }
+
+    @Override
     public void setHolddownPlayer(int player) {
         model.setHolddownPlayer(player);
     }
