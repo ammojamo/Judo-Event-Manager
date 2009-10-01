@@ -19,6 +19,7 @@ Section ""
 
   writeUninstaller "$INSTDIR\uninstall.exe"
 
+  CreateDirectory "$SMPROGRAMS\EventManager"
   createShortCut "$SMPROGRAMS\EventManager\EventManager.lnk" "$INSTDIR\EventManager.jar" "" "$INSTDIR\icon.ico"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager" \
