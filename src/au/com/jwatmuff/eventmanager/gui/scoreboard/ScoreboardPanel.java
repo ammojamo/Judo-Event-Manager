@@ -95,7 +95,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
         this.model = new ScoreboardModelImpl(system);
         this.interactive = interactive;
 
-        double offset = (system == ScoringSystem.NEW) ? 1.0 : 0;
+        double offset = (system == ScoringSystem.NEW) ? 0.25 : 0;
 
         ScalableAbsoluteLayout layout;
         
@@ -362,7 +362,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
                         label.setBorder(new EmptyBorder(0,0,0,0));
                         label.setOpaque(false);
                         label.setVisible(false);
-                        double x = i*8 + j*2 - (j==0?0:1) + offset;
+                        double x = i*8 + j*2.5 - (j==0?0:1) + offset;
                         double y = 5 + k*(j==0?1.5:3);
                         double w = j==0?1:2;
                         double h = j==0?0.5:1;
@@ -434,7 +434,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
                             }
                         });
                         scoreRegions[i][j][k] = label;
-                        double x = i*8 + j*2 - (j==0?0:1) + offset;
+                        double x = i*8 + j*2.5 - (j==0?0:1) + offset;
                         double y = 5 + k*(j==0?1.3:2);
                         double w = j==0?1:2;
                         double h = j==0?(k==0?1.3:0.7):2;
@@ -558,22 +558,22 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
         };
 
         layout.addComponent(timer, 5, 0, 6, 2.5);
-        layout.addComponent(player[0], 1, 2.5, 6, 1.5);
-        layout.addComponent(player[1], 9, 2.5, 6, 1.5);
+        layout.addComponent(player[0], 0.25, 2.5, 7.5, 1.5);
+        layout.addComponent(player[1], 8.25, 2.5, 7.5, 1.5);
         
         scoreLabels = new ScalableLabel[2][4];
         String[] iwyk = new String[]{"I","W","Y","K"};
         for(int i=0;i<2;i++)
             for(int j=0;j<4;j++) {
                 scoreLabels[i][j] = new ScalableLabel(iwyk[j]);
-                layout.addComponent(scoreLabels[i][j], i*8 + (j==0?0:(j*2-1)) + offset, 4, j==0?1:2, 1);
+                layout.addComponent(scoreLabels[i][j], i*8 + (j==0?0:(j*2.5-1)) + offset, 4, j==0?1:2, 1);
             }
         
         score = new ScalableLabel[2][4];
         for(int i=0;i<2;i++)
             for(int j=0;j<4;j++) {
                 score[i][j] = new ScalableLabel("0");
-                layout.addComponent(score[i][j], i*8 + (j==0?0:(j*2-1)) + offset, 5, j==0?1:2, j==0?2:4);
+                layout.addComponent(score[i][j], i*8 + (j==0?0:(j*2.5-1)) + offset, 5, j==0?1:2, j==0?2:4);
             }
         
         if(interactive) {
