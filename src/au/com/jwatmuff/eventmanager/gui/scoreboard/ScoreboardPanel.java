@@ -77,6 +77,10 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
     
     private JPanel noFightLayer;
     private JPanel pendingFightLayer;
+
+    private ScalableLabel vsPlayer[];
+    private ScalableLabel vs;
+    private JPanel vsLayer;
     
     private boolean swapPlayers;
     
@@ -112,11 +116,29 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
         noFightLayer = new JPanel();
         noFightLayer.setOpaque(true);
         noFightLayer.setVisible(false);
-        layeredPane.add(noFightLayer, new Integer(11));
+        layeredPane.add(noFightLayer, new Integer(12));
         layout = new ScalableAbsoluteLayout(noFightLayer, 16, 12);
         noFightLayer.setLayout(layout);
         
         layout.addComponent(new ScalableLabel("No Fight"), 4, 4, 8, 4);
+
+        /*
+         * Player vs Player layer
+         */
+        vsLayer = new JPanel();
+        vsLayer.setOpaque(true);
+        vsLayer.setVisible(false);
+        layeredPane.add(vsLayer, new Integer(11));
+        layout = new ScalableAbsoluteLayout(vsLayer, 16, 12);
+        vsLayer.setLayout(layout);
+        vsPlayer = new ScalableLabel[] {
+            new ScalableLabel("Player 1"),
+            new ScalableLabel("Player 2")
+        };
+        vs = new ScalableLabel("vs");
+        layout.addComponent(vsPlayer[0], 1, 1, 11, 3);
+        layout.addComponent(vsPlayer[1], 4, 8, 11, 3);
+        layout.addComponent(vs, 7, 5, 2, 2);
 
         /*
          * Pending fight layer
@@ -157,13 +179,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
                 });
             }
         }
-        pendingFightLayer.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if(model.getPendingFightTime(0) <= 0 && model.getPendingFightTime(1) <= 0)
-                    model.declareFightReady();
-            }
-        });
+        pendingFightLayer.addMouseListener(new MouseAdapter() { });
 
         /*
          * Winning result layer
@@ -646,7 +662,10 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
         timer.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent event) {
-                if(event.getClickCount() == 1) {
+                if(model.getMode() == Mode.FIGHT_PENDING) {
+                    model.declareFightReady();
+                    updateTimer();
+                } else if(event.getClickCount() == 1) {
                     model.toggleTimer();
                 }
             }
@@ -694,7 +713,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
 
         for(ScalableLabel label : new ScalableLabel[] {
                 timer,
-                goldenScore, goldenScoreApprove} ) {
+                goldenScore, goldenScoreApprove, vs} ) {
             label.setForeground(Color.BLACK);
             label.setBackground(Color.WHITE);
         }
@@ -748,6 +767,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
         for(Component c : new Component[] {
             noFightLayer,
             pendingFightLayer,
+            vsLayer,
             pendingPlayer[0],
             pendingPlayer[1],
             pendingFightTimer[0],
@@ -772,6 +792,9 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
 
             pendingPlayer[i].setForeground(fg);
             pendingPlayer[i].setBackground(bg);
+            
+            vsPlayer[i].setForeground(fg);
+            vsPlayer[i].setBackground(bg);
 
             for(int j=0; j<4; j++) {
                 score[i][j].setForeground(fg);
@@ -972,16 +995,29 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
 
     private void updatePendingFight() {
         if(model.getMode().equals(Mode.FIGHT_PENDING)) {
-            for(int i=0; i<2; i++) {
-                int sec = model.getPendingFightTime(swapPlayers?1-i:i);
-                String str = "Ready";
-                if(sec > 0) str = sec/60 + ":" + format.format(sec%60);
-                pendingFightTimer[i].setText(str);
-                pendingPlayer[i].setText(model.getPlayerName(swapPlayers?1-i:i));
+            if(model.getPendingFightTime(0) > 0 ||
+               model.getPendingFightTime(1) > 0) {
+                for(int i=0; i<2; i++) {
+                    int sec = model.getPendingFightTime(swapPlayers?1-i:i);
+                    String str = "Ready";
+                    if(sec > 0) str = sec/60 + ":" + format.format(sec%60);
+                    pendingFightTimer[i].setText(str);
+                    pendingPlayer[i].setText(model.getPlayerName(swapPlayers?1-i:i));
+                }
+                pendingFightLayer.setVisible(true);
+            } else {
+                pendingFightLayer.setVisible(false);
+                if(!interactive) {
+                    for(int i=0; i<2; i++)
+                        vsPlayer[i].setText(model.getPlayerName(swapPlayers?1-i:i));
+                    vsLayer.setVisible(true);
+                }
+                if(interactive)
+                    timer.setText("Click when Ready");
             }
-            pendingFightLayer.setVisible(true);
         } else {
             pendingFightLayer.setVisible(false);
+            vsLayer.setVisible(false);
         }
     }
     
