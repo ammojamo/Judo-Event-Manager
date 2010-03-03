@@ -45,7 +45,7 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 public class Main {
     private static Logger log = Logger.getLogger(Main.class);
     
-    public static final String VERSION = "0.0.2";
+    public static final String VERSION = "0.0.3";
 
     private static File workingDir = new File(".");
 

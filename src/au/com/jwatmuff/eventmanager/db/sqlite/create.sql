@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS competition (
   location VARCHAR(512),
   start_date DATE,
   end_date DATE,
+  age_threshold_date DATE,
   mats INTEGER NOT NULL,
   password_hash INTEGER,
   wi_password_hash INTEGER,

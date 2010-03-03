@@ -23,6 +23,7 @@ public class CompetitionInfo extends DistributableObject<Integer> implements Ser
     private String location;
     private Date startDate;
     private Date endDate;
+    private Date ageThresholdDate;
     private int mats;
     private int passwordHash;
     private int weighInPasswordHash;
@@ -72,6 +73,14 @@ public class CompetitionInfo extends DistributableObject<Integer> implements Ser
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public Date getAgeThresholdDate() {
+        return ageThresholdDate;
+    }
+
+    public void setAgeThresholdDate(Date ageThresholdDate) {
+        this.ageThresholdDate = ageThresholdDate;
     }
 
     public int getMats() {
