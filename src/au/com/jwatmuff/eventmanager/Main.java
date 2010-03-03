@@ -223,6 +223,7 @@ public class Main {
                         ci.setName(info.name);
                         ci.setStartDate(new Date());
                         ci.setEndDate(new Date());
+                        ci.setAgeThresholdDate(new Date());
                         //ci.setPasswordHash(info.passwordHash);
                         License license = licenseManager.getLicense();
                         if(license != null) {

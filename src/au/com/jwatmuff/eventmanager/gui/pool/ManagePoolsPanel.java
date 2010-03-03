@@ -84,7 +84,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         poolListTable.setModel(tableModel);
         
         if(database.get(CompetitionInfo.class, null) != null)
-            censusDate = database.get(CompetitionInfo.class, null).getStartDate();
+            censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
         else
             censusDate = new Date();
               
@@ -154,7 +154,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             @Override
             public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
                 if(database.get(CompetitionInfo.class, null) != null)
-                    censusDate = database.get(CompetitionInfo.class, null).getStartDate();
+                    censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
                 else
                     censusDate = new Date();
             }

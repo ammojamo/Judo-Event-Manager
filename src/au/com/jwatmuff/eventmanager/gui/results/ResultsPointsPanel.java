@@ -135,7 +135,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
                     map.put("pool", pool.getDescription());
 
-                    Date censusDate = database.get(CompetitionInfo.class, null).getStartDate();
+                    Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
 
                     int[] scores = bean.getResult().getPlayerScores();
 

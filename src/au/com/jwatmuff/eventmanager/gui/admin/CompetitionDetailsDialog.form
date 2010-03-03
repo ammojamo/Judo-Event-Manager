@@ -103,7 +103,6 @@
                                   <Component id="jLabel2" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel3" linkSize="2" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel4" linkSize="2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel5" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -111,8 +110,17 @@
                                   <Component id="locationTextField" alignment="1" pref="454" max="32767" attributes="0"/>
                                   <Component id="startDatePicker" alignment="0" min="-2" pref="83" max="-2" attributes="0"/>
                                   <Component id="finishDatePicker" alignment="0" min="-2" pref="83" max="-2" attributes="0"/>
-                                  <Component id="directorNameTextField" alignment="0" pref="454" max="32767" attributes="0"/>
                               </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel10" linkSize="2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="ageThresholdDatePicker" min="-2" pref="83" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel5" linkSize="2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="directorNameTextField" pref="454" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel6" linkSize="2" min="-2" max="-2" attributes="0"/>
@@ -148,6 +156,11 @@
                           <Component id="finishDatePicker" min="-2" max="-2" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="1"/>
+                          <Component id="ageThresholdDatePicker" alignment="0" min="-2" max="-2" attributes="1"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="directorNameTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -157,7 +170,7 @@
                           <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="directorContactTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="249" max="32767" attributes="0"/>
+                      <EmptySpace pref="222" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -208,6 +221,16 @@
             </Component>
             <Component class="javax.swing.JTextField" name="directorContactTextField">
             </Component>
+            <Component class="javax.swing.JLabel" name="jLabel10">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Age Threshold Date"/>
+              </Properties>
+            </Component>
+            <Component class="com.michaelbaranov.microba.calendar.DatePicker" name="ageThresholdDatePicker">
+              <Properties>
+                <Property name="toolTipText" type="java.lang.String" value="Competitor&apos;s ages will be calculated on this date"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="jPanel1">
@@ -225,14 +248,14 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jScrollPane1" alignment="0" pref="547" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" alignment="0" pref="555" max="32767" attributes="1"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="addPoolButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="editPoolButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="deletePoolButton" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="137" max="32767" attributes="0"/>
+                              <EmptySpace pref="145" max="32767" attributes="0"/>
                               <Component id="importButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -402,17 +425,17 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel7" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="licenseNameLabel" pref="427" max="32767" attributes="0"/>
+                                  <Component id="licenseNameLabel" pref="435" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel8" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="licenseContactLabel" pref="427" max="32767" attributes="0"/>
+                                  <Component id="licenseContactLabel" pref="435" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel9" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="licenseTypeLabel" pref="427" max="32767" attributes="0"/>
+                                  <Component id="licenseTypeLabel" pref="435" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>

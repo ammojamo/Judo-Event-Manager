@@ -261,7 +261,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         });
 
         for(Player player : players)
-            if(PoolChecker.checkPlayer(player, pool, ci.getStartDate())) {
+            if(PoolChecker.checkPlayer(player, pool, ci.getAgeThresholdDate())) {
                 Selectable s = new DefaultSelectable(player);
                 PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
                 if(pp != null && pp.isValid()) {

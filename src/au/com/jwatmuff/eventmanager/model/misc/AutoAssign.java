@@ -47,8 +47,8 @@ public class AutoAssign {
         
         if(ci == null)
             throw new DatabaseStateException("Competition Info must be present");
-        if(ci.getStartDate() == null)
-            throw new DatabaseStateException("Competition Info must have a start date");
+        if(ci.getAgeThresholdDate() == null)
+            throw new DatabaseStateException("Competition Info must have an age threshold date");
         
         database.perform(new Transaction() {
 
@@ -57,7 +57,7 @@ public class AutoAssign {
                 for(Player player : players)
                     for(Pool pool : pools)
                         if(pool.getLockedStatus() == Pool.LockedStatus.UNLOCKED)
-                            if(PoolChecker.checkPlayer(player, pool, ci.getStartDate())) {
+                            if(PoolChecker.checkPlayer(player, pool, ci.getAgeThresholdDate())) {
                                 PlayerPool pp = new PlayerPool();
                                 pp.setPlayerID(player.getID());
                                 pp.setPoolID(pool.getID());

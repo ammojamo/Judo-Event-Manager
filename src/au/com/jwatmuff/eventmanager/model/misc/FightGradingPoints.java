@@ -32,7 +32,7 @@ public class FightGradingPoints {
 
     public FightGradingPoints(ResultInfo ri, Database database) {
         result = ri;
-        Date censusDate = database.get(CompetitionInfo.class, null).getStartDate();
+        Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
         int[] scores = ri.getResult().getPlayerScores();
         int winner = scores[0] > scores[1] ? 0 : 1;
         int loser = 1 - winner;
