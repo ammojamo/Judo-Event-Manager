@@ -245,12 +245,16 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         /* can't start golden rule time if a holddown is still active */
         if(holddownMode == HolddownMode.ACTIVE)
             return;
-        
+
+        /* No longer want to set score to zero when golden score is activated */
+        /*
         for(int i=0; i<2; i++) {
             shido[i] = 0;
             for(int j=0; j<Score.values().length; j++)
                 score[i][j] = 0;
         }
+        */
+
         notifyListeners(ScoreboardUpdate.SCORE);
         notifyListeners(ScoreboardUpdate.SHIDO);
         
