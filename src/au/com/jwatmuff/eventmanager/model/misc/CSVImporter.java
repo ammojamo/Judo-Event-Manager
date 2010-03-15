@@ -197,6 +197,7 @@ public class CSVImporter {
         columnMapping.put("DOB", "dob");
         columnMapping.put("Division", "division");
         columnMapping.put("Club", "club");
+        columnMapping.put("Team", "club");
 
         columnMapping.put("Home Number", "homeNumber");
         columnMapping.put("Work Number", "workNumber");

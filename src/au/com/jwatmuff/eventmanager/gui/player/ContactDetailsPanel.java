@@ -238,7 +238,7 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Associations"));
 
-        jLabel1.setText("Club");
+        jLabel1.setText("Team");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);

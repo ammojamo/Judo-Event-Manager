@@ -73,7 +73,7 @@ public class CSVExporter {
             "Sex",
             "Grade",
             "DOB",
-            "Club",
+            "Team",
             "Home Number",
             "Work Number",
             "Mobile Number",
