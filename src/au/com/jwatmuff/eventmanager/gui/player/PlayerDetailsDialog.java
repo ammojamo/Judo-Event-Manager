@@ -96,7 +96,7 @@ public class PlayerDetailsDialog extends javax.swing.JDialog {
         playerPoolsPanel.setPlayerID(player.getID());
         notifier.addListener(playerPoolsPanel);
 
-        log.debug("Updating contact details panel. Club is " + details.getClub() + ", detailsID = " + details.getID() + ", " + player.getDetailsID());
+        //log.debug("Updating contact details panel. Club is " + details.getClub() + ", detailsID = " + details.getID() + ", " + player.getDetailsID());
 
         contactDetailsPanel.updateFromPlayerDetails(details);
         medicalDetailsPanel.updateFromPlayerDetails(details);        
@@ -211,7 +211,7 @@ public class PlayerDetailsDialog extends javax.swing.JDialog {
         contactDetailsPanel.populate(details);
         medicalDetailsPanel.populate(details);
 
-        log.debug("New player club is " + details.getClub() + ", details ID = " + details.getID() + ", " + player.getDetailsID());
+        //log.debug("New player club is " + details.getClub() + ", details ID = " + details.getID() + ", " + player.getDetailsID());
         
         database.update(player);
         database.update(details);
