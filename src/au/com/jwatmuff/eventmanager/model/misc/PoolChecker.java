@@ -136,7 +136,7 @@ public class PoolChecker {
 
         // adjust belt if necessary
         Grade grade = getEffectiveGrade(p, pool, censusDate);
-        if(p.getFirstName().equals("Test")) log.debug(grade);
+
         // check grade/belt
         Grade maxGrade = pool.getMaximumGrade();
         if ((maxGrade != null) &&
