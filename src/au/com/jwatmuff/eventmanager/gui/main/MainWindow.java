@@ -25,6 +25,7 @@ import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import java.awt.event.WindowEvent;
 
+import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -153,6 +154,7 @@ public class MainWindow extends javax.swing.JFrame {
         mainTabbedPane.insertTab("Administration", null, administrationPanel, null, 1);
         
         ChatPanel chatPanel = new ChatPanel(peerManager);
+        chatPanel.setBorder(new EmptyBorder(0,0,0,0));
         
         javax.swing.GroupLayout chatPanelLayout = new javax.swing.GroupLayout(this.chatParentPanel);
         this.chatParentPanel.setLayout(chatPanelLayout);
@@ -169,11 +171,24 @@ public class MainWindow extends javax.swing.JFrame {
         this.chatParentPanel.revalidate();
     }
 
+    public void toggleMasterUnlock() {
+        if(PermissionChecker.isMasterUnlocked()) {
+            PermissionChecker.lockMaster();
+            masterUnlockMenuItem.setText("Unlock Master..");
+            masterUnlockMenuItem.setIcon(Icons.UNLOCK);
+        } else {
+            if(PermissionChecker.isAllowed(Action.UNLOCK_MASTER, database)) {
+                PermissionChecker.unlockMaster();
+                masterUnlockMenuItem.setText("Lock Master");
+                masterUnlockMenuItem.setIcon(Icons.LOCK);
+            }
+        }
+    }
+
     public void afterPropertiesSet() {
         createPanels();
         pack();
     }
-    
     
     /**
      * This method may be called after the window has closed to determine
@@ -207,9 +222,10 @@ public class MainWindow extends javax.swing.JFrame {
         fightOrderButton = new javax.swing.JButton();
         competitionInterfacesButton = new javax.swing.JButton();
         chatParentPanel = new javax.swing.JPanel();
-        masterUnlockButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
+        masterUnlockMenuItem = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JSeparator();
         fileExitMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         helpAboutMenuItem = new javax.swing.JMenuItem();
@@ -317,6 +333,20 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        chatParentPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        chatParentPanel.setMaximumSize(new java.awt.Dimension(150, 32767));
+
+        javax.swing.GroupLayout chatParentPanelLayout = new javax.swing.GroupLayout(chatParentPanel);
+        chatParentPanel.setLayout(chatParentPanelLayout);
+        chatParentPanelLayout.setHorizontalGroup(
+            chatParentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 264, Short.MAX_VALUE)
+        );
+        chatParentPanelLayout.setVerticalGroup(
+            chatParentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 452, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -324,7 +354,6 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(mainPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
                     .addComponent(jLabel3)
                     .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(resultsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -334,8 +363,10 @@ public class MainWindow extends javax.swing.JFrame {
                         .addComponent(adminButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(fightOrderButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(manageSessionsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(competitionInterfacesButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(competitionInterfacesButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(chatParentPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -361,34 +392,22 @@ public class MainWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultsButton)
                 .addContainerGap(163, Short.MAX_VALUE))
+            .addComponent(chatParentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         mainTabbedPane.addTab("Main", mainPanel);
 
-        chatParentPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chatParentPanel.setMaximumSize(new java.awt.Dimension(150, 32767));
+        fileMenu.setText("File");
 
-        javax.swing.GroupLayout chatParentPanelLayout = new javax.swing.GroupLayout(chatParentPanel);
-        chatParentPanel.setLayout(chatParentPanelLayout);
-        chatParentPanelLayout.setHorizontalGroup(
-            chatParentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 254, Short.MAX_VALUE)
-        );
-        chatParentPanelLayout.setVerticalGroup(
-            chatParentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 449, Short.MAX_VALUE)
-        );
-
-        masterUnlockButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/lock_open.png"))); // NOI18N
-        masterUnlockButton.setText("Master Unlock..");
-        masterUnlockButton.setIconTextGap(8);
-        masterUnlockButton.addActionListener(new java.awt.event.ActionListener() {
+        masterUnlockMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/lock_open.png"))); // NOI18N
+        masterUnlockMenuItem.setText("Master Unlock..");
+        masterUnlockMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                masterUnlockButtonActionPerformed(evt);
+                masterUnlockMenuItemActionPerformed(evt);
             }
         });
-
-        fileMenu.setText("File");
+        fileMenu.add(masterUnlockMenuItem);
+        fileMenu.add(jSeparator2);
 
         fileExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/door_out.png"))); // NOI18N
         fileExitMenuItem.setText("Exit");
@@ -421,23 +440,14 @@ public class MainWindow extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(masterUnlockButton)
-                    .addComponent(chatParentPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(masterUnlockButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chatParentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE))
+                .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -493,19 +503,9 @@ private void resultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
         mainTabbedPane.setSelectedComponent(resultsPanel);
 }//GEN-LAST:event_resultsButtonActionPerformed
 
-private void masterUnlockButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_masterUnlockButtonActionPerformed
-    if(PermissionChecker.isMasterUnlocked()) {
-        PermissionChecker.lockMaster();
-        masterUnlockButton.setText("Unlock Master..");
-        masterUnlockButton.setIcon(Icons.UNLOCK);
-    } else {
-        if(PermissionChecker.isAllowed(Action.UNLOCK_MASTER, database)) {
-            PermissionChecker.unlockMaster();
-            masterUnlockButton.setText("Lock Master..");
-            masterUnlockButton.setIcon(Icons.LOCK);
-        }
-    }
-}//GEN-LAST:event_masterUnlockButtonActionPerformed
+private void masterUnlockMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_masterUnlockMenuItemActionPerformed
+    toggleMasterUnlock();
+}//GEN-LAST:event_masterUnlockMenuItemActionPerformed
 
             
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -520,11 +520,12 @@ private void masterUnlockButtonActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JTabbedPane mainTabbedPane;
     private javax.swing.JButton managePoolsButton;
     private javax.swing.JButton manageSessionsButton;
-    private javax.swing.JButton masterUnlockButton;
+    private javax.swing.JMenuItem masterUnlockMenuItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JButton registerButton;
     private javax.swing.JButton resultsButton;
