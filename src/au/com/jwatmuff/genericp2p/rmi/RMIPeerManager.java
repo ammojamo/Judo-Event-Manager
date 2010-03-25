@@ -198,7 +198,8 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
         for(ManagedPeer peer2 : new ArrayList<ManagedPeer>(peers)) {
             try {
                 if(peer2.isConnected() && !peer2.getUUID().equals(peer.getUUID())) {
-                    peer.getService(AnnounceService.class).announce(peer.getName(), peer.currentAddress, peer.getUUID());
+                    for(InetSocketAddress address : peer2.addressHistory)
+                        peer.getService(AnnounceService.class).announce(peer2.getName(), peer2.currentAddress, peer2.getUUID());
                 }
             } catch(Exception e) {
                 log.error(e);
