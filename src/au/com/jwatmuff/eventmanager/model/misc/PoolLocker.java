@@ -20,7 +20,6 @@ import au.com.jwatmuff.eventmanager.util.ObjectCopier;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -62,9 +61,6 @@ public class PoolLocker {
                 throw new DatabaseStateException("One or more players in this pool have not been locked using the Weigh-in interface");
 
         final List<PlayerPool> pps = database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID());
-        
-        // randomize players before locking the pool - Issue #99
-        Collections.shuffle(pps);
         
         final Pool lockedPool = Pool.getLockedCopy(pool, Pool.LockedStatus.PLAYERS_LOCKED);
         

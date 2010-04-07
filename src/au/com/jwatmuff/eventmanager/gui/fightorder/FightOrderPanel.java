@@ -212,6 +212,15 @@ public class FightOrderPanel extends javax.swing.JPanel {
                 setBeans(players);
             }
         }
+
+        public void shuffle() {
+            Pool pool = getSelectedPool();
+            if(pool == null) return;
+            int poolID = pool.getID();
+
+            Collections.shuffle(players);
+            PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
+        }
         
         public void moveUp(int index) {
             Pool pool = getSelectedPool();
@@ -571,6 +580,7 @@ public class FightOrderPanel extends javax.swing.JPanel {
         try {
             int result = CSVImporter.importFightDraw(csvFile, database, pool, numPlayers);
             //GUIUtils.displayMessage(this, result + " entries succesfully imported.", "Import Complete");
+            playerTableModel.shuffle();
         } catch(TooFewPlayersException tfpe) {
             GUIUtils.displayError(this, "The specified fight draw is to small for the number of players in this pool");
         } catch(Exception e) {
@@ -640,6 +650,7 @@ private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             try {
                 int result = CSVImporter.importFightDraw(csvFile, database, pool, numPlayers);
                 GUIUtils.displayMessage(this, result + " entries succesfully imported.", "Import Complete");
+                playerTableModel.shuffle();
             } catch(TooFewPlayersException tfpe) {
                 GUIUtils.displayError(this, "The specified fight draw is to small for the number of players in this pool");
             } catch(Exception e) {
