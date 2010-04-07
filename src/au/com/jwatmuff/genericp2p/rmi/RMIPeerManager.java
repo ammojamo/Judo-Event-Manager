@@ -104,6 +104,10 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     /**
      * This method is to be called remotely by a peer to determine the ID of the
      * local client. This ID is unique on an operating system user basis, using
@@ -426,8 +430,26 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
 
         public void checkConnectivity() {
             try {
-                getServiceWithoutProxy(IdentifyService.class).getUUID().toString();
-                setConnected();
+                // check that we can get a UUID at current address (failure will jump to catch block)
+                IdentifyService idService = getServiceWithoutProxy(IdentifyService.class);
+                UUID id = idService.getUUID();
+                String name = idService.getName();
+                if(id.equals(this.uuid)) {
+                    // if the obtained UUID matches the UUID of this peer, set this peer as connected
+                    setConnected();
+                } else {
+                    // else, set peer as disconnected
+                    setDisconnected();
+                    // update any existing peer with the obtained UUID
+                    for(ManagedPeer peer : peers) {
+                        if(id.equals(peer.getUUID())) {
+                            peer.addAddressToHistory(currentAddress);
+                            return;
+                        }
+                    }
+                    // if no existing peer with the obtained UUID is found, add a new peer
+                    handlePeerInfo(new PeerInfo(name, currentAddress, id));
+                }
             } catch (Exception e) {
                 log.error(this + " Connectivity failure", e);
                 setDisconnected();

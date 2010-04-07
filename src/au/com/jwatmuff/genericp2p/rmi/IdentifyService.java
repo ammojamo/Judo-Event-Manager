@@ -21,4 +21,12 @@ public interface IdentifyService {
      * @return  The ID of the local client
      */
     public UUID getUUID();
+
+    /**
+     * This method is to be called remotely by a peer to obtain a human readable
+     * name identifying the local client. This name does not need to be unique.
+     *
+     * @return the name of the local client
+     */
+    public String getName();
 }
