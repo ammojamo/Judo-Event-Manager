@@ -67,6 +67,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
     private static final int CHECK_DATABASES_PERIOD = 5000; //milliseconds
 
+    private static final long MS_PER_DAY = 24 * 60 * 60 * 1000;
+
     private Runnable checkDatabasesTask = new Runnable() {
         @Override
         public void run() {
@@ -161,11 +163,21 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             licenseContactLabel.setText("N/A");
             licenseTypeLabel.setText("FREE");
             licenseExpiryLabel.setText("Never");
+            expiryWarningLabel.setVisible(false);
         } else {
             licenseNameLabel.setText(license.getName());
             licenseContactLabel.setText(license.getContactPhoneNumber());
             licenseTypeLabel.setText(license.getType().toString());
             licenseExpiryLabel.setText(license.getExpiry().toString());
+
+            long daysToExpiry = (license.getExpiry().getTime() - new Date().getTime()) / MS_PER_DAY;
+            if(daysToExpiry > 0 && daysToExpiry <= 90) {
+                expiryWarningLabel.setText("Your Event Manager license will expire in "
+                                  + daysToExpiry + " day" + ((daysToExpiry > 1) ? "s" : ""));
+                expiryWarningLabel.setVisible(true);
+            } else {
+                expiryWarningLabel.setVisible(false);
+            }
         }
         this.pack();
     }
@@ -221,6 +233,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         newCompRadioButton = new javax.swing.JRadioButton();
         cancelButton = new javax.swing.JButton();
         okButton = new javax.swing.JButton();
+        expiryWarningLabel = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         manualScoreboardButton = new javax.swing.JButton();
         displayScoreboardButton = new javax.swing.JButton();
@@ -376,6 +389,10 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             }
         });
 
+        expiryWarningLabel.setFont(new java.awt.Font("Tahoma", 1, 11));
+        expiryWarningLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/exclamation.png"))); // NOI18N
+        expiryWarningLabel.setText("Your EventManager license will expire in X days.");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -386,6 +403,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(expiryWarningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(okButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelButton)))
@@ -402,9 +421,11 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cancelButton)
-                    .addComponent(okButton))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(okButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(expiryWarningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -805,6 +826,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private javax.swing.JButton displayScoreboardButton;
     private javax.swing.JButton enterLicenseKeyButton;
     private javax.swing.JRadioButton existingCompRadioButton;
+    private javax.swing.JLabel expiryWarningLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
