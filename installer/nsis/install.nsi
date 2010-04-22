@@ -3,6 +3,9 @@ Caption "Event Manager"
 ;Icon "YourProgram.ico"
 OutFile "EventManagerSetup.exe"
 
+LicenseData eula.txt
+LicenseForceSelection checkbox
+
 InstallDir $PROGRAMFILES\EventManager
 
 DirText "This will install EventManager on your computer."
@@ -28,6 +31,10 @@ Section ""
                    "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
 
 SectionEnd
+
+Page license
+Page directory
+Page instfiles
 
 UninstallText "This will uninstall EventManager."
 
