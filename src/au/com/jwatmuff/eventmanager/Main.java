@@ -46,6 +46,7 @@ public class Main {
     private static Logger log = Logger.getLogger(Main.class);
     
     public static final String VERSION = "0.0.3";
+    public static final String WINDOW_TITLE = "Event Manager 2010";
 
     private static File workingDir = new File(".");
 
@@ -202,6 +203,7 @@ public class Main {
 
             LoadCompetitionWindow loadCompetitionWindow
                     = new LoadCompetitionWindow(databaseManager, licenseManager, peerManager);
+            loadCompetitionWindow.setTitle(WINDOW_TITLE);
 
             loadWindow.dispose();
             log.info("Starting Load Competition Dialog");
@@ -243,6 +245,7 @@ public class Main {
                     mainWindow.setNotifier(notifier);
                     mainWindow.setPeerManager(peerManager);
                     mainWindow.setLicenseManager(licenseManager);
+                    mainWindow.setTitle(WINDOW_TITLE);
                     mainWindow.afterPropertiesSet();
 
                     // show main window (modally)
