@@ -67,20 +67,3 @@ Section "Install Java"
   Delete "$INSTDIR\jre-6u16-windows-i586-s.exe"
 SectionEnd
 
-Section "Install Bonjour"
-
-  MessageBox MB_YESNO \
-    "EventManager requires Bonjour to be installed on your computer. Do you wish to install Bonjour now?"\
-     IDYES installbonjour
-
-  Goto installbonjourdone
-
-  installbonjour:
-
-  File ..\thirdparty\BonjourSetup.exe
-  ExecWait "$INSTDIR\BonjourSetup.exe"
-
-  installbonjourdone:
-
-  Delete "$INSTDIR\BonjourSetup.exe"
-SectionEnd
