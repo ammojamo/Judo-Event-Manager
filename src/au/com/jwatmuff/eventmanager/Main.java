@@ -22,10 +22,7 @@ import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import au.com.jwatmuff.genericdb.p2p.DistributedDatabase;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
-import au.com.jwatmuff.genericp2p.BonjourRMIPeerManager;
-import com.apple.dnssd.BrowseListener;
-import com.apple.dnssd.DNSSD;
-import com.apple.dnssd.DNSSDService;
+import au.com.jwatmuff.genericp2p.JmDNSRMIPeerManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -71,26 +68,6 @@ public class Main {
             }
         }
         
-        return true;
-    }
-
-    private static boolean checkBonjour() {
-        try {
-            DNSSD.browse("_ftp._tcp", new BrowseListener() {
-                @Override
-                public void serviceFound(DNSSDService arg0, int arg1, int arg2, String arg3, String arg4, String arg5) {
-                }
-                @Override
-                public void serviceLost(DNSSDService arg0, int arg1, int arg2, String arg3, String arg4, String arg5) {
-                }
-                @Override
-                public void operationFailed(DNSSDService arg0, int arg1) {
-                }
-            }).stop();
-        } catch(Throwable t) {
-            return false;
-        }
-
         return true;
     }
 
@@ -156,15 +133,6 @@ public class Main {
                 System.exit(0);
         }
 
-        if(!checkBonjour()) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Unable to initialize Bonjour. Please ensure that Bonjour is installed.",
-                    "Event Manager",
-                    JOptionPane.OK_OPTION);
-            System.exit(0);
-        }
-
         try {
             LoadWindow loadWindow = new LoadWindow();
             loadWindow.setVisible(true);
@@ -190,7 +158,7 @@ public class Main {
             loadWindow.addMessage("Loading Peer Manager..");
             log.info("Loading Peer Manager");
 
-            BonjourRMIPeerManager peerManager = new BonjourRMIPeerManager(rmiPort, new File(workingDir, "peerid.dat"));
+            JmDNSRMIPeerManager peerManager = new JmDNSRMIPeerManager(rmiPort, new File(workingDir, "peerid.dat"));
 
             loadWindow.addMessage("Loading Database Manager..");
             log.info("Loading Database Manager");

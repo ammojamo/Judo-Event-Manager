@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.genericp2p.bonjour;
 
+import au.com.jwatmuff.genericp2p.PeerRegistrationService;
 import com.apple.dnssd.DNSSD;
 import com.apple.dnssd.DNSSDException;
 import com.apple.dnssd.DNSSDRegistration;
@@ -18,7 +19,7 @@ import org.apache.log4j.Logger;
  *
  * @author James
  */
-public class BonjourRegistrationService {
+public class BonjourRegistrationService implements PeerRegistrationService {
     private final static Logger log = Logger.getLogger(BonjourRegistrationService.class);
     private final static int TIMEOUT = 15;
     public final static String REG_TYPE = "_eventmanager._tcp";

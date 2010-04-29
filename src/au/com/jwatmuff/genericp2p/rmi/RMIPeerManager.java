@@ -153,12 +153,20 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     @Override
     public void announce(String name, InetSocketAddress address, UUID id) {
         log.debug("Got name/IP address/id from peer: " + name + " : " + address + " : " + id);
+        boolean known = false;
+        for(Peer peer : peers) {
+            if(peer.getName().equals(name)) {
+                known = true;
+                break;
+            }
+        }
+        if(!known) log.debug("*****PEER FOUND NOT VIA BONJOUR/JmDNS*****");
         final PeerInfo info = new PeerInfo(name, address, id);
         handlePeerInfo(info);
     }
 
     public void handlePeerInfo(PeerInfo info) {
-        /* update ID if necessary (i.e. if from Bonjour) */
+        /* update ID if necessary (i.e. if from Bonjour/JmDNS) */
         if (info.getID() == null) {
             try {
                 UUID peerUUID = getService(
@@ -223,7 +231,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     @Override
     public void handleDiscoveryEvent(PeerDiscoveryEvent event) {
         if (event.getType() == PeerDiscoveryEvent.Type.FOUND) {
-            log.debug("Got name/IP address from Bonjour: " + event.getPeerInfo().getName() + " : " + event.getPeerInfo().getAddress());
+            log.debug("Got name/IP address from Bonjour/JmDNS: " + event.getPeerInfo().getName() + " : " + event.getPeerInfo().getAddress());
             this.handlePeerInfo(event.getPeerInfo());
         }
     }
@@ -343,16 +351,16 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
 
     @SuppressWarnings("unchecked")
     private static <T> T getService(InetSocketAddress address, String serviceName, Class<T> serviceClass) throws NoSuchServiceException {
+        String url = "rmi://" + address.getHostName() + ":" + address.getPort() + "/" + serviceName;
         try {
             /* maybe should use address.getAddress().getHostAddress() */
-            String url = "rmi://" + address.getHostName() + ":" + address.getPort() + "/" + serviceName;
             RmiProxyFactoryBean factory = new RmiProxyFactoryBean();
             factory.setServiceInterface(serviceClass);
             factory.setServiceUrl(url);
             factory.afterPropertiesSet();
             return (T) factory.getObject();
         } catch (RemoteLookupFailureException rlfe) {
-            throw new NoSuchServiceException("Unable to resolve service " + serviceName);
+            throw new NoSuchServiceException("Unable to resolve service " + serviceName + " at url: " + url);
         } catch (Exception e) {
             throw new RuntimeException("getService failed", e);
         }

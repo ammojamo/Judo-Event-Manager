@@ -9,9 +9,7 @@
 
 package au.com.jwatmuff.genericp2p.bonjour;
 
-import au.com.jwatmuff.genericp2p.PeerDiscoveryEvent;
-import au.com.jwatmuff.genericp2p.PeerDiscoveryListener;
-import au.com.jwatmuff.genericp2p.PeerDiscoveryService;
+import au.com.jwatmuff.genericp2p.AbstractDiscoveryService;
 import au.com.jwatmuff.genericp2p.PeerInfo;
 import com.apple.dnssd.BrowseListener;
 import com.apple.dnssd.DNSSD;
@@ -24,25 +22,18 @@ import org.apache.log4j.Logger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
  * @author James
  */
-public class BonjourDiscoveryService implements PeerDiscoveryService {
+public class BonjourDiscoveryService extends AbstractDiscoveryService {
     private static Logger log = Logger.getLogger(BonjourDiscoveryService.class);
     
     public final static String REG_TYPE = "_eventmanager._tcp";
     
-    private PeerDiscoveryListener peerListener;
     private DNSSDService browser;
     private final MyListener listener = new MyListener();
-    private final Map<String, PeerInfo> discoveredPeers = Collections.synchronizedMap(new HashMap<String, PeerInfo>());
     
     /** Creates a new instance of BonjourPeerManager */
     public BonjourDiscoveryService() {
@@ -52,6 +43,7 @@ public class BonjourDiscoveryService implements PeerDiscoveryService {
     public void start() {
         try {
             log.debug("Browsing for services");
+            setRunning(true);
             browser = DNSSD.browse(REG_TYPE, listener);
         } catch(DNSSDException e) {
             log.error("Unable to browse network", e);
@@ -62,32 +54,9 @@ public class BonjourDiscoveryService implements PeerDiscoveryService {
     public void stop() {
         browser.stop();
         browser = null;
+        setRunning(false);
     }
-    
-    @Override
-    public List<PeerInfo> getPeers() {
-        if(browser == null)
-            throw new RuntimeException("Invalid state - service has not been started yet");
-        return new ArrayList<PeerInfo>(discoveredPeers.values());
-    }
-    
-    @Override
-    public void setListener(PeerDiscoveryListener listener) {
-        this.peerListener = listener;
-    }
-
-    private void addPeer(PeerInfo peer) {
-        discoveredPeers.put(peer.getName(), peer);
-        if(this.peerListener != null)
-            peerListener.handleDiscoveryEvent(new PeerDiscoveryEvent(PeerDiscoveryEvent.Type.FOUND, peer));
-    }
-    
-    private void removePeer(PeerInfo peer) {
-        discoveredPeers.remove(peer.getName());
-        if(this.peerListener != null)
-            peerListener.handleDiscoveryEvent(new PeerDiscoveryEvent(PeerDiscoveryEvent.Type.LOST, peer));
-    }
-     
+         
     class MyListener implements BrowseListener {
         @Override
         public void serviceFound(DNSSDService browser, int flags, int ifIndex, String serviceName, String regType, String domain) {
@@ -102,10 +71,7 @@ public class BonjourDiscoveryService implements PeerDiscoveryService {
         @Override
         public void serviceLost(DNSSDService browser, int flags, int ifIndex, String serviceName, String regType, String domain) {
             log.info("Peer lost (" + serviceName + ")");
-            PeerInfo peer = discoveredPeers.get(serviceName);
-            if(peer != null) {
-                removePeer(peer);
-            } else {
+            if(!removePeer(serviceName)) {
                 log.warn("Peer '" + serviceName + "' was not known to be found.");
             }
         }        
