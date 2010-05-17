@@ -24,6 +24,7 @@ Section ""
 
   CreateDirectory "$SMPROGRAMS\EventManager"
   createShortCut "$SMPROGRAMS\EventManager\EventManager.lnk" "$INSTDIR\EventManager.jar" "" "$INSTDIR\icon.ico"
+  createShortCut "$SMPROGRAMS\EventManager\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager" \
                    "DisplayName" "EventManager"
@@ -66,4 +67,3 @@ Section "Install Java"
 
   Delete "$INSTDIR\jre-6u16-windows-i586-s.exe"
 SectionEnd
-
