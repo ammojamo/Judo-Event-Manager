@@ -155,7 +155,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         minAgeCheckBox.setSelected(pool.getMinimumAge() > 0);
         minAgeSpinner.setValue(pool.getMinimumAge());
         maxAgeCheckBox.setSelected(pool.getMaximumAge() > 0);
-        maxAgeSpinner.setValue(pool.getMaximumAge() + 1);
+        maxAgeSpinner.setValue(pool.getMaximumAge());
 
         if(pool.getMinimumGrade() != Grade.UNSPECIFIED) {
             minGradeCheckBox.setSelected(true);
@@ -193,7 +193,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         poolName = poolNameTextField.getText();
         
         minAge = minAgeCheckBox.isSelected()?(Integer)minAgeSpinner.getValue():0;
-        maxAge = maxAgeCheckBox.isSelected()?(Integer)maxAgeSpinner.getValue() - 1:0;
+        maxAge = maxAgeCheckBox.isSelected()?(Integer)maxAgeSpinner.getValue():0;
         
         minWeight = minWeightCheckBox.isSelected()?(Double)minWeightSpinner.getValue():0;
         maxWeight = maxWeightCheckBox.isSelected()?(Double)maxWeightSpinner.getValue():0;
@@ -398,7 +398,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
 
         maxGradeCheckBox.setText("At most");
 
-        maxAgeCheckBox.setText("Under");
+        maxAgeCheckBox.setText("Max");
 
         jLabel15.setText("Weight Range:");
 
@@ -409,9 +409,9 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxGradeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), maxGradeComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        minWeightCheckBox.setText("Over");
+        minWeightCheckBox.setText("Min");
 
-        maxWeightCheckBox.setText("Under");
+        maxWeightCheckBox.setText("Max");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxAgeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), maxAgeSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -438,7 +438,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxWeightCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected && enabled}"), maxWeightSpinner, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        minAgeCheckBox.setText("Over");
+        minAgeCheckBox.setText("Min");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -484,7 +484,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
                         .addComponent(minWeightSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel17)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {maxAgeSpinner, maxWeightSpinner, minAgeSpinner, minWeightSpinner});

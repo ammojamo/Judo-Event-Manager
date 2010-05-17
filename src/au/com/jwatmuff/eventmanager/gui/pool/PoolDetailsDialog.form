@@ -30,7 +30,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel2" max="32767" attributes="1"/>
                   <Component id="jPanel1" max="32767" attributes="1"/>
-                  <Component id="jPanel3" alignment="0" min="-2" max="-2" attributes="1"/>
+                  <Component id="jPanel3" alignment="0" min="-2" pref="392" max="-2" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
@@ -216,7 +216,7 @@
                           <Component id="jLabel17" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="28" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -277,7 +277,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="maxAgeCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Under"/>
+            <Property name="text" type="java.lang.String" value="Max"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel15">
@@ -307,12 +307,12 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="minWeightCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Over"/>
+            <Property name="text" type="java.lang.String" value="Min"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="maxWeightCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Under"/>
+            <Property name="text" type="java.lang.String" value="Max"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="maxAgeSpinner">
@@ -372,7 +372,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="minAgeCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Over"/>
+            <Property name="text" type="java.lang.String" value="Min"/>
           </Properties>
         </Component>
       </SubComponents>
