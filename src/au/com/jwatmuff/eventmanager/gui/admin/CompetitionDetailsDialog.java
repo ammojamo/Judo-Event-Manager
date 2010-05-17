@@ -626,11 +626,11 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         if(!PermissionChecker.isAllowed(Action.IMPORT_DIVISIONS, database)) return;
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
-        if(GUIUtils.lastChooserDirectory != null)
-            fileChooser.setCurrentDirectory(GUIUtils.lastChooserDirectory);
+        if(GUIUtils.lastDivisionChooserDirectory != null)
+            fileChooser.setCurrentDirectory(GUIUtils.lastDivisionChooserDirectory);
 
         if(fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            GUIUtils.lastChooserDirectory = fileChooser.getCurrentDirectory();
+            GUIUtils.lastDivisionChooserDirectory = fileChooser.getCurrentDirectory();
             File csvFile = fileChooser.getSelectedFile();
             if(csvFile == null)
                 return;

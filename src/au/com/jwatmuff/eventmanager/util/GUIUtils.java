@@ -42,13 +42,21 @@ import org.apache.log4j.Logger;
  */
 public class GUIUtils {
     public static final Logger log = Logger.getLogger(GUIUtils.class);
-    
+
+    public static File lastDivisionChooserDirectory;
+    public static File lastDrawChooserDirectory;
     public static File lastChooserDirectory ;
 
     static {
-        File f = new File("resources");
+        lastChooserDirectory = null; // default to My Documents on windows
+
+        File f = new File("resources/division");
         if(f.exists())
-            lastChooserDirectory = f;
+            lastDivisionChooserDirectory = f;
+
+        f = new File("resources/draw");
+        if(f.exists())
+            lastDrawChooserDirectory = f;
     }
 
     public static boolean confirmLock(Frame parent, String thingToLock) {
