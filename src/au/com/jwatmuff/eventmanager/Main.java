@@ -26,7 +26,9 @@ import au.com.jwatmuff.genericp2p.JmDNSRMIPeerManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -189,11 +191,18 @@ public class Main {
                     syncWindow.dispose();
 
                     if(loadCompetitionWindow.isNewDatabase()) {
+                        GregorianCalendar calendar = new GregorianCalendar();
+                        Date today = calendar.getTime();
+                        calendar.set(Calendar.MONTH, 1);
+                        calendar.set(Calendar.DAY_OF_MONTH, 1);
+                        calendar.roll(Calendar.YEAR, 1);
+                        Date endOfYear = calendar.getTime();
+
                         CompetitionInfo ci = new CompetitionInfo();
                         ci.setName(info.name);
-                        ci.setStartDate(new Date());
-                        ci.setEndDate(new Date());
-                        ci.setAgeThresholdDate(new Date());
+                        ci.setStartDate(today);
+                        ci.setEndDate(today);
+                        ci.setAgeThresholdDate(endOfYear);
                         //ci.setPasswordHash(info.passwordHash);
                         License license = licenseManager.getLicense();
                         if(license != null) {
