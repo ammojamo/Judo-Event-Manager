@@ -20,11 +20,15 @@ import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.genericdb.distributed.DataEvent;
+import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import java.awt.event.WindowEvent;
 
+import java.util.Collection;
+import java.util.List;
 import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
@@ -52,6 +56,14 @@ public class MainWindow extends javax.swing.JFrame {
     private PeerManager peerManager;
     
     private boolean deleteOnExit = false;
+
+    // Listens to changes in the competition master password
+    private TransactionListener competitionInfoListener = new TransactionListener() {
+        public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
+            if(dataClasses.contains(CompetitionInfo.class))
+                updateMasterPasswordLock();
+        }
+    };
     
     /** Creates new form MainWindow */
     public MainWindow() {
@@ -185,8 +197,15 @@ public class MainWindow extends javax.swing.JFrame {
         }
     }
 
+    private void updateMasterPasswordLock() {
+        CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        masterUnlockMenuItem.setEnabled(ci != null && ci.getPasswordHash() != 0);
+    }
+
     public void afterPropertiesSet() {
         createPanels();
+        notifier.addListener(competitionInfoListener);
+        updateMasterPasswordLock();
         pack();
     }
     
@@ -481,6 +500,7 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_managePoolsButtonActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        notifier.removeListener(competitionInfoListener);
     }//GEN-LAST:event_formWindowClosing
 
     private void helpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpAboutMenuItemActionPerformed
