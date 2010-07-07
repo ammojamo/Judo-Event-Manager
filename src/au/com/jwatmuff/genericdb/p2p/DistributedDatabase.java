@@ -22,16 +22,22 @@ public class DistributedDatabase extends NotifyingTransactionalDatabase {
     private final String name;
     private final UUID id;
 
-    public DistributedDatabase(UUID id, String dbName, int passwordHash, TransactionalDatabase localDatabase, PeerManager peerManager, File updateFile) {
+    public DistributedDatabase(UUID id,
+                               String dbName,
+                               int passwordHash,
+                               TransactionalDatabase localDatabase,
+                               PeerManager peerManager,
+                               File updateFile) {
         super(localDatabase);
+        super.setReadOnly(true);
+        super.setUpdateTimestamps(true);
 
         this.peerManager = peerManager;
 
-        super.setReadOnly(true);
-        super.setUpdateTimestamps(true);
         databaseForUpdater = new NotifyingTransactionalDatabase(localDatabase);
         databaseForUpdater.setReadOnly(false);
         databaseForUpdater.setUpdateTimestamps(false);
+
         updater = new TransactionalDatabaseUpdater(databaseForUpdater);
         updateManager = new UpdateManager(
                 peerManager,

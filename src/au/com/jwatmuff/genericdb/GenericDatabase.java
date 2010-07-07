@@ -33,47 +33,41 @@ public class GenericDatabase implements Database {
         daos.put(dao.getDataClass(), dao);
     }
     
-    private GenericDAO getForClass(Class aClass) {
+    @SuppressWarnings("unchecked")
+    private <T> GenericDAO<T> getDAOForItem(T item) {
+        return (GenericDAO<T>)getDAOForClass(item.getClass());
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> GenericDAO<T> getDAOForClass(Class<? extends T> aClass) {
         GenericDAO dao = daos.get(aClass);
         if(dao == null)
             throw new RuntimeException("Could not find DAO for class " + aClass);
         return dao;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> void add(T item) {
-        //log.debug("add: " + item.getClass().getName());
-        
-        GenericDAO<T> dao = (GenericDAO<T>)getForClass(item.getClass());
+        GenericDAO<T> dao = getDAOForItem(item);
         dao.add(item);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> void update(T item) {
-        //log.debug("update: " + item.getClass().getName());
-        
-        GenericDAO<T> dao = (GenericDAO<T>)getForClass(item.getClass());
+        GenericDAO<T> dao = getDAOForItem(item);
         dao.update(item);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> void delete(T item) {
-        //log.debug("delete: " + item.getClass().getName());
-        
-        GenericDAO<T> dao = (GenericDAO<T>)getForClass(item.getClass());
+        GenericDAO<T> dao = getDAOForItem(item);
         dao.delete(item);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T get(Class<T> aClass, Object id) {
-        //log.debug("get: " + aClass.getName());
-        
-        GenericDAO<T> dao = (GenericDAO<T>)getForClass(aClass);
         //logCounts();
+        GenericDAO<T> dao = (GenericDAO<T>)getDAOForClass(aClass);
         return dao.get(id);
     }
 
@@ -85,7 +79,7 @@ public class GenericDatabase implements Database {
 
         //log.debug("findAll: " + aClass.getName() + ": " + query);
         
-        GenericDAO<T> dao = (GenericDAO<T>)getForClass(aClass);
+        GenericDAO<T> dao = (GenericDAO<T>)getDAOForClass(aClass);
         try {
             query = "find" + query.substring(0, 1).toUpperCase() + query.substring(1);
             Method[] methods = dao.getClass().getMethods();

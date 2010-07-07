@@ -12,6 +12,8 @@ package au.com.jwatmuff.genericdb;
 import java.util.List;
 
 /**
+ * Basic database interface to perform CRUD operations and execute named
+ * queries with parameters.
  *
  * @author James
  */
