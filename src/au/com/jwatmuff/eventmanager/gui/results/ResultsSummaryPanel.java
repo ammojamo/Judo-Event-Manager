@@ -20,6 +20,7 @@ import au.com.jwatmuff.eventmanager.print.ResultListHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.LimitedFrequencyRunner;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
@@ -61,6 +62,12 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
 
     private NumberFormat format = new DecimalFormat();
     private DateFormat dformat = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+
+    private LimitedFrequencyRunner updater = new LimitedFrequencyRunner(new Runnable() {
+        public void run() {
+            updateFromDatabase();
+        }
+    }, 2000);
 
     private BeanMapper<ResultInfo> mapper = new BeanMapper<ResultInfo>() {
         @Override
@@ -124,7 +131,7 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
     
     public void afterPropertiesSet() {
         notifier.addListener(this, Result.class);
-        updateFromDatabase();
+        updater.run(true);
     }
 
     public void shutdown() {
@@ -175,7 +182,7 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
 
     @Override
     public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
-        updateFromDatabase();
+        updater.run();
     }
 
     private void doActionOnSelectedItem() {

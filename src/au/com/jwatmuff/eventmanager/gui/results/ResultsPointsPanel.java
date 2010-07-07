@@ -22,6 +22,7 @@ import au.com.jwatmuff.eventmanager.print.GradingPointsHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.LimitedFrequencyRunner;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
@@ -63,6 +64,12 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
     private String competitionName;
 
     private ResultTableModel resultTableModel = new ResultTableModel();
+
+    private LimitedFrequencyRunner updater = new LimitedFrequencyRunner(new Runnable() {
+        public void run() {
+            updateFromDatabase();
+        }
+    }, 2000);
     
     /** Creates new form FightProgressionPanel */
     public ResultsPointsPanel() {
@@ -90,7 +97,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
     
     public void afterPropertiesSet() {
         notifier.addListener(this, Result.class);
-        updateFromDatabase();
+        updater.run(true);
         SortKey key = new SortKey(1, SortOrder.ASCENDING);
         resultTable.getRowSorter().setSortKeys(Arrays.asList(key));
     }
@@ -211,7 +218,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
     @Override
     public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
-        updateFromDatabase();
+        updater.run();
     }
     
     /** This method is called from within the constructor to

@@ -4,61 +4,122 @@
  */
 package au.com.jwatmuff.eventmanager.util;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author James
  */
 public class LimitedFrequencyRunner {
+    private static final Logger log = Logger.getLogger(LimitedFrequencyRunner.class);
+
     private static enum State {
-        IDLE, ACTIVE, PENDING    
+        IDLE, RUNNING, REQUESTED
     }
     
     private State state = State.IDLE;
 
     private final Runnable runnable;
-    private final Runnable internal_runnable = new Runnable() {
-        @Override
-        public void run() {
-            do_run();
-        }
-    };
-
-    private int period_ms;
-
-    private final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1);
+    private final int period_ms;
+    private final List<CountDownLatch> startLatches = new ArrayList<CountDownLatch>();
+    private final List<CountDownLatch> doneLatches = new ArrayList<CountDownLatch>();
 
     public LimitedFrequencyRunner(Runnable runnable, int period_ms) {
         this.runnable = runnable;
         this.period_ms = period_ms;
     }
 
+    private CountDownLatch newStartLatch() {
+        synchronized(startLatches) {
+            CountDownLatch latch = new CountDownLatch(1);
+            startLatches.add(latch);
+            return latch;
+        }
+    }
+
+    private CountDownLatch newDoneLatch() {
+        synchronized(doneLatches) {
+            CountDownLatch latch = new CountDownLatch(1);
+            doneLatches.add(latch);
+            return latch;
+        }
+    }
+
+    private void openStartLatches() {
+        synchronized(startLatches) {
+            for(CountDownLatch latch : startLatches)
+                latch.countDown();
+            startLatches.clear();
+        }
+    }
+
+    private void openDoneLatches() {
+        synchronized(doneLatches) {
+            for(CountDownLatch latch : doneLatches)
+                latch.countDown();
+            doneLatches.clear();
+        }
+    }
+
+    public void run(boolean block) {
+        if(block) {
+            CountDownLatch startLatch = newStartLatch();
+            CountDownLatch doneLatch = newDoneLatch();
+            run();
+            try {
+                startLatch.await();
+                doneLatch.await();
+            } catch(InterruptedException e) {
+                log.warn("Interrupted while waiting on latch", e);
+            }
+        } else {
+            run();
+        }
+    }
+
     public synchronized void run() {
         switch(state) {
             case IDLE:
-                do_run();
+                state = State.RUNNING;
+                runThread();
                 break;
-            case ACTIVE:
-            case PENDING:
-                state = State.PENDING;
-                break;
+            case RUNNING:
+            case REQUESTED:
+                state = State.REQUESTED;
         }
     }
-    
-    private synchronized void do_run() {        
+
+    private synchronized void runIfRequested() {
         switch(state) {
-            case PENDING:
             case IDLE:
-                state = state.ACTIVE;
-                runnable.run();
-                executor.schedule(internal_runnable, period_ms, TimeUnit.MILLISECONDS);
+                log.error("This should never happen");
                 break;
-            case ACTIVE:
-                state = state.IDLE;
+            case RUNNING:
+                state = State.IDLE;
                 break;
+            case REQUESTED:
+                state = State.RUNNING;
+                runThread();
         }
+    }
+
+    private void runThread() {
+        new Thread() {
+            @Override
+            public void run() {
+                openStartLatches();
+                runnable.run();
+                openDoneLatches();
+                try {
+                    Thread.sleep(period_ms);
+                } catch (InterruptedException e) {
+                    log.warn("Interrupted while sleeping", e);
+                }
+                runIfRequested();
+            }
+        }.start();
     }
 }

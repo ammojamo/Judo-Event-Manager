@@ -17,6 +17,7 @@ import au.com.jwatmuff.eventmanager.print.DivisionResultHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.LimitedFrequencyRunner;
 import au.com.jwatmuff.eventmanager.util.gui.CheckboxListDialog;
 import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
 import au.com.jwatmuff.genericdb.Database;
@@ -55,6 +56,12 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
     private DivisionResultCache cache;
 
     private ResultTableModel resultTableModel = new ResultTableModel();
+
+    private LimitedFrequencyRunner updater = new LimitedFrequencyRunner(new Runnable() {
+        public void run() {
+            updateFromDatabase();
+        }
+    }, 2000);
     
     /** Creates new form FightProgressionPanel */
     public DivisionResultsPanel() {
@@ -82,7 +89,7 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
     
     public void afterPropertiesSet() {
         this.notifier.addListener(this, Result.class);
-        updateFromDatabase();
+        updater.run(true);
         SortKey key = new SortKey(0, SortOrder.ASCENDING);
         resultTable.getRowSorter().setSortKeys(Arrays.asList(key));
     }
@@ -123,7 +130,7 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
 
     @Override
     public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
-        updateFromDatabase();
+        updater.run();
     }
     
     /** This method is called from within the constructor to
