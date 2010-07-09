@@ -13,22 +13,28 @@ import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardUpd
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors.Area;
+import au.com.jwatmuff.eventmanager.util.FileExtensionFilter;
 import au.com.jwatmuff.eventmanager.util.gui.ScalableAbsoluteLayout;
 import au.com.jwatmuff.eventmanager.util.gui.ScalableLabel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
 import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.JXImagePanel;
 
 /**
  *
@@ -85,6 +91,11 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
     private boolean swapPlayers;
     
     private boolean interactive = true;
+
+    private int imageDisplayTime = 5000;
+    private File[] imageFiles;
+    private int lastImageIndex = -1;
+    private JXImagePanel imageLayer;
     
     public ScoreboardPanel() {
         this(true);
@@ -96,6 +107,12 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
 
     /** Creates new form ScoreboardPanel */
     public ScoreboardPanel(boolean interactive, ScoringSystem system) {
+        if(!interactive) {
+            imageFiles = new File("resources/advertising").listFiles(new FileExtensionFilter("jpeg", "jpg", "png", "gif"));
+        } else {
+            imageFiles = new File[0];
+        }
+
         this.model = new ScoreboardModelImpl(system);
         this.interactive = interactive;
 
@@ -109,7 +126,16 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setLayout(new OverlayLayout(layeredPane));
         add(layeredPane);
-        
+
+        /*
+         * Image screen layer
+         */
+        imageLayer = new JXImagePanel();
+        imageLayer.setVisible(false);
+        imageLayer.setStyle(JXImagePanel.Style.SCALED_KEEP_ASPECT_RATIO);
+        imageLayer.setBackground(Color.BLACK);
+        layeredPane.add(imageLayer, new Integer(13));
+
         /*
          * No fight screen layer
          */
@@ -121,7 +147,6 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
         noFightLayer.setLayout(layout);
         
         layout.addComponent(new ScalableLabel("No Fight"), 4, 4, 8, 4);
-
         /*
          * Player vs Player layer
          */
@@ -990,7 +1015,52 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
     }
     
     private void updateNoFight() {
-        noFightLayer.setVisible(model.getMode() == Mode.NO_FIGHT);
+        boolean visible = (model.getMode() == Mode.NO_FIGHT);
+        if(!visible) noFightLayer.setVisible(false);
+        if(imageFiles.length > 0) {
+            if(visible) showImage();
+            else        hideImageIfReady();
+        }
+        if(visible) noFightLayer.setVisible(true);
+
+    }
+    
+    private synchronized void hideImageIfReady() {
+        long now = System.currentTimeMillis();
+        if(now - lastImageDisplayTime >= imageDisplayTime &&
+            model.getMode() != Mode.NO_FIGHT) {
+            imageLayer.setVisible(false);
+            imageVisible = false;
+        }
+           
+    }
+
+    private long lastImageDisplayTime;
+    private boolean imageVisible;
+    private void showImage() {
+        if(!imageVisible) {
+            int imageIndex = (lastImageIndex + 1) % imageFiles.length;
+            lastImageIndex = imageIndex;
+            File imageFile = imageFiles[imageIndex];
+            try {
+                Image image = ImageIO.read(imageFile);
+                imageLayer.setImage(image);
+            } catch(IOException e) {
+                log.error("Failed to load image " + imageFile.getAbsolutePath(), e);
+            }
+            lastImageDisplayTime = System.currentTimeMillis();
+            imageLayer.setVisible(true);
+            imageVisible = true;
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(imageDisplayTime);
+                    } catch(InterruptedException e) {}
+                    hideImageIfReady();
+                }
+            }.start();
+        }
     }
 
     private void updatePendingFight() {
