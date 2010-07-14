@@ -92,7 +92,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
     
     private boolean interactive = true;
 
-    private int imageDisplayTime = 5000;
+    private int imageDisplayTime = 3000;
     private File[] imageFiles;
     private int lastImageIndex = -1;
     private JXImagePanel imageLayer;
@@ -1015,53 +1015,78 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
     }
     
     private void updateNoFight() {
-        boolean visible = (model.getMode() == Mode.NO_FIGHT);
-        if(!visible) noFightLayer.setVisible(false);
+        boolean visible = (model.getMode() == Mode.NO_FIGHT) && imageFiles.length == 0;
+        noFightLayer.setVisible(visible);
+    }
+
+    private synchronized void updateImages(boolean endOfCycle) {
         if(imageFiles.length > 0) {
-            if(visible) showImage();
-            else        hideImageIfReady();
-        }
-        if(visible) noFightLayer.setVisible(true);
-
-    }
-    
-    private synchronized void hideImageIfReady() {
-        long now = System.currentTimeMillis();
-        if(now - lastImageDisplayTime >= imageDisplayTime &&
-            model.getMode() != Mode.NO_FIGHT) {
-            imageLayer.setVisible(false);
-            imageVisible = false;
-        }
-           
-    }
-
-    private long lastImageDisplayTime;
-    private boolean imageVisible;
-    private void showImage() {
-        if(!imageVisible) {
-            int imageIndex = (lastImageIndex + 1) % imageFiles.length;
-            lastImageIndex = imageIndex;
-            File imageFile = imageFiles[imageIndex];
-            try {
-                Image image = ImageIO.read(imageFile);
-                imageLayer.setImage(image);
-            } catch(IOException e) {
-                log.error("Failed to load image " + imageFile.getAbsolutePath(), e);
+            switch(model.getMode()) {
+                case NO_FIGHT:
+                    if(endOfCycle) loadNextImage();
+                    else           startImageDisplay();
+                    break;
+                case FIGHT_PENDING:
+                    if(endOfCycle) stopImageDisplay();
+                    break;
+                default:
+                    stopImageDisplay();
             }
-            lastImageDisplayTime = System.currentTimeMillis();
-            imageLayer.setVisible(true);
-            imageVisible = true;
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(imageDisplayTime);
-                    } catch(InterruptedException e) {}
-                    hideImageIfReady();
-                }
-            }.start();
         }
     }
+
+    private boolean imageDisplayed = false;
+    private void startImageDisplay() {
+        if(!imageDisplayed) {
+            imageDisplayed = true;
+            loadNextImage();
+            imageLayer.setVisible(true);
+            imageUpdateThread = new ImageUpdateThread();
+            imageUpdateThread.start();
+        }
+    }
+
+    private void stopImageDisplay() {
+        if(imageDisplayed) {
+            imageDisplayed = false;
+            imageUpdateThread.shutdown();
+            imageUpdateThread = null;
+            imageLayer.setVisible(false);
+        }
+    }
+
+    private void loadNextImage() {
+        int imageIndex = (lastImageIndex + 1) % imageFiles.length;
+        lastImageIndex = imageIndex;
+        File imageFile = imageFiles[imageIndex];
+        try {
+            Image image = ImageIO.read(imageFile);
+            imageLayer.setImage(image);
+        } catch(IOException e) {
+            log.error("Failed to load image " + imageFile.getAbsolutePath(), e);
+        }
+    }
+
+    private class ImageUpdateThread extends Thread {
+        private boolean run = true;
+        @Override
+        public void run() {
+            while(run) {
+                try {
+                    Thread.sleep(imageDisplayTime);
+                } catch(InterruptedException e) {}
+                if(!run) break;
+                updateImages(true);
+            }
+        }
+
+        public void shutdown() {
+            run = false;
+            interrupt();
+        }
+    }
+
+    private ImageUpdateThread imageUpdateThread;
 
     private void updatePendingFight() {
         if(model.getMode().equals(Mode.FIGHT_PENDING)) {
@@ -1107,6 +1132,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
                     updateHolddownTimer();
                 updateColors();
                 updateNoFight();
+                updateImages(false);
                 updatePendingFight();
                 break;
             case SCORE:
@@ -1143,6 +1169,7 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
                 updatePendingScores();
                 updateColors();
                 updateNoFight();
+                updateImages(false);
                 updateGoldenScore();
                 updatePendingFight();
                 break;
