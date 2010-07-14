@@ -127,7 +127,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     handleHolddownTimerEnd();
                 } else if(holddownTimer.getTime()/1000 >= 20 &&
                           holddownPlayer != UNKNOWN_PLAYER &&
-                          score[holddownPlayer][Score.WAZARI.ordinal()] == 1) {
+                          getScore(holddownPlayer, Score.WAZARI) == 1) {
                     stopTimer();
                     holddownTimer.stop();
                     setHolddownMode(HolddownMode.INACTIVE);
