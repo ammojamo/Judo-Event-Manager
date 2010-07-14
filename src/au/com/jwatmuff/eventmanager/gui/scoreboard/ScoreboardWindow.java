@@ -636,7 +636,8 @@ private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event
         peerManager.unregisterService(serviceName);
     // signal find peer scoreboard thread to stop if running
     findThreadRunning = false;
-    model.shutdown();
+    if(model != null)
+        model.shutdown();
 }//GEN-LAST:event_formWindowClosed
 
 private void setTimeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTimeMenuItemActionPerformed
