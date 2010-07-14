@@ -254,6 +254,8 @@ public class CSVImporter {
              */
             Player p = null;
             String id = row.get("ID");
+            if(!id.matches("[a-zA-Z0-9]*"))
+                throw new RuntimeException("Player IDs may only consist of letters and numbers with no spaces (invalid: " + id + ")");
             try {
                 p = database.find(Player.class, PlayerDAO.FOR_VISIBLE_ID, id);
             } catch(Exception e) {
