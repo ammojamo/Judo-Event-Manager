@@ -193,10 +193,9 @@ public class Main {
                     if(loadCompetitionWindow.isNewDatabase()) {
                         GregorianCalendar calendar = new GregorianCalendar();
                         Date today = calendar.getTime();
-                        calendar.set(Calendar.MONTH, 0);
-                        calendar.set(Calendar.DAY_OF_MONTH, 1);
-                        calendar.roll(Calendar.YEAR, 1);
-                        Date endOfYear = calendar.getTime();
+                        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+                        calendar.set(Calendar.DAY_OF_MONTH, 31);
+                        Date endOfYear = new java.sql.Date(calendar.getTimeInMillis());
 
                         CompetitionInfo ci = new CompetitionInfo();
                         ci.setName(info.name);
