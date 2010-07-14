@@ -78,8 +78,9 @@ public class AutoAssign {
         database.perform(new Transaction() {
             @Override
             public void perform() {
+                CompetitionInfo ci = database.get(CompetitionInfo.class, null);
                 for(PlayerPoolInfo ppi : PlayerPoolInfo.getForPool(database, pool.getID())) {
-                    if(PoolChecker.checkPlayer(ppi.getPlayer(), ppi.getPool(), new Date())) {
+                    if(PoolChecker.checkPlayer(ppi.getPlayer(), ppi.getPool(), ci.getAgeThresholdDate())) {
                         PlayerPool pp = ppi.getPlayerPool();
                         pp.setApproved(true);
                         database.update(pp);
