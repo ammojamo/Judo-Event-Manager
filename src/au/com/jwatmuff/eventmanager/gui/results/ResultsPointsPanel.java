@@ -148,25 +148,26 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
                     Grade loserGrade = null;
 
-                    if(scores[0] > scores[1]) {
-                        map.put("winner", bean.getPlayerName()[0]);
-                        map.put("loser", bean.getPlayerName()[1]);
-                        Player loser = bean.getPlayer()[1].player;
+                    if(scores[0] != scores[1]) {
+                        int winnerIndex = scores[1] > scores[0] ? 1 : 0;
+                        int loserIndex = 1 - winnerIndex;
+                        map.put("winner", bean.getPlayerName()[winnerIndex]);
+                        map.put("loser", bean.getPlayerName()[loserIndex]);
+                        Player loser = bean.getPlayer()[loserIndex].player;
+                        Player winner = bean.getPlayer()[winnerIndex].player;
                         loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate);
                         map.put("rank", (loserGrade==null)?"N/A": loserGrade);
-                    }
-                    else if(scores[0] < scores[1]) {
-                        map.put("winner", bean.getPlayerName()[1]);
-                        map.put("loser", bean.getPlayerName()[0]);
-                        Player loser = bean.getPlayer()[0].player;
-                        loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate);
-                        map.put("rank", (loserGrade==null)?"N/A": loserGrade);
+                        map.put("loserId", (loser == null) ? "N/A" : loser.getVisibleID());
+                        map.put("winnerId", (winner == null) ? "N/A" : winner.getVisibleID());
                     }
                     else {
                         map.put("winner", "Draw");
                         map.put("loser", "Draw");
                         map.put("rank", "N/A");
+                        map.put("winnerId", "N/A");
+                        map.put("loserId", "N/A");
                     }
+
                     
                     map.put("points", calculatePoints(bean, loserGrade));
                     map.put("signature", " ");
@@ -177,6 +178,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
             addColumn("Date", "date");
             addColumn("Player", "winner");
+            addColumn("Player ID", "winnerId");
             addColumn("Competition", "compname");
             addColumn("Division", "pool");
             addColumn("Opponent", "loser");

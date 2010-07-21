@@ -14,6 +14,7 @@ import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
+import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.print.ResultListHTMLGenerator;
@@ -76,8 +77,12 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("matfight", bean.getMatName() + " " + format.format(bean.getMatFightNumber()));
             map.put("division", database.get(Pool.class, bean.getFight().getPoolID()).getDescription());
-            map.put("player1", bean.getPlayerName()[0]);
-            map.put("player2", bean.getPlayerName()[1]);
+            for(int i = 0; i < 2; i++) {
+                Player player = bean.getPlayer()[i].player;
+                map.put("player" + (i + 1), bean.getPlayerName()[i]);
+                map.put("playerId" + (i + 1), (player != null) ? player.getVisibleID() : "N/A");
+            }
+
             int[] scores = bean.getResult().getPlayerScores();
             map.put("score", scores[0] + " : " + scores[1]);
             if(scores[0] > scores[1])
@@ -166,7 +171,9 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
             addColumn("Fight", "matfight");
             addColumn("Division", "division");
             addColumn("Player 1", "player1");
+            addColumn("Player 1 ID", "playerId1");
             addColumn("Player 2", "player2");
+            addColumn("Player 2 ID", "playerId2");
             addColumn("Score", "score");
             addColumn("Winner", "winner");
             addColumn("Time Recorded", "time");

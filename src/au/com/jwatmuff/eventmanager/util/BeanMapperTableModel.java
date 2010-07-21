@@ -14,12 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author James
  */
 public class BeanMapperTableModel<T> extends AbstractBeanTableModel<T> {
+    private static final Logger log = Logger.getLogger(BeanMapperTableModel.class);
+
     private List<ColumnInfo> columns = new ArrayList<ColumnInfo>();    
     private BeanMapper<T> mapper;
     private Map<T, Map<String, Object>> mapCache = new HashMap<T, Map<String, Object>>();
@@ -37,18 +40,23 @@ public class BeanMapperTableModel<T> extends AbstractBeanTableModel<T> {
 
     @Override
     public Object getValueAt(int row, int column) {
-        T bean = getAtRow(row);
-        Map<String, Object> rowData;
-        if(mapCache.containsKey(bean)) {
-            rowData = mapCache.get(bean);
-        }
-        else  {
-            rowData = mapper.mapBean(bean);
-            mapCache.put(bean, rowData);
-        }
+        try {
+            T bean = getAtRow(row);
+            Map<String, Object> rowData;
+            if(mapCache.containsKey(bean)) {
+                rowData = mapCache.get(bean);
+            }
+            else  {
+                rowData = mapper.mapBean(bean);
+                mapCache.put(bean, rowData);
+            }
 
-        ColumnInfo cinfo = columns.get(column);
-        return rowData.get(cinfo.property);
+            ColumnInfo cinfo = columns.get(column);
+            return rowData.get(cinfo.property);
+        } catch(Exception e) {
+            log.error("Exception in table model", e);
+            return null;
+        }
     }
     
     @Override
