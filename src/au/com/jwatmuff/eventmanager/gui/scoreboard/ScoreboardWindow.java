@@ -215,6 +215,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
 
         initComponents();
 
+        optionsMenu.remove(showImagesMenuItem);
+
         /* create scoreboard panels (one for windowed, one for fullscreen) */
         scoreboard = new ScoreboardPanel(true, system);
         fullscreen = new ScoreboardPanel(true, system);
@@ -443,6 +445,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         fullScreenMenuItem = new javax.swing.JMenuItem();
         swapPlayersMenuItem = new javax.swing.JCheckBoxMenuItem();
         chooseColorsMenuItem = new javax.swing.JMenuItem();
+        showImagesMenuItem = new javax.swing.JCheckBoxMenuItem();
         jSeparator3 = new javax.swing.JSeparator();
         chooseSirenMenuItem = new javax.swing.JMenuItem();
         testSirenMenuItem = new javax.swing.JMenuItem();
@@ -504,6 +507,15 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             }
         });
         optionsMenu.add(chooseColorsMenuItem);
+
+        showImagesMenuItem.setSelected(true);
+        showImagesMenuItem.setText("Show Advertising");
+        showImagesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showImagesMenuItemActionPerformed(evt);
+            }
+        });
+        optionsMenu.add(showImagesMenuItem);
 
         jSeparator3.setForeground(new java.awt.Color(204, 204, 204));
         optionsMenu.add(jSeparator3);
@@ -660,6 +672,11 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
     }
 }//GEN-LAST:event_formWindowClosing
 
+private void showImagesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showImagesMenuItemActionPerformed
+    scoreboard.setImagesEnabled(showImagesMenuItem.isSelected());
+    fullscreen.setImagesEnabled(showImagesMenuItem.isSelected());
+}//GEN-LAST:event_showImagesMenuItemActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem chooseColorsMenuItem;
@@ -674,6 +691,7 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JMenuItem setTimeMenuItem;
+    private javax.swing.JCheckBoxMenuItem showImagesMenuItem;
     private javax.swing.JCheckBoxMenuItem swapPlayersMenuItem;
     private javax.swing.JMenuItem testSirenMenuItem;
     // End of variables declaration//GEN-END:variables

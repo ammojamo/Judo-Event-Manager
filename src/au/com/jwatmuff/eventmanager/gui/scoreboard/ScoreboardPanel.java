@@ -40,7 +40,7 @@ import org.jdesktop.swingx.JXImagePanel;
  *
  * @author  James
  */
-public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardModel.ScoreboardModelListener {    
+public class ScoreboardPanel extends JPanel implements ScoreboardModel.ScoreboardModelListener {    
     private static final Logger log = Logger.getLogger(ScoreboardPanel.class);
     
     private ScoreboardModel model;
@@ -107,14 +107,9 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
 
     /** Creates new form ScoreboardPanel */
     public ScoreboardPanel(boolean interactive, ScoringSystem system) {
-        if(!interactive) {
-            imageFiles = new File("resources/advertising").listFiles(new FileExtensionFilter("jpeg", "jpg", "png", "gif"));
-        } else {
-            imageFiles = new File[0];
-        }
-
         this.model = new ScoreboardModelImpl(system);
         this.interactive = interactive;
+        imageFiles = interactive ? new File[0] : findImageFiles();
 
         double offset = (system == ScoringSystem.NEW) ? 0.25 : 0;
 
@@ -720,6 +715,12 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
         this.colors = colors;
         updateColors();
     }
+
+    public void setImagesEnabled(boolean enabled) {
+        imageFiles = enabled ? findImageFiles() : new File[0];
+        updateNoFight();
+        updateImages(false);
+    }
     
     private void updateColors() {
         switch(model.getHolddownPlayer()) {
@@ -1032,6 +1033,8 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
                 default:
                     stopImageDisplay();
             }
+        } else {
+            stopImageDisplay();
         }
     }
 
@@ -1087,6 +1090,10 @@ public class ScoreboardPanel extends javax.swing.JPanel implements ScoreboardMod
     }
 
     private ImageUpdateThread imageUpdateThread;
+
+    private static File[] findImageFiles() {
+        return new File("resources/advertising").listFiles(new FileExtensionFilter("jpeg", "jpg", "png", "gif"));
+    }
 
     private void updatePendingFight() {
         if(model.getMode().equals(Mode.FIGHT_PENDING)) {
