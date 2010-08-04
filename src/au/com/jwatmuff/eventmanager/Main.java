@@ -18,6 +18,7 @@ import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.permissions.License;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.eventmanager.util.LogUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import au.com.jwatmuff.genericdb.p2p.DistributedDatabase;
@@ -34,8 +35,10 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.util.Log4jConfigurer;
 
 /**
  *
@@ -103,8 +106,12 @@ public class Main {
         String applicationData = System.getenv("APPDATA");
         if(applicationData != null) {
             workingDir = new File(applicationData, "EventManager");
-            if(!workingDir.exists() && !workingDir.mkdirs())
+            if(workingDir.exists() || workingDir.mkdirs()) {
+                // redirect logging to writable folder
+                LogUtils.reconfigureFileAppenders("log4j.properties", workingDir);
+            } else {
                 workingDir = new File(".");
+            }
         }
 
         /*
