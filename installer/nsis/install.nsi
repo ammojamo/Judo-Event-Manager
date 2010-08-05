@@ -1,4 +1,4 @@
-Name "Event Manager"
+Name "Event Manager 2010 Update 1"
 Caption "Event Manager"
 ;Icon "YourProgram.ico"
 OutFile "EventManagerSetup.exe"
@@ -8,7 +8,7 @@ LicenseForceSelection checkbox
 
 InstallDir $PROGRAMFILES\EventManager
 
-DirText "This will install EventManager on your computer."
+DirText "This will install EventManager 2010 Update 1 on your computer."
 
 Section ""
   SetOutPath $INSTDIR

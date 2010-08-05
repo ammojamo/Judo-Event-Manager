@@ -27,13 +27,17 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="-2" pref="176" max="-2" attributes="0"/>
+                      <Component id="okButton" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jScrollPane1" pref="380" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="176" max="-2" attributes="0"/>
-                      <Component id="okButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="versionLabel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -42,9 +46,11 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" min="-2" pref="239" max="-2" attributes="0"/>
+              <Component id="jScrollPane1" min="-2" pref="198" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="versionLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
               <Component id="okButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -72,11 +78,16 @@
           <Properties>
             <Property name="contentType" type="java.lang.String" value="text/html"/>
             <Property name="editable" type="boolean" value="false"/>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;&#xa;  &lt;head&gt;&#xd;&#xa;&#xd;&#xa;  &lt;/head&gt;&#xd;&#xa;  &lt;body&gt;&#xd;&#xa;    &lt;h1&gt;Event Manager 4&lt;/h1&gt;&#xa;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#xd;&#xa;        &amp;copy; 2008 - 2010 James Watmuff and Leonard Hall&#xa;    &lt;/p&gt;&#xd;&#xa;&#xa;    &lt;h2&gt;Credits&lt;/h2&gt;&#xa;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#xa;        All icons from the &quot;Silk&quot; icon set by famfamfam.&lt;br&gt;&#xa;        &lt;href=&quot;http://www.famfamfam.com&quot;&gt;http://famfamfam.com&lt;/a&gt;&#xa;    &lt;/p&gt;&#xa;&#xa;  &lt;/body&gt;&#xd;&#xa;&lt;/html&gt;&#xd;&#xa;"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;&#xa;  &lt;head&gt;&#xd;&#xa;&#xd;&#xa;  &lt;/head&gt;&#xd;&#xa;  &lt;body&gt;&#xd;&#xa;    &lt;h1&gt;Event Manager 2010&lt;/h1&gt;&#xa;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#xd;&#xa;        &amp;copy; 2008 - 2010 James Watmuff and Leonard Hall&#xa;    &lt;/p&gt;&#xd;&#xa;&#xa;    &lt;h3&gt;Acknowledgements&lt;/h3&gt;&#xa;    &lt;p style=&quot;margin-top: 0&quot;&gt;&#xa;        All icons from the &quot;Silk&quot; icon set by famfamfam.&lt;br&gt;&#xa;        &lt;href=&quot;http://www.famfamfam.com&quot;&gt;http://famfamfam.com&lt;/a&gt;&#xa;    &lt;/p&gt;&#xa;&#xa;  &lt;/body&gt;&#xd;&#xa;&lt;/html&gt;&#xd;&#xa;"/>
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="versionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Event Manager Version:"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>
