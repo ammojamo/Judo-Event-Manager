@@ -72,71 +72,14 @@
 
     -->
 
-    <property name="installer-build.dir" value="installer-build"/>
-
     <target name="-post-clean">
-        <delete dir="${installer-build.dir}"/>
     </target>
 
+    <property name="nsis.dir" value="C:/Program Files/NSIS"/>
+
     <target name="build-installer" description="Create Installer" depends="clean,jar">
-        <echo message=" "/>
-        <echo message="Setting property and task for installer creation" />
-        <property name="nbdist.dir" value="dist"/>
-<!--
-        <property name="nbdist-app.dir" value="${nbdist.dir}/${app.name}"/>
-        <property name="nbdist-app-installer" value="${app.name}-${app.version.dash}.zip"/>
-        -->
-        <property name="izpack-installer" value="${app.title}-${app.version}-setup"/>
-        <property name="izpack.dir" value="/Program Files/IzPack"/>
-        <taskdef name="izpack" classpath="${izpack.dir}/lib/compiler.jar"
-                 classname="com.izforge.izpack.ant.IzPackTask"/>
-
-        <echo message=" "/>
-        <echo message="Preparing ...." />
-
-
-        <copy todir="${installer-build.dir}">
-            <fileset dir="installer/izpack" />
-        </copy>
-        <replace file="${installer-build.dir}/izpack-install-script.xml">
-            <replacefilter token="$APP-NAME" value="${app.title}" />
-            <replacefilter token="$APP-VERSION" value="${app.version}" />
-        </replace>
-        <replace file="${installer-build.dir}/win-shortcut-spec.xml">
-            <replacefilter token="$APP-VERSION" value="${app.version}" />
-        </replace>
-
-        <echo message=" "/>
-        <echo message="Makes the installer using IzPack to ${izpack-installer}"/>
-        <izpack input="${basedir}/${installer-build.dir}/izpack-install-script.xml"
-                output="${basedir}/${installer-build.dir}/${izpack-installer}.jar"
-                installerType="standard"
-                basedir="${basedir}/${installer-build.dir}"
-                izPackDir="${izpack.dir}/"/>
-
-        <echo message=" "/>
-        <echo message="Wraps the installer as a native Windows executable"/>
-
-      <exec executable="${izpack.dir}/utils/wrappers/izpack2exe/izpack2exe.exe">
-        <arg value="--file=${basedir}/${installer-build.dir}/${izpack-installer}.jar"/>
-        <arg value="--output=${basedir}/${installer-build.dir}/${izpack-installer}.exe"/>
-        <arg value="--with-7z=${izpack.dir}/utils/wrappers/izpack2exe/7za.exe"/>
-        <arg value="--with-upx=${izpack.dir}/utils/wrappers/izpack2exe/upx.exe"/>
+      <exec executable="${nsis.dir}/makensis.exe">
+        <arg value="installer/nsis/install.nsi"/>
       </exec>
-
-<!--
-        <echo message=" "/>
-        <echo message="create the release ${nbdist-app-installer}"/>
-        <zip destfile="${nbdist.dir}/${nbdist-app-installer}">
-            <zipfileset dir="${nbdist-app.dir}">
-                <include name="readme.html"/>
-                <include name="setup.exe"/>
-                <include name="${izpack-installer}"/>
-            </zipfileset>
-            <zipfileset dir="${nbdist-app.dir}" filemode="755">
-                <include name="setup"/>
-            </zipfileset>
-        </zip>
--->
     </target>
 </project>
