@@ -7,11 +7,13 @@
 
 package au.com.jwatmuff.eventmanager.model.misc;
 
+import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.db.SessionDAO;
 import au.com.jwatmuff.eventmanager.db.sqlite.SQLiteDatabase;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
+import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import junit.framework.*;
@@ -75,17 +77,25 @@ public class SessionLockerTest extends TestCase {
     private static Session setupUnlockedSession(TransactionalDatabase database) throws IOException {
         Session session = null;
         try {
-            CSVImporter.importPlayers(new File("test\\player_test_data.csv"), database);
-            CSVImporter.importPools(new File("test\\pool_test_data.csv"), database);
+            CSVImporter.importPlayers(new File("test/player_test_data.csv"), database);
+            CSVImporter.importPools(new File("test/pool_test_data.csv"), database);
 
             CompetitionInfo ci = new CompetitionInfo();
             Calendar cal = new GregorianCalendar(2008, 1, 1);
             ci.setStartDate(cal.getTime());
             cal.roll(GregorianCalendar.DATE, 2);
             ci.setEndDate(cal.getTime());
+            ci.setAgeThresholdDate(cal.getTime());
             ci.setName("My Comp");
             ci.setMats(1);
             database.add(ci);
+
+            // lock all players so they can be assigned to pools
+            for(Player p : database.findAll(Player.class, PlayerDAO.ALL)) {
+                p.setWeight(65.0);
+                database.update(p);
+                PlayerLocker.lockPlayer(database, p);
+            }
 
             AutoAssign.assignPlayersToPools(database);
         
