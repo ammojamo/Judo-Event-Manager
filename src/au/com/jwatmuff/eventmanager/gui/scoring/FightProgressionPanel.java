@@ -49,67 +49,137 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
     private Frame parentWindow;
     private Session matSession;
     
-    ScalableLabel f1p1, f1p2, f2p1, f2p2, f3p1, f3p2, f1num, f2num, f3num, f1highlight, now;
-    
+    ScalableLabel f1highlight, now, matTitle;
+
+    ScalableLabel[] numbers;
+    ScalableLabel[] player1s;
+    ScalableLabel[] player2s;
+
+
     /** Creates new form FightProgressionPanel */
-    public FightProgressionPanel(Session matSession) {
+    public FightProgressionPanel(Session matSession, boolean displayMatName, int layoutType, int noVertCells, int noHorizCells, double screenHight, double screenWidth) {
+
         initComponents();
         this.matSession = matSession;
-        
+        String matName = matSession.getMat();
+        System.out.println(matName);
         JLayeredPane layeredPane = new JLayeredPane();
-        
+
         JPanel front = new JPanel();
-        
         Font impact = new Font("Impact", Font.PLAIN, 12);
-        
-        ScalableAbsoluteLayout layout = new ScalableAbsoluteLayout(front, 1.5, 1);
-                
-        f1p1 = new ScalableLabel(" ");
-        layout.addComponent(f1p1, new Rectangle.Double(0.3, 0, 1.15, 7.0/48));
-        
-        f1p2 = new ScalableLabel(" ");
-        layout.addComponent(f1p2, new Rectangle.Double(0.3, 7.0/48, 1.15, 7.0/48));
-                
-        f1num = new ScalableLabel(" ", impact);
-        layout.addComponent(f1num, new Rectangle.Double(0, 7.0/48, 0.3, 9.0/48));
-        
-        now = new ScalableLabel("Now", impact);
-        layout.addComponent(now, new Rectangle.Double(0, -2.0/48, 0.3, 11.0/48));
-        
-        f2p1 = new ScalableLabel(" ");
-        layout.addComponent(f2p1, new Rectangle.Double(0.3, 16.0/48, 1.15, 7.0/48));
-        
-        f2p2 = new ScalableLabel(" ");
-        layout.addComponent(f2p2, new Rectangle.Double(0.3, 23.0/48, 1.15, 7.0/48));
-        
-        f2num = new ScalableLabel(" ", impact);
-        layout.addComponent(f2num, new Rectangle.Double(0, 16.0/48, 0.3, 14.0/48));
-        
-        f3p1 = new ScalableLabel(" ");
-        layout.addComponent(f3p1, new Rectangle.Double(0.3, 32.0/48, 1.15, 7.0/48));
-        
-        f3p2 = new ScalableLabel(" ");
-        layout.addComponent(f3p2, new Rectangle.Double(0.3, 39.0/48, 1.15, 7.0/48));
-        
-        f3num = new ScalableLabel(" ", impact);
-        layout.addComponent(f3num, new Rectangle.Double(0, 32.0/48, 0.3, 14.0/48));
-                
-        f1num.setBorder(new EmptyBorder(0,0,0,0));
-        f2num.setBorder(new EmptyBorder(0,0,0,0));
-        f3num.setBorder(new EmptyBorder(0,0,0,0));
-        now.setBorder(new EmptyBorder(0,0,0,0));
+        ScalableAbsoluteLayout layout = new ScalableAbsoluteLayout(front, screenWidth, screenHight);
+
+
+        matTitle = new ScalableLabel(matName, impact);
+        numbers = new ScalableLabel[noVertCells*noHorizCells];
+        player1s = new ScalableLabel[noVertCells*noHorizCells];
+        player2s = new ScalableLabel[noVertCells*noHorizCells];
+        for(int i = 0; i < noVertCells*noHorizCells; i++){
+            numbers[i] = new ScalableLabel(" ");
+            player1s[i] = new ScalableLabel(" ");
+            player2s[i] = new ScalableLabel(" ");
+        }
+
+        double boarder_Ratio = 0.1;
+        double number_Ratio = 1.5;
+
+        double cellStart;
+        double frameHight;
+        double frameWidth;
+        double cellHight;
+        double cellWidth;
+        double textHight;
+        double Boarder_Width;
+        double numberWidth;
+        double textWidth;
+
+        if (layoutType == 0) {
+            if (displayMatName) {
+                cellStart = screenHight/(noVertCells+1);
+            } else {
+                cellStart = 0.0;
+            }
+            frameHight = screenHight - cellStart;
+            frameWidth = screenWidth;
+            cellHight = frameHight/(noVertCells);
+            cellWidth = frameWidth/noHorizCells;
+            textHight = cellHight/(2.0*(1+boarder_Ratio));
+            Boarder_Width = boarder_Ratio*textHight;
+            numberWidth = textHight*number_Ratio;
+            textWidth = cellWidth-(2.0*Boarder_Width+numberWidth);
+
+            if (displayMatName) {
+                layout.addComponent(matTitle, new Rectangle.Double(Boarder_Width, Boarder_Width, screenWidth-2.0*Boarder_Width, 2.0*textHight));
+                matTitle.setBorder(new EmptyBorder(0,0,0,0));
+            }
+
+            now = new ScalableLabel("Now", impact);
+
+            layout.addComponent(now, new Rectangle.Double(Boarder_Width, cellStart+Boarder_Width, numberWidth, textHight));
+            now.setBorder(new EmptyBorder(0,0,0,0));
+            numbers[0].setBorder(new EmptyBorder(0,0,0,0));
+            layout.addComponent(player1s[0], new Rectangle.Double(Boarder_Width+numberWidth, cellStart+Boarder_Width, textWidth, textHight));
+            layout.addComponent(player2s[0], new Rectangle.Double(Boarder_Width+numberWidth, cellStart+Boarder_Width+textHight, textWidth, textHight));
+            layout.addComponent(numbers[0], new Rectangle.Double(Boarder_Width, cellStart+Boarder_Width+textHight, numberWidth, textHight));
+
+            for(int a = 0; a < noVertCells; a++){
+                for(int b = 0; b < noHorizCells; b++){
+                    if( a > 0 || b > 0){
+                        layout.addComponent(player1s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+Boarder_Width+numberWidth, cellStart+a*cellHight+Boarder_Width, textWidth, textHight));
+                        layout.addComponent(player2s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+Boarder_Width+numberWidth, cellStart+a*cellHight+Boarder_Width+textHight, textWidth, textHight));
+                        layout.addComponent(numbers[a+noVertCells*b], new Rectangle.Double(b*cellWidth+Boarder_Width, cellStart+a*cellHight+Boarder_Width, numberWidth, 2.0*textHight));
+                    }
+                }
+            }
+
+        } else {
+            if (displayMatName) {
+                cellStart = 2.0*(screenHight/(noVertCells+2));
+            } else {
+                cellStart = 0.0;
+            }
+            frameHight = screenHight - cellStart;
+            frameWidth = screenWidth;
+            cellHight = frameHight/(noVertCells);
+            cellWidth = frameWidth/noHorizCells;
+            textHight = cellHight/(1+2.0*boarder_Ratio);
+            Boarder_Width = boarder_Ratio*textHight;
+            numberWidth = textHight*number_Ratio;
+            textWidth = (cellWidth-(2.0*Boarder_Width+numberWidth))/2.0;
+
+            if (displayMatName) {
+                layout.addComponent(matTitle, new Rectangle.Double(Boarder_Width, Boarder_Width, screenWidth-2.0*Boarder_Width, 2.0*textHight));
+                matTitle.setBorder(new EmptyBorder(0,0,0,0));
+            }
+
+            now = new ScalableLabel("Now", impact);
+
+            layout.addComponent(now, new Rectangle.Double(Boarder_Width, cellStart+Boarder_Width, numberWidth, textHight));
+            now.setBorder(new EmptyBorder(0,0,0,0));
+            numbers[0].setBorder(new EmptyBorder(0,0,0,0));
+            layout.addComponent(player1s[0], new Rectangle.Double(Boarder_Width+numberWidth, cellStart+Boarder_Width, textWidth, textHight));
+            layout.addComponent(player2s[0], new Rectangle.Double(Boarder_Width+numberWidth+textWidth, cellStart+Boarder_Width, textWidth, textHight));
+
+            for(int a = 0; a < noVertCells; a++){
+                for(int b = 0; b < noHorizCells; b++){
+                    if( a > 0 || b > 0){
+                        layout.addComponent(player1s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+Boarder_Width+numberWidth, cellStart+a*cellHight+Boarder_Width, textWidth, textHight));
+                        layout.addComponent(player2s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+Boarder_Width+numberWidth+textWidth, cellStart+a*cellHight+Boarder_Width, textWidth, textHight));
+                        layout.addComponent(numbers[a+noVertCells*b], new Rectangle.Double(b*cellWidth+Boarder_Width, cellStart+a*cellHight+Boarder_Width, numberWidth, textHight));
+                    }
+                }
+            }
+        }
 
         front.setLayout(layout);
-        
         JPanel back = new JPanel();
 
-        layout = new ScalableAbsoluteLayout(back, 1.5, 1);
+        layout = new ScalableAbsoluteLayout(back, screenWidth, screenHight);
         f1highlight = new ScalableLabel(" ");
         f1highlight.setBorder(new EmptyBorder(0,0,0,0));
-        layout.addComponent(f1highlight, new Rectangle.Double(0, -2.0/48, 1.5, 18.0/48));
-        
+        layout.addComponent(f1highlight, new Rectangle.Double(0.0, cellStart, cellWidth, cellHight));
         back.setLayout(layout);
-        
+
         layeredPane.setLayout(new OverlayLayout(layeredPane));
         front.setOpaque(false);
         front.setBackground(new Color(0,0,0,0));
@@ -118,7 +188,7 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
 
         layeredPane.add(front, new Integer(2));
         layeredPane.add(back, new Integer(1));
-        
+
         setColors(new ScoringColors());
         setLayout(new GridLayout(1,1));
         add(layeredPane);
@@ -127,22 +197,25 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
     public void setColors(ScoringColors colors) {
         setForeground(colors.getColor(Area.FIGHTING_FOREGROUND));
         setBackground(colors.getColor(Area.FIGHTING_BACKGROUND));
-        for(ScalableLabel f : new ScalableLabel[] { f1num, now, f1highlight }) {
+        for(ScalableLabel f : new ScalableLabel[] { now, f1highlight }) {
             f.setForeground(colors.getColor(Area.IDLE_FOREGROUND));
             f.setBackground(colors.getColor(Area.IDLE_BACKGROUND));
         }
-        for(ScalableLabel f : new ScalableLabel[] { f2num, f3num }) {
-            f.setForeground(colors.getColor(Area.FIGHTING_FOREGROUND));
-            f.setBackground(colors.getColor(Area.FIGHTING_BACKGROUND));
+        for(int a = 0; a < numbers.length; a++){
+            if(a == 0) {
+                numbers[a].setForeground(colors.getColor(Area.IDLE_FOREGROUND));
+                numbers[a].setBackground(colors.getColor(Area.IDLE_BACKGROUND));
+            } else {
+                numbers[a].setForeground(colors.getColor(Area.FIGHTING_FOREGROUND));
+                numbers[a].setBackground(colors.getColor(Area.FIGHTING_BACKGROUND));
+            }
+            player1s[a].setForeground(colors.getColor(Area.PLAYER1_FOREGROUND));
+            player2s[a].setForeground(colors.getColor(Area.PLAYER2_FOREGROUND));
+            player1s[a].setBackground(colors.getColor(Area.PLAYER1_BACKGROUND));
+            player2s[a].setBackground(colors.getColor(Area.PLAYER2_BACKGROUND));
         }
-        for(ScalableLabel f : new ScalableLabel[] { f1p1, f2p1, f3p1}) {
-            f.setForeground(colors.getColor(Area.PLAYER1_FOREGROUND));
-            f.setBackground(colors.getColor(Area.PLAYER1_BACKGROUND));
-        }
-        for(ScalableLabel f : new ScalableLabel[] { f1p2, f2p2, f3p2}) {
-            f.setForeground(colors.getColor(Area.PLAYER2_FOREGROUND));
-            f.setBackground(colors.getColor(Area.PLAYER2_BACKGROUND));
-        }
+        matTitle.setForeground(colors.getColor(Area.FIGHTING_FOREGROUND));
+        matTitle.setBackground(colors.getColor(Area.FIGHTING_BACKGROUND));
     }
     
     @Required
@@ -165,45 +238,34 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
     }    
     
     private void updateFightsFromDatabase() {
-        f1p1.setText("");
-        f1p2.setText("");
-        f1num.setText("");
-        f2p1.setText("");
-        f2p2.setText("");
-        f2num.setText("");
-        f3p1.setText("");
-        f3p2.setText("");
-        f3num.setText("");
+
+        for(int a = 0; a < numbers.length; a++){
+            numbers[a].setText("");
+            player1s[a].setText("");
+            player2s[a].setText("");
+        }
 
         try {
 
-            Collection<Fight> fights = UpcomingFightFinder.findUpcomingFights(database, matSession.getID(), 3);
+            Collection<Fight> fights = UpcomingFightFinder.findUpcomingFights(database, matSession.getID(), numbers.length);
 
             if(fights.size() > 0) {
                 Iterator<Fight> iter = fights.iterator();
                 int number = 0;
-                if(iter.hasNext()) {
-                    Fight f = iter.next();                    
-                    SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, f.getID());
-                    number = SessionFightSequencer.getFightMatInfo(database, sf).fightNumber;
-                    f1p1.setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString());
-                    f1p2.setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString());
-                    f1num.setText("F#" + number++);
-                }
-                if(iter.hasNext()) {
-                    Fight f = iter.next();
-                    f2p1.setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString());
-                    f2p2.setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString());
-                    f2num.setText("F#" + number++);
-                }
-                if(iter.hasNext()) {
-                    Fight f = iter.next();
-                    f3p1.setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString());
-                    f3p2.setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString());
-                    f3num.setText("F#" + number++);
+                for(int a = 0; a < numbers.length; a++){
+                    if(iter.hasNext()) {
+                        Fight f = iter.next();
+                        SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, f.getID());
+                        number = SessionFightSequencer.getFightMatInfo(database, sf).fightNumber;
+                        numbers[a].setText("" + number++);
+                        player1s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString());
+                        player2s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString());
+                    } else {
+                        return;
+                    }
                 }
                 return;
-            }        
+            }
         } catch(DatabaseStateException e) {
             log.error(e.getMessage(), e);
         }

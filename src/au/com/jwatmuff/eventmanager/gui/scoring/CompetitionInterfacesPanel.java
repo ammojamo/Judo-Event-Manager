@@ -273,7 +273,9 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
 private void fightProgressionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fightProgressionButtonActionPerformed
     Session mat = chooseMat("Fight Progression");
     if(mat == null) return;
-    openWindow(new FightProgressionWindow(database, notifier, mat));
+    FightProgressionOptionsDialog fpOptions = new FightProgressionOptionsDialog(parentWindow, true);
+    fpOptions.setVisible(true);
+    openWindow(new FightProgressionWindow(database, notifier, mat, fpOptions));
 }//GEN-LAST:event_fightProgressionButtonActionPerformed
 
 private void scoringButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scoringButtonActionPerformed

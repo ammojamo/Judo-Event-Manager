@@ -18,23 +18,35 @@ import java.awt.GridLayout;
 public class FightProgressionWindow extends javax.swing.JFrame {
 
     private Session matSession;
+    private boolean matName;
+    private int layoutType;
+    private int noVertCells;
+    private int noHorizCells;
+    private double screenHight;
+    private double screenWidth;
     private Database database;
     private TransactionNotifier notifier;
     private FightProgressionPanel fightProgressionPanel, fullScreenPanel;
     private ScoringColors colors = new ScoringColors();
 
     /** Creates new form FightProgressionWindow */
-    public FightProgressionWindow(Database database, TransactionNotifier notifier, Session mat) {
+    public FightProgressionWindow(Database database, TransactionNotifier notifier, Session mat, FightProgressionOptionsDialog fpOptions) {
         initComponents();
         setLocationRelativeTo(null);
         this.matSession = mat;
         this.database = database;
         this.notifier = notifier;
+        this.matName = fpOptions.getShoweMatName();
+        this.layoutType = fpOptions.getLayoutType();
+        this.noVertCells = fpOptions.getNoVert();
+        this.noHorizCells = fpOptions.getNoHoriz();
+        this.screenHight = fpOptions.getScreenVert();
+        this.screenWidth = fpOptions.getScreenHoriz();
 
         fightProgressionPanel = getFightProgressionPanel();
-        fullScreenPanel = getFightProgressionPanel();
+//        fullScreenPanel = getFightProgressionPanel();
         fightProgressionPanel.setColors(colors);
-        fullScreenPanel.setColors(colors);
+//        fullScreenPanel.setColors(colors);
 
         getContentPane().setLayout(new GridLayout(1,1));
         getContentPane().add(fightProgressionPanel);
@@ -42,7 +54,7 @@ public class FightProgressionWindow extends javax.swing.JFrame {
     }
     
     private FightProgressionPanel getFightProgressionPanel() {
-        FightProgressionPanel fpp = new FightProgressionPanel(matSession);
+        FightProgressionPanel fpp = new FightProgressionPanel(matSession, matName, layoutType, noVertCells, noHorizCells, screenHight, screenWidth);
         fpp.setDatabase(database);
         fpp.setNotifier(notifier);
         fpp.setParentWindow(this);
