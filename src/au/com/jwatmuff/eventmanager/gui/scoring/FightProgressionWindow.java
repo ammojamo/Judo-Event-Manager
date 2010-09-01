@@ -36,7 +36,7 @@ public class FightProgressionWindow extends javax.swing.JFrame {
         this.matSession = mat;
         this.database = database;
         this.notifier = notifier;
-        this.matName = fpOptions.getShoweMatName();
+        this.matName = fpOptions.getShowMatName();
         this.layoutType = fpOptions.getLayoutType();
         this.noVertCells = fpOptions.getNoVert();
         this.noHorizCells = fpOptions.getNoHoriz();
