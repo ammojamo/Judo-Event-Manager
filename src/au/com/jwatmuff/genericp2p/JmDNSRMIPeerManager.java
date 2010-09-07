@@ -49,10 +49,11 @@ public class JmDNSRMIPeerManager implements PeerManager {
         discoverer.start();
     }
     
-    private void stop() {
+    public void stop() {
         discoverer.stop();
-        registrar.unregister();
-        manager = null;
+//        registrar.unregister();
+        manager.stop();
+//        manager = null;
     }
 
     @Override

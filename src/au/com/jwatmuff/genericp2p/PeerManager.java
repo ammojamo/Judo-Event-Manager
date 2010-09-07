@@ -13,6 +13,7 @@ import java.util.UUID;
  * @author James
  */
 public interface PeerManager {
+    public void stop();
     public void addConnectionListener(PeerConnectionListener listener);
     public void removeConnectionListener(PeerConnectionListener listener);
     public UUID getUUID();

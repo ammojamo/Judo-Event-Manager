@@ -146,7 +146,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
      * This method is to be called remotely (via RMI) by a peer to inform the
      * local client of its existence on the network. The local client may
      * already be aware of the peer, by this mechanism or otherwise.
-     * 
+     *
      * @param name      The name of the remote peer
      * @param address   The socket address by which the peer may be contacted
      */
@@ -155,7 +155,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
         log.debug("Got name/IP address/id from peer: " + name + " : " + address + " : " + id);
         boolean known = false;
         for(Peer peer : peers) {
-            if(peer.getName().equals(name)) {
+            if(peer.getName().equalsIgnoreCase(name)) {
                 known = true;
                 break;
             }
@@ -163,6 +163,30 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
         if(!known) log.debug("*****PEER FOUND NOT VIA BONJOUR/JmDNS*****");
         final PeerInfo info = new PeerInfo(name, address, id);
         handlePeerInfo(info);
+    }
+
+    /**
+     * This method is to be called remotely (via RMI) by a peer to inform the
+     * local client of its existence on the network. The local client may
+     * already be aware of the peer, by this mechanism or otherwise.
+     *
+     * @param name      The name of the remote peer
+     * @param address   The socket address by which the peer may be contacted
+     */
+    @Override
+    public void announceDisconnected(String name, UUID id) {
+        log.debug("Attempting to disconnect peer: " + name + " : " + id);
+        boolean disconnectedPeer = false;
+        for (ManagedPeer peer : peers) {
+            if(peer.getUUID().equals(id)) {
+                log.debug("Disconnect peer: " + name + " : " + id);
+                peer.setDisconnected();
+                disconnectedPeer = true;
+                break;
+            }
+        }
+        if(!disconnectedPeer) log.debug("*****Could not disconect peer because uuid was not found*****");
+
     }
 
     public void handlePeerInfo(PeerInfo info) {
@@ -189,7 +213,9 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
                 } else {
                     log.debug("Reconnecting peer on address " + info.getAddress());
                     peer.setAddress(info.getAddress());
-                    announcePeers(peer);
+                    if (peer.isConnected() && !peer.currentAddress.getAddress().isLoopbackAddress()) {
+                        announcePeers(peer);
+                    }
                 }
                 return;
             }
@@ -198,23 +224,44 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
         /* if the peer was not already in our list, add it */
         log.debug("New peer found, adding as connected");
         ManagedPeer peer = new ManagedPeer(info);
-        peers.add(peer);
-        for(PeerConnectionListener listener : new ArrayList<PeerConnectionListener>(listeners)) {
-            listener.handleConnectionEvent(
-                new PeerConnectionEvent(PeerConnectionEvent.Type.CONNECTED, peer));
+        synchronized (peers){
+            for (ManagedPeer peerCheck : new ArrayList<ManagedPeer>(peers)) {
+                if (peerCheck.getUUID().equals(info.getID())) {
+                    /* if we get here another thread got to it first */
+                    return;
+                }
+            }
+            peers.add(peer);
+            for(PeerConnectionListener listener : new ArrayList<PeerConnectionListener>(listeners)) {
+                listener.handleConnectionEvent(
+                    new PeerConnectionEvent(PeerConnectionEvent.Type.CONNECTED, peer));
+            }
         }
         announcePeers(peer);
     }
 
     private void announcePeers(ManagedPeer peer) {
         for(ManagedPeer peer2 : new ArrayList<ManagedPeer>(peers)) {
-            try {
-                if(peer2.isConnected() && !peer2.getUUID().equals(peer.getUUID())) {
-                    for(InetSocketAddress address : peer2.addressHistory)
-                        peer.getService(AnnounceService.class).announce(peer2.getName(), peer2.currentAddress, peer2.getUUID());
+            /* This code announces ouselves and each of our known peers to the new peer, including all their address history */
+            for(InetSocketAddress address : peer2.addressHistory) {
+                try {
+                    if(peer.isConnected() && !address.getAddress().isLoopbackAddress()) {
+                        peer.getService(AnnounceService.class).announce(peer2.getName(), address, peer2.getUUID());
+                    }
+                } catch(Exception e) {
+                    log.error(e);
                 }
-            } catch(Exception e) {
-                log.error(e);
+            }
+
+            /* This code announces the new peer to all our known peers, including all their address history */
+            for(InetSocketAddress address : peer.addressHistory) {
+                try {
+                    if(peer2.isConnected() && !peer2.getUUID().equals(uuid) && !address.getAddress().isLoopbackAddress()) {
+                        peer2.getService(AnnounceService.class).announce(peer.getName(), address, peer.getUUID());
+                    }
+                } catch(Exception e) {
+                    log.error(e);
+                }
             }
         }
     }
@@ -245,7 +292,10 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
             if (peer.isDisconnected()) {
                 for (InetSocketAddress address : peer.addressHistory) {
                     peer.setAddress(address);
-                    if(peer.isConnected()) break;
+                    if(peer.isConnected()) {
+                        announcePeers(peer);
+                        break;
+                    }
                 }
             } else {
                 peer.checkConnectivity();
@@ -254,9 +304,26 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     }
 
     /**
+     * I want this to tell all peers to set this peer to disconnected.
+     */
+    @Override
+    public void stop() {
+        for(ManagedPeer peer2 : new ArrayList<ManagedPeer>(peers)) {
+            try {
+                if(peer2.isConnected() && !peer2.getUUID().equals(uuid)) {
+                    log.debug("Informing peer " + peer2.getName() + " : " + peer2.getUUID() + " that we are disconnecting." );
+                    peer2.getService(AnnounceService.class).announceDisconnected(name, uuid);
+                }
+            } catch(Exception e) {
+                log.error(e);
+            }
+        }
+    }
+
+    /**
      * Registers a PeerConnectionListener which will be notified when peers are
      * connected to or disconnected from the peer manager.
-     * 
+     *
      * @param listener  The listener to be registered
      */
     @Override
@@ -473,7 +540,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
             }
         }
 
-        private void setDisconnected() {
+        public void setDisconnected() {
             if(status != PeerStatus.DISCONNECTED) {
                 log.debug("Setting peer " + this + " Disconnected");
                 status = PeerStatus.DISCONNECTED;

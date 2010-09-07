@@ -253,6 +253,7 @@ public class Main {
                         info.localDirectory.deleteOnExit();
                     }
                 } else {
+                    peerManager.stop();
                     System.exit(0);
                 }
             }
