@@ -37,6 +37,8 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -121,6 +123,19 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                 log.info(e,e);
             }
         }
+        Collections.sort(ri, new Comparator<ResultInfo>() {
+            public int compare(ResultInfo ri1, ResultInfo ri2) {
+                int[] scores1 = ri1.getResult().getPlayerScores();
+                int winnerIndex1 = scores1[1] > scores1[0] ? 1 : 0;
+                Player winner1 = ri1.getPlayer()[winnerIndex1].player;
+
+                int[] scores2 = ri2.getResult().getPlayerScores();
+                int winnerIndex2 = scores2[1] > scores2[0] ? 1 : 0;
+                Player winner2 = ri2.getPlayer()[winnerIndex2].player;
+
+                return winner1.getVisibleID().compareTo(winner2.getVisibleID());
+            }
+        });
         resultTableModel.setBeans(ri);
     }
 
