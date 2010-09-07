@@ -32,6 +32,8 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -130,23 +132,40 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
             int unknownMats = 0;
             HashMap<String, Integer> columnIndex = new HashMap<String, Integer>();
 
+            /** Gets and orders the Mat row so that mats appear in alphabetical order */
+            ArrayList<SessionInfo> matRowInfo = sessionTableInfo.get(0);
+
+            Collections.sort(matRowInfo, new Comparator<SessionInfo>() {
+                public int compare(SessionInfo session1, SessionInfo session2) {
+                    return session1.getMat().compareTo(session2.getMat());
+                }
+            });
+
+            for (SessionInfo session : matRowInfo) {
+                // only add a column for mat sessions
+                if (session.getSession().getType() == Session.SessionType.MAT) {
+                    String mat = session.getMat();
+                    if (mat == null) {
+                        log.debug("Found a mat session with null mat string!");
+                    } else if (!columnIndex.containsKey(mat)) {
+                        columnIndex.put(mat, columnIndex.size());
+                        setValueAt(null, 0, columnIndex.get(mat));
+                    }
+                }
+            }
+
+            /** Ignores the mat row and adds the sessions */
             int baseRow = 0;
             for (ArrayList<SessionInfo> sessionRowInfo : sessionTableInfo) {
                 int maxRow = baseRow;
                 int col = 0;
+
                 for (SessionInfo session : sessionRowInfo) {
-                    // only add a column for mat sessions
+                    // add rows under mats
                     if (session.getSession().getType() == Session.SessionType.MAT) {
-                        String mat = session.getMat();
-                        if (mat == null) {
-                            log.debug("Found a mat session with null mat string!");
-                        } else if (!columnIndex.containsKey(mat)) {
-                            columnIndex.put(mat, columnIndex.size());
-                            setValueAt(null, 0, columnIndex.get(mat));
-                        }
                         continue;
                     }
-
+                    
                     int row = baseRow;
 
                     // find correct column
