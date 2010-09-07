@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.3" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
@@ -57,8 +57,8 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Component id="newDivisionButton" alignment="0" max="32767" attributes="1"/>
-                      <Component id="removeDivisionButton" alignment="0" pref="101" max="32767" attributes="1"/>
-                      <Component id="addDivisionButton" alignment="0" pref="101" max="32767" attributes="1"/>
+                      <Component id="removeDivisionButton" alignment="0" pref="113" max="32767" attributes="1"/>
+                      <Component id="addDivisionButton" alignment="0" pref="113" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -121,6 +121,9 @@
           </SubComponents>
         </Container>
         <Component class="javax.swing.JComboBox" name="divisionsComboBox">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="divisionsComboBoxActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="addDivisionButton">
           <Properties>

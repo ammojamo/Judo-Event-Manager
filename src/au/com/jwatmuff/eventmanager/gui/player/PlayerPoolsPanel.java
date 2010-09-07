@@ -33,7 +33,9 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
@@ -119,8 +121,21 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
     private void updatePoolList() {
         poolListModel.clear();
         
-        Collection<PlayerPoolInfo> playerPools = PlayerPoolInfo.getForPlayer(database, playerID);
+        Collection<PlayerPoolInfo> playerPools = PlayerPoolInfo.getForPlayer(database, playerID);        
+
+        /** Creates an ArrayList so I can sort them, can I do it without having to do this??? */
+        ArrayList<PlayerPoolInfo> playerPoolsList = new ArrayList<PlayerPoolInfo>();
         for(PlayerPoolInfo ppi : playerPools) {
+            playerPoolsList.add(ppi);
+        }        
+        Collections.sort(playerPoolsList, new Comparator<PlayerPoolInfo>() {
+            public int compare(PlayerPoolInfo p1, PlayerPoolInfo p2) {
+                return p1.getPool().getDescription().compareTo(p2.getPool().getDescription());
+            }
+        });
+
+
+        for(PlayerPoolInfo ppi : playerPoolsList) {
             poolListModel.addElement(ppi);
         }
         
@@ -247,6 +262,12 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
         });
         jScrollPane1.setViewportView(divisionsList);
 
+        divisionsComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                divisionsComboBoxActionPerformed(evt);
+            }
+        });
+
         addDivisionButton.setText("Add");
         addDivisionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -269,8 +290,8 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(newDivisionButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(removeDivisionButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
-                    .addComponent(addDivisionButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE))
+                    .addComponent(removeDivisionButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+                    .addComponent(addDivisionButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(divisionsComboBox, 0, 267, Short.MAX_VALUE)
@@ -351,6 +372,10 @@ private void newDivisionButtonActionPerformed(java.awt.event.ActionEvent evt) {/
 private void divisionsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_divisionsListValueChanged
     fightTableModel.updateFromDatabase();
 }//GEN-LAST:event_divisionsListValueChanged
+
+private void divisionsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_divisionsComboBoxActionPerformed
+    // TODO add your handling code here:
+}//GEN-LAST:event_divisionsComboBoxActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addDivisionButton;
