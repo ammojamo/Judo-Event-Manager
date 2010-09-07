@@ -132,7 +132,7 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
 
         } else {
             if (displayMatName) {
-                cellStart = screenHight*((2.0+2*borderRatio)/((noVertCells+2)*(1.0+2*borderRatio)+1));
+                cellStart = screenHight*((2.0+2*borderRatio)/(1+(noVertCells+1)*(1.0+2*borderRatio)));
             } else {
                 cellStart = 0.0;
             }
