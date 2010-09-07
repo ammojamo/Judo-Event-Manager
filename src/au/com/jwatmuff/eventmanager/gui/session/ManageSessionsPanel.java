@@ -132,74 +132,77 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
             int unknownMats = 0;
             HashMap<String, Integer> columnIndex = new HashMap<String, Integer>();
 
-            /** Gets and orders the Mat row so that mats appear in alphabetical order */
-            ArrayList<SessionInfo> matRowInfo = sessionTableInfo.get(0);
+                if (!sessionTableInfo.isEmpty()) {
 
-            Collections.sort(matRowInfo, new Comparator<SessionInfo>() {
-                public int compare(SessionInfo session1, SessionInfo session2) {
-                    return session1.getMat().compareTo(session2.getMat());
-                }
-            });
+                /** Gets and orders the Mat row so that mats appear in alphabetical order */
+                ArrayList<SessionInfo> matRowInfo = sessionTableInfo.get(0);
 
-            for (SessionInfo session : matRowInfo) {
-                // only add a column for mat sessions
-                if (session.getSession().getType() == Session.SessionType.MAT) {
-                    String mat = session.getMat();
-                    if (mat == null) {
-                        log.debug("Found a mat session with null mat string!");
-                    } else if (!columnIndex.containsKey(mat)) {
-                        columnIndex.put(mat, columnIndex.size());
-                        setValueAt(null, 0, columnIndex.get(mat));
+                Collections.sort(matRowInfo, new Comparator<SessionInfo>() {
+                    public int compare(SessionInfo session1, SessionInfo session2) {
+                        return session1.getMat().compareTo(session2.getMat());
                     }
-                }
-            }
+                });
 
-            /** Ignores the mat row and adds the sessions */
-            int baseRow = 0;
-            for (ArrayList<SessionInfo> sessionRowInfo : sessionTableInfo) {
-                int maxRow = baseRow;
-                int col = 0;
-
-                for (SessionInfo session : sessionRowInfo) {
-                    // add rows under mats
+                for (SessionInfo session : matRowInfo) {
+                    // only add a column for mat sessions
                     if (session.getSession().getType() == Session.SessionType.MAT) {
-                        continue;
+                        String mat = session.getMat();
+                        if (mat == null) {
+                            log.debug("Found a mat session with null mat string!");
+                        } else if (!columnIndex.containsKey(mat)) {
+                            columnIndex.put(mat, columnIndex.size());
+                            setValueAt(null, 0, columnIndex.get(mat));
+                        }
                     }
-                    
-                    int row = baseRow;
-
-                    // find correct column
-                    String mat = session.getMat();
-                    if (mat == null) {
-                        mat = "Unknown Mat " + (++unknownMats);
-                    }
-                    if (!columnIndex.containsKey(mat)) {
-                        columnIndex.put(mat, columnIndex.size());
-                    }
-                    col = columnIndex.get(mat);
-
-                    // populate cells with information
-                    setValueAt("[" + session.getSession().getName() + "]", row++, col);
-                    if (session.getSession().getLockedStatus() != Session.LockedStatus.UNLOCKED) {
-                        setValueAt("LOCKED", row++, col);
-                    }
-                    for (Pool pool : session.getPools()) {
-                        int nfights = 0;
-                        try {
-                            nfights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID()).size();
-                        } catch(Exception e) {}
-                        setValueAt(pool.getDescription() + " (" + nfights + ")", row++, col);
-                    }
-                    Collection<Session> following = session.getFollowingDependentSessions();
-                    for (Session fs : following) {
-                        setValueAt("--> " + fs.getName(), row++, col);
-                    //if(following.size() == 0)
-                    //    setValueAt("--> *", row++, col);
-                    // calculate the last row index of this column
-                    }
-                    maxRow = Math.max(maxRow, row);
                 }
-                baseRow = maxRow + 2;
+
+                /** Ignores the mat row and adds the sessions */
+                int baseRow = 0;
+                for (ArrayList<SessionInfo> sessionRowInfo : sessionTableInfo) {
+                    int maxRow = baseRow;
+                    int col = 0;
+
+                    for (SessionInfo session : sessionRowInfo) {
+                        // add rows under mats
+                        if (session.getSession().getType() == Session.SessionType.MAT) {
+                            continue;
+                        }
+
+                        int row = baseRow;
+
+                        // find correct column
+                        String mat = session.getMat();
+                        if (mat == null) {
+                            mat = "Unknown Mat " + (++unknownMats);
+                        }
+                        if (!columnIndex.containsKey(mat)) {
+                            columnIndex.put(mat, columnIndex.size());
+                        }
+                        col = columnIndex.get(mat);
+
+                        // populate cells with information
+                        setValueAt("[" + session.getSession().getName() + "]", row++, col);
+                        if (session.getSession().getLockedStatus() != Session.LockedStatus.UNLOCKED) {
+                            setValueAt("LOCKED", row++, col);
+                        }
+                        for (Pool pool : session.getPools()) {
+                            int nfights = 0;
+                            try {
+                                nfights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID()).size();
+                            } catch(Exception e) {}
+                            setValueAt(pool.getDescription() + " (" + nfights + ")", row++, col);
+                        }
+                        Collection<Session> following = session.getFollowingDependentSessions();
+                        for (Session fs : following) {
+                            setValueAt("--> " + fs.getName(), row++, col);
+                        //if(following.size() == 0)
+                        //    setValueAt("--> *", row++, col);
+                        // calculate the last row index of this column
+                        }
+                        maxRow = Math.max(maxRow, row);
+                    }
+                    baseRow = maxRow + 2;
+                }
             }
 
             this.columnNames = new String[columnIndex.size()];
