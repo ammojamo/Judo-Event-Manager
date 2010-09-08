@@ -391,8 +391,9 @@ public class NewSessionDialog extends javax.swing.JDialog {
             Session session = new Session();        
             session.setName(sessionName);
             session.setType(Session.SessionType.NORMAL);
+            session.setMat(matSession.getMat());
 
-            matSession = SessionInfo.getLastOnMat(database, matSession);
+            Session matSessionLast = SessionInfo.getLastOnMat(database, matSession);
 
             Collection<Session> preceding = new ArrayList<Session>();
             for(Object o : sessionListModel.toArray()) {
@@ -408,7 +409,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
             for(Object o : poolListModel.toArray())
                 pools.add((Pool)o);
             
-            SessionLinker.insertSession(database, session, matSession, preceding, pools);
+            SessionLinker.insertSession(database, session, matSessionLast, preceding, pools);
         } catch(Exception e) {
             log.error("Exception while adding new session", e);
             GUIUtils.displayError(parentWindow, "Adding new session failed");

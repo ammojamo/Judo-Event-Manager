@@ -194,7 +194,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
                         }
                         Collection<Session> following = session.getFollowingDependentSessions();
                         for (Session fs : following) {
-                            setValueAt("--> " + fs.getName(), row++, col);
+                            setValueAt("--> " + fs.getMat() + " : " + fs.getName(), row++, col);
                         //if(following.size() == 0)
                         //    setValueAt("--> *", row++, col);
                         // calculate the last row index of this column
@@ -442,7 +442,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
         cbd.setRenderer(new StringRenderer<Session>() {
             @Override
             public String asString(Session o) {
-                return o.getName();
+                return o.getMat() + " : " + o.getName();
             }
         }, Icons.SESSION);
 
@@ -498,7 +498,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
         cbd.setRenderer(new StringRenderer<Session>() {
             @Override
             public String asString(Session o) {
-                return o.getName();
+                return o.getMat() + " : " + o.getName();
             }
         }, Icons.SESSION);
 
