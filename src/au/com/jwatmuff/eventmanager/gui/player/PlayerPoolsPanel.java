@@ -121,13 +121,8 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
     private void updatePoolList() {
         poolListModel.clear();
         
-        Collection<PlayerPoolInfo> playerPools = PlayerPoolInfo.getForPlayer(database, playerID);        
 
-        /** Creates an ArrayList so I can sort them, can I do it without having to do this??? */
-        ArrayList<PlayerPoolInfo> playerPoolsList = new ArrayList<PlayerPoolInfo>();
-        for(PlayerPoolInfo ppi : playerPools) {
-            playerPoolsList.add(ppi);
-        }        
+        ArrayList<PlayerPoolInfo> playerPoolsList = new ArrayList<PlayerPoolInfo>(PlayerPoolInfo.getForPlayer(database, playerID));
         Collections.sort(playerPoolsList, new Comparator<PlayerPoolInfo>() {
             public int compare(PlayerPoolInfo p1, PlayerPoolInfo p2) {
                 return p1.getPool().getDescription().compareTo(p2.getPool().getDescription());
@@ -139,7 +134,7 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
             poolListModel.addElement(ppi);
         }
         
-        removeDivisionButton.setEnabled(playerPools.size() > 0);
+        removeDivisionButton.setEnabled(playerPoolsList.size() > 0);
     }
 
     @Override
