@@ -262,12 +262,6 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
         });
         jScrollPane1.setViewportView(divisionsList);
 
-        divisionsComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                divisionsComboBoxActionPerformed(evt);
-            }
-        });
-
         addDivisionButton.setText("Add");
         addDivisionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -372,10 +366,6 @@ private void newDivisionButtonActionPerformed(java.awt.event.ActionEvent evt) {/
 private void divisionsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_divisionsListValueChanged
     fightTableModel.updateFromDatabase();
 }//GEN-LAST:event_divisionsListValueChanged
-
-private void divisionsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_divisionsComboBoxActionPerformed
-    // TODO add your handling code here:
-}//GEN-LAST:event_divisionsComboBoxActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addDivisionButton;

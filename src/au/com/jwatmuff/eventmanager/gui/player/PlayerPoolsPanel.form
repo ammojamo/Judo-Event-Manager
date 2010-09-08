@@ -121,9 +121,6 @@
           </SubComponents>
         </Container>
         <Component class="javax.swing.JComboBox" name="divisionsComboBox">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="divisionsComboBoxActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="addDivisionButton">
           <Properties>

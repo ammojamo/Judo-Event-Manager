@@ -99,11 +99,6 @@ public class FightProgressionOptionsDialog extends javax.swing.JDialog {
         jLabel2.setText("Rows:");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "4:3", "4:3 1/2", "4:3 1/3", "16:9", "16:9 1/2", "16:9 1/3" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Top / Bottom", "Side by Side" }));
 
@@ -199,10 +194,6 @@ public class FightProgressionOptionsDialog extends javax.swing.JDialog {
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
         doClose();
     }//GEN-LAST:event_closeDialog
-
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void doClose() {
         setVisible(false);
