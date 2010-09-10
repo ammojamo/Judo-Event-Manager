@@ -425,6 +425,10 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         Pool pool = getSelectedPool();
         if(pool != null && pool.getID() != 0)
             if(!PermissionChecker.isAllowed(Action.LOCK_DIVISION, database)) return;
+            if(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true).isEmpty()){
+                JOptionPane.showMessageDialog(this.parentWindow, "Pool can not be locked without any approved players");
+                return;
+            }
             if(!GUIUtils.confirmLock(this.parentWindow, "division")) return;
             
             try {
