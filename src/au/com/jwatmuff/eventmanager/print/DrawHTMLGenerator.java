@@ -73,9 +73,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
             ps.add(p);
             pds.add(pd);
             c.put("player" + i,
-                  p.getVisibleID() + " " +
-                  p.getLastName() + ", " +
-                  p.getFirstName().charAt(0));
+                  p.getLastName() + ", " + p.getFirstName().charAt(0) + " (" + p.getGrade() + ")" );
         }
         while(i++ < 64) { //TODO: this should not be an arbitrary limit
             c.put("player" + i, "BYE");
@@ -109,9 +107,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                 switch(p.type) {
                     case NORMAL:
                         c.put(code,
-                              p.player.getVisibleID() + " " +
-                              p.player.getLastName() + ", " +
-                              p.player.getFirstName().charAt(0));
+                              p.player.getLastName() + ", " + p.player.getFirstName().charAt(0));
                         break;
                     case ERROR:
                         c.put(code, "--"); // mark error with --
