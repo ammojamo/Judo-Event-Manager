@@ -172,6 +172,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
             
             notifier.addListener(this, Session.class);
             
+            this.addColumn("Mat", "mat");
             this.addColumn("Session", "name");
             this.addColumn("Locked", "lockedStatus == 'FIGHTS_LOCKED'");
             dbtm = new DistributableBeanTableModel<Session>(this);
