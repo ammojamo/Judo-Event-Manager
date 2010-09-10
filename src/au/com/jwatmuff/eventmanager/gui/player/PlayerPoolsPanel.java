@@ -348,6 +348,14 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
     
     private void removeDivisionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeDivisionButtonActionPerformed
         PlayerPoolInfo ppi = ((PlayerPoolInfo)divisionsList.getSelectedValue());
+        if(ppi.getPool().getLockedStatus() != Pool.LockedStatus.UNLOCKED) {
+            GUIUtils.displayMessage(
+                    parent,
+                    "This division (" + ppi.getPool().getDescription() + ") has been locked.\n" +
+                    "Players may not be removed from a locked division.",
+                    "Division Locked");
+            return;
+        }
         PlayerPool pp = ppi.getPlayerPool();
         database.delete(pp);
     }//GEN-LAST:event_removeDivisionButtonActionPerformed
