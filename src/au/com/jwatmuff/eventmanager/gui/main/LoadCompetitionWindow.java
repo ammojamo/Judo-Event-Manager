@@ -21,6 +21,9 @@ import au.com.jwatmuff.eventmanager.util.ZipUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import au.com.jwatmuff.genericp2p.PeerManager;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.io.File;
@@ -142,7 +145,13 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             public void run() {
                 DatabaseInfo oldSelected = (DatabaseInfo)competitionList.getSelectedValue();
                 dbListModel.clear();
-                for(DatabaseInfo info : dbManager.getDatabases())
+                ArrayList<DatabaseInfo> dbinfo = new ArrayList<DatabaseInfo>(dbManager.getDatabases());
+                Collections.sort(dbinfo, new Comparator<DatabaseInfo>() {
+                    public int compare(DatabaseInfo dbinfo1, DatabaseInfo dbinfo2) {
+                        return dbinfo1.name.compareTo(dbinfo2.name);
+                    }
+                });
+                for(DatabaseInfo info : dbinfo)
                     dbListModel.addElement(info);
                 
                 boolean compsPresent = dbListModel.size() > 0;
