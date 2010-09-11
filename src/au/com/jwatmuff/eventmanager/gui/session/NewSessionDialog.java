@@ -93,8 +93,12 @@ public class NewSessionDialog extends javax.swing.JDialog {
         sessionList.setCellRenderer(sessionRenderer);
         
         sessionComboBoxModel = new DefaultComboBoxModel();
-        for(Session session : database.findAll(Session.class, SessionDAO.ALL_NORMAL))
-            sessionComboBoxModel.addElement(session);
+        for(Session session : database.findAll(Session.class, SessionDAO.ALL_NORMAL)){
+            SessionInfo si = new SessionInfo(database, session);
+            if(si.getFollowingDependentSessions().size() == 0) {
+                sessionComboBoxModel.addElement(session);
+            }
+        }
         sessionComboBox.setModel(sessionComboBoxModel);
         sessionListModel = new DefaultListModel();
         sessionList.setModel(sessionListModel);
@@ -406,7 +410,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
             Collection<Session> preceding = new ArrayList<Session>();
             for(Object o : sessionListModel.toArray()) {
                 Session s = (Session)o;
-                if(new SessionInfo(database, (Session)o).getFollowingSessions().size() > 0) {
+                if(new SessionInfo(database, (Session)o).getFollowingDependentSessions().size() > 0) {
                     GUIUtils.displayError(parentWindow, "Cannot link to session " + s.getName() + ": already has a following session");
                     return;
                 }
