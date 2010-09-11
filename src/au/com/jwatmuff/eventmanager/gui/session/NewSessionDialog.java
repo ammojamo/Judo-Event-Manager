@@ -411,7 +411,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
             for(Object o : sessionListModel.toArray()) {
                 Session s = (Session)o;
                 if(new SessionInfo(database, (Session)o).getFollowingDependentSessions().size() > 0) {
-                    GUIUtils.displayError(parentWindow, "Cannot link to session " + s.getName() + ": already has a following session");
+                    GUIUtils.displayError(parentWindow, "Cannot link to session " + s.getMat() + " : " + s.getName() + ": already has a following session");
                     return;
                 }
                 preceding.add(s);

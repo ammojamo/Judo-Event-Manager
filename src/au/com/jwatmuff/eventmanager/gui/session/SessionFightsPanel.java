@@ -531,7 +531,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         if(sessions.size() > 0) {
             StringBuilder sb = new StringBuilder();
             sb.append("The fights in the following sessions will also be locked:\n");
-            for(Session s : sessions) sb.append("\n" + s.getName());
+            for(Session s : sessions) sb.append("\n" + s.getMat() + " : " + s.getName());
             sb.append("\n\nDo you wish to continue?");
             int result = JOptionPane.showConfirmDialog(this, sb.toString(), "Lock Session Fights", JOptionPane.YES_NO_OPTION);
             if(result != JOptionPane.YES_OPTION) return;
@@ -547,7 +547,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
             }
             SessionLocker.lockFights(database, session);
         } catch(Exception e) {
-            log.error("Error while locking fights in session " + session.getName(), e);
+            log.error("Error while locking fights in session " + session.getMat() + " : " + session.getName(), e);
             GUIUtils.displayError(parentWindow, "Unable to lock session");
         } finally {
             this.setCursor(Cursor.getDefaultCursor());
