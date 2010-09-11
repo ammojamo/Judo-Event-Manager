@@ -268,7 +268,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
             String msg = "The following sessions will also be locked: \n";
             for (Session s : sessions) {
                 if (s.getType() == Session.SessionType.NORMAL) {
-                    msg = msg + "\n " + s.getName();
+                    msg = msg + "\n " + s.getMat() + " : " + s.getName();
                 } else {
                     msg = msg + "\n " + s.getMat();
                 }
@@ -288,7 +288,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
         if (sessions.size() > 0) {
             String msg = "The following sessions will also be deleted: \n";
             for (Session s : sessions) {
-                msg = msg + "\n " + s.getName();
+                msg = msg + "\n " + s.getMat() + " : " + s.getName();
             }
             msg = msg + "\n\nAre you sure you wish to continue?";
             if (JOptionPane.showConfirmDialog(parentWindow, msg, "Confirm Delete", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {

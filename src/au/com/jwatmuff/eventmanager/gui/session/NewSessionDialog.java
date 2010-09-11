@@ -17,7 +17,9 @@ import au.com.jwatmuff.genericdb.Database;
 import java.awt.Component;
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Collection;
+import java.util.Comparator;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -54,7 +56,13 @@ public class NewSessionDialog extends javax.swing.JDialog {
 
         // populate mats
         matComboBoxModel = new DefaultComboBoxModel();
-        for(Session mat : database.findAll(Session.class, SessionDAO.ALL_MATS))
+        ArrayList<Session> mats = new ArrayList<Session>(database.findAll(Session.class, SessionDAO.ALL_MATS));
+        Collections.sort(mats, new Comparator<Session>() {
+            public int compare(Session mat1, Session mat2) {
+                return mat1.getMat().compareTo(mat2.getMat());
+            }
+        });
+        for(Session mat : mats)
             matComboBoxModel.addElement(mat);
         matComboBox.setModel(matComboBoxModel);
         
@@ -181,7 +189,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(poolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(addPoolButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(removePoolButton, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE))
+                    .addComponent(removePoolButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, Short.MAX_VALUE))
                 .addContainerGap())
         );
         poolPanelLayout.setVerticalGroup(
@@ -278,7 +286,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(poolPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(addSessionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(removeSessionButton, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE))
+                    .addComponent(removeSessionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, Short.MAX_VALUE))
                 .addContainerGap())
         );
         poolPanel1Layout.setVerticalGroup(
