@@ -92,7 +92,7 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
     
     private boolean interactive = true;
 
-    private int imageDisplayTime = 3000;
+    private int imageDisplayTime = 5000;
     private File[] imageFiles;
     private int lastImageIndex = -1;
     private JXImagePanel imageLayer;
