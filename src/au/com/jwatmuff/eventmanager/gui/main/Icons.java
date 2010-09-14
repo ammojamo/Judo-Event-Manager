@@ -12,7 +12,7 @@ import javax.swing.ImageIcon;
  * @author James
  */
 public class Icons {
-    private static String SILK = "/com/famfamfam/icons/silk";
+    private final static String SILK = "/com/famfamfam/icons/silk";
     
     public static ImageIcon CONTEST_AREA = getIcon(SILK, "shape_square.png");
     public static ImageIcon SCOREBOARD = getIcon(SILK, "application_view_tile.png");
@@ -25,6 +25,7 @@ public class Icons {
     public static ImageIcon FEMALE = getIcon(SILK, "female.png");
     public static ImageIcon UNKNOWN = getIcon(SILK, "bullet_white.png");
     public static ImageIcon POOL = getIcon(SILK, "group.png");
+    public static ImageIcon TEAM = getIcon(SILK, "group.png");
     public static ImageIcon YES = getIcon(SILK, "tick.png");
     public static ImageIcon NO = getIcon(SILK, "cross.png");
 

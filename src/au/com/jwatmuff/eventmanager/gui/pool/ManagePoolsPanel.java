@@ -10,6 +10,7 @@ import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
+import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow;
 import au.com.jwatmuff.eventmanager.model.misc.AutoAssign;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
@@ -231,6 +232,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         autoAssignButton = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
         printButton = new javax.swing.JButton();
+        drawWizardButton = new javax.swing.JButton();
         autoApproveButton = new javax.swing.JButton();
         lockButton = new javax.swing.JButton();
         customPoolButton = new javax.swing.JButton();
@@ -321,6 +323,17 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         });
         jToolBar1.add(printButton);
 
+        drawWizardButton.setText("Draw Wizard");
+        drawWizardButton.setFocusable(false);
+        drawWizardButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        drawWizardButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        drawWizardButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                drawWizardButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(drawWizardButton);
+
         autoApproveButton.setText("Auto Approve >");
         autoApproveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -352,7 +365,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 647, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -366,8 +379,8 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 647, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(autoAssignButton)
                         .addGap(6, 6, 6)
@@ -560,6 +573,19 @@ private void customPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//
     new PoolDetailsDialog(parentWindow, true, database, null).setVisible(true);
 }//GEN-LAST:event_customPoolButtonActionPerformed
 
+private void drawWizardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    if(getSelectedPool() != null && getSelectedPool().getID() != 0) {
+        Pool pool = getSelectedPool();
+        // TODO: disable the button instead of displaying this ugly message
+        // .. or maybe we can start the wizard on a locked pool??
+        if(pool.getLockedStatus() != Pool.LockedStatus.UNLOCKED) {
+            GUIUtils.displayMessage(null, "Please select an unlocked division", "Draw Wizard");
+        } else {
+            new DrawWizardWindow(database, notifier, getSelectedPool()).setVisible(true);
+        }
+    }
+}//GEN-LAST:event_jButton1ActionPerformed
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton approveButton;
@@ -567,6 +593,7 @@ private void customPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//
     private javax.swing.JButton autoApproveButton;
     private javax.swing.JButton autoAssignButton;
     private javax.swing.JButton customPoolButton;
+    private javax.swing.JButton drawWizardButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
