@@ -108,7 +108,48 @@ public class PlayerCodeParser {
         
         while(prefix.length() > 0) {
             if(!fight.resultKnown()) {
-                fp.type = PlayerType.UNDECIDED;
+                String[] codes = fight.getAllPlayerCode();
+                FightPlayer player0 = parseCode(codes[0], fights, players);
+                FightPlayer player1 = parseCode(codes[1], fights, players);
+                if (player0.type == PlayerType.BYE){
+                    if(prefix.equals("W"))
+                        return player1;
+
+                    if(prefix.equals("L"))
+                        return player0;
+
+                    switch(prefix.charAt(prefix.length()-1)) {
+                        case 'W':
+                            code = codes[1];
+                            break;
+                        case 'L':
+                            code = codes[0];
+                            break;
+                        default:
+                            fp.type = PlayerType.ERROR;
+                            return fp;
+                    }
+                } else if(player1.type == PlayerType.BYE) {
+                    if(prefix.equals("W"))
+                        return player0;
+
+                    if(prefix.equals("L"))
+                        return player1;
+
+                    switch(prefix.charAt(prefix.length()-1)) {
+                        case 'W':
+                            code = codes[0];
+                            break;
+                        case 'L':
+                            code = codes[1];
+                            break;
+                        default:
+                            fp.type = PlayerType.ERROR;
+                            return fp;
+                    }
+                } else {
+                    fp.type = PlayerType.UNDECIDED;
+                }
                 return fp;
             }
         

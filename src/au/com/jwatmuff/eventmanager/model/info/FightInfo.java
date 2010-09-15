@@ -62,11 +62,16 @@ public class FightInfo {
         else
             return null;
     }
-    
+
     public String getLosingPlayerCode() {
         if(resultKnown())
             return (r.getPlayerScores()[0] > r.getPlayerScores()[1]) ? f.getPlayerCodes()[1] : f.getPlayerCodes()[0];
         else
-            return null;        
+            return null;
     }
+
+    public String[] getAllPlayerCode() {
+        return f.getPlayerCodes();
+    }
+//    Leoanrd: add get codes that gets both codes, keep it general so return in a list or arraylist.  f.getPlayerCodes()
 }

@@ -271,7 +271,6 @@ public class SessionFightSequencer {
                 return sf1.getSessionFight().getPosition() - sf2.getSessionFight().getPosition();
             }
         });
-
         return fights;
     }
 
