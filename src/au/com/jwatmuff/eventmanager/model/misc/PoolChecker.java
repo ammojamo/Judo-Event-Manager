@@ -8,12 +8,18 @@
  */
 package au.com.jwatmuff.eventmanager.model.misc;
 
+import au.com.jwatmuff.eventmanager.db.PlayerDAO;
+import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Player.Grade;
 import au.com.jwatmuff.eventmanager.model.vo.Player.Gender;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.genericdb.Database;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.log4j.Logger;
 
 /**
@@ -152,5 +158,16 @@ public class PoolChecker {
         }
 
         return true;
+    }
+
+    public static List<Player> findEligiblePlayers(final Pool pool, Database database) {
+        final CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        List<Player> players = database.findAll(Player.class, PlayerDAO.ALL);
+        CollectionUtils.filter(players, new Predicate() {
+            public boolean evaluate(Object arg0) {
+                return checkPlayer((Player)arg0, pool, ci.getAgeThresholdDate());
+            }
+        });
+        return players;
     }
 }
