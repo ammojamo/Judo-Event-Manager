@@ -11,18 +11,27 @@
 
 package au.com.jwatmuff.eventmanager.gui.wizard;
 
+import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
+import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.genericdb.distributed.DataEvent;
+import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 /**
  *
@@ -32,18 +41,19 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     private DefaultTableModel model;
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
+    private TransactionListener listener;
     private Pool pool;
     private List<PlayerPoolInfo> players = new ArrayList<PlayerPoolInfo>();
+    private Map<PlayerPoolInfo, Integer> seeds = new HashMap<PlayerPoolInfo, Integer>();
+    private Context context;
 
     /** Creates new form SeedingPanel */
-    public SeedingPanel(TransactionalDatabase database, TransactionNotifier notifier, Pool pool) {
+    public SeedingPanel(TransactionalDatabase database, TransactionNotifier notifier, Context context) {
         this.database = database;
         this.notifier = notifier;
-        this.pool = pool;
+        this.context = context;
 
         initComponents();
-
-        divisionNameLabel.setText(pool.getDescription());
 
         model = new DefaultTableModel();
         model.addColumn("Player");
@@ -54,24 +64,40 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
 
         seedingTable.setModel(model);
 
-        JComboBox seedingComboBox = new JComboBox(new Object[] {1, 2, 3, 4});
+        listener = new TransactionListener() {
+            @Override
+            public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateFromDatabase();
+                    }
+                });
+            }
+        };
+    }
 
-        seedingTable.getColumn("Seed").setCellEditor(new DefaultCellEditor(seedingComboBox));
+    private TableCellEditor getSeedingCellEditor(int numPlayers) {
+        Object[] values =  new Object[numPlayers + 1];
+        values[0] = "None";
+        for(int i = 1; i <= numPlayers; i++) values[i] = "" + i;
 
-        updateFromDatabase();
+        return new DefaultCellEditor(new JComboBox(values));
     }
 
     private void updateFromDatabase() {
         List<PlayerPoolInfo> newPlayers = PoolPlayerSequencer.getPlayerSequence(database, pool.getID());
 
+        seedingTable.getColumn("Seed").setCellEditor(getSeedingCellEditor(newPlayers.size()));
+
         // step 1. delete old players and update existing players
-        List<PlayerPoolInfo> deletedPlayers;
         int row = 0;
         Iterator<PlayerPoolInfo> iterator = players.iterator();
         while(iterator.hasNext()) {
             PlayerPoolInfo player = iterator.next();
             if(!newPlayers.contains(player)) {
                 model.removeRow(row);
+                seeds.remove(player);
                 iterator.remove();
             }
             else {
@@ -88,8 +114,6 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
             players.add(player);
             model.addRow(getRowData(player));
         }
-
-        
     }
 
     private Object[] getRowData(PlayerPoolInfo player) {
@@ -97,7 +121,7 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         return new Object[] {
             player.getPlayer().getLastName() + ", " + player.getPlayer().getFirstName(),
             playerDetails.getClub(),
-            player.getPlayerPool().getPlayerPosition()
+            seeds.get(player) == null ? "None" : seeds.get(player)
         };
     }
 
@@ -176,4 +200,16 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         return true;
     }
 
+    @Override
+    public void beforeShow() {
+        pool = context.pool;
+        divisionNameLabel.setText(pool.getDescription() + ": Seeding");
+        updateFromDatabase();
+        notifier.addListener(listener, Pool.class, PlayerPool.class);
+    }
+
+    @Override
+    public void afterHide() {
+        notifier.removeListener(listener);
+    }
 }

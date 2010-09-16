@@ -25,6 +25,10 @@ import org.apache.log4j.Logger;
 public class DrawWizardWindow extends javax.swing.JFrame {
     private static final Logger log = Logger.getLogger(DrawWizardWindow.class);
 
+    public class Context {
+        public Pool pool;
+    }
+
     public interface Panel {
         /*
          * All panels of the wizard must implement this interface
@@ -36,28 +40,34 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         boolean nextButtonPressed();
         boolean backButtonPressed();
         boolean closedButtonPressed();
+        void beforeShow();
+        void afterHide();
     }
 
     private CardLayout layout = new CardLayout();
     final private Panel[] panels;
     private int currentIndex;
+    private Context context = new Context();
 
     /** Creates new form DrawWizardWindow */
     public DrawWizardWindow(TransactionalDatabase database, TransactionNotifier notifier, Pool pool) {
+        context.pool = pool;
+
         panels = new Panel[] {
-            new PlayerSelectionPanel(database, notifier, pool),
-            new SeedingPanel(database, notifier, pool)
+            new PlayerSelectionPanel(database, notifier, context),
+            new SeedingPanel(database, notifier, context)
         };
 
         initComponents();
+
+        currentIndex = 0;
+        panels[0].beforeShow();
 
         contentPanel.setLayout(layout);
         int index = 0;
         for(Panel panel : panels) {
             contentPanel.add((Component) panel, String.valueOf(index++));
         }
-
-        currentIndex = 0;
 
         updateButtons();
 
@@ -71,19 +81,25 @@ public class DrawWizardWindow extends javax.swing.JFrame {
 
     private void next() {
         currentIndex++;
-        if(currentIndex < panels.length)
+        if(currentIndex < panels.length) {
+            panels[currentIndex].beforeShow();
             layout.next(contentPanel);
-        else
+            panels[currentIndex - 1].afterHide();
+        } else {
             log.warn("Next tried to go past end of available panels");
+        }
         updateButtons();
     }
 
     private void previous() {
         currentIndex--;
-        if(currentIndex >= 0)
+        if(currentIndex >= 0) {
+            panels[currentIndex].beforeShow();
             layout.previous(contentPanel);
-        else
+            panels[currentIndex + 1].afterHide();
+        } else {
             log.warn("Previous tried to go past start of available panels");
+        }
         updateButtons();
     }
 
@@ -110,6 +126,7 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         nextButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Draw Wizard");
 
         javax.swing.GroupLayout contentPanelLayout = new javax.swing.GroupLayout(contentPanel);
         contentPanel.setLayout(contentPanelLayout);
