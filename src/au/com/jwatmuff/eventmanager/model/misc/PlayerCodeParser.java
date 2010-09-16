@@ -45,7 +45,7 @@ public class PlayerCodeParser {
                 case BYE:
                     return "Bye";
                 case UNDECIDED:
-                    return code;
+                    return code + " : " + division.getDescription();
             }
             return "Error";
         }
