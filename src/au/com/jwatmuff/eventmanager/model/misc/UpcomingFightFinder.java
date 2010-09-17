@@ -7,6 +7,8 @@ package au.com.jwatmuff.eventmanager.model.misc;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.model.info.SessionInfo;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.genericdb.Database;
@@ -24,6 +26,7 @@ public class UpcomingFightFinder {
     
     public static List<Fight> findUpcomingFights(Database database, int sessionID, int numFights) throws DatabaseStateException {
         List<Fight> fights = new ArrayList<Fight>();
+        boolean isBye = false;
         
         Session session = database.get(Session.class, sessionID);
         if(session == null || session.getType() != Session.SessionType.MAT)
@@ -43,8 +46,21 @@ public class UpcomingFightFinder {
             
             List<Fight> unplayed = database.findAll(Fight.class, FightDAO.UNPLAYED_IN_SESSION, s.getID());
 
-            while(unplayed.size() > 0 && fights.size() < numFights)
-                fights.add(unplayed.remove(0));
+            while(unplayed.size() > 0 && fights.size() < numFights) {
+                isBye = false;
+                for(int i = 0; i < 2; i++) {
+                    String code = unplayed.get(0).getPlayerCodes()[i];
+                    FightPlayer fp = PlayerCodeParser.parseCode(database, code, unplayed.get(0).getPoolID());
+                    if(fp.type == PlayerType.BYE){
+                        isBye = true;
+                    }
+                }
+                if(isBye) {
+                    unplayed.remove(0);
+                } else {
+                    fights.add(unplayed.remove(0));
+                }
+            }
             
             if(fights.size() == numFights) break;
 

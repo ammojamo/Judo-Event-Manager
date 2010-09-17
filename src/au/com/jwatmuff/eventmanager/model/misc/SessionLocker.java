@@ -24,7 +24,7 @@ import au.com.jwatmuff.eventmanager.model.vo.Session.LockedStatus;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
 import au.com.jwatmuff.eventmanager.model.vo.SessionLink;
 import au.com.jwatmuff.eventmanager.model.vo.SessionPool;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
+//import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.util.IDGenerator;
