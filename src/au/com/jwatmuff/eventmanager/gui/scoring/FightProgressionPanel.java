@@ -268,6 +268,15 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
                     }
                 }
                 return;
+            } else {
+                for(int a = 0; a < numbers.length; a++){
+                    if(!numbers[a].getText().equals(""))
+                        numbers[a].setText("");
+                    if(!player1s[a].getText().equals(""))
+                        player1s[a].setText("");
+                    if(!player2s[a].getText().equals(""))
+                        player2s[a].setText("");
+                }
             }
         } catch(DatabaseStateException e) {
             log.error(e.getMessage(), e);
