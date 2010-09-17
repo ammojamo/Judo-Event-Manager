@@ -17,6 +17,7 @@ import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColorsDialog;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerTimer;
 import au.com.jwatmuff.eventmanager.model.misc.ResultRecorder;
@@ -363,7 +364,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                 if(model.getMode() == Mode.NO_FIGHT)
                     updateFightFromDatabase();
             }
-        }, SessionFight.class);        
+        }, Result.class, Fight.class, SessionFight.class, Session.class);
     }
     
     private void openSirenFile(File sirenFile) {
@@ -394,6 +395,15 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         Collection<Fight> fights;
         try {
             fights = UpcomingFightFinder.findUpcomingFights(database, mat.getID(), 1);
+            if(fights.size() > 0) {
+                Fight nextFight = fights.iterator().next();
+                for(int i=0; i<2; i++) {
+                    FightPlayer nextPlayer = PlayerCodeParser.parseCode(database, nextFight.getPlayerCodes()[i], nextFight.getPoolID());
+                    if(nextPlayer.type == PlayerType.UNDECIDED){
+                        return;
+                    }
+                }
+            }
         } catch (DatabaseStateException e) {
             log.error("Unable to get upcoming fights for mat " + mat.getMat(), e);
             return;
