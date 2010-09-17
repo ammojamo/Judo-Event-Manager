@@ -30,6 +30,7 @@ import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
@@ -54,6 +55,7 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
     ScalableLabel[] numbers;
     ScalableLabel[] player1s;
     ScalableLabel[] player2s;
+    int nowNumber;
 
 
     /** Creates new form FightProgressionPanel */
@@ -237,6 +239,24 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
     
     private void updateFightsFromDatabase() {
 
+        Collection<Fight> fights;
+        Iterator<Fight> iter;
+        int number;
+
+        try {
+            fights = UpcomingFightFinder.findUpcomingFights(database, matSession.getID(), 1);
+            if(fights.isEmpty()) return;
+            iter = fights.iterator();
+            if(!iter.hasNext()) return;
+            Fight f = iter.next();
+            SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, f.getID());
+            number = SessionFightSequencer.getFightMatInfo(database, sf).fightNumber;
+            if(nowNumber == number) return;
+        } catch (DatabaseStateException e) {
+            log.error(e.getMessage(), e);
+            return;
+        }
+
         for(int a = 0; a < numbers.length; a++){
             numbers[a].setText("");
             player1s[a].setText("");
@@ -245,17 +265,17 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
 
         try {
 
-            Collection<Fight> fights = UpcomingFightFinder.findUpcomingFights(database, matSession.getID(), numbers.length);
+            fights = UpcomingFightFinder.findUpcomingFights(database, matSession.getID(), numbers.length);
 
             if(fights.size() > 0) {
-                Iterator<Fight> iter = fights.iterator();
-                int number = 0;
+                iter = fights.iterator();
                 for(int a = 0; a < numbers.length; a++){
                     if(iter.hasNext()) {
                         Fight f = iter.next();
                         SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, f.getID());
                         number = SessionFightSequencer.getFightMatInfo(database, sf).fightNumber;
-                        numbers[a].setText("" + number++);
+                        if(a==0) nowNumber = number;
+                        numbers[a].setText("" + number);
                         player1s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString());
                         player2s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString());
                     } else {
