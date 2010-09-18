@@ -131,8 +131,42 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                 List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, f.getID());
                 if(!results.isEmpty()) {
                     int[] scores = results.get(0).getPlayerScores();
-                    c.put("fight" + i + "score1", scores[0]);
-                    c.put("fight" + i + "score2", scores[1]);
+                    c.put("fight" + i + "points1", scores[0]);
+                    c.put("fight" + i + "points2", scores[1]);
+                    switch(scores[0]) {
+                        case 1:
+                            c.put("fight" + i + "score1", "D");
+                            break;
+                        case 5:
+                            c.put("fight" + i + "score1", "Y");
+                            break;
+                        case 7:
+                            c.put("fight" + i + "score1", "W");
+                            break;
+                        case 10:
+                            c.put("fight" + i + "score1", "I");
+                            break;
+                        default:
+                            c.put("fight" + i + "score1", " ");
+                            break;
+                    }
+                    switch(scores[1]) {
+                        case 1:
+                            c.put("fight" + i + "score2", "D");
+                            break;
+                        case 5:
+                            c.put("fight" + i + "score2", "Y");
+                            break;
+                        case 7:
+                            c.put("fight" + i + "score2", "W");
+                            break;
+                        case 10:
+                            c.put("fight" + i + "score2", "I");
+                            break;
+                        default:
+                            c.put("fight" + i + "score2", " ");
+                            break;
+                    }
                 }
             }
         }
