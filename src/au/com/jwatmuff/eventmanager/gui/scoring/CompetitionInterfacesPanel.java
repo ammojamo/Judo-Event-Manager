@@ -286,6 +286,7 @@ private void scoringButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 }//GEN-LAST:event_scoringButtonActionPerformed
 
 private void scoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scoreboardButtonActionPerformed
+    if(!PermissionChecker.isAllowed(Action.SCOREBOARD_ENTRY, database)) return;
     Session mat = chooseMat("Scoreboard");
     if(mat == null) return;
     String serviceName = "scoreboard" + mat.getID();
