@@ -72,10 +72,11 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
             PlayerDetails pd = database.get(PlayerDetails.class, p.getDetailsID());
             ps.add(p);
             pds.add(pd);
+            c.put("player" + i, p.getLastName() + ", " + p.getFirstName().charAt(0) );
             if (pd.getClub() == null) {
-                c.put("player" + i, p.getLastName() + ", " + p.getFirstName().charAt(0) + " (" + p.getGrade() + ")" );
+                c.put("player" + i + "Details", "(" + p.getGrade() + ")" );
             } else {
-                c.put("player" + i, p.getLastName() + ", " + p.getFirstName().charAt(0) + " (" + p.getGrade() + ", " + pd.getClub() + ")" );
+                c.put("player" + i + "Details", "(" + p.getGrade() + ", " + pd.getClub() + ")" );
             }
         }
         while(i++ < 64) { //TODO: this should not be an arbitrary limit
