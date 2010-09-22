@@ -46,6 +46,7 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
             LICENSE_CONTACT_FIELD = "license_contact",
             DIRECTOR_NAME_FIELD = "director_name",
             DIRECTOR_CONTACT_FIELD = "director_contact",
+            DRAW_CONFIGURATION_FIELD = "draw_configuration",
             CLOSED_FIELD = "closed",
             TIMESTAMP_FIELD = "last_updated";
 
@@ -77,6 +78,7 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
             ci.setLicenseContact(rs.getString(LICENSE_CONTACT_FIELD));
             ci.setDirectorName(rs.getString(DIRECTOR_NAME_FIELD));
             ci.setDirectorContact(rs.getString(DIRECTOR_CONTACT_FIELD));
+            ci.setDrawConfiguration(rs.getString(DRAW_CONFIGURATION_FIELD));
             ci.setClosed(rs.getBoolean(CLOSED_FIELD));
             ci.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             return ci;
@@ -85,8 +87,8 @@ public class SQLiteCompetitionDAO implements CompetitionDAO {
     
     @Override
     public void add(CompetitionInfo ci) {
-        final String sql = "INSERT INTO competition (id, name, location, start_date, end_date, age_threshold_date, mats, password_hash, wi_password_hash, pd_password_hash, sb_password_hash, license_name, license_type, license_contact, director_name, director_contact, closed, last_updated) VALUES " +
-                "(:ID, :name, :location, :startDate, :endDate, :ageThresholdDate, :mats, :passwordHash, :weighInPasswordHash, :personalDetailsPasswordHash, :scoreboardPasswordHash, :licenseName, :licenseType, :licenseContact, :directorName, :directorContact, :closed, :timestamp)";
+        final String sql = "INSERT INTO competition (id, name, location, start_date, end_date, age_threshold_date, mats, password_hash, wi_password_hash, pd_password_hash, sb_password_hash, license_name, license_type, license_contact, director_name, director_contact, draw_configuration, closed, last_updated) VALUES " +
+                "(:ID, :name, :location, :startDate, :endDate, :ageThresholdDate, :mats, :passwordHash, :weighInPasswordHash, :personalDetailsPasswordHash, :scoreboardPasswordHash, :licenseName, :licenseType, :licenseContact, :directorName, :directorContact, :drawConfiguration, :closed, :timestamp)";
         
         if(get(null) != null) {
             log.error("Cannot open a competition - a competition is already open.");

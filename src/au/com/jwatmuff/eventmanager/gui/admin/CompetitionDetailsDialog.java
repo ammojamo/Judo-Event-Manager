@@ -9,6 +9,7 @@ package au.com.jwatmuff.eventmanager.gui.admin;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
 import au.com.jwatmuff.eventmanager.gui.pool.PoolDetailsDialog;
+import au.com.jwatmuff.eventmanager.model.draw.DrawConfiguration;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.permissions.Action;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -65,7 +67,9 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         this.notifier = notifier;
         this.licenseManager = licenseManager;
         initComponents();
-        
+
+        drawConfigurationComboBox.setModel(new DefaultComboBoxModel(DrawConfiguration.getDrawConfigurationNames()));
+
         this.setLocationRelativeTo(parent);
         
         compInfo = database.get(CompetitionInfo.class, null);
@@ -155,6 +159,11 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             licenseNameLabel.setText(ci.getLicenseName());
             licenseTypeLabel.setText(ci.getLicenseType());
             licenseContactLabel.setText(ci.getLicenseContact());
+            drawConfigurationComboBox.setSelectedItem(ci.getDrawConfiguration());
+            // if the draw configuration does not exist, default to the first item in the list,
+            // which is expected to be the 'default' draw configuration
+            if(drawConfigurationComboBox.getSelectedIndex() < 0)
+                drawConfigurationComboBox.setSelectedIndex(0);
         }
     }
  
@@ -255,6 +264,8 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         directorContactTextField = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         ageThresholdDatePicker = new com.michaelbaranov.microba.calendar.DatePicker();
+        jLabel11 = new javax.swing.JLabel();
+        drawConfigurationComboBox = new javax.swing.JComboBox();
         jPanel1 = new javax.swing.JPanel();
         addPoolButton = new javax.swing.JButton();
         deletePoolButton = new javax.swing.JButton();
@@ -312,6 +323,8 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
 
         ageThresholdDatePicker.setToolTipText("Competitor's ages will be calculated on this date");
 
+        jLabel11.setText("Draw Configuration");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -340,13 +353,17 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(directorNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel6)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel11))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(directorContactTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(directorContactTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                            .addComponent(drawConfigurationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
-        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel10, jLabel2, jLabel3, jLabel4, jLabel5, jLabel6});
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel10, jLabel11, jLabel2, jLabel3, jLabel4, jLabel5, jLabel6});
 
         jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {ageThresholdDatePicker, finishDatePicker, startDatePicker});
 
@@ -381,7 +398,11 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(directorContactTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(222, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(drawConfigurationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(196, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("General", jPanel2);
@@ -702,6 +723,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             comp.setAgeThresholdDate(ageThresholdDatePicker.getDate());
             comp.setDirectorContact(directorContactTextField.getText().trim());
             comp.setDirectorName(directorNameTextField.getText().trim());
+            comp.setDrawConfiguration((String)drawConfigurationComboBox.getSelectedItem());
             
             if(!PermissionChecker.isAllowed(Action.UPDATE_COMPETITION_DETAILS, database))
                 return;
@@ -760,12 +782,14 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     private javax.swing.JButton deletePoolButton;
     private javax.swing.JTextField directorContactTextField;
     private javax.swing.JTextField directorNameTextField;
+    private javax.swing.JComboBox drawConfigurationComboBox;
     private javax.swing.JButton editPoolButton;
     private javax.swing.JButton enterLicenseKeyButton;
     private com.michaelbaranov.microba.calendar.DatePicker finishDatePicker;
     private javax.swing.JButton importButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

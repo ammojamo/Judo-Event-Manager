@@ -10,6 +10,7 @@ import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
+import au.com.jwatmuff.eventmanager.model.draw.DrawConfiguration;
 import au.com.jwatmuff.eventmanager.model.info.FightInfo;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
@@ -20,6 +21,7 @@ import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
+import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
@@ -37,14 +39,12 @@ import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
@@ -60,16 +60,12 @@ import org.apache.log4j.Logger;
 public class FightOrderPanel extends javax.swing.JPanel {
     private static final Logger log = Logger.getLogger(FightOrderPanel.class);
 
-    private static final String DEFAULT_IMPORT_FILE ="resources/draw/default-files.properties";
-
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
     
     private LockedPoolListTableModel poolTableModel;
     private PlayerTableModel playerTableModel;
     private FightTableModel fightTableModel;
-
-    private Properties defaultImportFiles = new Properties();
 
     private JFrame parentWindow;
 
@@ -297,17 +293,6 @@ public class FightOrderPanel extends javax.swing.JPanel {
         public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
             updateTableFromDatabase();
         }
-    }
-
-    private Properties getDefaultImportFiles() {
-        if(defaultImportFiles.isEmpty()) {
-            try {
-                defaultImportFiles.load(new FileReader(DEFAULT_IMPORT_FILE));
-            } catch(Exception e) {
-                log.error("Unable to load default import files at " + DEFAULT_IMPORT_FILE);
-            }
-        }
-        return defaultImportFiles;
     }
     
     /** This method is called from within the constructor to
@@ -546,32 +531,22 @@ public class FightOrderPanel extends javax.swing.JPanel {
         } catch(DatabaseStateException e) {
             GUIUtils.displayError(parentWindow, e.getMessage());
         }*/
-
-        String fileName = null;
+        CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        DrawConfiguration dc = DrawConfiguration.getDrawConfiguration(ci.getDrawConfiguration());
+        if(dc == null) {
+            GUIUtils.displayMessage(parentWindow, "Could not load a valid draw configuration.\nPlease set a draw configuration in Competition Details or assign draws manually", "Auto Assign");
+            return;
+        }
 
         int numPlayers = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true).size();            
         if(numPlayers < 1) {
             GUIUtils.displayMessage(parentWindow, "At least 1 player is required to generate a fight draw.", "Auto Assign");
             return;
         }
-        else if(getDefaultImportFiles().containsKey("" + numPlayers))
-            fileName = getDefaultImportFiles().getProperty("" + numPlayers);
-        else if(numPlayers <= 2)
-            fileName = "roundrobin2";
-        else if(numPlayers <= 3)
-            fileName = "roundrobin3";
-        else if(numPlayers == 4)
-            fileName = "roundrobin4";
-        else if(numPlayers == 5)
-            fileName = "roundrobin5";
-        else if(numPlayers <= 8)
-            fileName = "repechage8";
-        else if(numPlayers <= 16)
-            fileName = "repechage16";
-        else if(numPlayers <= 32)
-            fileName = "repechage32";
-        else {
-            GUIUtils.displayMessage(parentWindow, "Too many players to generate a fight draw automatically.", "Auto Assign");
+
+        String fileName = dc.getDrawName(numPlayers);
+        if(fileName == null) {
+            GUIUtils.displayMessage(parentWindow, "The draw configuration " + dc.getName() + " does not support divisions with " + numPlayers + " players", "Auto Assign");
             return;
         }
 

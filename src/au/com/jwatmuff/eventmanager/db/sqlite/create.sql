@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS competition (
   license_contact VARCHAR(255),
   director_name VARCHAR(255),
   director_contact VARCHAR(255),
+  draw_configuration VARCHAR(255),
   closed BOOL NOT NULL DEFAULT 'false',
   last_updated TIME NOT NULL
 );

@@ -35,6 +35,8 @@ public class CompetitionInfo extends DistributableObject<Integer> implements Ser
     private String licenseContact;
     private String directorName;
     private String directorContact;
+
+    private String drawConfiguration;
     
     private boolean closed;
     
@@ -169,5 +171,13 @@ public class CompetitionInfo extends DistributableObject<Integer> implements Ser
 
     public void setDirectorContact(String directorContact) {
         this.directorContact = directorContact;
+    }
+
+    public String getDrawConfiguration() {
+        return drawConfiguration;
+    }
+
+    public void setDrawConfiguration(String drawConfiguration) {
+        this.drawConfiguration = drawConfiguration;
     }
 }
