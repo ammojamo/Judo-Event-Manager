@@ -21,12 +21,15 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author James
  */
 public class PoolPlayerSequencer {
+    private static final Logger log = Logger.getLogger(PoolPlayerSequencer.class);
+
     private static Map<Database, PoolPlayerSequencer> instances = new HashMap<Database, PoolPlayerSequencer>();
     
     /*
@@ -137,7 +140,7 @@ public class PoolPlayerSequencer {
         // create a new list with null entries so that player pool position reflects
         // the index of each player in the list
         List<PlayerPoolInfo> newPlayers = new ArrayList<PlayerPoolInfo>();
-        int index = 0;
+        int index = 1;
         for(PlayerPoolInfo player : players) {
             while(index < player.getPlayerPool().getPlayerPosition()) {
                 newPlayers.add(null);
@@ -146,6 +149,13 @@ public class PoolPlayerSequencer {
             newPlayers.add(player);
             index++;
         }
+
+        // finally, insert any additional nulls to make the length of the list
+        // equal to the number of player positions in the pool
+        int numPlayerPositions = getNumberOfPlayerPositions(database, poolID);
+        for(; index <= numPlayerPositions; index++)
+            newPlayers.add(null);
+
         return newPlayers;
     }
     
@@ -169,4 +179,20 @@ public class PoolPlayerSequencer {
         });
     }
 
+    public static int getNumberOfPlayerPositions(Database database, int poolID) {
+        List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
+        int max = 0;
+        for(Fight fight : fights) {
+            for(String code : fight.getPlayerCodes()) {
+                if(code.startsWith("P")) {
+                    try {
+                        max = Math.max(max, Integer.parseInt(code.substring(1)));
+                    } catch(NumberFormatException e) {
+                        log.warn("Number format exception while parsing code: " + code);
+                    }
+                }
+            }
+        }
+        return max;
+    }
 }

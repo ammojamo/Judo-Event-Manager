@@ -84,7 +84,12 @@ public class PlayerCodeParser {
         FightPlayer fp = new FightPlayer();
 
         fp.code = code;
-        fp.division = players.get(0).getPool();
+        for(PlayerPoolInfo player : players) {
+            if(player != null) {
+                fp.division = player.getPool();
+                break;
+            }
+        }
         
         String prefix = getPrefix(code);
         int number = getNumber(code);
@@ -111,48 +116,27 @@ public class PlayerCodeParser {
         
         while(prefix.length() > 0) {
             if(!fight.resultKnown()) {
+                // This handles fights with a bye player, and always returns the
+                // bye player as the loser and the real player as the winner.
+
+                // This only works to one level. A failing example: if the code is LW3, and the
+                // one of the players in fight 3 is guaranteed to be a bye player
+                // (e.g. the result of a fight between two bye players in a previous round)
+                // then this will return 'undecided' even though the result could be
+                // known.
                 String[] codes = fight.getAllPlayerCode();
-                FightPlayer player0 = parseCode(codes[0], fights, players);
-                FightPlayer player1 = parseCode(codes[1], fights, players);
-                if (player0.type == PlayerType.BYE){
-                    if(prefix.equals("W"))
-                        return player1;
-
-                    if(prefix.equals("L"))
-                        return player0;
-
-                    switch(prefix.charAt(prefix.length()-1)) {
-                        case 'W':
-                            code = codes[1];
-                            break;
-                        case 'L':
-                            code = codes[0];
-                            break;
-                        default:
-                            fp.type = PlayerType.ERROR;
-                            return fp;
+                FightPlayer[] fightPlayers = new FightPlayer[] {
+                    parseCode(codes[0], fights, players),
+                    parseCode(codes[1], fights, players)
+                };
+                for(int i = 0; i < 2; i++) {
+                    int j = 1 - 1; // other player
+                    if(fightPlayers[i].type == PlayerType.BYE) {
+                        if(prefix.equals("W")) return fightPlayers[j];
+                        if(prefix.equals("L")) return fightPlayers[i];
                     }
-                } else if(player1.type == PlayerType.BYE) {
-                    if(prefix.equals("W"))
-                        return player0;
-
-                    if(prefix.equals("L"))
-                        return player1;
-
-                    switch(prefix.charAt(prefix.length()-1)) {
-                        case 'W':
-                            code = codes[0];
-                            break;
-                        case 'L':
-                            code = codes[1];
-                            break;
-                        default:
-                            fp.type = PlayerType.ERROR;
-                            return fp;
-                    }
-                } else {
-                    fp.type = PlayerType.UNDECIDED;
                 }
+                fp.type = PlayerType.UNDECIDED;
                 return fp;
             }
         
@@ -220,4 +204,3 @@ public class PlayerCodeParser {
         return PlayerCodeParser.getInstance(database, poolID).parseCode(code);
     }
 }
-
