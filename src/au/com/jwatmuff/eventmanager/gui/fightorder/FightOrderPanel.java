@@ -11,16 +11,10 @@ import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.model.draw.DrawConfiguration;
-import au.com.jwatmuff.eventmanager.model.info.FightInfo;
-import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter.TooFewPlayersException;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
-import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
@@ -38,11 +32,8 @@ import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
-import java.beans.Beans;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,13 +103,24 @@ public class FightOrderPanel extends javax.swing.JPanel {
         });
         
         /**** Set up player table ****/
-        playerTableModel = new PlayerTableModel(notifier);
+        playerTableModel = new PlayerTableModel(database, notifier) {
+            @Override
+            public Pool getPool() {
+                return getSelectedPool();
+            }
+        };
         playerTable.setModel(playerTableModel);
         playerTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         
         /**** Set up fight table ****/
-        fightTableModel = new FightTableModel(notifier);
+        fightTableModel = new FightTableModel(database, notifier) {
+            @Override
+            public Pool getPool() {
+                return getSelectedPool();
+            }
+        };
+
         fightTable.setModel(fightTableModel);
         fightTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fightTableModel.updateFromDatabase();
@@ -136,127 +138,6 @@ public class FightOrderPanel extends javax.swing.JPanel {
             return null;
         }
         
-    }
-
-    private class FightTableModel extends BeanMapperTableModel<Fight> implements TransactionListener {
-        private List<FightInfo> fi;
-        private List<PlayerPoolInfo> ppi;
-        
-        public FightTableModel(TransactionNotifier notifier) {
-            notifier.addListener(this, Fight.class);
-
-            setBeanMapper(new BeanMapper<Fight>() {
-                @Override
-                public Map<String, Object> mapBean(Fight bean) {
-                    Map<String, Object> map = new HashMap<String, Object>();
-                    map.put("position", bean.getPosition());
-
-                    for(int i = 0; i < 2; i++) {
-                        String code = bean.getPlayerCodes()[i];
-                        FightPlayer fp = PlayerCodeParser.parseCode(code, fi, ppi);
-                        if(fp.type == PlayerType.NORMAL)
-                          map.put("player" + (i+1), code + ": " + fp.toString());
-                        else
-                          map.put("player" + (i+1), code + ": " + fp.type);
-                    }
-
-                    return map;
-                }
-            });
-            addColumn("Sequence #", "position");
-            addColumn("Player 1", "player1");
-            addColumn("Player 2", "player2");
-        }
-
-        public void updateFromDatabase() {
-            Pool pool = getSelectedPool();
-            if(pool != null) {
-                fi = FightInfo.getFightInfo(database, pool.getID());
-                ppi = PoolPlayerSequencer.getPlayerSequence(database, pool.getID());
-                Collection<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID());
-                setBeans(fights);
-            }
-        }
-
-        @Override
-        public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
-            updateFromDatabase();
-        }
-    }
-    
-    private class PlayerTableModel extends BeanMapperTableModel<PlayerPoolInfo> implements TransactionListener {
-        private List<PlayerPoolInfo> players = new ArrayList<PlayerPoolInfo>();
-
-        public PlayerTableModel(TransactionNotifier notifier) {
-            super();
-            notifier.addListener(this, Pool.class, PlayerPool.class, Player.class);
-            setBeanMapper(new BeanMapper<PlayerPoolInfo> () {
-                @Override
-                public Map<String, Object> mapBean(PlayerPoolInfo bean) {
-                    Map<String,Object> map = new HashMap<String, Object>();
-                    if(bean != null) {
-                        map.put("name", "P" + bean.getPlayerPool().getPlayerPosition() + ": "+ bean.getPlayer().getFirstName() + " " + bean.getPlayer().getLastName());
-                    } else {
-                        map.put("name", "P" + getBeans().indexOf(bean));
-                    }
-                    return map;
-                } 
-            });
-            addColumn("Player", "name");
-        }
-        
-        public void updateFromDatabase() {
-            Pool pool = getSelectedPool();
-            if(pool != null) {
-                //Collection<Player> players = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true);
-                players = PoolPlayerSequencer.getPlayerSequence(database, pool.getID());
-                setBeans(players);
-            }
-        }
-
-        public void shuffle() {
-            Pool pool = getSelectedPool();
-            if(pool == null) return;
-            int poolID = pool.getID();
-
-            Collections.shuffle(players);
-            PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
-        }
-        
-        public void moveUp(int index) {
-            Pool pool = getSelectedPool();
-            if(pool == null) return;
-            int poolID = pool.getID();
-            
-            if((index > 0) && (index < players.size())) {
-                Collections.swap(players, index, index - 1);
-                PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
-            }
-        }
-        
-        public void moveDown(int index) {
-            Pool pool = getSelectedPool();
-            if(pool == null) return;
-            int poolID = pool.getID();
-
-            if((index >= 0) && (index < players.size()-1)) {
-                Collections.swap(players, index, index+1);
-                PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
-            }
-        }
-        
-        public void savePlayerSequence() {
-            Pool pool = getSelectedPool();
-            if(pool == null) return;
-            int poolID = pool.getID();
-
-            PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
-        }
-        
-        @Override
-        public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
-           updateFromDatabase();
-        }
     }
     
     private class LockedPoolListTableModel extends BeanMapperTableModel<Pool> implements TransactionListener {
