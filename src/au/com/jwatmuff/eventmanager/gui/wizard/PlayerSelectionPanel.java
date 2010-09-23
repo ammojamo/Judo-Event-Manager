@@ -96,8 +96,6 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 // TODO: this seems to get called twice when a team is selected and i'm not sure why
-                log.debug("playerSelectionListener: selectionChanged");
-
                 final List<PlayerPool> playerPoolsToUpdate = new ArrayList<PlayerPool>();
                 if(e.getFirstIndex() < 0 || e.getLastIndex() < 0)
                     return;
@@ -219,7 +217,6 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         }
 
         // register for list selection events to detect when players are ticked
-        log.debug("adding list selection listener: " + playerSelectionListener);
         playerSelectionModel.addListSelectionListener(playerSelectionListener);
     }
 
@@ -560,7 +557,6 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     }// </editor-fold>//GEN-END:initComponents
 
     private void teamListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_teamListValueChanged
-        log.debug("teamListValueChanged");
         updateEligiblePlayerList();
         updatePlayerList();
     }//GEN-LAST:event_teamListValueChanged
