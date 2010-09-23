@@ -11,33 +11,46 @@
 
 package au.com.jwatmuff.eventmanager.gui.wizard;
 
+import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
+import au.com.jwatmuff.eventmanager.model.draw.DrawConfiguration;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
+import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
+import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
+import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author James
  */
 public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow.Panel {
+    private static final Logger log = Logger.getLogger(SeedingPanel.class);
+
     private DefaultTableModel model;
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
@@ -125,6 +138,62 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         };
     }
 
+    private int getNumberOfPlayerPositions() {
+        List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID());
+        int max = 0;
+        for(Fight fight : fights) {
+            for(String code : fight.getPlayerCodes()) {
+                if(code.startsWith("P")) {
+                    try {
+                        max = Math.max(max, Integer.parseInt(code.substring(1)));
+                    } catch(NumberFormatException e) {
+                        log.warn("Number format exception while parsing code: " + code);
+                    }
+                }
+            }
+        }
+        return max;
+    }
+
+    private List<PlayerPoolInfo> orderPlayers() {
+        /********************************************************************************/
+        /* Ordering of players based on seeds - TODO: it might be possible to simplify this */
+        /* TODO: if this code needs to be used elsewhere, it should be moved to a shared utility class */
+        /********************************************************************************/
+
+        int numPlayers = getNumberOfPlayerPositions();
+
+        // create a list of all players, unordered
+        List<PlayerPoolInfo> unorderedPlayers = new ArrayList<PlayerPoolInfo>(players);
+        // add null (bye) players to fill in all available position in the
+        while(unorderedPlayers.size() < numPlayers)
+            unorderedPlayers.add(null);
+        // create a list to hold the players after they have been
+        List<PlayerPoolInfo> orderedPlayers = new ArrayList<PlayerPoolInfo>();
+
+        // get the set of all seeds specified, in order from lowest to highest
+        List<Integer> seedSet = new ArrayList<Integer>();
+        for(Integer seed : seeds.values())
+            if(seed != null && !seedSet.contains(seed)) seedSet.add(seed);
+        Collections.sort(seedSet);
+
+        // build up ordered list of players from those players that had seeds specified
+        for(Integer seed : seedSet) {
+            for(PlayerPoolInfo player : seeds.keySet()) {
+                if(seeds.get(player) == seed) {
+                    unorderedPlayers.remove(player);
+                    orderedPlayers.add(player);
+                }
+            }
+        }
+
+        // randomize remaining unordered players, and add them to the ordered players
+        Collections.shuffle(unorderedPlayers);
+        orderedPlayers.addAll(unorderedPlayers);
+
+        return orderedPlayers;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -187,6 +256,34 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
 
     @Override
     public boolean nextButtonPressed() {
+        CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        DrawConfiguration drawConfig = DrawConfiguration.getDrawConfiguration(ci.getDrawConfiguration());
+        if(drawConfig == null) {
+            GUIUtils.displayError(this, "Unable to load draw configuration.");
+            return false;
+        }
+
+        String drawName = drawConfig.getDrawName(players.size());
+        if(drawName == null) {
+            GUIUtils.displayError(this, "The current draw configuration does not support divisions with " + players.size() + " players");
+            return false;
+        }
+
+        File csvFile = new File("resources/draw/" + drawName + ".csv");
+
+        try {
+            CSVImporter.importFightDraw(csvFile, database, pool, players.size());
+        } catch(Exception e) {
+            GUIUtils.displayError(this, "Failed to import fight draw (" + drawName + ")");
+            log.error("Error importing fight draw", e);
+        }
+
+        // construct list of ordered players based on seeds, with null entries to
+        // represent bye players
+        List<PlayerPoolInfo> orderedPlayers = orderPlayers();
+
+        PoolPlayerSequencer.savePlayerSequence(database, pool.getID(), orderedPlayers);
+
         return true;
     }
 
