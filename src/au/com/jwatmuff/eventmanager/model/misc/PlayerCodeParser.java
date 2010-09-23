@@ -93,6 +93,9 @@ public class PlayerCodeParser {
             if(players.size() < number) {
                 fp.type = PlayerType.BYE;
                 return fp;
+            } else if(players.get(number-1) == null) {
+                fp.type = PlayerType.BYE;
+                return fp;
             } else {
                 fp.type = PlayerType.NORMAL;
                 fp.player = players.get(number-1).getPlayer();

@@ -133,8 +133,20 @@ public class PoolPlayerSequencer {
                 return pp1.getPlayerPool().getPlayerPosition() - pp2.getPlayerPool().getPlayerPosition();
             }
         });
-        
-        return players;
+
+        // create a new list with null entries so that player pool position reflects
+        // the index of each player in the list
+        List<PlayerPoolInfo> newPlayers = new ArrayList<PlayerPoolInfo>();
+        int index = 0;
+        for(PlayerPoolInfo player : players) {
+            while(index < player.getPlayerPool().getPlayerPosition()) {
+                newPlayers.add(null);
+                index++;
+            }
+            newPlayers.add(player);
+            index++;
+        }
+        return newPlayers;
     }
     
     public static void savePlayerSequence(final TransactionalDatabase database, int poolID, final List<PlayerPoolInfo> players) {
@@ -145,10 +157,12 @@ public class PoolPlayerSequencer {
                 int pos = 0;
                 for(PlayerPoolInfo player : players) {
                     pos++;
-                    PlayerPool pp = player.getPlayerPool();
-                    if(pp.getPlayerPosition() != pos) {
-                        pp.setPlayerPosition(pos);
-                        database.update(pp);
+                    if(player != null) {
+                        PlayerPool pp = player.getPlayerPool();
+                        if(pp.getPlayerPosition() != pos) {
+                            pp.setPlayerPosition(pos);
+                            database.update(pp);
+                        }
                     }
                 }
             }

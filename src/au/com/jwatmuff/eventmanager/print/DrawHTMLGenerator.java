@@ -68,6 +68,10 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
         int i = 0;
         for(PlayerPoolInfo player : PoolPlayerSequencer.getPlayerSequence(database, poolID)) {
             i++;
+            if(player == null) {
+                c.put("player" + i, "BYE");
+                continue;
+            }
             Player p = player.getPlayer();
             PlayerDetails pd = database.get(PlayerDetails.class, p.getDetailsID());
             ps.add(p);

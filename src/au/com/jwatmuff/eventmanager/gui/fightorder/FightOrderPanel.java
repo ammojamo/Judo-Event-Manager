@@ -38,6 +38,7 @@ import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
+import java.beans.Beans;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -193,7 +194,11 @@ public class FightOrderPanel extends javax.swing.JPanel {
                 @Override
                 public Map<String, Object> mapBean(PlayerPoolInfo bean) {
                     Map<String,Object> map = new HashMap<String, Object>();
-                    map.put("name", "P" + bean.getPlayerPool().getPlayerPosition() + ": "+ bean.getPlayer().getFirstName() + " " + bean.getPlayer().getLastName());
+                    if(bean != null) {
+                        map.put("name", "P" + bean.getPlayerPool().getPlayerPosition() + ": "+ bean.getPlayer().getFirstName() + " " + bean.getPlayer().getLastName());
+                    } else {
+                        map.put("name", "P" + getBeans().indexOf(bean));
+                    }
                     return map;
                 } 
             });
