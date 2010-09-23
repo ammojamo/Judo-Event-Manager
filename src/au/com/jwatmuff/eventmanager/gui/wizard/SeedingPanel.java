@@ -32,11 +32,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
@@ -57,7 +55,7 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     private TransactionListener listener;
     private Pool pool;
     private List<PlayerPoolInfo> players = new ArrayList<PlayerPoolInfo>();
-    private Map<PlayerPoolInfo, Integer> seeds = new HashMap<PlayerPoolInfo, Integer>();
+    private Map<Integer, Integer> seeds = new HashMap<Integer, Integer>();
     private Context context;
 
     /** Creates new form SeedingPanel */
@@ -99,42 +97,29 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     }
 
     private void updateFromDatabase() {
-        List<PlayerPoolInfo> newPlayers = PoolPlayerSequencer.getPlayerSequence(database, pool.getID());
+        players = new ArrayList<PlayerPoolInfo>();
+        // filter out the null entries
+        for(PlayerPoolInfo player : PoolPlayerSequencer.getPlayerSequence(database, pool.getID()))
+            if(player != null)
+                players.add(player);
 
-        seedingTable.getColumn("Seed").setCellEditor(getSeedingCellEditor(newPlayers.size()));
+        seedingTable.getColumn("Seed").setCellEditor(getSeedingCellEditor(players.size()));
 
-        // step 1. delete old players and update existing players
-        int row = 0;
-        Iterator<PlayerPoolInfo> iterator = players.iterator();
-        while(iterator.hasNext()) {
-            PlayerPoolInfo player = iterator.next();
-            if(!newPlayers.contains(player)) {
-                model.removeRow(row);
-                seeds.remove(player);
-                iterator.remove();
-            }
-            else {
-                Object[] rowData = getRowData(player);
-                for(int col = 0; col < 3; col++)
-                    model.setValueAt(rowData[col], row, col);
-                row++;
-                newPlayers.remove(player);
-            }
-        }
-        
-        // step 2. add any new players
-        for(PlayerPoolInfo player : newPlayers) {
-            players.add(player);
+        // clear table
+        while(model.getRowCount() > 0) model.removeRow(0);
+
+        for(PlayerPoolInfo player : players) {
             model.addRow(getRowData(player));
         }
     }
 
     private Object[] getRowData(PlayerPoolInfo player) {
         PlayerDetails playerDetails = database.get(PlayerDetails.class, player.getPlayer().getDetailsID());
+        int playerID = player.getPlayer().getID();
         return new Object[] {
             player.getPlayer().getLastName() + ", " + player.getPlayer().getFirstName(),
             playerDetails.getClub(),
-            seeds.get(player) == null ? "None" : seeds.get(player)
+            seeds.get(playerID) == null ? "None" : "" + seeds.get(playerID)
         };
     }
 
@@ -153,6 +138,13 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
             }
         }
         return max;
+    }
+
+    private PlayerPoolInfo getPlayerById(int id) {
+        for(PlayerPoolInfo player : players)
+            if(player != null && player.getPlayer().getID() == id)
+                return player;
+        return null;
     }
 
     private List<PlayerPoolInfo> orderPlayers() {
@@ -174,13 +166,16 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         // get the set of all seeds specified, in order from lowest to highest
         List<Integer> seedSet = new ArrayList<Integer>();
         for(Integer seed : seeds.values())
-            if(seed != null && !seedSet.contains(seed)) seedSet.add(seed);
+            if(seed != null && !seedSet.contains(seed))
+                seedSet.add(seed);
+
         Collections.sort(seedSet);
 
         // build up ordered list of players from those players that had seeds specified
         for(Integer seed : seedSet) {
-            for(PlayerPoolInfo player : seeds.keySet()) {
-                if(seeds.get(player) == seed) {
+            for(Integer playerID : seeds.keySet()) {
+                if(seeds.get(playerID) == seed) {
+                    PlayerPoolInfo player = getPlayerById(playerID);
                     unorderedPlayers.remove(player);
                     orderedPlayers.add(player);
                 }
@@ -256,6 +251,24 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
 
     @Override
     public boolean nextButtonPressed() {
+        // TODO: this shouldn't be done here, the seeds map should be updated
+        // every time the user changes a seed, otherwise all seeds will be lost
+        // if there is a database update.
+        // populate seeds map:
+        int index = 0;
+        for(PlayerPoolInfo player : players) {
+            if(player != null) {
+                String seed = (String)seedingTable.getModel().getValueAt(index, 2);
+                try {
+                    seeds.put(player.getPlayer().getID(), Integer.parseInt(seed));
+                } catch(NumberFormatException e) {
+                    // do nothing, just means no seed specified
+                }
+                index++;
+            }
+        }
+        // end TODO
+
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         DrawConfiguration drawConfig = DrawConfiguration.getDrawConfiguration(ci.getDrawConfiguration());
         if(drawConfig == null) {
