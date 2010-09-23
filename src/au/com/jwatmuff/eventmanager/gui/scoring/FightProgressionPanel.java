@@ -30,6 +30,7 @@ import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
@@ -54,7 +55,6 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
     ScalableLabel[] numbers;
     ScalableLabel[] player1s;
     ScalableLabel[] player2s;
-
 
     /** Creates new form FightProgressionPanel */
     public FightProgressionPanel(Session matSession, boolean displayMatName, int layoutType, int noVertCells, int noHorizCells, double screenHight, double screenWidth) {
@@ -237,32 +237,46 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
     
     private void updateFightsFromDatabase() {
 
-        for(int a = 0; a < numbers.length; a++){
-            numbers[a].setText("");
-            player1s[a].setText("");
-            player2s[a].setText("");
-        }
+        Collection<Fight> fights;
+        Iterator<Fight> iter;
+        int number;
 
         try {
 
-            Collection<Fight> fights = UpcomingFightFinder.findUpcomingFights(database, matSession.getID(), numbers.length);
+            fights = UpcomingFightFinder.findUpcomingFights(database, matSession.getID(), numbers.length);
 
             if(fights.size() > 0) {
-                Iterator<Fight> iter = fights.iterator();
-                int number = 0;
+                iter = fights.iterator();
                 for(int a = 0; a < numbers.length; a++){
                     if(iter.hasNext()) {
                         Fight f = iter.next();
                         SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, f.getID());
                         number = SessionFightSequencer.getFightMatInfo(database, sf).fightNumber;
-                        numbers[a].setText("" + number++);
-                        player1s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString());
-                        player2s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString());
+                        if(!numbers[a].getText().equals("" + number))
+                            numbers[a].setText("" + number);
+                        if(!player1s[a].getText().equals(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString()))
+                            player1s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString());
+                        if(!player2s[a].getText().equals(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString()))
+                            player2s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString());
                     } else {
-                        return;
+                        if(!numbers[a].getText().equals(""))
+                            numbers[a].setText("");
+                        if(!player1s[a].getText().equals(""))
+                            player1s[a].setText("");
+                        if(!player2s[a].getText().equals(""))
+                            player2s[a].setText("");
                     }
                 }
                 return;
+            } else {
+                for(int a = 0; a < numbers.length; a++){
+                    if(!numbers[a].getText().equals(""))
+                        numbers[a].setText("");
+                    if(!player1s[a].getText().equals(""))
+                        player1s[a].setText("");
+                    if(!player2s[a].getText().equals(""))
+                        player2s[a].setText("");
+                }
             }
         } catch(DatabaseStateException e) {
             log.error(e.getMessage(), e);

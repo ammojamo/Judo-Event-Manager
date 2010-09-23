@@ -5,10 +5,14 @@
 
 package au.com.jwatmuff.eventmanager.model.cache;
 
+import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
@@ -20,11 +24,13 @@ import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -76,21 +82,53 @@ public class DivisionResultCache {
     }
     
     private boolean fightsCompleted(int poolID) {
-        for(Fight f : database.findAll(Fight.class, FightDAO.FOR_POOL, poolID))
-            if(database.findAll(Result.class, ResultDAO.FOR_FIGHT, f.getID()).size() == 0)
-                return false;
-
+        boolean isBye;
+        for(Fight f : database.findAll(Fight.class, FightDAO.FOR_POOL, poolID)) {
+            if(database.findAll(Result.class, ResultDAO.FOR_FIGHT, f.getID()).isEmpty()) {
+                isBye = false;
+                for(int i = 0; i < 2; i++) {
+                    String code = f.getPlayerCodes()[i];
+                    FightPlayer fp;
+// todo Leonard: Why do I need this try catch when I didin't need it before, I also needed the import bla.misc.PlayerCodeParser bit when I didn't need it before
+                    try {
+                        fp = PlayerCodeParser.parseCode(database, code, f.getPoolID());
+                        if(fp.type == PlayerType.BYE){
+                            isBye = true;
+                        }
+                    } catch (DatabaseStateException ex) {
+                        java.util.logging.Logger.getLogger(DivisionResultCache.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                if(!isBye) {
+                    return false;
+                }
+//                return false;
+            }
+        }
         return true;
     }
     
     private List<PlayerScore> getScores(int poolID) {
         List<PlayerScore> scores = new ArrayList<PlayerScore>();
-        
+        Collection<Player> players = database.findAll(Player.class, PlayerDAO.FOR_POOL, poolID, true);
         Map<Integer, Integer> playerScores = new HashMap<Integer, Integer>();
-        
+        if(players.size() == 1) {
+//        To handle when a single player is in a division with a locked draw
+            Player player = players.iterator().next();
+            int playerID = player.getID();
+            playerScores.put(playerID, 1);
+        } else {
+//        Initialises all player names
+            for (Player player : players) {
+                int playerID = player.getID();
+                if(!playerScores.containsKey(playerID))
+                    playerScores.put(playerID, 0);
+            }
+        }
+
         for(Fight f : database.findAll(Fight.class, FightDAO.FOR_POOL, poolID)) {
             List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, f.getID());
-            if(results.size() == 0) continue;
+            if(results.isEmpty()) continue;
 
             try {
                 ResultInfo ri = riCache.getResultInfo(results.iterator().next().getID());
@@ -142,6 +180,8 @@ public class DivisionResultCache {
         if(!fightsCompleted(poolID)) return drs;
         
         List<PlayerScore> scores = getScores(poolID);
+
+        if(scores.isEmpty()) return drs;
         
         Collections.sort(scores, new Comparator<PlayerScore>(){
             @Override
@@ -156,7 +196,7 @@ public class DivisionResultCache {
         boolean done = false;
         for(int place = 1; place <= 3; place++) {
             while(true) {
-                PlayerScore score = scores.get(i++);
+                PlayerScore score = scores.get(i++); //this is what is killing it
                 if(score.score == 0) { done = true; break; }
                 DivisionResult dr = new DivisionResult();
                 dr.place = place;

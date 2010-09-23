@@ -174,7 +174,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     @Override
                     public void run() {
                         notifyListeners(ScoreboardUpdate.FIGHT_PENDING);
-                        if(getPendingFightTime(j) <= 0) {
+                        if(!(pendingFightTimers[j] == null) && getPendingFightTime(j) <= 0) {
                             pendingFightTimers[j].stop();
                             pendingFightTimers[j] = null;
                         }
