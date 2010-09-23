@@ -55,7 +55,8 @@ public class DrawWizardWindow extends javax.swing.JFrame {
 
         panels = new Panel[] {
             new PlayerSelectionPanel(database, notifier, context),
-            new SeedingPanel(database, notifier, context)
+            new SeedingPanel(database, notifier, context),
+            new ReviewDrawPanel(database, notifier, context)
         };
 
         initComponents();
@@ -104,7 +105,8 @@ public class DrawWizardWindow extends javax.swing.JFrame {
     }
 
     private void updateButtons() {
-        nextButton.setEnabled(currentIndex < panels.length - 1);
+        boolean last = currentIndex == panels.length - 1;
+        nextButton.setText(last ? "Finish" : "Next");
         // hack to disable back button on SeedingPanel
         backButton.setEnabled(currentIndex > 0 && !(getCurrentPanel() instanceof SeedingPanel));
     }
@@ -212,13 +214,22 @@ public class DrawWizardWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
-        if(getCurrentPanel().nextButtonPressed())
-            next();
+        if(getCurrentPanel().nextButtonPressed()) {
+            // if this is the last panel, close wizard
+            if(currentIndex == panels.length - 1) {
+                this.setVisible(false);
+                getCurrentPanel().afterHide();
+            } else {
+                next();
+            }
+        }
 }//GEN-LAST:event_nextButtonActionPerformed
 
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
-        if(getCurrentPanel().closedButtonPressed())
+        if(getCurrentPanel().closedButtonPressed()) {
             this.setVisible(false);
+            getCurrentPanel().afterHide();
+        }
     }//GEN-LAST:event_closeButtonActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
