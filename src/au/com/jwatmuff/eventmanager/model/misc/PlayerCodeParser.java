@@ -95,7 +95,6 @@ public class PlayerCodeParser {
         int number = getNumber(code);
 
         if(prefix.equals("P")) {
-            System.out.println(players.size());
             if(players.size() < number) {
                 fp.type = PlayerType.BYE;
                 return fp;

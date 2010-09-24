@@ -192,9 +192,11 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
             i = 0;
             for(PlayerPoolInfo player : pPS) {
                 i++;
-                Player p = player.getPlayer();
-                c.put("player" + i + "wins", wins.get(p.getID()) );
-                c.put("player" + i + "points", points.get(p.getID()) );
+                if(player!=null){
+                    Player p = player.getPlayer();
+                    c.put("player" + i + "wins", wins.get(p.getID()) );
+                    c.put("player" + i + "points", points.get(p.getID()) );
+                }
             }
         }
         c.put("fullDocument", fullDocument);
