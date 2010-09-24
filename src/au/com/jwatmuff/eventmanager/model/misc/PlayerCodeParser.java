@@ -95,6 +95,7 @@ public class PlayerCodeParser {
         int number = getNumber(code);
 
         if(prefix.equals("P")) {
+            System.out.println(players.size());
             if(players.size() < number) {
                 fp.type = PlayerType.BYE;
                 return fp;
@@ -115,47 +116,56 @@ public class PlayerCodeParser {
         FightInfo fight = fights.get(number-1);
         
         while(prefix.length() > 0) {
+            isABye:
             if(!fight.resultKnown()) {
                 // This handles fights with a bye player, and always returns the
-                // bye player as the loser and the real player as the winner.
+                // first bye player as the loser and the second bye or player as the winner.
+                // This works through all levels.
 
-                // This only works to one level. A failing example: if the code is LW3, and the
-                // one of the players in fight 3 is guaranteed to be a bye player
-                // (e.g. the result of a fight between two bye players in a previous round)
-                // then this will return 'undecided' even though the result could be
-                // known.
                 String[] codes = fight.getAllPlayerCode();
                 FightPlayer[] fightPlayers = new FightPlayer[] {
                     parseCode(codes[0], fights, players),
                     parseCode(codes[1], fights, players)
                 };
                 for(int i = 0; i < 2; i++) {
-                    int j = 1 - 1; // other player
+                    int j = 1 - i; // other player
                     if(fightPlayers[i].type == PlayerType.BYE) {
                         if(prefix.equals("W")) return fightPlayers[j];
                         if(prefix.equals("L")) return fightPlayers[i];
+
+                        switch(prefix.charAt(prefix.length()-1)) {
+                            case 'W':
+                                code = codes[j];
+                                break isABye;
+                            case 'L':
+                                code = codes[i];
+                                break isABye;
+                            default:
+                                fp.type = PlayerType.ERROR;
+                                return fp;
+                        }
                     }
                 }
                 fp.type = PlayerType.UNDECIDED;
                 return fp;
-            }
-        
-            if(prefix.equals("W"))
-                return parseCode(fight.getWinningPlayerCode(), fights, players);
+            } else {
+                if(prefix.equals("W"))
+                    return parseCode(fight.getWinningPlayerCode(), fights, players);
 
-            if(prefix.equals("L"))
-                return parseCode(fight.getLosingPlayerCode(), fights, players);
+                if(prefix.equals("L"))
+                    return parseCode(fight.getLosingPlayerCode(), fights, players);
 
-            switch(prefix.charAt(prefix.length()-1)) {
-                case 'W':
-                    code = fight.getWinningPlayerCode();
-                    break;
-                case 'L':
-                    code = fight.getLosingPlayerCode();
-                    break;
-                default:
-                    fp.type = PlayerType.ERROR;
-                    return fp;
+                switch(prefix.charAt(prefix.length()-1)) {
+                    case 'W':
+                        code = fight.getWinningPlayerCode();
+                        break;
+                    case 'L':
+                        code = fight.getLosingPlayerCode();
+                        break;
+                    default:
+                        fp.type = PlayerType.ERROR;
+                        return fp;
+                }
             }
             
             if(!isValidCode(code) || getPrefix(code).equals("P")) {
