@@ -24,7 +24,7 @@
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="jPanel1" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="divisionNameLabel" alignment="1" pref="586" max="32767" attributes="0"/>
+                  <Component id="divisionNameLabel" alignment="1" pref="605" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -53,7 +53,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane1" alignment="0" pref="296" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" alignment="0" pref="312" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="approveAllPlayersCheckBox" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -168,7 +168,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane3" pref="140" max="32767" attributes="0"/>
+                  <Component id="jScrollPane3" pref="141" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="addPlayerButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>

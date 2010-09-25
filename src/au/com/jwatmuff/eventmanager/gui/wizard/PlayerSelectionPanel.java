@@ -17,6 +17,7 @@ import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
+import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
@@ -28,11 +29,13 @@ import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import com.jidesoft.swing.CheckBoxListSelectionModel;
+import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -73,6 +76,8 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     private CheckBoxListSelectionModel playerSelectionModel;
     private ListSelectionListener playerSelectionListener;
     private final Context context;
+
+    private Date censusDate;
 
     /** Creates new form PlayerSelectionPanel */
     public PlayerSelectionPanel(final TransactionalDatabase database, TransactionNotifier notifier, Context context) {
@@ -338,6 +343,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     public void beforeShow() {
         pool = context.pool;
         divisionNameLabel.setText(pool.getDescription() + ": Player Selection");
+        censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
         updateFromDatabase();
         this.notifier.addListener(listener, Player.class, PlayerDetails.class, Pool.class, PlayerPool.class);
     }
@@ -615,9 +621,20 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean hasFocus) {
             if (value instanceof Player) {
                 Player player = (Player) value;
+                boolean ok = true;
+                if (pool != null && pool.getID() != 0) {
+                    ok = PoolChecker.checkPlayer(player, pool, censusDate);
+                }
                 String str =  player.getLastName() + ", " + player.getFirstName();
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, str, index, isSelected, hasFocus);
-                label.setIcon(Icons.PLAYER);
+                if (player.getLockedStatus() != Player.LockedStatus.LOCKED) {
+                    label.setIcon(Icons.UNLOCKED_PLAYER);
+                } else {
+                    label.setIcon(ok ? Icons.PLAYER : Icons.INVALID_PLAYER);
+                }
+                if (!ok) {
+                    label.setForeground(Color.RED);
+                }
                 return label;
             } else {
                 return super.getListCellRendererComponent(list, value, index, isSelected, hasFocus);
