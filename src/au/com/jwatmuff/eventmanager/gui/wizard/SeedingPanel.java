@@ -149,18 +149,21 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
 
     private List<PlayerPoolInfo> orderPlayers() {
         /********************************************************************************/
-        /* Ordering of players based on seeds - TODO: it might be possible to simplify this */
+        /* Ordering of players based on seeds - TODO: it might be possible to simplify this :) yes I think so */
         /* TODO: if this code needs to be used elsewhere, it should be moved to a shared utility class */
+        /* TODO: This should be moved to a shared utility class to ensure easy update and inspection*/
         /********************************************************************************/
 
         int numPlayers = getNumberOfPlayerPositions();
 
         // create a list of all players, unordered
         List<PlayerPoolInfo> unorderedPlayers = new ArrayList<PlayerPoolInfo>(players);
-        // add null (bye) players to fill in all available position in the
-        while(unorderedPlayers.size() < numPlayers)
+
+        // add null (bye) players to fill the available positions in the draw
+        while(unorderedPlayers.size() < numPlayers/2)
             unorderedPlayers.add(null);
-        // create a list to hold the players after they have been
+
+        // create a list to hold the players after they have been ordered
         List<PlayerPoolInfo> orderedPlayers = new ArrayList<PlayerPoolInfo>();
 
         // get the set of all seeds specified, in order from lowest to highest
@@ -182,8 +185,24 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
             }
         }
 
+        // randomize remaining unordered players
+        Collections.shuffle(unorderedPlayers);
+
+        // fill at least half the available position in the ordered players list
+        Iterator<PlayerPoolInfo> unorderedPlayersIterator = unorderedPlayers.iterator();
+        while(orderedPlayers.size() < numPlayers/2 && unorderedPlayersIterator.hasNext()) {
+            PlayerPoolInfo uoPlayer = unorderedPlayersIterator.next();
+                orderedPlayers.add(uoPlayer);
+        }
+        unorderedPlayers.removeAll(orderedPlayers);
+
+        // add null (bye) players to fill the available positions in the draw
+        while(unorderedPlayers.size() + orderedPlayers.size() < numPlayers)
+            unorderedPlayers.add(null);
+
         // randomize remaining unordered players, and add them to the ordered players
         Collections.shuffle(unorderedPlayers);
+
         orderedPlayers.addAll(unorderedPlayers);
 
         return orderedPlayers;
