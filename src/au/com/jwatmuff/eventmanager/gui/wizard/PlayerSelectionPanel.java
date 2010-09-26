@@ -13,6 +13,7 @@ package au.com.jwatmuff.eventmanager.gui.wizard;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
+import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
@@ -22,6 +23,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
@@ -417,6 +420,11 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
+        playerList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                playerListMouseClicked(evt);
+            }
+        });
         playerList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 playerListValueChanged(evt);
@@ -439,7 +447,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(approveAllPlayersCheckBox)
                         .addContainerGap())
@@ -463,7 +471,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                 .addContainerGap())
         );
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel2.setText("Filter by Team");
 
         eligiblePlayerList.setModel(new javax.swing.AbstractListModel() {
@@ -531,13 +539,13 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(addPlayerButton)
                 .addContainerGap())
         );
 
-        divisionNameLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        divisionNameLabel.setFont(new java.awt.Font("Tahoma", 1, 24));
         divisionNameLabel.setText("Division Name");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -551,7 +559,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                         .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(divisionNameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE))
+                    .addComponent(divisionNameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -572,8 +580,15 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     }//GEN-LAST:event_teamListValueChanged
 
     private void eligiblePlayerListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_eligiblePlayerListMouseClicked
-        if(evt.getClickCount() == 2) {
-            addSelectedEligiblePlayers();
+        int index = eligiblePlayerList.getSelectedIndex();
+        if(evt.getClickCount() == 1) {
+            addPlayerButton.setEnabled((index == -1)?false:true);
+        }
+        
+        if(evt.getClickCount() == 2 && index != -1) {
+            if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
+            Player player = (Player) eligiblePlayerList.getSelectedValue();
+            new PlayerDetailsDialog(null, true, database, notifier, player).setVisible(true);
         }
     }//GEN-LAST:event_eligiblePlayerListMouseClicked
 
@@ -600,6 +615,19 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     private void removePlayerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removePlayerButtonActionPerformed
         removeSelectedPlayers();
     }//GEN-LAST:event_removePlayerButtonActionPerformed
+
+    private void playerListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_playerListMouseClicked
+        int index = playerList.getSelectedIndex();
+        if(evt.getClickCount() == 1) {
+            removePlayerButton.setEnabled((index == -1)?false:true);
+        }
+
+        if(evt.getClickCount() == 2 && index != -1) {
+            if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
+            Player player = (Player) playerList.getSelectedValue();
+            new PlayerDetailsDialog(null, true, database, notifier, player).setVisible(true);
+        }
+    }//GEN-LAST:event_playerListMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
