@@ -436,7 +436,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
     private void lockButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockButtonActionPerformed
         Pool pool = getSelectedPool();
-        if(pool != null && pool.getID() != 0)
+        if(pool != null && pool.getID() != 0){
             if(!PermissionChecker.isAllowed(Action.LOCK_DIVISION, database)) return;
             if(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true).isEmpty()){
                 JOptionPane.showMessageDialog(this.parentWindow, "Pool can not be locked without any approved players");
@@ -449,6 +449,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             } catch(DatabaseStateException e) {
                 GUIUtils.displayError(parentWindow, e.getMessage());
             }
+        }
     }//GEN-LAST:event_lockButtonActionPerformed
 
     private void autoAssignButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoAssignButtonActionPerformed
