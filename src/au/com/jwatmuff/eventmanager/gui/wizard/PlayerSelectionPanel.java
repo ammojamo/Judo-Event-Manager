@@ -339,12 +339,6 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     }
 
     @Override
-    public boolean backButtonPressed() {
-        log.error("Back button pressed on first panel of draw wizard!");
-        return false;
-    }
-
-    @Override
     public boolean closedButtonPressed() {
         return true;
     }

@@ -320,11 +320,6 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     }
 
     @Override
-    public boolean backButtonPressed() {
-        return true;
-    }
-
-    @Override
     public boolean closedButtonPressed() {
         return true;
     }

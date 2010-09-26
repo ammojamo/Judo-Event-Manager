@@ -150,11 +150,6 @@ public class ReviewDrawPanel extends javax.swing.JPanel implements DrawWizardWin
     }
 
     @Override
-    public boolean backButtonPressed() {
-        return true;
-    }
-
-    @Override
     public boolean closedButtonPressed() {
         return true;
     }
