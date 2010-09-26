@@ -38,7 +38,6 @@ public class DrawWizardWindow extends javax.swing.JFrame {
          * press
          */
         boolean nextButtonPressed();
-        boolean backButtonPressed();
         boolean closedButtonPressed();
         void beforeShow();
         void afterHide();
@@ -92,23 +91,9 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         updateButtons();
     }
 
-    private void previous() {
-        currentIndex--;
-        if(currentIndex >= 0) {
-            panels[currentIndex].beforeShow();
-            layout.previous(contentPanel);
-            panels[currentIndex + 1].afterHide();
-        } else {
-            log.warn("Previous tried to go past start of available panels");
-        }
-        updateButtons();
-    }
-
     private void updateButtons() {
         boolean last = currentIndex == panels.length - 1;
         nextButton.setText(last ? "Finish" : "Next");
-        // hack to disable back button on SeedingPanel
-        backButton.setEnabled(currentIndex > 0 && !(getCurrentPanel() instanceof SeedingPanel));
     }
 
     /** This method is called from within the constructor to
@@ -124,7 +109,6 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         contentPanel = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
         closeButton = new javax.swing.JButton();
-        backButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -134,7 +118,7 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         contentPanel.setLayout(contentPanelLayout);
         contentPanelLayout.setHorizontalGroup(
             contentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 501, Short.MAX_VALUE)
+            .addGap(0, 505, Short.MAX_VALUE)
         );
         contentPanelLayout.setVerticalGroup(
             contentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -145,14 +129,6 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         closeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 closeButtonActionPerformed(evt);
-            }
-        });
-
-        backButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/resultset_previous.png"))); // NOI18N
-        backButton.setText("Back");
-        backButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                backButtonActionPerformed(evt);
             }
         });
 
@@ -175,15 +151,13 @@ public class DrawWizardWindow extends javax.swing.JFrame {
                     .addGroup(mainPanelLayout.createSequentialGroup()
                         .addComponent(closeButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(backButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(nextButton))
                     .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE))
                 .addContainerGap())
             .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        mainPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {backButton, closeButton, nextButton});
+        mainPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {closeButton, nextButton});
 
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -194,7 +168,6 @@ public class DrawWizardWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(nextButton)
-                    .addComponent(backButton)
                     .addComponent(closeButton))
                 .addContainerGap())
         );
@@ -232,14 +205,8 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_closeButtonActionPerformed
 
-    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
-        if(getCurrentPanel().backButtonPressed())
-            previous();
-    }//GEN-LAST:event_backButtonActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton backButton;
     private javax.swing.JButton closeButton;
     private javax.swing.JPanel contentPanel;
     private javax.swing.JSeparator jSeparator1;
