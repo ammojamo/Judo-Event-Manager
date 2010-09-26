@@ -105,7 +105,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                 if(e.getFirstIndex() < 0 || e.getLastIndex() < 0)
                     return;
 
-                for(int index = e.getFirstIndex(); index <= e.getLastIndex(); index++) {
+                for(int index = 0; index <= playerList.getModel().getSize() - 1; index++) {
                     boolean selected = playerSelectionModel.isSelectedIndex(index);
                     Player player = (Player)playerList.getModel().getElementAt(index);
 
