@@ -108,11 +108,19 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                 for(int index = e.getFirstIndex(); index <= e.getLastIndex(); index++) {
                     boolean selected = playerSelectionModel.isSelectedIndex(index);
                     Player player = (Player)playerList.getModel().getElementAt(index);
-                    if(selected && unapprovedPlayersInPool.contains(player)) {
+
+                    boolean ok = false;
+                    if (pool != null && pool.getID() != 0) {
+                        if (player.getLockedStatus() == Player.LockedStatus.LOCKED && PoolChecker.checkPlayer(player, pool, censusDate))
+                            ok = true;
+                    }
+
+                    if(selected && unapprovedPlayersInPool.contains(player) && ok) {
                         // approve player
                         PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
                         pp.setApproved(true);
                         playerPoolsToUpdate.add(pp);
+
                     } else if(!selected && approvedPlayersInPool.contains(player)) {
                         // unapprove player
                         PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
@@ -120,6 +128,8 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                         playerPoolsToUpdate.add(pp);
                     }
                 }
+                updatePlayerList();
+
                 try {
                     if(!playerPoolsToUpdate.isEmpty()) {
                         database.perform(new Transaction() {
