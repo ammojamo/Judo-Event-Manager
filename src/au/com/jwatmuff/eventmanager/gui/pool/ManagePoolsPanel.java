@@ -232,10 +232,10 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         autoAssignButton = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
         printButton = new javax.swing.JButton();
-        drawWizardButton = new javax.swing.JButton();
         autoApproveButton = new javax.swing.JButton();
         lockButton = new javax.swing.JButton();
         customPoolButton = new javax.swing.JButton();
+        drawWizardButton = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(300, 0));
 
@@ -323,17 +323,6 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         });
         jToolBar1.add(printButton);
 
-        drawWizardButton.setText("Draw Wizard");
-        drawWizardButton.setFocusable(false);
-        drawWizardButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        drawWizardButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        drawWizardButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                drawWizardButtonActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(drawWizardButton);
-
         autoApproveButton.setText("Auto Approve >");
         autoApproveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -358,6 +347,16 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             }
         });
 
+        drawWizardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/wand.png"))); // NOI18N
+        drawWizardButton.setText("Draw Wizard");
+        drawWizardButton.setFocusable(false);
+        drawWizardButton.setIconTextGap(8);
+        drawWizardButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                drawWizardButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -365,7 +364,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -379,8 +378,8 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(autoAssignButton)
                         .addGap(6, 6, 6)
@@ -388,7 +387,9 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lockButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                        .addComponent(drawWizardButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -400,7 +401,8 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                         .addComponent(autoAssignButton)
                         .addComponent(lockButton)
                         .addComponent(customPoolButton))
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(drawWizardButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
