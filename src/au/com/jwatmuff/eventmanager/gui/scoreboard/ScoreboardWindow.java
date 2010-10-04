@@ -612,6 +612,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
 
 private void chooseSirenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseSirenMenuItemActionPerformed
     JFileChooser fileChooser = new JFileChooser();
+    if(GUIUtils.lastSirenChooserDirectory != null)
+        fileChooser.setCurrentDirectory(GUIUtils.lastSirenChooserDirectory);
     fileChooser.setFileFilter(new FileFilter() {
             String[] endings = new String[]{".wav", ".aiff", ".au"};
         

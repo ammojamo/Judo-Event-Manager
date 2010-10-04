@@ -45,6 +45,7 @@ public class GUIUtils {
 
     public static File lastDivisionChooserDirectory;
     public static File lastDrawChooserDirectory;
+    public static File lastSirenChooserDirectory;
     public static File lastChooserDirectory ;
 
     static {
@@ -57,6 +58,10 @@ public class GUIUtils {
         f = new File("resources/draw");
         if(f.exists())
             lastDrawChooserDirectory = f;
+
+        f = new File("resources/sound");
+        if(f.exists())
+            lastSirenChooserDirectory = f;
     }
 
     public static boolean confirmLock(Frame parent, String thingToLock) {
