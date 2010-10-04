@@ -339,8 +339,8 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
         if(email.length() == 0)
             errors.add("Email is required");
          */
-        if(email.length() > 0 && !EmailValidator.getInstance().isValid(email))
-            errors.add("'" + email + "' is not a valid email");
+//        if(email.length() > 0 && !EmailValidator.getInstance().isValid(email))
+//            errors.add("'" + email + "' is not a valid email");
 
         
         /* emergency contact */
