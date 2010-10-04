@@ -234,9 +234,7 @@ private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_cancelButtonActionPerformed
 
 private void openPlayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPlayerActionPerformed
-        if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
         new PlayerDetailsDialog(parent, true, database, notifier, player).setVisible(true);
-        System.out.println("**** opened");
         updatePlayerDetails();
 }//GEN-LAST:event_openPlayerActionPerformed
     
