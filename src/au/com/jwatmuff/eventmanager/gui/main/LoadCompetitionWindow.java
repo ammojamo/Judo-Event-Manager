@@ -113,6 +113,8 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         updateDatabaseList();
         updateLicenseInfo();
         
+        updateOkButton();
+        
         // center window on screen
         setLocationRelativeTo(null);
     }
@@ -205,7 +207,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
     private void updateOkButton() {
         if(newCompRadioButton.isSelected()) {
-            okButton.setText("Open");
+            okButton.setText("Create");
             okButton.setEnabled(true);
         } else if(existingCompRadioButton.isSelected()) {
             okButton.setText("Open");
