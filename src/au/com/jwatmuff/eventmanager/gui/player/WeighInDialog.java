@@ -33,6 +33,7 @@ public class WeighInDialog extends javax.swing.JDialog {
     private PlayerListTableModel tableModel;
     private Frame parent;
     private TransactionalDatabase database;
+    private TransactionNotifier notifier;
     
     /** Creates new form WeighInDialog */
     public WeighInDialog(java.awt.Frame parent, boolean modal, TransactionalDatabase database, TransactionNotifier notifier) {
@@ -40,6 +41,7 @@ public class WeighInDialog extends javax.swing.JDialog {
         initComponents();
         this.parent = parent;
         this.database = database;
+        this.notifier = notifier;
         
         tableModel = new PlayerListTableModel(database, notifier);
         tableModel.addColumn("Player ID", "visibleID");
@@ -197,7 +199,7 @@ public class WeighInDialog extends javax.swing.JDialog {
                 if(!PermissionChecker.isAllowed(Action.CHANGE_WEIGH_IN, database)) return;
             }
             
-            EnterWeightDialog ewd = new EnterWeightDialog(parent, true, player);
+            EnterWeightDialog ewd = new EnterWeightDialog(parent, true, database, notifier, player);
             ewd.setVisible(true);
             if(ewd.getSuccess()) {
                 player.setWeight(ewd.getWeight());

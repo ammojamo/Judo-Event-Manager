@@ -7,7 +7,11 @@
 package au.com.jwatmuff.eventmanager.gui.player;
 
 import au.com.jwatmuff.eventmanager.model.vo.Player;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
+import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.awt.Frame;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
@@ -22,23 +26,34 @@ import javax.swing.JOptionPane;
  */
 public class EnterWeightDialog extends javax.swing.JDialog {
     private boolean success;
-    private double weight;
     private Frame parent;
+    private TransactionalDatabase database;
+    private TransactionNotifier notifier;
+    private double weight;
+    private Player player;
     
     /** Creates new form EnterWeightDialog */
-    public EnterWeightDialog(java.awt.Frame parent, boolean modal, Player player) {
+    public EnterWeightDialog(java.awt.Frame parent, boolean modal, TransactionalDatabase database, TransactionNotifier notifier, Player player) {
         super(parent, modal);
-        initComponents();        
+        initComponents();
         this.parent = parent;
+        this.database = database;
+        this.notifier = notifier;
+        this.player = player;
+
+        updatePlayerDetails();
+        this.getRootPane().setDefaultButton(okButton);
+        this.weightTextField.grabFocus();
+        this.setLocationRelativeTo(parent);
+    }
+
+    private void updatePlayerDetails() {
         this.idTextField.setText(player.getVisibleID());
         this.nameTextField.setText(player.getFirstName() + " " + player.getLastName());
         this.gradeTextField.setText(player.getGrade().toString());
         this.genderTextField.setText(player.getGender().toString());
         if(player.getDob() != null)
             this.dobTextField.setText(new SimpleDateFormat("dd/MM/yyyy").format(player.getDob()));
-        this.getRootPane().setDefaultButton(okButton);
-        this.weightTextField.grabFocus();
-        this.setLocationRelativeTo(parent);
     }
     
     public boolean getSuccess() {
@@ -72,6 +87,7 @@ public class EnterWeightDialog extends javax.swing.JDialog {
         gradeTextField = new javax.swing.JTextField();
         weightTextField = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
+        openPlayer = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Enter Weight");
@@ -116,6 +132,13 @@ public class EnterWeightDialog extends javax.swing.JDialog {
 
         jLabel7.setText("kg");
 
+        openPlayer.setText("Open Player");
+        openPlayer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openPlayerActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -124,6 +147,8 @@ public class EnterWeightDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(openPlayer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(okButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelButton))
@@ -179,7 +204,8 @@ public class EnterWeightDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
-                    .addComponent(okButton))
+                    .addComponent(okButton)
+                    .addComponent(openPlayer))
                 .addContainerGap())
         );
 
@@ -206,6 +232,13 @@ private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
     this.dispose();
 }//GEN-LAST:event_cancelButtonActionPerformed
+
+private void openPlayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPlayerActionPerformed
+        if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
+        new PlayerDetailsDialog(parent, true, database, notifier, player).setVisible(true);
+        System.out.println("**** opened");
+        updatePlayerDetails();
+}//GEN-LAST:event_openPlayerActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -222,6 +255,7 @@ private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.JLabel jLabel7;
     private javax.swing.JTextField nameTextField;
     private javax.swing.JButton okButton;
+    private javax.swing.JButton openPlayer;
     private javax.swing.JTextField weightTextField;
     // End of variables declaration//GEN-END:variables
     
