@@ -41,7 +41,7 @@
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jScrollPane3" alignment="0" pref="272" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" alignment="0" pref="278" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="jSeparator1" alignment="1" pref="659" max="32767" attributes="0"/>
@@ -53,6 +53,8 @@
                       <Component id="lockButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jToolBar1" min="-2" pref="100" max="-2" attributes="0"/>
+                      <EmptySpace pref="59" max="32767" attributes="0"/>
+                      <Component id="drawWizardButton" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -70,6 +72,7 @@
                       <Component id="customPoolButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jToolBar1" alignment="1" min="-2" pref="25" max="-2" attributes="0"/>
+                  <Component id="drawWizardButton" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="200" max="-2" attributes="0"/>
@@ -225,17 +228,6 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="printButtonActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="drawWizardButton">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Draw Wizard"/>
-            <Property name="focusable" type="boolean" value="false"/>
-            <Property name="horizontalTextPosition" type="int" value="0"/>
-            <Property name="verticalTextPosition" type="int" value="3"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="drawWizardButtonActionPerformed"/>
-          </Events>
-        </Component>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JButton" name="autoApproveButton">
@@ -267,6 +259,19 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="customPoolButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="drawWizardButton">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/com/famfamfam/icons/silk/wand.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Draw Wizard"/>
+        <Property name="focusable" type="boolean" value="false"/>
+        <Property name="iconTextGap" type="int" value="8"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="drawWizardButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
