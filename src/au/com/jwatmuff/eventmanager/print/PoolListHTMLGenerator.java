@@ -10,6 +10,7 @@ import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.model.vo.Pool.LockedStatus;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,9 @@ public class PoolListHTMLGenerator extends VelocityHTMLGenerator {
         while(iter.hasNext()) {
             Pool pool = iter.next();
             List<Player> poolPlayers = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true);
+            if(pool.getLockedStatus()==LockedStatus.UNLOCKED){
+                poolPlayers.addAll(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), false));
+            }
             if(poolPlayers.size() == 0)
                 iter.remove();
             else

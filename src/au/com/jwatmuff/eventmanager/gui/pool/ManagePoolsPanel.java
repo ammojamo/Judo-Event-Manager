@@ -539,9 +539,11 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     
     /* remove pools with no players */
     Iterator<Pool> iter = pools.iterator();
-    while(iter.hasNext())
-        if(database.findAll(Player.class, PlayerDAO.FOR_POOL, iter.next().getID(), true).isEmpty())
+    while(iter.hasNext()){
+        Pool nextPool = iter.next();
+        if(database.findAll(Player.class, PlayerDAO.FOR_POOL, nextPool.getID(), false).isEmpty() && database.findAll(Player.class, PlayerDAO.FOR_POOL, nextPool.getID(), true).isEmpty())
             iter.remove();
+    }
 
     /* display pool selection dialog */
     CheckboxListDialog<Pool> cld = new CheckboxListDialog<Pool>(
