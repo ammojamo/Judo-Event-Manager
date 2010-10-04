@@ -22,6 +22,8 @@ import au.com.jwatmuff.genericp2p.PeerManager;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -65,10 +67,15 @@ public class CompetitionInterfacesPanel extends javax.swing.JPanel {
     
     public Session chooseMat(String title) {
         List<Session> mats = database.findAll(Session.class, SessionDAO.ALL_MATS);
-        if(mats.size() == 0) {
+        if(mats.isEmpty()) {
             GUIUtils.displayMessage(null, "At least one contest area must be defined before competition interfaces can be used", title);
             return null;
         }
+        Collections.sort(mats, new Comparator<Session>() {
+            public int compare(Session mat1, Session mat2) {
+                return mat1.getMat().compareTo(mat2.getMat());
+            }
+        });
         ListDialog<Session> dialog = new ListDialog<Session>(parentWindow, true, mats, "Choose Contest Area", title);
         dialog.setRenderer(new StringRenderer<Session>() {
                 @Override
