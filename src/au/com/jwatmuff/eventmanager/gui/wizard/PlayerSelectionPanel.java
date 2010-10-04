@@ -586,7 +586,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         }
         
         if(evt.getClickCount() == 2 && index != -1) {
-            if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
+            if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
             Player player = (Player) eligiblePlayerList.getSelectedValue();
             new PlayerDetailsDialog(null, true, database, notifier, player).setVisible(true);
         }
@@ -623,7 +623,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         }
 
         if(evt.getClickCount() == 2 && index != -1) {
-            if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
+            if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
             Player player = (Player) playerList.getSelectedValue();
             new PlayerDetailsDialog(null, true, database, notifier, player).setVisible(true);
         }

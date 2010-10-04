@@ -142,8 +142,10 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
     
     public void updateFromPlayer(Player player) {
         boolean editable = (player.getLockedStatus() != Player.LockedStatus.LOCKED);
+//        replace this with if in locked pool... maybe
+        editable = true;
 
-        playerIDTextField.setEditable(editable);
+        playerIDTextField.setEditable(false);
         lastNameTextField.setEditable(editable);
         firstNameTextField.setEditable(editable);
         dobDatePicker.setEnabled(editable);

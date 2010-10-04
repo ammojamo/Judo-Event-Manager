@@ -391,7 +391,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
-        if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
+        if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
         Player player = getSelectedPlayer();
         new PlayerDetailsDialog(parentWindow, true, database, notifier, player).setVisible(true);
     }//GEN-LAST:event_editButtonActionPerformed

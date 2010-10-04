@@ -9,6 +9,8 @@ package au.com.jwatmuff.eventmanager.gui.player;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
+import au.com.jwatmuff.eventmanager.permissions.Action;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.awt.Frame;
@@ -203,6 +205,9 @@ public class PlayerDetailsDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+
+        boolean editable = (player.getLockedStatus() != Player.LockedStatus.LOCKED);
+        if(!editable && !PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
         if(!personalDetailsPanel.validateInput()) return;
         if(!contactDetailsPanel.validateInput()) return;
         if(!medicalDetailsPanel.validateInput()) return;

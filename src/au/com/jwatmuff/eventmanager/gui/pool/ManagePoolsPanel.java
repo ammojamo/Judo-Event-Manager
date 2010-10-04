@@ -496,7 +496,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         //removeButton.setEnabled((index == -1)?false:true);
         //approveButton.setEnabled(false);
         if(evt.getClickCount() == 2 && index != -1) {
-            if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
+            if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
             Player player = approvedListModel.getPlayerAt(index);
             new PlayerDetailsDialog(parentWindow, true, database, notifier, player).setVisible(true);
         }
@@ -533,7 +533,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         int index = requestedList.getSelectedIndex();
         approveButton.setEnabled((index == -1)?false:true);
         if(evt.getClickCount() == 2 && index != -1) {
-            if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
+            if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
             Player player = requestedListModel.getPlayerAt(index);
             new PlayerDetailsDialog(parentWindow, true, database, notifier, player).setVisible(true);
         }
