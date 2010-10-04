@@ -37,7 +37,7 @@ public class ChooseSessionDialog extends javax.swing.JDialog {
             @Override
             public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b0) {
                 if(object instanceof Session)
-                    return super.getListCellRendererComponent(jList, ((Session)object).getName(), i, b, b0);
+                    return super.getListCellRendererComponent(jList, ((Session)object).getMat() + " : " + ((Session)object).getName(), i, b, b0);
                 else
                     return super.getListCellRendererComponent(jList, object, i, b, b0);
             }

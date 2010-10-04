@@ -83,7 +83,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
             public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b0) {
                 if(object instanceof Session) {
                     Session session = (Session)object;
-                    return super.getListCellRendererComponent(jList, session.getName(), i, b, b0);
+                    return super.getListCellRendererComponent(jList, session.getMat() + " : " + session.getName(), i, b, b0);
                 } else {
                     return super.getListCellRendererComponent(jList, object, i, b, b0);
                 }
