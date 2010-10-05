@@ -9,7 +9,7 @@ package au.com.jwatmuff.eventmanager.gui.admin;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
 import au.com.jwatmuff.eventmanager.gui.pool.PoolDetailsDialog;
-import au.com.jwatmuff.eventmanager.model.draw.DrawConfiguration;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.permissions.Action;
@@ -68,7 +68,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         this.licenseManager = licenseManager;
         initComponents();
 
-        drawConfigurationComboBox.setModel(new DefaultComboBoxModel(DrawConfiguration.getDrawConfigurationNames()));
+        drawConfigurationComboBox.setModel(new DefaultComboBoxModel(ConfigurationFile.getDrawConfigurationNames()));
 
         this.setLocationRelativeTo(parent);
         

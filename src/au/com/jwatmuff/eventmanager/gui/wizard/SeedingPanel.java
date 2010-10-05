@@ -13,7 +13,7 @@ package au.com.jwatmuff.eventmanager.gui.wizard;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
-import au.com.jwatmuff.eventmanager.model.draw.DrawConfiguration;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
@@ -289,7 +289,7 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         // end TODO
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-        DrawConfiguration drawConfig = DrawConfiguration.getDrawConfiguration(ci.getDrawConfiguration());
+        ConfigurationFile drawConfig = ConfigurationFile.getDrawConfiguration(ci.getDrawConfiguration());
         if(drawConfig == null) {
             GUIUtils.displayError(this, "Unable to load draw configuration.");
             return false;

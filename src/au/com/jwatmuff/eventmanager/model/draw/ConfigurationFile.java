@@ -16,14 +16,14 @@ import org.apache.log4j.Logger;
  *
  * @author James
  */
-public class DrawConfiguration {
-    private static final Logger log = Logger.getLogger(DrawConfiguration.class);
+public class ConfigurationFile {
+    private static final Logger log = Logger.getLogger(ConfigurationFile.class);
 
-    private static final String DRAW_CONFIG_DIR = "resources/draw";
+    private static final String DRAW_CONFIG_DIR = "resources";
 
     private Properties properties;
 
-    private DrawConfiguration(Properties properties) {
+    private ConfigurationFile(Properties properties) {
         this.properties = properties;
     }
 
@@ -37,7 +37,7 @@ public class DrawConfiguration {
 
     /*** Static utility methods ***/
 
-    private static Map<String, DrawConfiguration> drawConfigurations = new HashMap<String, DrawConfiguration>();
+    private static Map<String, ConfigurationFile> drawConfigurations = new HashMap<String, ConfigurationFile>();
 
     static {
         updateDrawConfigurations();
@@ -51,7 +51,7 @@ public class DrawConfiguration {
                 props.load(new FileReader(f));
                 if(props.containsKey("name")) {
                     String name = props.getProperty("name");
-                    drawConfigurations.put(name, new DrawConfiguration(props));
+                    drawConfigurations.put(name, new ConfigurationFile(props));
                 }
             } catch(IOException e) {
                 log.error("IOException loading draw configurations", e);
@@ -59,13 +59,13 @@ public class DrawConfiguration {
         }
     }
 
-    public static List<DrawConfiguration> getDrawConfigurations() {
-        return new ArrayList<DrawConfiguration>(drawConfigurations.values());
+    public static List<ConfigurationFile> getDrawConfigurations() {
+        return new ArrayList<ConfigurationFile>(drawConfigurations.values());
     }
 
     public static String[] getDrawConfigurationNames() {
         ArrayList<String> names = new ArrayList<String>();
-        for(DrawConfiguration config : drawConfigurations.values())
+        for(ConfigurationFile config : drawConfigurations.values())
             names.add(config.getName());
 
         // Sort alphabetically
@@ -76,7 +76,7 @@ public class DrawConfiguration {
         return names.toArray(new String[] {});
     }
 
-    public static DrawConfiguration getDrawConfiguration(String name) {
+    public static ConfigurationFile getDrawConfiguration(String name) {
         if(!drawConfigurations.containsKey(name))
             name = "Default";
         return drawConfigurations.get(name);

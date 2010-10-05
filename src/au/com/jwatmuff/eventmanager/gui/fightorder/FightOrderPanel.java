@@ -10,7 +10,7 @@ import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
-import au.com.jwatmuff.eventmanager.model.draw.DrawConfiguration;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter.TooFewPlayersException;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
@@ -418,7 +418,7 @@ public class FightOrderPanel extends javax.swing.JPanel {
             GUIUtils.displayError(parentWindow, e.getMessage());
         }*/
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-        DrawConfiguration dc = DrawConfiguration.getDrawConfiguration(ci.getDrawConfiguration());
+        ConfigurationFile dc = ConfigurationFile.getDrawConfiguration(ci.getDrawConfiguration());
         if(dc == null) {
             GUIUtils.displayMessage(parentWindow, "Could not load a valid draw configuration.\nPlease set a draw configuration in Competition Details or assign draws manually", "Auto Assign");
             return;
