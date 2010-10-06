@@ -35,6 +35,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -709,6 +710,14 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
             for(Object o : playerListModel.toArray())
                 visiblePlayers.add(((Player)((DefaultSelectable)o).getObject()).getID());
             selectedPlayers.retainAll(visiblePlayers);
+
+            if(selectedPlayers.isEmpty()){
+                String msg = "You have not selected any players \n";
+                msg = msg + "Are you sure you wish to continue?";
+                if (JOptionPane.showConfirmDialog(null, msg, "Confirm Lock", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
 
             database.perform(new Transaction() {
                 @Override
