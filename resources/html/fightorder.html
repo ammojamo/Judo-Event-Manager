@@ -32,6 +32,7 @@
         <td><b>Blue</b></td>
         <td><b>White</b></td>
         <td><b>Division</b></td>
+        <td><b>Draw Fight No.</b></td>
       </tr>
 <!--
 #foreach($fight in $fights.get($session.ID))
@@ -41,6 +42,7 @@
         <td>$!fight.player1</td>
         <td>$!fight.player2</td>
         <td>$!fight.pool</td>
+        <td>$!fight.poolNumber</td>
       </tr>
 <!--
 #set($i = $i + 1)

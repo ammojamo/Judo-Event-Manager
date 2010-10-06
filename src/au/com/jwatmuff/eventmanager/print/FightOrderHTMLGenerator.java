@@ -65,6 +65,7 @@ public class FightOrderHTMLGenerator extends VelocityHTMLGenerator {
                     fight.put("player1", PlayerCodeParser.parseCode(database, sfi.getFight().getPlayerCodes()[0], sfi.getFight().getPoolID()).toString());
                     fight.put("player2", PlayerCodeParser.parseCode(database, sfi.getFight().getPlayerCodes()[1], sfi.getFight().getPoolID()).toString());
                     fight.put("pool", database.get(Pool.class, sfi.getFight().getPoolID()).getDescription());
+                    fight.put("poolNumber", "Fight " + sfi.getFight().getPosition());
                     sessionFights.add(fight);
                     fightNumbers.add(fightNumber++);
                 } catch (DatabaseStateException e) { }
