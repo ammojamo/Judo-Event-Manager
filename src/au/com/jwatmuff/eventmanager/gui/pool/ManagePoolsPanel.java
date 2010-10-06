@@ -26,6 +26,7 @@ import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.CheckboxListDialog;
 import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
+import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -225,11 +226,12 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         autoAssignButton = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
-        printButton = new javax.swing.JButton();
         autoApproveButton = new javax.swing.JButton();
         lockButton = new javax.swing.JButton();
         customPoolButton = new javax.swing.JButton();
         drawWizardButton = new javax.swing.JButton();
+        printButton = new javax.swing.JButton();
+        customPoolButton1 = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(300, 0));
 
@@ -309,14 +311,6 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
         jToolBar1.setFloatable(false);
 
-        printButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/printer.png"))); // NOI18N
-        printButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                printButtonActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(printButton);
-
         autoApproveButton.setText("Auto Approve >");
         autoApproveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -351,6 +345,21 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             }
         });
 
+        printButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/printer.png"))); // NOI18N
+        printButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                printButtonActionPerformed(evt);
+            }
+        });
+
+        customPoolButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/wrench.png"))); // NOI18N
+        customPoolButton1.setText("Copy Division");
+        customPoolButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                customPoolButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -358,7 +367,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 761, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -372,17 +381,21 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 761, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(autoAssignButton)
                         .addGap(6, 6, 6)
                         .addComponent(customPoolButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(customPoolButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lockButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                        .addComponent(printButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                         .addComponent(drawWizardButton)))
                 .addContainerGap())
         );
@@ -393,10 +406,12 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(autoAssignButton)
-                        .addComponent(lockButton)
-                        .addComponent(customPoolButton))
+                        .addComponent(customPoolButton)
+                        .addComponent(customPoolButton1)
+                        .addComponent(lockButton))
+                    .addComponent(drawWizardButton)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(drawWizardButton))
+                    .addComponent(printButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -585,6 +600,45 @@ private void drawWizardButtonActionPerformed(java.awt.event.ActionEvent evt) {//
     }
 }//GEN-LAST:event_jButton1ActionPerformed
 
+private void customPoolButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customPoolButton1ActionPerformed
+    if(!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) return;
+    if(getSelectedPool() != null && getSelectedPool().getID() != 0) {
+        Pool pool = getSelectedPool();
+
+        final Pool poolCopy = new Pool();
+        poolCopy.setDescription(pool.getDescription() + " Copy");
+        poolCopy.setGender(pool.getGender());
+
+        poolCopy.setMinimumAge(pool.getMinimumAge());
+        poolCopy.setMaximumAge(pool.getMaximumAge());
+
+        poolCopy.setMinimumWeight(pool.getMinimumWeight());
+        poolCopy.setMaximumWeight(pool.getMaximumWeight());
+
+        poolCopy.setMinimumGrade(pool.getMinimumGrade());
+        poolCopy.setMaximumGrade(pool.getMaximumGrade());
+
+        poolCopy.setMatchTime(pool.getMatchTime());
+        poolCopy.setMinimumBreakTime(pool.getMinimumBreakTime());
+        poolCopy.setGoldenScoreTime(pool.getGoldenScoreTime());
+        final List<Player> selectedPlayers = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), false);
+        selectedPlayers.addAll(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true));
+        database.perform(new Transaction() {
+            @Override
+            public void perform() {
+                database.add(poolCopy);
+
+                for(Player player : selectedPlayers) {
+                    PlayerPool pp = new PlayerPool();
+                    pp.setPlayerID(player.getID());
+                    pp.setPoolID(poolCopy.getID());
+                    database.add(pp);
+                }
+            }
+        });
+    }
+}//GEN-LAST:event_customPoolButton1ActionPerformed
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton approveButton;
@@ -592,6 +646,7 @@ private void drawWizardButtonActionPerformed(java.awt.event.ActionEvent evt) {//
     private javax.swing.JButton autoApproveButton;
     private javax.swing.JButton autoAssignButton;
     private javax.swing.JButton customPoolButton;
+    private javax.swing.JButton customPoolButton1;
     private javax.swing.JButton drawWizardButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
