@@ -60,9 +60,9 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
         jLabel17 = new javax.swing.JLabel();
         streetAddressTextField = new javax.swing.JTextField();
         cityTextField = new javax.swing.JTextField();
-        stateComboBox = new javax.swing.JComboBox();
         postcodeTextField = new javax.swing.JTextField();
         emailTextField = new javax.swing.JTextField();
+        stateTextField = new javax.swing.JTextField();
         jPanel32 = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
@@ -103,7 +103,7 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
                     .addComponent(homePhoneTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
                     .addComponent(workPhoneTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
                     .addComponent(mobilePhoneTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
-                .addContainerGap(189, Short.MAX_VALUE))
+                .addContainerGap(191, Short.MAX_VALUE))
         );
         jPanel30Layout.setVerticalGroup(
             jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -136,12 +136,11 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
 
         cityTextField.setName("city"); // NOI18N
 
-        stateComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "NSW", "VIC", "SA", "NT", "QLD", "WA", "TAS", "ACT" }));
-        stateComboBox.setName("state"); // NOI18N
-
         postcodeTextField.setName("postcode"); // NOI18N
 
         emailTextField.setName("email"); // NOI18N
+
+        stateTextField.setName("state"); // NOI18N
 
         javax.swing.GroupLayout jPanel31Layout = new javax.swing.GroupLayout(jPanel31);
         jPanel31.setLayout(jPanel31Layout);
@@ -157,7 +156,7 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel31Layout.createSequentialGroup()
-                        .addComponent(stateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(stateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(postcodeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(cityTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
@@ -178,7 +177,7 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel16)
-                    .addComponent(stateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(stateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(postcodeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -297,7 +296,7 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
         
         streetAddress = streetAddressTextField.getText().trim();
         city = cityTextField.getText().trim();
-        state = (String)stateComboBox.getSelectedItem();
+        state = stateTextField.getText().trim();
         postcode = postcodeTextField.getText().trim();
         email = emailTextField.getText().trim();
     
@@ -328,8 +327,8 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
 
         /* postcode */
         if(postcode.length() > 0) {
-            if(postcode.length() != 4)
-                errors.add("Postcode must consist of 4 digits");
+//            if(postcode.length() != 4)
+//                errors.add("Postcode must consist of 4 digits");
             if(!postcode.matches("[\\d]*"))
                 errors.add("Postcode must be a number");
         }
@@ -397,7 +396,7 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
         mobilePhoneTextField.setText(details.getMobileNumber());
         streetAddressTextField.setText(details.getStreet());
         cityTextField.setText(details.getCity());
-        stateComboBox.setSelectedItem(details.getState());
+        stateTextField.setText(details.getState());
         postcodeTextField.setText(details.getPostcode());
         emailTextField.setText(details.getEmail());
         emergencyNameTextField.setText(details.getEmergencyName());
@@ -430,7 +429,7 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel32;
     private javax.swing.JTextField mobilePhoneTextField;
     private javax.swing.JTextField postcodeTextField;
-    private javax.swing.JComboBox stateComboBox;
+    private javax.swing.JTextField stateTextField;
     private javax.swing.JTextField streetAddressTextField;
     private javax.swing.JTextField workPhoneTextField;
     // End of variables declaration//GEN-END:variables
