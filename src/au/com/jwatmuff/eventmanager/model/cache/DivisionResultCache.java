@@ -89,7 +89,7 @@ public class DivisionResultCache {
                 for(int i = 0; i < 2; i++) {
                     String code = f.getPlayerCodes()[i];
                     FightPlayer fp;
-// todo Leonard: Why do I need this try catch when I didin't need it before, I also needed the import bla.misc.PlayerCodeParser bit when I didn't need it before
+// TODO: Leonard: Why do I need this try catch when I didin't need it before, I also needed the import bla.misc.PlayerCodeParser bit when I didn't need it before
                     try {
                         fp = PlayerCodeParser.parseCode(database, code, f.getPoolID());
                         if(fp.type == PlayerType.BYE){

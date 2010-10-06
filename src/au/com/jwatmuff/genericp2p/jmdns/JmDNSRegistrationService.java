@@ -60,7 +60,7 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
             public void run() {
                 try {
                     jmdns.registerService(service);
-                    //todo: is there a way to verify that we succesfully registered?
+//TODO: is there a way to verify that we succesfully registered?
                     registered = true;
                 } catch (IOException e) {
                     failed.set(true);

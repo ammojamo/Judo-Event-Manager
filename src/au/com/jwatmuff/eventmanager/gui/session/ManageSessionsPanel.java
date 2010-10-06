@@ -136,7 +136,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
 
                 /** Gets and orders the Mat row so that mats appear in alphabetical order */
                 ArrayList<SessionInfo> matRowInfo = sessionTableInfo.get(0);
-// todo Leonard: Why is there a null mat just after a session is added and just before the mat link is added.
+// TODO: Leonard: Why is there a null mat just after a session is added and just before the mat link is added.
 //System.out.println("No mats is " + matRowInfo.size());
                 Collections.sort(matRowInfo, new Comparator<SessionInfo>() {
                     public int compare(SessionInfo session1, SessionInfo session2) {
