@@ -29,6 +29,7 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -240,6 +241,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         loadBackupButton = new javax.swing.JButton();
         saveBackupButton = new javax.swing.JButton();
         deleteCompButton = new javax.swing.JButton();
+        renameCompButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         newCompRadioButton = new javax.swing.JRadioButton();
         cancelButton = new javax.swing.JButton();
@@ -323,6 +325,15 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             }
         });
 
+        renameCompButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/delete.png"))); // NOI18N
+        renameCompButton.setText("Rename");
+        renameCompButton.setEnabled(false);
+        renameCompButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                renameCompButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -330,14 +341,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
                     .addComponent(existingCompRadioButton)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(loadBackupButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(saveBackupButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(deleteCompButton)))
+                        .addComponent(deleteCompButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(renameCompButton)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -346,12 +359,13 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(existingCompRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadBackupButton)
                     .addComponent(saveBackupButton)
-                    .addComponent(deleteCompButton))
+                    .addComponent(deleteCompButton)
+                    .addComponent(renameCompButton))
                 .addContainerGap())
         );
 
@@ -376,7 +390,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(newCompRadioButton)
-                .addContainerGap(437, Short.MAX_VALUE))
+                .addContainerGap(427, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -414,7 +428,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(expiryWarningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
+                        .addComponent(expiryWarningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(okButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -469,7 +483,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(manualScoreboardButton)
                     .addComponent(displayScoreboardButton))
-                .addContainerGap(425, Short.MAX_VALUE))
+                .addContainerGap(397, Short.MAX_VALUE))
         );
 
         jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {displayScoreboardButton, manualScoreboardButton});
@@ -481,7 +495,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addComponent(manualScoreboardButton)
                 .addGap(18, 18, 18)
                 .addComponent(displayScoreboardButton)
-                .addContainerGap(364, Short.MAX_VALUE))
+                .addContainerGap(360, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Manual Interfaces", jPanel4);
@@ -528,7 +542,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
                         .addComponent(licenseExpiryLabel)))
-                .addContainerGap(463, Short.MAX_VALUE))
+                .addContainerGap(445, Short.MAX_VALUE))
         );
 
         jPanel6Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel2, jLabel3, jLabel4});
@@ -595,7 +609,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadLicenseButton)
                     .addComponent(enterLicenseKeyButton))
-                .addContainerGap(289, Short.MAX_VALUE))
+                .addContainerGap(269, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Licenses", jPanel5);
@@ -744,6 +758,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         boolean local = (info != null && info.local);
         saveBackupButton.setEnabled(local);
         deleteCompButton.setEnabled(local);
+        renameCompButton.setEnabled(local);
         updateOkButton();
     }//GEN-LAST:event_competitionListValueChanged
 
@@ -827,6 +842,39 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private void displayScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_displayScoreboardButtonActionPerformed
         ScoreboardWindow.selectAndDisplayRemoteScoreboard(this, peerManager);
     }//GEN-LAST:event_displayScoreboardButtonActionPerformed
+
+    private void renameCompButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renameCompButtonActionPerformed
+
+        selected = (DatabaseInfo)competitionList.getSelectedValue();
+        if(selected == null) return;
+        if(!Main.VERSION.equals(selected.version)) {
+            GUIUtils.displayError(this, "This competition is only compatible with version " + selected.version + ".\nThis copy of EventManager is version " + Main.VERSION + ".");
+            return;
+        }
+        
+        String newName = (String)JOptionPane.showInputDialog(null,
+                    "Enter a new competition name",
+                    "Rename Competition",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    selected.name + "-copy");
+
+
+        Properties props = new Properties();
+        props.setProperty("UUID", "" + selected.id);
+        props.setProperty("name", newName);
+        props.setProperty("password", "" + selected.passwordHash);
+        props.setProperty("version", selected.version);
+
+        File infoFile = new File(selected.localDirectory, "info.dat");
+
+        try {
+            props.store(new FileOutputStream(infoFile), null);
+        } catch (IOException e) {
+            log.error("Unable to write database info to file", e);
+        }
+    }//GEN-LAST:event_renameCompButtonActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -859,6 +907,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private javax.swing.JButton manualScoreboardButton;
     private javax.swing.JRadioButton newCompRadioButton;
     private javax.swing.JButton okButton;
+    private javax.swing.JButton renameCompButton;
     private javax.swing.JButton saveBackupButton;
     // End of variables declaration//GEN-END:variables
     
