@@ -447,6 +447,16 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
         }
         if(!PermissionChecker.isAllowed(Action.LOCK_SESSION, database)) return;
 
+        Collections.sort(sessions, new Comparator<Session>() {
+            public int compare(Session session1, Session session2) {
+                if(session1.getMat().equals(session2.getMat())){
+                    return session1.getName().compareTo(session2.getName());
+                } else {
+                    return session1.getMat().compareTo(session2.getMat());
+                }
+            }
+        });
+
         ComboBoxDialog<Session> cbd = new ComboBoxDialog<Session>(parentWindow, true, sessions, "Choose session to lock", "Lock Session");
         cbd.setRenderer(new StringRenderer<Session>() {
             @Override
