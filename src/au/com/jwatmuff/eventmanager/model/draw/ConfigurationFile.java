@@ -35,15 +35,19 @@ public class ConfigurationFile {
         return properties.getProperty("" + players);
     }
 
+    public String getProperty(String propertyName) {
+        return properties.getProperty(propertyName);
+    }
+
     /*** Static utility methods ***/
 
     private static Map<String, ConfigurationFile> drawConfigurations = new HashMap<String, ConfigurationFile>();
 
     static {
-        updateDrawConfigurations();
+        updateConfigurations();
     }
 
-    private static void updateDrawConfigurations() {
+    private static void updateConfigurations() {
         File configDir = new File(DRAW_CONFIG_DIR);
         for(File f : configDir.listFiles(new FileExtensionFilter("properties"))) {
             Properties props = new Properties();
@@ -59,11 +63,11 @@ public class ConfigurationFile {
         }
     }
 
-    public static List<ConfigurationFile> getDrawConfigurations() {
+    public static List<ConfigurationFile> getConfigurations() {
         return new ArrayList<ConfigurationFile>(drawConfigurations.values());
     }
 
-    public static String[] getDrawConfigurationNames() {
+    public static String[] getConfigurationNames() {
         ArrayList<String> names = new ArrayList<String>();
         for(ConfigurationFile config : drawConfigurations.values())
             names.add(config.getName());
@@ -76,7 +80,7 @@ public class ConfigurationFile {
         return names.toArray(new String[] {});
     }
 
-    public static ConfigurationFile getDrawConfiguration(String name) {
+    public static ConfigurationFile getConfiguration(String name) {
         if(!drawConfigurations.containsKey(name))
             name = "Default";
         return drawConfigurations.get(name);

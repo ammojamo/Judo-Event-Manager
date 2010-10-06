@@ -106,8 +106,8 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="competitionNameTextField" alignment="1" pref="454" max="32767" attributes="0"/>
-                                  <Component id="locationTextField" alignment="1" pref="454" max="32767" attributes="0"/>
+                                  <Component id="competitionNameTextField" alignment="1" pref="463" max="32767" attributes="0"/>
+                                  <Component id="locationTextField" alignment="1" pref="463" max="32767" attributes="0"/>
                                   <Component id="finishDatePicker" linkSize="4" alignment="0" min="-2" pref="83" max="-2" attributes="0"/>
                                   <Component id="startDatePicker" linkSize="4" alignment="0" min="-2" pref="148" max="-2" attributes="0"/>
                               </Group>
@@ -120,7 +120,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel5" linkSize="2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="directorNameTextField" pref="454" max="32767" attributes="0"/>
+                              <Component id="directorNameTextField" pref="463" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -129,7 +129,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="directorContactTextField" pref="454" max="32767" attributes="0"/>
+                                  <Component id="directorContactTextField" pref="463" max="32767" attributes="0"/>
                                   <Component id="drawConfigurationComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -181,7 +181,7 @@
                           <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="drawConfigurationComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="196" max="32767" attributes="0"/>
+                      <EmptySpace pref="171" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -253,6 +253,9 @@
                   <StringArray count="0"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="drawConfigurationComboBoxActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -271,7 +274,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jScrollPane1" alignment="0" pref="555" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" alignment="0" pref="583" max="32767" attributes="1"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="addPoolButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -297,7 +300,7 @@
                           <Component id="importButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="366" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="359" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -424,7 +427,7 @@
                           <Component id="loadLicenseButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="enterLicenseKeyButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="285" max="32767" attributes="0"/>
+                      <EmptySpace pref="268" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -448,17 +451,17 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel7" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="licenseNameLabel" pref="435" max="32767" attributes="0"/>
+                                  <Component id="licenseNameLabel" pref="443" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel8" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="licenseContactLabel" pref="435" max="32767" attributes="0"/>
+                                  <Component id="licenseContactLabel" pref="443" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel9" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="licenseTypeLabel" pref="435" max="32767" attributes="0"/>
+                                  <Component id="licenseTypeLabel" pref="443" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>

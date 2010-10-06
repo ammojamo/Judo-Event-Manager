@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
@@ -68,7 +69,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         this.licenseManager = licenseManager;
         initComponents();
 
-        drawConfigurationComboBox.setModel(new DefaultComboBoxModel(ConfigurationFile.getDrawConfigurationNames()));
+        drawConfigurationComboBox.setModel(new DefaultComboBoxModel(ConfigurationFile.getConfigurationNames()));
 
         this.setLocationRelativeTo(parent);
         
@@ -325,6 +326,12 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
 
         jLabel11.setText("Draw Configuration");
 
+        drawConfigurationComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                drawConfigurationComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -340,8 +347,8 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(competitionNameTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
-                            .addComponent(locationTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                            .addComponent(competitionNameTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                            .addComponent(locationTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
                             .addComponent(finishDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(startDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
@@ -351,14 +358,14 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(directorNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE))
+                        .addComponent(directorNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel6)
                             .addComponent(jLabel11))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(directorContactTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                            .addComponent(directorContactTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
                             .addComponent(drawConfigurationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
@@ -402,7 +409,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(drawConfigurationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(196, Short.MAX_VALUE))
+                .addContainerGap(171, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("General", jPanel2);
@@ -483,7 +490,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(addPoolButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -504,7 +511,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                     .addComponent(deletePoolButton)
                     .addComponent(importButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -534,15 +541,15 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(licenseNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE))
+                        .addComponent(licenseNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(licenseContactLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE))
+                        .addComponent(licenseContactLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(licenseTypeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)))
+                        .addComponent(licenseTypeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -606,7 +613,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadLicenseButton)
                     .addComponent(enterLicenseKeyButton))
-                .addContainerGap(285, Short.MAX_VALUE))
+                .addContainerGap(268, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("License", jPanel3);
@@ -773,6 +780,44 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_enterLicenseKeyButtonActionPerformed
+
+    private void drawConfigurationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drawConfigurationComboBoxActionPerformed
+
+
+        ConfigurationFile dc = ConfigurationFile.getConfiguration((String)drawConfigurationComboBox.getSelectedItem());
+        String defaultDivisionsFileName = dc.getProperty("defaultDivisions");
+        String defaultDirectorName = dc.getProperty("defaultDirectorName");
+        String defaultDirectorContact = dc.getProperty("defaultDirectorContact");
+        if(!defaultDirectorName.isEmpty() && directorNameTextField.getText().trim().isEmpty()){
+            directorNameTextField.setText(defaultDirectorName);
+            directorContactTextField.setText(defaultDirectorContact);
+        }
+        System.out.println("Config file output is : " + defaultDivisionsFileName);
+        if(defaultDivisionsFileName.isEmpty() || !database.findAll(Pool.class, PoolDAO.ALL).isEmpty())
+            return;
+        int response = JOptionPane.showConfirmDialog( null,
+                "Do you want to import the default divisions from : " + defaultDivisionsFileName,
+                "Default Divisions Import",
+                JOptionPane.WARNING_MESSAGE);
+        if(response == JOptionPane.OK_OPTION) {
+            File csvFile = new File("resources/division/" + defaultDivisionsFileName + ".csv");
+
+            try {
+                int succeeded = CSVImporter.importPools(csvFile, database);
+
+                if(succeeded == 0)
+                    GUIUtils.displayError(this, "No divisions imported. Check that the CSV file is properly formatted.");
+                else
+                    GUIUtils.displayMessage(this, succeeded + " divisions succesfully imported", "Import Completed");
+
+            } catch(FileNotFoundException e) {
+                GUIUtils.displayError(this, "Could not find file " + csvFile);
+            } catch(Exception e) {
+                log.error("Error while reading CSV file", e);
+                GUIUtils.displayError(this, "CSV Import Failed: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_drawConfigurationComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addPoolButton;
