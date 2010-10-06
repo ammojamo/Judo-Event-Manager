@@ -8,6 +8,7 @@ package au.com.jwatmuff.eventmanager.model.misc;
 import au.com.jwatmuff.eventmanager.model.info.SessionFightInfo;
 import au.com.jwatmuff.eventmanager.model.info.SessionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
+import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
@@ -15,9 +16,10 @@ import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -31,42 +33,93 @@ public class SessionFightSequencer {
     private SessionFightSequencer() {}
     
     public static void nPassAutoOrder(Database database, List<SessionFightInfo> fights, int spacing) {
+
+        int n = fights.size();
+        Map<SessionFightInfo,ArrayList<Player>> possiblePlayersInFights = new HashMap<SessionFightInfo,ArrayList<Player>>();
+        for(int i = 0; i < n; i++) {
+            SessionFightInfo sFI = fights.get(i);
+            Fight f = fights.get(i).getFight();
+            ArrayList<Player> possiblePlayersF = PoolPlayerSequencer.getPossiblePlayers(database,  f.getPoolID(), f.getPosition());
+            possiblePlayersInFights.put(sFI,possiblePlayersF);
+        }
+
         while(spacing >= 1) {
-            autoOrder(database, fights, spacing, false);
-            autoOrder(database, fights, spacing, true);
-            autoOrder(database, fights, spacing, false);
+            autoOrder(database, fights, possiblePlayersInFights, spacing, false);
+            autoOrder(database, fights, possiblePlayersInFights, spacing, true);
+            autoOrder(database, fights, possiblePlayersInFights, spacing, false);
             spacing--;
         }
     }
     
-    public static void autoOrder(Database database, List<SessionFightInfo> fights, int spacing, boolean up) {
-        Collection<Integer> checkedPools = new ArrayList<Integer>();
+    public static void autoOrder(Database database, List<SessionFightInfo> fights, Map<SessionFightInfo,ArrayList<Player>> possiblePlayersInFights, int spacing, boolean up) {
 
         log.debug("Auto-order: " + (up?"UP":"DOWN") + ", spacing " + spacing);
+
         int n = fights.size();
         for(int i = 1; i < n; i++) {
 
-            checkedPools.clear();
-
             for(int j = i; j < n; j++) {
 
-                Fight f1 = fights.get(up?n-j-1:j).getFight();
-                if(checkedPools.contains(f1.getPoolID()))
-                    continue;
+                SessionFightInfo sFI1 = fights.get(up?n-j-1:j);
+                Fight f1 = sFI1.getFight();
 
                 boolean positionOk = true;
 
                 for(int k = 1; k <= spacing && i-k >= 0; k++) {
-
                     Fight f2 = fights.get(up?n-(i-k)-1:i-k).getFight();
-
                     if(f1.getPoolID() == f2.getPoolID() &&
                        PoolPlayerSequencer.hasCommonPlayers(database, f1.getPoolID(), new int[] { f1.getPosition(), f2.getPosition() })) {
                         // means that fight f1 is NOT in an ok position
                         positionOk = false;
                         break;
                     }
+                }
 
+                if(positionOk) {
+                    if(!up) {
+                        ArrayList<Integer> dependentFights =  PoolPlayerSequencer.getDependentFights(database,  f1.getPoolID(), f1.getPosition());
+                        for(int l = i; l < j; l++) {
+                            Fight f2 = fights.get(up?n-l-1:l).getFight();
+                            if(f1.getPoolID() == f2.getPoolID() && dependentFights.contains(f2.getPosition())) {
+                                // means that fight in position j is dependent on fight at position l
+                                positionOk = false;
+                                break;
+                            }
+                        }
+                    } else {
+                        for(int l = i; l < j; l++) {
+                            Fight f2 = fights.get(up?n-l-1:l).getFight();
+                            if(f1.getPoolID() == f2.getPoolID()) {
+                                ArrayList<Integer> dependentFights =  PoolPlayerSequencer.getDependentFights(database,  f2.getPoolID(), f2.getPosition());
+                                if(dependentFights.contains(f1.getPosition())) {
+                                    // means that fight in position l is dependent on fight at position j
+                                    positionOk = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(positionOk) {
+                pPCheck:
+                    for(int l = j-1; l >= i-spacing && l >= 0; l--) {
+                        SessionFightInfo sFI2 = fights.get(up?n-l-1:l);
+                        Fight f2 = sFI2.getFight();
+                        if(f1.getPoolID() != f2.getPoolID()) {
+                            ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
+                            ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
+                            for(Player player1 : possiblePlayersF1){
+                                for(Player player2 : possiblePlayersF2){
+                                    if(player1.getVisibleID().equals(player2.getVisibleID())){
+                                        // means that fight at position j could have a player in it that is in another pool between i-spacing and j-1
+                                        positionOk = false;
+                                        break pPCheck;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if(positionOk) {
@@ -79,10 +132,8 @@ public class SessionFightSequencer {
                     break;
                 }
 
-                checkedPools.add(f1.getPoolID());
             }
         }
-        
         fixPositions(fights);
     }
     
