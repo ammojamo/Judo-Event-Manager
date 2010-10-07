@@ -485,6 +485,16 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
         }
         if(!PermissionChecker.isAllowed(Action.REMOVE_CONTEST_AREA, database)) return;
 
+        Collections.sort(unlockedMats, new Comparator<Session>() {
+            public int compare(Session session1, Session session2) {
+                if(session1.getMat().equals(session2.getMat())){
+                    return session1.getName().compareTo(session2.getName());
+                } else {
+                    return session1.getMat().compareTo(session2.getMat());
+                }
+            }
+        });
+
         ComboBoxDialog<Session> cbd = new ComboBoxDialog<Session>(parentWindow, true, unlockedMats, "Choose contest area to delete", "Delete Contest Area");
         cbd.setRenderer(new StringRenderer<Session>() {
             @Override
@@ -512,6 +522,16 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
             return;
         }
         if(!PermissionChecker.isAllowed(Action.REMOVE_SESSION, database)) return;
+
+        Collections.sort(sessions, new Comparator<Session>() {
+            public int compare(Session session1, Session session2) {
+                if(session1.getMat().equals(session2.getMat())){
+                    return session1.getName().compareTo(session2.getName());
+                } else {
+                    return session1.getMat().compareTo(session2.getMat());
+                }
+            }
+        });
 
         ComboBoxDialog<Session> cbd = new ComboBoxDialog<Session>(parentWindow, true, sessions, "Choose session to delete", "Delete Session");
         cbd.setRenderer(new StringRenderer<Session>() {
