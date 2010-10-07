@@ -23,16 +23,15 @@
             <th>Last Name</th>
             <th>First Name</th>
             <th>DOB</th>
-            <th>Weight (kg)</th>
             <th>Grade</th>
             <th>Gender</th>
-            <th>Status</th>
+            <th>Weight</th>
         </tr>
 <!--
 #foreach($player in $players)
 #set($weight = $player.weight)
 #if($weight == 0)
-  #set($weight = "--")
+  #set($weight = "_________")
 #end
 <!-- -->
         <tr>
@@ -44,10 +43,9 @@
 #else
             <td>---</td>
 #end
-            <td>$!weight</td>
             <td>$!player.shortGrade</td>
             <td>$!player.gender</td>
-            <td>$!player.lockedStatus</td>
+            <td>$!weight  (kg)</td>
         </tr>
 <!--
 #end
