@@ -59,11 +59,33 @@ public abstract class PlayerTableModel extends BeanMapperTableModel<PlayerPoolIn
     }
 
     public void shuffle() {
+        List<PlayerPoolInfo> unorderedPlayers = new ArrayList<PlayerPoolInfo>();
         Pool pool = getPool();
         if(pool == null) return;
         int poolID = pool.getID();
 
-        Collections.shuffle(players);
+        int numPlayerPositions = players.size();
+
+        for(PlayerPoolInfo player : players) {
+            if(player != null)
+                unorderedPlayers.add(player);
+        }
+
+        players.clear();
+
+        Collections.shuffle(unorderedPlayers);
+
+        // fill at least half the available position in the ordered players list
+        while(players.size() < numPlayerPositions/2 && !unorderedPlayers.isEmpty()) {
+            players.add(unorderedPlayers.remove(0));
+        }
+        // fill at other half the available position in the ordered players list
+        while(players.size()+unorderedPlayers.size() < numPlayerPositions) {
+            unorderedPlayers.add(null);
+        }
+        Collections.shuffle(unorderedPlayers);
+        players.addAll(unorderedPlayers);
+
         PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
     }
 

@@ -32,6 +32,22 @@ public class PoolPlayerSequencer {
     private static final Logger log = Logger.getLogger(PoolPlayerSequencer.class);
 
     private static Map<Database, PoolPlayerSequencer> instances = new HashMap<Database, PoolPlayerSequencer>();
+
+    private static final Comparator<PlayerPoolInfo> PLAYERS_COMPARATOR = new Comparator<PlayerPoolInfo>() {
+        @Override
+        public int compare(PlayerPoolInfo p1, PlayerPoolInfo p2) {
+            String n1 = p1.getPlayer().getLastName() + p1.getPlayer().getFirstName();
+            String n2 = p2.getPlayer().getLastName() + p2.getPlayer().getFirstName();
+            return n1.compareTo(n2);
+        }
+    };
+
+    private static final Comparator<PlayerPoolInfo> PLAYERS_COMPARATOR_POSITION = new Comparator<PlayerPoolInfo>() {
+        @Override
+        public int compare(PlayerPoolInfo pp1, PlayerPoolInfo pp2) {
+            return pp1.getPlayerPool().getPlayerPosition() - pp2.getPlayerPool().getPlayerPosition();
+        }
+    };
     
     /*
     private static class PoolFightPlayerInfo extends ArrayList<Set<Integer>> {}
@@ -142,7 +158,9 @@ public class PoolPlayerSequencer {
 
     
     public static List<PlayerPoolInfo> getPlayerSequence(Database database, int poolID) {
+        int numPlayerPositions = getNumberOfPlayerPositions(database, poolID);
         List<PlayerPoolInfo> players = new ArrayList<PlayerPoolInfo>(PlayerPoolInfo.getForPool(database, poolID));
+        List<PlayerPoolInfo> newPlayers = new ArrayList<PlayerPoolInfo>();
 
         CollectionUtils.filter(players, new Predicate() {
             @Override
@@ -151,31 +169,36 @@ public class PoolPlayerSequencer {
                 return ((PlayerPoolInfo)player).getPlayerPool().isApproved();
             }
         });
-        
-        Collections.sort(players, new Comparator<PlayerPoolInfo> () {
-            @Override
-            public int compare(PlayerPoolInfo pp1, PlayerPoolInfo pp2) {
-                return pp1.getPlayerPool().getPlayerPosition() - pp2.getPlayerPool().getPlayerPosition();
-            }
-        });
 
-        // create a new list with null entries so that player pool position reflects
-        // the index of each player in the list
-        List<PlayerPoolInfo> newPlayers = new ArrayList<PlayerPoolInfo>();
-        int index = 1;
+        boolean repositionPlayers = false;
         for(PlayerPoolInfo player : players) {
-            while(index < player.getPlayerPool().getPlayerPosition()) {
-                newPlayers.add(null);
+            if(player.getPlayerPool().getPlayerPosition() > numPlayerPositions) {
+                repositionPlayers = true;
+            }
+        }
+
+        if(repositionPlayers) {
+            Collections.sort(players, PLAYERS_COMPARATOR);
+            newPlayers.addAll(players);
+        } else {
+            Collections.sort(players, PLAYERS_COMPARATOR_POSITION);
+
+            // create a new list with null entries so that player pool position reflects
+            // the index of each player in the list
+            int index = 1;
+            for(PlayerPoolInfo player : players) {
+                while(index < player.getPlayerPool().getPlayerPosition()) {
+                    newPlayers.add(null);
+                    index++;
+                }
+                newPlayers.add(player);
                 index++;
             }
-            newPlayers.add(player);
-            index++;
         }
 
         // finally, insert any additional nulls to make the length of the list
         // equal to the number of player positions in the pool
-        int numPlayerPositions = getNumberOfPlayerPositions(database, poolID);
-        for(; index <= numPlayerPositions; index++)
+        for(int index = newPlayers.size()+1; index <= numPlayerPositions; index++)
             newPlayers.add(null);
 
         return newPlayers;
