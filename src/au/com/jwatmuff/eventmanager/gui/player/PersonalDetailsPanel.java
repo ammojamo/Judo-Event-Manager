@@ -19,7 +19,10 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ArrayList;
+import java.awt.Component;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
 
 /**
  *
@@ -49,6 +52,15 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
         
         // Set up grade combo box
         model = (DefaultComboBoxModel)gradeComboBox.getModel();
+        gradeComboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b0) {
+                if(object instanceof Player.Grade)
+                    return super.getListCellRendererComponent(jList, ((Player.Grade)object).belt, i, b, b0);
+                else
+                    return super.getListCellRendererComponent(jList, object, i, b, b0);
+            }
+        });
         for(Grade b : Player.Grade.values())
             model.addElement(b);
         model.setSelectedItem(Player.Grade.UNSPECIFIED);

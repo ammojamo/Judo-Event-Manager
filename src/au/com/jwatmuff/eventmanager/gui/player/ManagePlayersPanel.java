@@ -151,6 +151,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
                 else
                     label.setIcon(new ColorIcon(c, 16, 12));
 
+                label.setText(grade.belt);
                 return label;
             }
         });

@@ -27,9 +27,31 @@ public class Player extends DistributableObject<Integer> implements Serializable
     }
     
     public static enum Grade {
-        WHITE, YELLOW, ORANGE, GREEN, BLUE, BROWN, BLACK_1ST_DAN, BLACK_2ND_DAN,
-        BLACK_3RD_DAN, BLACK_4TH_DAN, BLACK_5TH_DAN, BLACK_6TH_DAN,
-        BLACK_7TH_DAN, BLACK_8TH_DAN, BLACK_9TH_DAN, UNSPECIFIED;
+        WHITE ("6 Kyu", "WHITE", "6K"),
+        YELLOW ("5 Kyu", "YELLOW", "5K"),
+        ORANGE ("4 Kyu", "ORANGE", "4K"),
+        GREEN ("3 Kyu", "GREEN", "3K"),
+        BLUE ("2 Kyu", "BLUE", "2K"),
+        BROWN ("1 Kyu", "BROWN", "1K"),
+        BLACK_1ST_DAN ("1 Dan", "1st Dan", "1D"),
+        BLACK_2ND_DAN ("2 Dan", "2nd Dan", "2D"),
+        BLACK_3RD_DAN ("3 Dan", "3rd Dan", "3D"),
+        BLACK_4TH_DAN ("4 Dan", "4th Dan", "4D"),
+        BLACK_5TH_DAN ("5 Dan", "5th Dan", "5D"),
+        BLACK_6TH_DAN ("6 Dan", "6th Dan", "6D"),
+        BLACK_7TH_DAN ("7 Dan", "7th Dan", "7D"),
+        BLACK_8TH_DAN ("8 Dan", "8th Dan", "8D"),
+        BLACK_9TH_DAN ("9 Dan", "9th Dan", "9D"),
+        UNSPECIFIED ("None", "None", "N");
+
+        public final String shortGrade;   // in kilograms
+        public final String belt;   // in kilograms
+        public final String veryShortGrade;   // in kilograms
+        Grade(String shortGrade, String belt, String veryShortGrade) {
+            this.shortGrade = shortGrade;
+            this.belt = belt;
+            this.veryShortGrade = veryShortGrade;
+        }
         
         public static Grade fromString(String name) {
             return (name == null) ? UNSPECIFIED : valueOf(name);
@@ -114,6 +136,18 @@ public class Player extends DistributableObject<Integer> implements Serializable
 
     public Grade getGrade() {
         return grade;
+    }
+
+    public String getShortGrade() {
+        return grade.shortGrade;
+    }
+
+    public String getVeryShortGrade() {
+        return grade.veryShortGrade;
+    }
+
+    public String getBelt() {
+        return grade.belt;
     }
 
     public void setGrade(Grade grade) {

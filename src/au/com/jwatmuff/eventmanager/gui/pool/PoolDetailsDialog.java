@@ -70,12 +70,30 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         for(Player.Grade grade : Player.Grade.values())
             model.addElement(grade);
         minGradeComboBox.setModel(model);
+        minGradeComboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b0) {
+                if(object instanceof Player.Grade)
+                    return super.getListCellRendererComponent(jList, ((Player.Grade)object).belt, i, b, b0);
+                else
+                    return super.getListCellRendererComponent(jList, object, i, b, b0);
+            }
+        });
         minGradeComboBox.setSelectedItem(Player.Grade.UNSPECIFIED);
         
         model = new DefaultComboBoxModel();
         for(Player.Grade grade : Player.Grade.values())
             model.addElement(grade);
         maxGradeComboBox.setModel(model);
+        maxGradeComboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b0) {
+                if(object instanceof Player.Grade)
+                    return super.getListCellRendererComponent(jList, ((Player.Grade)object).belt, i, b, b0);
+                else
+                    return super.getListCellRendererComponent(jList, object, i, b, b0);
+            }
+        });
         maxGradeComboBox.setSelectedItem(Player.Grade.UNSPECIFIED);
         
         model = new DefaultComboBoxModel();

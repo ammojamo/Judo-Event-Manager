@@ -301,7 +301,10 @@ public class CSVImporter {
 
                     grade = grade.toUpperCase();
                     for(Grade g : Grade.values()) {
-                        if(grade.startsWith("BLACK")) {
+                        if(grade.equalsIgnoreCase(g.shortGrade) || grade.equalsIgnoreCase(g.veryShortGrade)) {
+                            p.setGrade(g);
+                            break;
+                        } else if(grade.startsWith("BLACK")) {
                             if(g.toString().startsWith("BLACK") &&
                                grade.contains(g.toString().substring(6, 9))) {
                                     p.setGrade(g);
@@ -312,7 +315,6 @@ public class CSVImporter {
                             break;
                         }
                     }
-
                 }
             } catch(Exception e) {}
             
