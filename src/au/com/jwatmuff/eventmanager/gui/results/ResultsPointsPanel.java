@@ -171,7 +171,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                         Player loser = bean.getPlayer()[loserIndex].player;
                         Player winner = bean.getPlayer()[winnerIndex].player;
                         loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate);
-                        map.put("rank", (loserGrade==null)?"N/A": loserGrade);
+                        map.put("rank", (loserGrade==null)?"N/A": loserGrade.shortGrade);
                         map.put("loserId", (loser == null) ? "N/A" : loser.getVisibleID());
                         map.put("winnerId", (winner == null) ? "N/A" : winner.getVisibleID());
                     }

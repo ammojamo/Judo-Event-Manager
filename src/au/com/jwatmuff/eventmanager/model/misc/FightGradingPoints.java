@@ -57,6 +57,10 @@ public class FightGradingPoints {
         return effectiveLoserGrade;
     }
 
+    public String getEffectiveLoserGradeDisplay() {
+        return effectiveLoserGrade.shortGrade;
+    }
+
     public ResultInfo getResult() {
         return result;
     }
