@@ -858,21 +858,22 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                     JOptionPane.PLAIN_MESSAGE,
                     null,
                     null,
-                    selected.name + "-copy");
+                    selected.name);
 
+        if(newName != null) {
+            Properties props = new Properties();
+            props.setProperty("UUID", "" + selected.id);
+            props.setProperty("name", newName);
+            props.setProperty("password", "" + selected.passwordHash);
+            props.setProperty("version", selected.version);
 
-        Properties props = new Properties();
-        props.setProperty("UUID", "" + selected.id);
-        props.setProperty("name", newName);
-        props.setProperty("password", "" + selected.passwordHash);
-        props.setProperty("version", selected.version);
+            File infoFile = new File(selected.localDirectory, "info.dat");
 
-        File infoFile = new File(selected.localDirectory, "info.dat");
-
-        try {
-            props.store(new FileOutputStream(infoFile), null);
-        } catch (IOException e) {
-            log.error("Unable to write database info to file", e);
+            try {
+                props.store(new FileOutputStream(infoFile), null);
+            } catch (IOException e) {
+                log.error("Unable to write database info to file", e);
+            }
         }
     }//GEN-LAST:event_renameCompButtonActionPerformed
         
