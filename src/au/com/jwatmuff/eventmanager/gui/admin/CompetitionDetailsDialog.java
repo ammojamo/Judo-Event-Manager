@@ -788,12 +788,13 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         String defaultDivisionsFileName = dc.getProperty("defaultDivisions");
         String defaultDirectorName = dc.getProperty("defaultDirectorName");
         String defaultDirectorContact = dc.getProperty("defaultDirectorContact");
-        if(!defaultDirectorName.isEmpty() && directorNameTextField.getText().trim().isEmpty()){
+        if(defaultDirectorName != null && !defaultDirectorName.isEmpty() && directorNameTextField.getText().trim().isEmpty()){
             directorNameTextField.setText(defaultDirectorName);
+        }
+        if(defaultDirectorContact != null && !defaultDirectorContact.isEmpty() && directorContactTextField.getText().trim().isEmpty()){
             directorContactTextField.setText(defaultDirectorContact);
         }
-        System.out.println("Config file output is : " + defaultDivisionsFileName);
-        if(defaultDivisionsFileName.isEmpty() || !database.findAll(Pool.class, PoolDAO.ALL).isEmpty())
+        if(defaultDivisionsFileName == null || defaultDivisionsFileName.isEmpty() || !database.findAll(Pool.class, PoolDAO.ALL).isEmpty())
             return;
         int response = JOptionPane.showConfirmDialog( null,
                 "Do you want to import the default divisions from : " + defaultDivisionsFileName,
