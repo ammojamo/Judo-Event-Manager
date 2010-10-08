@@ -874,6 +874,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             } catch (IOException e) {
                 log.error("Unable to write database info to file", e);
             }
+            checkDatabasesExecutor.schedule(checkDatabasesTask, 0, TimeUnit.MILLISECONDS);
         }
     }//GEN-LAST:event_renameCompButtonActionPerformed
         
