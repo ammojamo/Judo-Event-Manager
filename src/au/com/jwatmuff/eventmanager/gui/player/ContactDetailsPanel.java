@@ -10,7 +10,6 @@ import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import java.util.List;
 import java.util.ArrayList;
-import org.apache.commons.validator.EmailValidator;
 
 /**
  *
@@ -338,8 +337,8 @@ public class ContactDetailsPanel extends javax.swing.JPanel {
         if(email.length() == 0)
             errors.add("Email is required");
          */
-//        if(email.length() > 0 && !EmailValidator.getInstance().isValid(email))
-//            errors.add("'" + email + "' is not a valid email");
+        if(email.length() > 0 && !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$"))
+            errors.add("'" + email + "' is not a valid email");
 
         
         /* emergency contact */
