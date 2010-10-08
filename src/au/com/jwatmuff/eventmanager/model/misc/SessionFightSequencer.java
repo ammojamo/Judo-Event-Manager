@@ -30,6 +30,60 @@ import org.apache.log4j.Logger;
 public class SessionFightSequencer {
     private static final Logger log = Logger.getLogger(SessionFightSequencer.class);
 
+    private static final Comparator<SessionFightInfo> Fight_COMPARATOR = new Comparator<SessionFightInfo>() {
+        @Override
+        public int compare(SessionFightInfo sf1, SessionFightInfo sf2) {
+            Fight f1 = sf1.getFight();
+            Fight f2 = sf2.getFight();
+
+            if(f1.getPoolID() == f2.getPoolID())
+                return f1.getPosition() - f2.getPosition();
+            else
+                return f1.getPoolID() - f2.getPoolID();
+        }
+    };
+
+    private static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
+        @Override
+        public int compare(Pool p1, Pool p2) {
+            if(p1.getMaximumAge() == p2.getMaximumAge()){
+                if(p2.getGender().equals(p1.getGender())){
+                    if(p1.getMaximumWeight() == p2.getMaximumWeight()){
+                        if(p1.getMinimumWeight() == p2.getMinimumWeight()){
+                            return  p2.getDescription().compareTo(p1.getDescription());
+                        } else {
+                            if(p1.getMinimumWeight() == 0) {
+                                return -1;
+                            } else if(p1.getMinimumWeight() == 0) {
+                                return 1;
+                            } else {
+                                return -Double.compare(p1.getMinimumWeight(), p2.getMinimumWeight());
+                            }
+                        }
+                    } else {
+                        if(p1.getMaximumWeight() == 0) {
+                            return 1;
+                        } else if(p1.getMaximumWeight() == 0) {
+                            return -1;
+                        } else {
+                            return Double.compare(p1.getMaximumWeight(), p2.getMaximumWeight());
+                        }
+                    }
+                } else {
+                    return  p2.getGender().compareTo(p1.getGender());
+                }
+            } else {
+                if(p1.getMaximumAge() == 0) {
+                    return 1;
+                } else if(p1.getMaximumAge() == 0) {
+                    return -1;
+                } else {
+                    return p1.getMaximumAge() - p2.getMaximumAge();
+                }
+            }
+        }
+    };
+
     private SessionFightSequencer() {}
     
     public static void nPassAutoOrder(Database database, List<SessionFightInfo> fights, int spacing) {
@@ -137,20 +191,29 @@ public class SessionFightSequencer {
         fixPositions(fights);
     }
     
-    public static void resetOrder(List<SessionFightInfo> fights) {
-        Collections.sort(fights, new Comparator<SessionFightInfo>() {
-            @Override
-            public int compare(SessionFightInfo sf1, SessionFightInfo sf2) {
-                Fight f1 = sf1.getFight();
-                Fight f2 = sf2.getFight();
-                
-                if(f1.getPoolID() == f2.getPoolID())
-                    return f1.getPosition() - f2.getPosition();
-                else
-                    return f1.getPoolID() - f2.getPoolID();
-            }            
-        });
-        
+    public static void resetOrder(Database database, List<SessionFightInfo> fights) {
+        ArrayList<Pool> pools = new ArrayList<Pool>();
+        ArrayList<SessionFightInfo> resetFights = new ArrayList<SessionFightInfo>();
+
+        Collections.sort(fights, Fight_COMPARATOR);
+
+        for(SessionFightInfo fight : fights){
+            Pool pool = database.get(Pool.class, fight.getFight().getPoolID());
+            if(!pools.contains(pool))
+                pools.add(pool);
+        }
+
+        Collections.sort(pools, POOL_COMPARATOR);
+
+        for(Pool pool : pools){
+            System.out.println(pool.getDescription());
+            for(SessionFightInfo fight : fights){
+                if(fight.getFight().getPoolID() == pool.getID())
+                    resetFights.add(fight);
+            }
+        }
+        fights.removeAll(resetFights);
+        fights.addAll(resetFights);
         fixPositions(fights);
     }
     

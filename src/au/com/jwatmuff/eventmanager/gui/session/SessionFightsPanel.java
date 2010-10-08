@@ -657,7 +657,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
         if(selectedSession == null) return;
         setFightsDirty(false);
-        SessionFightSequencer.resetOrder(fights);
+        SessionFightSequencer.resetOrder(database, fights);
         
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
