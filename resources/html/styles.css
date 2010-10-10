@@ -43,6 +43,18 @@ table.repechage td.rborder {
     border-right: 1px solid black;
 }
 
+table.repechage td.lborder {
+    border-left: 1px solid black;
+}
+
+table.repechage td.tborder {
+    border-top: 1px solid black;
+}
+
+table.repechage td.bborder {
+    border-bottom: 1px solid black;
+}
+
 table.repechage td.border {
     border-width: 1px;
 }
