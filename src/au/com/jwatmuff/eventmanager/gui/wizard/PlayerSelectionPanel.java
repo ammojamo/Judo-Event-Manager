@@ -330,7 +330,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
 
     @Override
     public boolean nextButtonPressed() {
-        if(GUIUtils.confirmLock(null, "division")) {
+        if(GUIUtils.confirmLock(null, context.pool.getDescription())) {
             try {
                 context.pool = PoolLocker.lockPoolPlayers(database, pool);
                 return true;

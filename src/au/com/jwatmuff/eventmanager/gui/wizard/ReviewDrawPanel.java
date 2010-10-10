@@ -170,7 +170,7 @@ public class ReviewDrawPanel extends javax.swing.JPanel implements DrawWizardWin
 
     @Override
     public boolean nextButtonPressed() {
-        if(!GUIUtils.confirmLock(null, "division")) return false;
+        if(!GUIUtils.confirmLock(null, context.pool.getDescription())) return false;
         if(!PermissionChecker.isAllowed(Action.LOCK_DRAW, database)) return false;
         try {
             PoolLocker.lockPoolFights(database, context.pool);

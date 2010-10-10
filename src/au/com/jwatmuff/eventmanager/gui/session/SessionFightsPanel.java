@@ -536,7 +536,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(this, sb.toString(), "Lock Session Fights", JOptionPane.YES_NO_OPTION);
             if(result != JOptionPane.YES_OPTION) return;
         } else {
-            if(!GUIUtils.confirmLock(parentWindow, "session")) return;
+            if(!GUIUtils.confirmLock(parentWindow, session.getMat() + " : " + session.getName())) return;
         }
         
         try {

@@ -453,7 +453,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(this.parentWindow, "Pool can not be locked without any approved players");
                 return;
             }
-            if(!GUIUtils.confirmLock(this.parentWindow, "division")) return;
+            if(!GUIUtils.confirmLock(this.parentWindow, pool.getDescription())) return;
             
             try {
                 PoolLocker.lockPoolPlayers(database, pool);

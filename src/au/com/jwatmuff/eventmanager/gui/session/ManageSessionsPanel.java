@@ -287,7 +287,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
                 return false;
             }
         } else {
-            return GUIUtils.confirmLock(parentWindow, "session");
+            return GUIUtils.confirmLock(parentWindow, session.getMat() + " : " + session.getName());
         }
         return true;
     }

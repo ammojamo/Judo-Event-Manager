@@ -399,7 +399,7 @@ public class FightOrderPanel extends javax.swing.JPanel {
         Pool pool = getSelectedPool();
 
         if(pool == null) return;
-        if(!GUIUtils.confirmLock(parentWindow, "division")) return;
+        if(!GUIUtils.confirmLock(parentWindow, pool.getDescription())) return;
         if(!PermissionChecker.isAllowed(Action.LOCK_DRAW, database)) return;
         try {
             playerTableModel.savePlayerSequence();

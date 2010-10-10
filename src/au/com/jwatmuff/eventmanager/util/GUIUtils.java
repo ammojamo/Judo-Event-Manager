@@ -67,7 +67,7 @@ public class GUIUtils {
     public static boolean confirmLock(Frame parent, String thingToLock) {
         int status = JOptionPane.showConfirmDialog(
                 parent,
-                "Are you sure you wish to lock this " + thingToLock + "?",
+                "Are you sure you wish to lock " + thingToLock + "?",
                 "Confirm Lock",
                 JOptionPane.YES_NO_OPTION);
         return (status == JOptionPane.YES_OPTION);
