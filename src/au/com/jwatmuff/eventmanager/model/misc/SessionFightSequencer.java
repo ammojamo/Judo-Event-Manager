@@ -50,12 +50,12 @@ public class SessionFightSequencer {
                 if(p2.getGender().equals(p1.getGender())){
                     if(p1.getMaximumWeight() == p2.getMaximumWeight()){
                         if(p1.getMinimumWeight() == p2.getMinimumWeight()){
-                            return  p2.getDescription().compareTo(p1.getDescription());
+                            return  p1.getDescription().compareTo(p2.getDescription());
                         } else {
                             if(p1.getMinimumWeight() == 0) {
-                                return -1;
-                            } else if(p1.getMinimumWeight() == 0) {
                                 return 1;
+                            } else if(p2.getMinimumWeight() == 0) {
+                                return -1;
                             } else {
                                 return -Double.compare(p1.getMinimumWeight(), p2.getMinimumWeight());
                             }
@@ -63,7 +63,7 @@ public class SessionFightSequencer {
                     } else {
                         if(p1.getMaximumWeight() == 0) {
                             return 1;
-                        } else if(p1.getMaximumWeight() == 0) {
+                        } else if(p2.getMaximumWeight() == 0) {
                             return -1;
                         } else {
                             return Double.compare(p1.getMaximumWeight(), p2.getMaximumWeight());
@@ -75,7 +75,7 @@ public class SessionFightSequencer {
             } else {
                 if(p1.getMaximumAge() == 0) {
                     return 1;
-                } else if(p1.getMaximumAge() == 0) {
+                } else if(p2.getMaximumAge() == 0) {
                     return -1;
                 } else {
                     return p1.getMaximumAge() - p2.getMaximumAge();
@@ -206,7 +206,6 @@ public class SessionFightSequencer {
         Collections.sort(pools, POOL_COMPARATOR);
 
         for(Pool pool : pools){
-            System.out.println(pool.getDescription());
             for(SessionFightInfo fight : fights){
                 if(fight.getFight().getPoolID() == pool.getID())
                     resetFights.add(fight);
