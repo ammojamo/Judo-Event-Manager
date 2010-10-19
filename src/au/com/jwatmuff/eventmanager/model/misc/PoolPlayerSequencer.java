@@ -178,7 +178,7 @@ public class PoolPlayerSequencer {
         }
 
         if(repositionPlayers) {
-            Collections.sort(players, PLAYERS_COMPARATOR);
+            Collections.sort(players, PLAYERS_COMPARATOR_POSITION);
             newPlayers.addAll(players);
         } else {
             Collections.sort(players, PLAYERS_COMPARATOR_POSITION);
