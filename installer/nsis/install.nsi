@@ -1,4 +1,4 @@
-Name "Event Manager 2010 Update 3"
+Name "Event Manager 2010 Update 4"
 Caption "Event Manager"
 ;Icon "YourProgram.ico"
 OutFile "EventManagerSetup.exe"
@@ -8,7 +8,7 @@ LicenseForceSelection checkbox
 
 InstallDir $PROGRAMFILES\EventManager
 
-DirText "This will install EventManager 2010 Update 3 on your computer."
+DirText "This will install EventManager 2010 Update 4 on your computer."
 
 Section ""
   SetOutPath $INSTDIR
@@ -60,10 +60,10 @@ Section "Install Java"
 
   installjava:
 
-  File ..\thirdparty\jre-6u16-windows-i586-s.exe
-  ExecWait "$INSTDIR\jre-6u16-windows-i586-s.exe"
+  File ..\thirdparty\jre-6u22-windows-i586-s.exe
+  ExecWait "$INSTDIR\jre-6u22-windows-i586-s.exe"
 
   installjavadone:
 
-  Delete "$INSTDIR\jre-6u16-windows-i586-s.exe"
+  Delete "$INSTDIR\jre-6u22-windows-i586-s.exe"
 SectionEnd
