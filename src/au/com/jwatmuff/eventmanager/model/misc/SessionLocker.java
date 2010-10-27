@@ -150,7 +150,12 @@ public class SessionLocker {
         Collection<Session> allPreceding = si.getPrecedingSessions();
         if(allPreceding.size() > 0) {
             for(Session preceding : allPreceding) {
-                if(preceding.getLockedStatus() != LockedStatus.FIGHTS_LOCKED)
+                // update 'preceding' from database, since the session may have
+                // been locked in an earlier iteration of this loop
+                preceding = database.get(Session.class, preceding.getID());
+
+                // only lock if 'preceding' is still valid
+                if(preceding.isValid() && preceding.getLockedStatus() != LockedStatus.FIGHTS_LOCKED)
                     lockFights(database, preceding);
             }
 
