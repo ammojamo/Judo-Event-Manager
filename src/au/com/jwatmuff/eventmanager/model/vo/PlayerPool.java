@@ -18,9 +18,18 @@ import java.io.Serializable;
  * @author James
  */
 public class PlayerPool extends DistributableObject<PlayerPool.Key> implements Serializable {  
+    public static enum Status {
+        NONE, OK, WITHDRAWN, DISQUALIFIED;
+
+        public static Status fromString(String name) {
+            return (name == null) ? NONE : valueOf(name);
+        }
+    }
+
     private int playerPosition;
     private boolean approved = false;
     private boolean locked = false;
+    private Status status = Status.OK;
 
     // immutable
     public static class Key implements Serializable {
@@ -99,7 +108,7 @@ public class PlayerPool extends DistributableObject<PlayerPool.Key> implements S
 
     public void setApproved(boolean approved) {
         this.approved = approved;
-    }    
+    }
 
     public boolean isLocked() {
         return locked;
@@ -107,6 +116,14 @@ public class PlayerPool extends DistributableObject<PlayerPool.Key> implements S
 
     private void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    private void setStatus(Status status) {
+        this.status = status;
     }
 
     public static PlayerPool getLockedCopy(PlayerPool pp, Pool p) {
