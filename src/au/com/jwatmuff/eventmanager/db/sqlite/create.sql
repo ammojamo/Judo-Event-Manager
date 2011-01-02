@@ -148,10 +148,11 @@ CREATE TABLE IF NOT EXISTS session_has_fight (
 CREATE TABLE IF NOT EXISTS fight_result (
     id INTEGER NOT NULL,
     fight_id INTEGER NOT NULL,
-    player_score1 INTEGER NOT NULL,
-    player_score2 INTEGER NOT NULL,
+    player_score1 VARCHAR(50) NOT NULL,
+    player_score2 VARCHAR(50) NOT NULL,
     player_id1 INTEGER NOT NULL,
     player_id2 INTEGER NOT NULL,
+    duration INTEGER NOT NULL,
     event_log TEXT,
     is_valid BOOL,
     last_updated TIME NOT NULL,

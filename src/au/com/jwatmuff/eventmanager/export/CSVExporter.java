@@ -139,8 +139,8 @@ public class CSVExporter {
                 ps.print(ri.getMatFightNumber() + ",");
                 ps.print("\"" + ri.getPlayerName()[0] + "\",");
                 ps.print("\"" + ri.getPlayerName()[1] + "\",");
-                ps.print(ri.getResult().getPlayerScores()[0] + ",");
-                ps.print(ri.getResult().getPlayerScores()[1]);
+                ps.print(ri.getResult().getScores()[0] + ",");
+                ps.print(ri.getResult().getScores()[1]);
                 
                 ps.println();
             } catch (DatabaseStateException e) {

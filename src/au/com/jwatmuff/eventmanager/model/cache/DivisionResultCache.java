@@ -138,7 +138,7 @@ public class DivisionResultCache {
                     int playerID = player.getID();
                     if(!playerScores.containsKey(playerID))
                         playerScores.put(playerID, 0);
-                    switch(ri.getResult().getPlayerScores()[i]) {
+                    switch(ri.getResult().getSimpleScores()[i]) {
                         case 10:
                             playerScores.put(playerID, playerScores.get(playerID)+f.getPoints()[0]);
                             break;

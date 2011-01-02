@@ -14,6 +14,7 @@ import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.ResultRecorder;
 import au.com.jwatmuff.eventmanager.model.misc.UpcomingFightFinder;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
+import au.com.jwatmuff.eventmanager.model.vo.FullScore;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
@@ -83,20 +84,22 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
                     });
 
                     pendingResult.setFightID(currentFight.getID());
+                    FullScore score = new FullScore();
                     if(evt.getComponent() == ssp1.iButton)
-                        pendingResult.setPlayerScores(new int[] {10, 0});
+                        score.setIppon(1);
                     else if(evt.getComponent() == ssp1.wButton)
-                        pendingResult.setPlayerScores(new int[] {7, 0});
+                        score.setWazari(1);
                     else if(evt.getComponent() == ssp1.yButton)
-                        pendingResult.setPlayerScores(new int[] {5, 0});
+                        score.setYuko(1);
                     else if(evt.getComponent() == ssp1.kButton)
-                        pendingResult.setPlayerScores(new int[] {3, 0});
+                        throw new RuntimeException("Old score system no longer supported");
                     else if(evt.getComponent() == ssp1.dButton)
-                        pendingResult.setPlayerScores(new int[] {1, 0});
+                        score.setDecision(1);
                     else {
                         pendingResult = null;
                         return;
                     }
+                    pendingResult.setScores(new String[]{score.toString(), new FullScore().toString()});
                     evt.getComponent().setVisible(true);
                 } else {
                     if(evt.getComponent() == ssp1.confirmButton) {
@@ -147,20 +150,22 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
                     });
                     
                     pendingResult.setFightID(currentFight.getID());
+                    FullScore score = new FullScore();
                     if(evt.getComponent() == ssp2.iButton)
-                        pendingResult.setPlayerScores(new int[] {0, 10});
+                        score.setIppon(1);
                     else if(evt.getComponent() == ssp2.wButton)
-                        pendingResult.setPlayerScores(new int[] {0, 7});
+                        score.setWazari(1);
                     else if(evt.getComponent() == ssp2.yButton)
-                        pendingResult.setPlayerScores(new int[] {0, 5});
+                        score.setYuko(1);
                     else if(evt.getComponent() == ssp2.kButton)
-                        pendingResult.setPlayerScores(new int[] {0, 3});
+                        throw new RuntimeException("Old score system no longer supported");
                     else if(evt.getComponent() == ssp2.dButton)
-                        pendingResult.setPlayerScores(new int[] {0, 1});
+                        score.setDecision(1);
                     else {
                         pendingResult = null;
                         return;
                     }
+                    pendingResult.setScores(new String[]{new FullScore().toString(), score.toString()});
                     evt.getComponent().setVisible(true);
                 } else {
                     if(evt.getComponent() == ssp2.confirmButton) {

@@ -83,7 +83,7 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
                 map.put("playerId" + (i + 1), (player != null) ? player.getVisibleID() : "N/A");
             }
 
-            int[] scores = bean.getResult().getPlayerScores();
+            int[] scores = bean.getResult().getSimpleScores();
             map.put("score", scores[0] + " : " + scores[1]);
             if(scores[0] > scores[1])
                 map.put("winner", bean.getPlayerName()[0]);
@@ -226,7 +226,7 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
                 Result r = new Result();
                 r.setFightID(f1.getID());
                 r.setPlayerIDs(ri.getResult().getPlayerIDs());
-                r.setPlayerScores(crd.getPlayerScores());
+                r.setScores(crd.getScores());
                 database.add(r);
             }
         } else {

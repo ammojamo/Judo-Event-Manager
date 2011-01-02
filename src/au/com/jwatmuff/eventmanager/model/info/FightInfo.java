@@ -58,14 +58,14 @@ public class FightInfo {
     
     public String getWinningPlayerCode() {
         if(resultKnown())
-            return (r.getPlayerScores()[0] > r.getPlayerScores()[1]) ? f.getPlayerCodes()[0] : f.getPlayerCodes()[1];
+            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? f.getPlayerCodes()[0] : f.getPlayerCodes()[1];
         else
             return null;
     }
 
     public String getLosingPlayerCode() {
         if(resultKnown())
-            return (r.getPlayerScores()[0] > r.getPlayerScores()[1]) ? f.getPlayerCodes()[1] : f.getPlayerCodes()[0];
+            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? f.getPlayerCodes()[1] : f.getPlayerCodes()[0];
         else
             return null;
     }

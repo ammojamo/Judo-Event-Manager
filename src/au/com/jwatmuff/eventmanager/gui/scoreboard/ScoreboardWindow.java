@@ -24,6 +24,7 @@ import au.com.jwatmuff.eventmanager.model.misc.ResultRecorder;
 import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer;
 import au.com.jwatmuff.eventmanager.model.misc.UpcomingFightFinder;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
+import au.com.jwatmuff.eventmanager.model.vo.FullScore;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
@@ -338,9 +339,16 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                             playerIDs[i] = (currentPlayers[i] != null && currentPlayers[i].player != null) ?  currentPlayers[i].player.getID() : -1;
                         r.setPlayerIDs(playerIDs);
 
-                        int[] playerScores = new int[2];
-                        playerScores[model.getWinningPlayer()] = model.getWinPoints();
-                        r.setPlayerScores(playerScores);
+                        String[] scores = new String[2];
+                        for(int i=0; i<2; i++) {
+                            FullScore score = new FullScore();
+                            score.setIppon(model.getScore(i, ScoreboardModel.Score.IPPON));
+                            score.setWazari(model.getScore(i, ScoreboardModel.Score.WAZARI));
+                            score.setYuko(model.getScore(i, ScoreboardModel.Score.YUKO));
+                            score.setDecision(model.getScore(i, ScoreboardModel.Score.DECISION));
+                            score.setShido(model.getShido(i));
+                        }
+                        r.setScores(scores);
                         r.setEventLog(model.getEventLog());
                         ResultRecorder.recordResult(ScoreboardWindow.this.database, r);
                     }

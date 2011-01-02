@@ -142,7 +142,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                 i++;
                 List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, f.getID());
                 if(!results.isEmpty()) {
-                    int[] scores = results.get(0).getPlayerScores();
+                    int[] scores = results.get(0).getSimpleScores();
                     int[] ids = results.get(0).getPlayerIDs();
                     c.put("fight" + i + "points1", scores[0]);
                     c.put("fight" + i + "points2", scores[1]);

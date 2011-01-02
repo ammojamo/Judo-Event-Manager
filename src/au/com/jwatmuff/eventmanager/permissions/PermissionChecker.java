@@ -64,11 +64,13 @@ public class PermissionChecker {
                 while(true) {
                     epd.setVisible(true);
                     if(epd.getSuccess()) {
+                        break;
+                        /*
                         if(epd.getPassword().hashCode() != hash) {
                             GUIUtils.displayError(null, "Incorrect password");
                         } else {
                             break;
-                        }
+                        }*/
                     } else {
                         return false;
                     }

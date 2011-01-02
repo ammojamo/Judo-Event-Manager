@@ -125,11 +125,11 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
         }
         Collections.sort(ri, new Comparator<ResultInfo>() {
             public int compare(ResultInfo ri1, ResultInfo ri2) {
-                int[] scores1 = ri1.getResult().getPlayerScores();
+                int[] scores1 = ri1.getResult().getSimpleScores();
                 int winnerIndex1 = scores1[1] > scores1[0] ? 1 : 0;
                 Player winner1 = ri1.getPlayer()[winnerIndex1].player;
 
-                int[] scores2 = ri2.getResult().getPlayerScores();
+                int[] scores2 = ri2.getResult().getSimpleScores();
                 int winnerIndex2 = scores2[1] > scores2[0] ? 1 : 0;
                 Player winner2 = ri2.getPlayer()[winnerIndex2].player;
 
@@ -159,7 +159,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
                     Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
 
-                    int[] scores = bean.getResult().getPlayerScores();
+                    int[] scores = bean.getResult().getSimpleScores();
 
                     Grade loserGrade = null;
 
@@ -207,7 +207,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
         private int calculatePoints(ResultInfo info, Grade loserGrade) {
             if(loserGrade == null) return 0;
 
-            int[] score = info.getResult().getPlayerScores();
+            int[] score = info.getResult().getSimpleScores();
             if(score[0] == score[1]) return 0;
             int w = (score[0] > score[1]) ? 0 : 1;
             int l = 1-w;

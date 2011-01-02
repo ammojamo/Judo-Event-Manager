@@ -156,9 +156,9 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="postcodeTextField" min="-2" pref="45" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="cityTextField" alignment="1" pref="279" max="32767" attributes="1"/>
-                      <Component id="emailTextField" alignment="1" pref="279" max="32767" attributes="1"/>
-                      <Component id="streetAddressTextField" alignment="1" pref="279" max="32767" attributes="1"/>
+                      <Component id="cityTextField" alignment="1" pref="281" max="32767" attributes="1"/>
+                      <Component id="emailTextField" alignment="1" pref="281" max="32767" attributes="1"/>
+                      <Component id="streetAddressTextField" alignment="1" pref="281" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -261,7 +261,7 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="emergencyNameTextField" alignment="0" pref="279" max="32767" attributes="0"/>
+                      <Component id="emergencyNameTextField" alignment="0" pref="281" max="32767" attributes="0"/>
                       <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
                           <Component id="emergencyPhoneTextField" alignment="0" pref="100" max="32767" attributes="1"/>
                           <Component id="emergencyMobileTextField" alignment="0" pref="100" max="32767" attributes="1"/>
@@ -342,7 +342,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" pref="100" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="clubTextField" pref="279" max="32767" attributes="0"/>
+                  <Component id="clubTextField" pref="281" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
