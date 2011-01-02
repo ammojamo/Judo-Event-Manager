@@ -90,11 +90,6 @@ public class Pool extends DistributableObject<Integer> implements Serializable {
         this.maximumWeight = maximumWeight;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return (o instanceof Pool && ((Pool) o).getID().equals(this.getID()));
-    }
-
     public Grade getMinimumGrade() {
         return minimumGrade;
     }
@@ -151,6 +146,14 @@ public class Pool extends DistributableObject<Integer> implements Serializable {
         this.templateName = templateName;
     }
 
+    public LockedStatus getLockedStatus() {
+        return lockedStatus;
+    }
+
+    private void setLockedStatus(LockedStatus lockedStatus) {
+        this.lockedStatus = lockedStatus;
+    }
+
     public static Pool getLockedCopy(Pool p, LockedStatus lockedStatus) {
         p = ObjectCopier.copy(p);
         p.setID(IDGenerator.generate());
@@ -158,11 +161,8 @@ public class Pool extends DistributableObject<Integer> implements Serializable {
         return p;
     }
 
-    public LockedStatus getLockedStatus() {
-        return lockedStatus;
-    }
-
-    private void setLockedStatus(LockedStatus lockedStatus) {
-        this.lockedStatus = lockedStatus;
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof Pool && ((Pool) o).getID().equals(this.getID()));
     }
 }
