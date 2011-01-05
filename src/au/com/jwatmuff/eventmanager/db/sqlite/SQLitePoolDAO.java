@@ -12,12 +12,17 @@ package au.com.jwatmuff.eventmanager.db.sqlite;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
+import au.com.jwatmuff.eventmanager.util.CompositeSqlParameterSource;
 import au.com.jwatmuff.genericdb.distributed.Timestamp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -44,6 +49,7 @@ public class SQLitePoolDAO implements PoolDAO {
             MINIMUM_BREAK_TIME_FIELD = "min_break_time",
             GOLDEN_SCORE_TIME_FIELD = "golden_score_time",
             TEMPLATE_NAME_FIELD = "template_name",
+            PLACES_FIELD = "places",
             VALID_FIELD = "is_valid",
             TIMESTAMP_FIELD = "last_updated";
     
@@ -72,6 +78,7 @@ public class SQLitePoolDAO implements PoolDAO {
             p.setMinimumBreakTime(rs.getInt(MINIMUM_BREAK_TIME_FIELD));
             p.setGoldenScoreTime(rs.getInt(GOLDEN_SCORE_TIME_FIELD));
             p.setTemplateName(rs.getString(TEMPLATE_NAME_FIELD));
+            p.setPlaces(placesFromString(rs.getString(PLACES_FIELD)));
             p.setValid(rs.getString(VALID_FIELD).equals("true"));
             p.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             return p;
@@ -130,15 +137,15 @@ public class SQLitePoolDAO implements PoolDAO {
     
     @Override
     public void add(Pool p) {
-        final String sql = "INSERT INTO pool (id, description, max_age, min_age, max_weight, min_weight, max_grade, min_grade, gender, match_time, min_break_time, golden_score_time, template_name, locked_status, is_valid, last_updated) VALUES (:ID, :description, :maximumAge, :minimumAge, :maximumWeight, :minimumWeight, :maximumGrade, :minimumGrade, :gender, :matchTime, :minimumBreakTime, :goldenScoreTime, :templateName, :lockedStatus, :valid, :timestamp);";
-        SqlParameterSource params = new BeanPropertySqlParameterSource(p);
+        final String sql = "INSERT INTO pool (id, description, max_age, min_age, max_weight, min_weight, max_grade, min_grade, gender, match_time, min_break_time, golden_score_time, template_name, places, locked_status, is_valid, last_updated) VALUES (:ID, :description, :maximumAge, :minimumAge, :maximumWeight, :minimumWeight, :maximumGrade, :minimumGrade, :gender, :matchTime, :minimumBreakTime, :goldenScoreTime, :templateName, :places, :lockedStatus, :valid, :timestamp);";
+        SqlParameterSource params = getSqlParams(p);
         template.update(sql, params);
     }
     
     @Override
     public void update(Pool p) {
-        final String sql = "UPDATE pool SET description=:description, max_age=:maximumAge, min_age=:minimumAge, max_weight=:maximumWeight, min_weight=:minimumWeight, max_grade=:maximumGrade, min_grade=:minimumGrade, gender=:gender, match_time=:matchTime, min_break_time=:minimumBreakTime, golden_score_time=:goldenScoreTime, template_name=:templateName, locked_status=:lockedStatus, is_valid=:valid, last_updated=:timestamp WHERE id=:ID";
-        SqlParameterSource params = new BeanPropertySqlParameterSource(p);
+        final String sql = "UPDATE pool SET description=:description, max_age=:maximumAge, min_age=:minimumAge, max_weight=:maximumWeight, min_weight=:minimumWeight, max_grade=:maximumGrade, min_grade=:minimumGrade, gender=:gender, match_time=:matchTime, min_break_time=:minimumBreakTime, golden_score_time=:goldenScoreTime, template_name=:templateName, places=:places, locked_status=:lockedStatus, is_valid=:valid, last_updated=:timestamp WHERE id=:ID";
+        SqlParameterSource params = getSqlParams(p);
         template.update(sql, params);
     }
     
@@ -150,5 +157,34 @@ public class SQLitePoolDAO implements PoolDAO {
     @Override
     public Class<Pool> getDataClass() {
         return Pool.class;
+    }
+
+    private static SqlParameterSource getSqlParams(Pool p) {
+        SqlParameterSource bean = new BeanPropertySqlParameterSource(p);
+        SqlParameterSource map = new MapSqlParameterSource()
+                .addValue("places", placesToString(p.getPlaces()));
+
+        return new CompositeSqlParameterSource(map, bean);
+    }
+
+    private static List<Place> placesFromString(String placeCodes) {
+        List<Place> places = new ArrayList<Place>();
+        for(String code : placeCodes.split(",")) {
+            String[] pair = code.split(":");
+            Place p = new Place();
+            p.name = pair[0];
+            p.code = pair[1];
+            places.add(p);
+        }
+        return places;
+    }
+
+    private static String placesToString(List<Place> places) {
+        String s = "";
+        for(Place place : places) {
+            if(!s.equals("")) s += ",";
+            s += place.name + ":" + place.code;
+        }
+        return s;
     }
 }

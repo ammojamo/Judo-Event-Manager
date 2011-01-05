@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS pool (
   min_break_time INTEGER NOT NULL,
   golden_score_time INTEGER NOT NULL,
   template_name VARCHAR(512),
+  places VARCHAR(5120),
   locked_status VARCHAR(20),
   is_valid BOOL,
   last_updated TIME NOT NULL,
