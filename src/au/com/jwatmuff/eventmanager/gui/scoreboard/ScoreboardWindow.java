@@ -339,7 +339,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                             playerIDs[i] = (currentPlayers[i] != null && currentPlayers[i].player != null) ?  currentPlayers[i].player.getID() : -1;
                         r.setPlayerIDs(playerIDs);
 
-                        String[] scores = new String[2];
+                        FullScore[] scores = new FullScore[2];
                         for(int i=0; i<2; i++) {
                             FullScore score = new FullScore();
                             score.setIppon(model.getScore(i, ScoreboardModel.Score.IPPON));
@@ -347,6 +347,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                             score.setYuko(model.getScore(i, ScoreboardModel.Score.YUKO));
                             score.setDecision(model.getScore(i, ScoreboardModel.Score.DECISION));
                             score.setShido(model.getShido(i));
+                            scores[i] = score;
                         }
                         r.setScores(scores);
                         r.setEventLog(model.getEventLog());

@@ -86,7 +86,17 @@ public class FullScore implements Comparable<FullScore> {
     }
 
     public int compareTo(FullScore o) {
-
+        // TODO: implement comparable interface for sorting
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getSimple() {
+        /*
+         * TODO: not sure if this can be always be calculated without knowing
+         * the other player's score and fight duration.
+         * If not, just get rid of this method and implement logic in
+         * Result.getSimpleScores();
+         */
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 }

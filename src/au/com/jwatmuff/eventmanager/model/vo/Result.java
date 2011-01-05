@@ -20,9 +20,8 @@ public class Result extends DistributableObject<Integer> {
     private int fightID;
     private int[] playerIDs = new int[] {0, 0};
 
-    private int[] simpleScores = new int[] {0, 0};
-    // full score, e.g. "I:0,W:1,Y:4,S:0,D:0"
-    private String[] scores = new String[] {"", ""};
+    private FullScore[] scores = new FullScore[] { new FullScore(), new FullScore() };
+
     // duration of fight in seconds
     private int duration;
 
@@ -60,26 +59,21 @@ public class Result extends DistributableObject<Integer> {
         return eventLog;
     }
 
-    public int[] getSimpleScores() {
-        return simpleScores;
-    }
-
-    public void setSimpleScores(int[] playerScores) {
-        assert playerScores != null;
-        assert playerScores.length == 2;
-
-        this.simpleScores = playerScores;
-    }
-
-    public String[] getScores() {
-        assert scores != null;
-        assert scores.length == 2;
-
+    public FullScore[] getScores() {
         return scores;
     }
 
-    public void setScores(String[] scores) {
+    public void setScores(FullScore[] scores) {
+        assert scores != null;
+        assert scores.length == 2;
+
         this.scores = scores;
+    }
+
+    public int[] getSimpleScores() {
+        int[] simple = new int[2];
+        for(int i = 0; i < 2; i++) simple[i] = scores[i].getSimple();
+        return simple;
     }
 
     public int getDuration() {

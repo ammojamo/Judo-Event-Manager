@@ -32,8 +32,8 @@ public class ChangeResultDialog extends javax.swing.JDialog {
 
         playerTextField1.setText(ri.getPlayerName()[0]);
         playerTextField2.setText(ri.getPlayerName()[1]);
-        FullScore score1 = new FullScore(ri.getResult().getScores()[0]);
-        FullScore score2 = new FullScore(ri.getResult().getScores()[1]);
+        FullScore score1 = ri.getResult().getScores()[0];
+        FullScore score2 = ri.getResult().getScores()[1];
         iSpinner1.setValue(score1.getIppon());
         wSpinner1.setValue(score1.getWazari());
         ySpinner1.setValue(score1.getYuko());
@@ -50,7 +50,7 @@ public class ChangeResultDialog extends javax.swing.JDialog {
         return success;
     }
 
-    private FullScore[] getFullScores() {
+    public FullScore[] getScores() {
         FullScore score1 = new FullScore();
         score1.setIppon((Integer)iSpinner1.getValue());
         score1.setWazari((Integer)wSpinner1.getValue());
@@ -66,14 +66,6 @@ public class ChangeResultDialog extends javax.swing.JDialog {
         return new FullScore[] {
             score1,
             score2
-        };
-    }
-
-    public String[] getScores() {
-        FullScore[] scores = getFullScores();
-        return new String[] {
-            scores[0].toString(),
-            scores[1].toString()
         };
     }
 
@@ -280,7 +272,7 @@ public class ChangeResultDialog extends javax.swing.JDialog {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         List<String> errors = new ArrayList<String>();
         int player = 1;
-        for(FullScore score : getFullScores()) {
+        for(FullScore score : getScores()) {
             if(!score.isValid())
                 errors.add("The score for player " + player + " is not a valid Judo score");
             player++;
