@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS player_has_pool (
   pool_id INTEGER NOT NULL,
   approved BOOL NOT NULL DEFAULT 'false',
   player_pos INTEGER,
+  player_pos_2 INTEGER,
   is_locked BOOL,
   is_valid BOOL,
   last_updated TIME NOT NULL,
