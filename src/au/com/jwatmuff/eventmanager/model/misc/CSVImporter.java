@@ -16,6 +16,7 @@ import au.com.jwatmuff.eventmanager.model.vo.Player.Grade;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
 import au.com.jwatmuff.eventmanager.util.CSVBeanReader;
 import au.com.jwatmuff.eventmanager.util.CSVMapReader;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
@@ -52,6 +53,22 @@ public class CSVImporter {
     public static class TooFewPlayersException extends Exception {
     }
 
+    private static List<Place> importDrawPlaces(final File csvFile) throws IOException {
+        if(csvFile.exists()) {
+            CSVReader reader = new CSVReader(new FileReader(csvFile));
+
+            Map<String, String> columnMapping = new HashMap<String, String>();
+            columnMapping.put("Place", "name");
+            columnMapping.put("Code", "code");
+
+            CSVBeanReader<Place> beanReader = new CSVBeanReader<Place>(reader, columnMapping, Place.class);
+
+            return beanReader.readBeans();
+        } else {
+            return new ArrayList<Place>();
+        }
+    }
+
     public static int importFightDraw(final File csvFile, final TransactionalDatabase database, final Pool pool, int minPlayers) throws IOException, DatabaseStateException, TooFewPlayersException {
         CSVReader reader = new CSVReader(new FileReader(csvFile));
         
@@ -62,6 +79,9 @@ public class CSVImporter {
         
         CSVMapReader mapReader = new CSVMapReader(reader, columnMapping);
         List<Map<String, String>> fights = mapReader.readRows();
+
+        File placesFile = new File(csvFile.getAbsolutePath().replace(".csv^", ".places.csv"));
+        final List<Place> places = importDrawPlaces(placesFile);
         
         if(pool.getLockedStatus() == Pool.LockedStatus.UNLOCKED)
             throw new DatabaseStateException("Cannot generate fights for unlocked pool");
@@ -119,6 +139,7 @@ public class CSVImporter {
                         database.add(fight);
                     }
                     pool.setTemplateName(templateName);
+                    pool.setPlaces(places);
                     database.update(pool);
                 }
             });
