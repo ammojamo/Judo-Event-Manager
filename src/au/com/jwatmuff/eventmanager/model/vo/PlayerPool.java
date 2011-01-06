@@ -132,7 +132,7 @@ public class PlayerPool extends DistributableObject<PlayerPool.Key> implements S
         return status;
     }
 
-    private void setStatus(Status status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
