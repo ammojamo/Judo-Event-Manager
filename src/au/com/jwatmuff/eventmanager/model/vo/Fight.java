@@ -23,12 +23,6 @@ public class Fight extends DistributableObject<Integer> implements Serializable 
     private String[] playerCodes = new String[] { "", "" };
     private int position;
     
-    /*
-     * points for determining places within a division
-     * 5 possible points awarded: win by I,W,Y,K and lose
-     */
-    private int[] points = new int[5];
-    
     private boolean locked = false;
     
     /** Creates a new instance of Fight */
@@ -98,13 +92,5 @@ public class Fight extends DistributableObject<Integer> implements Serializable 
     @Override
     public String toString() {
         return "[ID: " + getID() + ", pool: " + poolID + ", playerCodes: (" + playerCodes[0] + ", " + playerCodes[1] + "), position: " + position + "]";
-    }
-
-    public int[] getPoints() {
-        return points;
-    }
-
-    public void setPoints(int[] points) {
-        this.points = points;
     }
 }

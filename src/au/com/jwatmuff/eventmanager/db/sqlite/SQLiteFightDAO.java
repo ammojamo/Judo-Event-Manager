@@ -54,13 +54,6 @@ public class SQLiteFightDAO implements FightDAO {
             f.setPoolID(rs.getInt(POOL_ID_FIELD));
             f.setPlayerCodes(new String[] { rs.getString(PLAYER_CODE1_FIELD), rs.getString(PLAYER_CODE2_FIELD) });
             f.setPosition(rs.getInt(POSITION_FIELD));
-            f.setPoints(new int[] {
-                rs.getInt("i_points"),
-                rs.getInt("w_points"),
-                rs.getInt("y_points"),
-                rs.getInt("k_points"),
-                rs.getInt("l_points")
-            });
             f.setValid(rs.getString(VALID_FIELD).equals("true"));
             f.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             return f;
@@ -107,13 +100,11 @@ public class SQLiteFightDAO implements FightDAO {
                       "id, pool_id, " +
                       "player_code1, player_code2, " +
                       "pos_in_pool, " +
-                      "i_points, w_points, y_points, k_points, l_points, " +
                       "is_locked, is_valid, last_updated " + 
                       ") VALUES ( " +
                       ":ID, :poolID, " +
                       ":playerCodes[0], :playerCodes[1], " +
                       ":position, " +
-                      ":points[0], :points[1], :points[2], :points[3], :points[4], " +
                       ":locked, :valid, :timestamp );";
         SqlParameterSource params = new BeanPropertySqlParameterSource(item);
         template.update(sql, params);
@@ -135,11 +126,6 @@ public class SQLiteFightDAO implements FightDAO {
                       "player_code1=:playerCodes[0], " +
                       "player_code2=:playerCodes[1], " +
                       "pos_in_pool=:position, " +
-                      "i_points=:points[0]" +
-                      "w_points=:points[1]" +
-                      "y_points=:points[2]" +
-                      "k_points=:points[3]" +
-                      "l_points=:points[4]" +
                       "is_locked=:locked, " +
                       "is_valid=:valid, " +
                       "last_updated=:timestamp " +

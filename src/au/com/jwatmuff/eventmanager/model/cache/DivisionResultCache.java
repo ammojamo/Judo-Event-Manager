@@ -48,7 +48,7 @@ public class DivisionResultCache {
     public class DivisionResult {
         public Pool pool;
         public Player player;
-        public int place;
+        public int place; // TODO: change this to a string
 
         // for velocity
         public Pool getPool() { return pool; }
@@ -107,7 +107,8 @@ public class DivisionResultCache {
         }
         return true;
     }
-    
+
+    /*
     private List<PlayerScore> getScores(int poolID) {
         List<PlayerScore> scores = new ArrayList<PlayerScore>();
         Collection<Player> players = database.findAll(Player.class, PlayerDAO.FOR_POOL, poolID, true);
@@ -170,7 +171,9 @@ public class DivisionResultCache {
         
         return scores;
     }
-    
+    */
+
+
     public List<DivisionResult> getDivisionResults(int poolID) {
         List<DivisionResult> drs = cache.get(poolID);
         if(drs != null) return drs;
@@ -178,7 +181,11 @@ public class DivisionResultCache {
         drs = new ArrayList<DivisionResult>();
 
         if(!fightsCompleted(poolID)) return drs;
-        
+
+        //  TODO: implement new division results based on draw csv file
+        // (will be much simpler than the old way)
+
+    /*
         List<PlayerScore> scores = getScores(poolID);
 
         if(scores.isEmpty()) return drs;
@@ -208,7 +215,7 @@ public class DivisionResultCache {
             }
             if(done) break;
         }
-
+*/
         cache.put(poolID, drs);
         return drs;
     }
