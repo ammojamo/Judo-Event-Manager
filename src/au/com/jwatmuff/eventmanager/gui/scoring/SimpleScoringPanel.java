@@ -99,7 +99,7 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
                         pendingResult = null;
                         return;
                     }
-                    pendingResult.setScores(new String[]{score.toString(), new FullScore().toString()});
+                    pendingResult.setScores(new FullScore[]{score, new FullScore()});
                     evt.getComponent().setVisible(true);
                 } else {
                     if(evt.getComponent() == ssp1.confirmButton) {
@@ -165,7 +165,7 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
                         pendingResult = null;
                         return;
                     }
-                    pendingResult.setScores(new String[]{new FullScore().toString(), score.toString()});
+                    pendingResult.setScores(new FullScore[]{new FullScore(), score});
                     evt.getComponent().setVisible(true);
                 } else {
                     if(evt.getComponent() == ssp2.confirmButton) {

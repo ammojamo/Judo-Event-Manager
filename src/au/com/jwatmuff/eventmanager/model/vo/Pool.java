@@ -14,13 +14,14 @@ import au.com.jwatmuff.eventmanager.util.IDGenerator;
 import au.com.jwatmuff.eventmanager.util.ObjectCopier;
 import au.com.jwatmuff.genericdb.distributed.DistributableObject;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author James
  */
 public class Pool extends DistributableObject<Integer> implements Serializable {
-
     private String description;
     private int minimumAge;
     private int maximumAge;
@@ -33,10 +34,16 @@ public class Pool extends DistributableObject<Integer> implements Serializable {
     private int minimumBreakTime;
     private int goldenScoreTime;
     private String templateName;
+    private List<Place> places;
+
+    public static class Place {
+        public String name;
+        public String code;
+    }
+
     private LockedStatus lockedStatus = LockedStatus.UNLOCKED;
 
     public enum LockedStatus {
-
         UNLOCKED, PLAYERS_LOCKED, FIGHTS_LOCKED
     }
 
@@ -144,6 +151,14 @@ public class Pool extends DistributableObject<Integer> implements Serializable {
 
     public void setTemplateName(String templateName) {
         this.templateName = templateName;
+    }
+
+    public List<Place> getPlaces() {
+        return places;
+    }
+
+    public void setPlaces(List<Place> places) {
+        this.places = places;
     }
 
     public LockedStatus getLockedStatus() {
