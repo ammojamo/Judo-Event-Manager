@@ -30,54 +30,54 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="playerTextField1" pref="243" max="32767" attributes="0"/>
+                      <Component id="playerTextField1" pref="324" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="iSpinner1" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="iSpinner1" linkSize="4" min="-2" pref="29" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="wSpinner1" min="-2" max="-2" attributes="0"/>
+                      <Component id="wSpinner1" linkSize="4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="ySpinner1" min="-2" max="-2" attributes="0"/>
+                      <Component id="ySpinner1" linkSize="4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                       <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="dSpinner1" min="-2" max="-2" attributes="0"/>
+                      <Component id="dSpinner1" linkSize="4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="sSpinner1" min="-2" max="-2" attributes="0"/>
+                      <Component id="sSpinner1" linkSize="4" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="playerTextField2" pref="243" max="32767" attributes="0"/>
+                      <Component id="playerTextField2" pref="324" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="iSpinner2" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="iSpinner2" linkSize="4" min="-2" pref="29" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="wSpinner2" min="-2" max="-2" attributes="0"/>
+                      <Component id="wSpinner2" linkSize="4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="ySpinner2" min="-2" max="-2" attributes="0"/>
+                      <Component id="ySpinner2" linkSize="4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                       <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="dSpinner2" min="-2" max="-2" attributes="0"/>
+                      <Component id="dSpinner2" linkSize="4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="sSpinner2" min="-2" max="-2" attributes="0"/>
+                      <Component id="sSpinner2" linkSize="4" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="cancelButton" linkSize="3" min="-2" max="-2" attributes="0"/>
@@ -100,15 +100,15 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="iSpinner1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="iSpinner1" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="wSpinner1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="wSpinner1" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="ySpinner1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="ySpinner1" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="dSpinner1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="dSpinner1" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="sSpinner1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="sSpinner1" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="18" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -118,15 +118,15 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="iSpinner2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="iSpinner2" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="wSpinner2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="wSpinner2" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel12" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="ySpinner2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="ySpinner2" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="dSpinner2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="dSpinner2" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="sSpinner2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="sSpinner2" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
