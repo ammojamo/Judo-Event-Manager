@@ -69,6 +69,29 @@ public class CSVImporter {
         }
     }
 
+    private static Map<Integer, Integer> importDrawPools(final File csvFile) throws IOException {
+        Map<Integer, Integer> poolEntries = new HashMap<Integer, Integer>();
+
+        if(csvFile.exists()) {
+            class PoolEntry {
+                int pool;
+                int player;
+            }
+            CSVReader reader = new CSVReader(new FileReader(csvFile));
+
+            Map<String, String> columnMapping = new HashMap<String, String>();
+            columnMapping.put("Pool", "pool");
+            columnMapping.put("Player", "player");
+
+            CSVBeanReader<PoolEntry> beanReader = new CSVBeanReader<PoolEntry>(reader, columnMapping, PoolEntry.class);
+
+            for(PoolEntry entry : beanReader.readBeans()) {
+                poolEntries.put(entry.player, entry.pool);
+            }
+        }
+        return poolEntries;
+    }
+
     public static int importFightDraw(final File csvFile, final TransactionalDatabase database, final Pool pool, int minPlayers) throws IOException, DatabaseStateException, TooFewPlayersException {
         CSVReader reader = new CSVReader(new FileReader(csvFile));
         
@@ -80,8 +103,11 @@ public class CSVImporter {
         CSVMapReader mapReader = new CSVMapReader(reader, columnMapping);
         List<Map<String, String>> fights = mapReader.readRows();
 
-        File placesFile = new File(csvFile.getAbsolutePath().replace(".csv^", ".places.csv"));
+        File placesFile = new File(csvFile.getAbsolutePath().replace(".csv", ".places.csv"));
         final List<Place> places = importDrawPlaces(placesFile);
+
+        File poolsFile = new File(csvFile.getAbsolutePath().replace(".csv", ".pools.csv"));
+        final Map<Integer, Integer> drawPools = importDrawPools(poolsFile);
         
         if(pool.getLockedStatus() == Pool.LockedStatus.UNLOCKED)
             throw new DatabaseStateException("Cannot generate fights for unlocked pool");
@@ -140,6 +166,7 @@ public class CSVImporter {
                     }
                     pool.setTemplateName(templateName);
                     pool.setPlaces(places);
+                    pool.setDrawPools(drawPools);
                     database.update(pool);
                 }
             });
