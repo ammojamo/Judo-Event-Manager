@@ -108,7 +108,7 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
     private class ResultTableModel extends BeanMapperTableModel<DivisionResult> {
         NumberFormat format = new DecimalFormat();
         //DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        String[] placeName = new String[] { "FIRST", "SECOND", "THIRD" };
+
         public ResultTableModel() {
             super();
             format.setMinimumIntegerDigits(2);
@@ -120,7 +120,7 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
                     map.put("player", bean.player.getFirstName() + " " + bean.player.getLastName());
                     PlayerDetails details = database.get(PlayerDetails.class, bean.player.getDetailsID());
                     map.put("club", (details != null) ? details.getClub() : "");
-                    map.put("place", placeName[bean.place-1]);
+                    map.put("place", bean.place);
                     return map;
                 } 
             });
