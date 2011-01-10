@@ -82,7 +82,7 @@ public class SQLitePoolDAO implements PoolDAO {
             p.setGoldenScoreTime(rs.getInt(GOLDEN_SCORE_TIME_FIELD));
             p.setTemplateName(rs.getString(TEMPLATE_NAME_FIELD));
             p.setPlaces(placesFromString(rs.getString(PLACES_FIELD)));
-            p.setDrawPools(drawPoolsFromString(DRAW_POOLS_FIELD));
+            p.setDrawPools(drawPoolsFromString(rs.getString(DRAW_POOLS_FIELD)));
             p.setValid(rs.getString(VALID_FIELD).equals("true"));
             p.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             return p;
@@ -167,19 +167,21 @@ public class SQLitePoolDAO implements PoolDAO {
         SqlParameterSource bean = new BeanPropertySqlParameterSource(p);
         SqlParameterSource map = new MapSqlParameterSource()
                 .addValue("places", placesToString(p.getPlaces()))
-                .addValue("draw_pools", drawPoolsToString(p.getDrawPools()));
+                .addValue("drawPools", drawPoolsToString(p.getDrawPools()));
 
         return new CompositeSqlParameterSource(map, bean);
     }
 
     private static List<Place> placesFromString(String placeCodes) {
         List<Place> places = new ArrayList<Place>();
-        for(String code : placeCodes.split(",")) {
-            String[] pair = code.split(":");
-            Place p = new Place();
-            p.name = pair[0];
-            p.code = pair[1];
-            places.add(p);
+        if(!placeCodes.isEmpty()) {
+            for(String code : placeCodes.split(",")) {
+                String[] pair = code.split(":");
+                Place p = new Place();
+                p.name = pair[0];
+                p.code = pair[1];
+                places.add(p);
+            }
         }
         return places;
     }
@@ -195,9 +197,11 @@ public class SQLitePoolDAO implements PoolDAO {
 
     private static Map<Integer, Integer> drawPoolsFromString(String drawPoolString) {
         Map<Integer, Integer> drawPools = new HashMap<Integer, Integer>();
-        for(String entry : drawPoolString.split(",")) {
-            String[] pair = entry.split(":");
-            drawPools.put(Integer.valueOf(pair[0]), Integer.valueOf(pair[1]));
+        if(!drawPoolString.isEmpty()) {
+            for(String entry : drawPoolString.split(",")) {
+                String[] pair = entry.split(":");
+                drawPools.put(Integer.valueOf(pair[0]), Integer.valueOf(pair[1]));
+            }
         }
         return drawPools;
     }
