@@ -47,7 +47,7 @@ import org.springframework.util.Log4jConfigurer;
 public class Main {
     private static Logger log = Logger.getLogger(Main.class);
     
-    public static final String VERSION = "0.0.4";
+    public static final String VERSION = "5";
     public static final String WINDOW_TITLE = "Event Manager 2010 Update 4";
     public static final String VISIBLE_VERSION = "Event Manager 2010 Update 4";
 
