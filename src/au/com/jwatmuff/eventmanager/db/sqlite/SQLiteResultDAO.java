@@ -80,7 +80,7 @@ public class SQLiteResultDAO implements ResultDAO
 
     @Override
     public void add(Result item) {
-        String sql = "INSERT INTO fight_result (id, fight_id, player_score1, player_score2, player_id1, player_id2, duration, event_log, is_valid, last_updated) VALUES (:ID, :fightID, :scores[0].toString(), :scores[1].toString(), :playerIDs[0], :playerIDs[1], :duration, :eventLog, :valid, :timestamp)";
+        String sql = "INSERT INTO fight_result (id, fight_id, player_score1, player_score2, player_id1, player_id2, duration, event_log, is_valid, last_updated) VALUES (:ID, :fightID, :scores[0], :scores[1], :playerIDs[0], :playerIDs[1], :duration, :eventLog, :valid, :timestamp)";
         SqlParameterSource params = new BeanPropertySqlParameterSource(item);
         template.update(sql, params);
     }
@@ -101,7 +101,7 @@ public class SQLiteResultDAO implements ResultDAO
         /*
          * do not uncomment this and expect it to work
          *
-        String sql = "UPDATE fight_result SET fight_id=:fightID, player_score1=:scores[0].toString(), player_score2=:scores[1].toString(), player_id1=:playerIDs[0], player_id2=:playerIDs[1], duration=:duration, event_log=:eventLog, is_valid=:valid, last_updated=:timestamp WHERE id = :ID";
+        String sql = "UPDATE fight_result SET fight_id=:fightID, player_score1=:scores[0], player_score2=:scores[1], player_id1=:playerIDs[0], player_id2=:playerIDs[1], duration=:duration, event_log=:eventLog, is_valid=:valid, last_updated=:timestamp WHERE id = :ID";
         SqlParameterSource params = new BeanPropertySqlParameterSource(item);
         template.update(sql, params);
         */

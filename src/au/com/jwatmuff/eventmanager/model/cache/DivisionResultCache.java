@@ -114,11 +114,15 @@ public class DivisionResultCache {
 
         for(Place place : pool.getPlaces()) {
             try {
-                DivisionResult result = new DivisionResult();
-                result.place = place.name;
-                result.pool = pool;
-                result.player = PlayerCodeParser.parseCode(database, place.code, poolID).player;
-                drs.add(result);
+                FightPlayer fp = PlayerCodeParser.parseCode(database, place.code, poolID);
+                // can't assume that all places resolve to actual players
+                if(fp.type == PlayerType.NORMAL) {
+                    DivisionResult result = new DivisionResult();
+                    result.place = place.name;
+                    result.pool = pool;
+                    result.player = fp.player;
+                    drs.add(result);
+                }
             } catch(DatabaseStateException e) {
                 log.error("Error while calculating division result", e);
             }

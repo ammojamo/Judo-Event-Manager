@@ -14,6 +14,8 @@ import au.com.jwatmuff.eventmanager.util.IDGenerator;
 import au.com.jwatmuff.eventmanager.util.ObjectCopier;
 import au.com.jwatmuff.genericdb.distributed.DistributableObject;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,14 +36,14 @@ public class Pool extends DistributableObject<Integer> implements Serializable {
     private int minimumBreakTime;
     private int goldenScoreTime;
     private String templateName;
-    private List<Place> places;
+    private List<Place> places = new ArrayList<Place>();
     // This desribes the pools for seeding players in the draw
     // It is a map from pool numbers to player numbers
     // The way of representing the pools may be revised to make it more
     // readable, but for now it stores information we need.
-    private Map<Integer, Integer> drawPools;
+    private Map<Integer, Integer> drawPools = new HashMap<Integer, Integer>();
 
-    public static class Place {
+    public static class Place implements Serializable {
         public String name;
         public String code;
     }
