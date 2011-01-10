@@ -43,7 +43,7 @@ public class Pool extends DistributableObject<Integer> implements Serializable {
     // readable, but for now it stores information we need.
     private Map<Integer, Integer> drawPools = new HashMap<Integer, Integer>();
 
-    public static class Place {
+    public static class Place implements Serializable {
         public String name;
         public String code;
     }

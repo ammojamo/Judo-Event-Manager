@@ -54,6 +54,7 @@ public class CSVImporter {
     }
 
     private static List<Place> importDrawPlaces(final File csvFile) throws IOException {
+        List<Place> places = new ArrayList<Place>();
         if(csvFile.exists()) {
             CSVReader reader = new CSVReader(new FileReader(csvFile));
 
@@ -61,32 +62,34 @@ public class CSVImporter {
             columnMapping.put("Place", "name");
             columnMapping.put("Code", "code");
 
-            CSVBeanReader<Place> beanReader = new CSVBeanReader<Place>(reader, columnMapping, Place.class);
+            CSVMapReader beanReader = new CSVMapReader(reader, columnMapping);
 
-            return beanReader.readBeans();
-        } else {
-            return new ArrayList<Place>();
+            for(Map<String, String> entry : beanReader.readRows()) {
+                Place place = new Place();
+                place.code = entry.get("code");
+                place.name = entry.get("name");
+                places.add(place);
+            }
         }
+        return places;
     }
 
     private static Map<Integer, Integer> importDrawPools(final File csvFile) throws IOException {
         Map<Integer, Integer> poolEntries = new HashMap<Integer, Integer>();
 
         if(csvFile.exists()) {
-            class PoolEntry {
-                int pool;
-                int player;
-            }
             CSVReader reader = new CSVReader(new FileReader(csvFile));
 
             Map<String, String> columnMapping = new HashMap<String, String>();
             columnMapping.put("Pool", "pool");
             columnMapping.put("Player", "player");
 
-            CSVBeanReader<PoolEntry> beanReader = new CSVBeanReader<PoolEntry>(reader, columnMapping, PoolEntry.class);
+            CSVMapReader beanReader = new CSVMapReader(reader, columnMapping);
 
-            for(PoolEntry entry : beanReader.readBeans()) {
-                poolEntries.put(entry.player, entry.pool);
+            for(Map<String,String> entry : beanReader.readRows()) {
+                poolEntries.put(
+                        Integer.valueOf(entry.get("player")),
+                        Integer.valueOf(entry.get("pool")));
             }
         }
         return poolEntries;

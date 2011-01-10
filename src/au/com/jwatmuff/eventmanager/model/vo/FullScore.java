@@ -1,6 +1,8 @@
 package au.com.jwatmuff.eventmanager.model.vo;
 
-public class FullScore implements Comparable<FullScore> {
+import java.io.Serializable;
+
+public class FullScore implements Comparable<FullScore>, Serializable {
     private int ippon;
     private int wazari;
     private int yuko;

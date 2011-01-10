@@ -58,6 +58,7 @@ public class ResultsPanel extends javax.swing.JPanel {
     }
     
     public void afterPropertiesSet() {
+        resultInfoCache = new ResultInfoCache(database, notifier);
         divisionResultCache = new DivisionResultCache(database, notifier);
     }
 
