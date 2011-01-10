@@ -1,220 +1,16 @@
 <html>
   <head>
     <title>Draw - Event Manager</title>
-    <style type="text/css">
-table {
-    text-align:left;
-    font-family:monospace;
-    background: oldlace;
-    border: solid black;
-}
-
-td, th {
-    padding-left:   1em;
-    padding-right:  1em;
-    padding-top:    0.5em;
-    padding-bottom: 0.5em;
-    white-space:    nowrap;
-}
-
-th {
-    padding-top:   2em;
-    border-bottom: 1px solid;
-}
-
-/**** Repechage styles ****/
-
-table.repechage {
-    border-collapse: collapse;
-    border-spacing: 0;
-    padding: 0;
-    margin: 0;
-    border: none;
-    font-family: serif;
-    font-size: 70%;
-}
-
-table.repechage td, th {
-    white-space: nowrap;
-    border-style: solid;
-    border-spacing: 0px;
-    border-color: black;
-    border-width: 0px;
-    padding: 0;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-table.repechage td.borderBottom {
-    border-bottom: 2px solid black;
-}
-
-table.repechage td.borderTitle1 {
-    background: white;
-    border-width: 2px;
-    font-size: 2em;
-    text-align: center;
-    width: 600px;
-}
-
-table.repechage td.borderTitle2 {
-    background: white;
-    border-width: 2px;
-    text-align: center;
-}
-
-table.repechage td.borderTitle3 {
-    background: white;
-    border-width: 2px;
-    font-size: 2em;
-    text-align: center;
-}
-
-table.repechage td.borderBlue {
-    background: aliceblue;
-    border-top: 2px solid black;
-    border-left: 2px solid black;
-    border-bottom: 1px solid black;
-    border-right: 2px solid black;
-    padding-top: 0.3em;
-}
-
-table.repechage td.borderBluePlayer {
-    background: aliceblue;
-    border-top: 2px solid black;
-    border-left: 2px solid black;
-    border-bottom: 1px solid black;
-    border-right: none;
-    padding-top: 0.3em;
-}
-
-table.repechage td.borderBluePlayerInfo {
-    background: aliceblue;
-    border-top: 2px solid black;
-    border-left: none;
-    border-bottom: 1px solid black;
-    border-right: 2px solid black;
-    padding-top: 0.3em;
-    text-align: right;
-}
-
-table.repechage td.borderWhite {
-    background: white;
-    border-top: 1px solid black;
-    border-left: 2px solid black;
-    border-bottom: 2px solid black;
-    border-right: 2px solid black;
-    padding-bottom: 0.3em;
-}
-
-table.repechage td.borderWhitePlayer {
-    background: white;
-    border-top: 1px solid black;
-    border-left: 2px solid black;
-    border-bottom: 2px solid black;
-    border-right: none;
-    padding-bottom: 0.3em;
-}
-
-table.repechage td.borderWhitePlayerInfo {
-    background: white;
-    border-top: 1px solid black;
-    border-left: none;
-    border-bottom: 2px solid black;
-    border-right: 2px solid black;
-    padding-bottom: 0.3em;
-    text-align: right;
-}
-
-table.repechage td.borderResultBottom {
-    border-top: 2px solid black;
-    font-size: 0.7em;
-}
-
-table.repechage td.borderResultTop {
-    border-bottom: 2px solid black;
-    font-size: 0.7em;
-}
-
-table.repechage td.borderPlaceLeft {
-    background: white;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
-}
-
-table.repechage td.borderPlaceRight {
-    background: white;
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
-}
-
-table.repechage td.borderFightNumber {
-    background:lightyellow;
-    border-width: 2px;
-}
-
-table.repechage td.borderFightFinal {
-    background: yellow;
-    border-width: 2px;
-}
-
-table.repechage td.borderMedal {
-    border-bottom: 2px solid black;
-}
-
-table.repechage td.borderRepechage {
-    font-size: 0.7em;
-    text-align: right;
-}
-
-table.repechage td.borderPoolA {
-    background: skyblue;
-    border-width: 1px;
-}
-
-table.repechage td.borderPoolB {
-    background: yellowgreen;
-    border-width: 1px;
-}
-
-table.repechage td.borderPoolC {
-    background: red;
-    border-width: 1px;
-}
-
-table.repechage td.borderPoolD {
-    background: orange;
-    border-width: 1px;
-}
-
-/*** Round robin styles ***/
-
-.f {
-    background-color: gray;
-}
-
-table.roundrobin {
-    border-collapse: collapse;
-    border-spacing: 0;
-    padding: 0;
-    margin: 0;
-    font-family: serif;
-}
-table.roundrobin td {
-    border-style: solid;
-    border-spacing: 0px;
-    border-color: black;
-    border-width: 1px;
-}
-    </style>
+    <link rel="stylesheet" type="text/css" href="StyleSheet.css" />
   </head>
 
   <body>
 
 
-    <h1>Repechage 16</h1>
+    <h1>16 Repechage</h1>
 
-    <table class="repechage">
+    <table class="repechage" style="font-size: 70%">
+
       <tr>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
@@ -533,8 +329,7 @@ table.roundrobin td {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td class="borderPlaceLeft">1:</td>
-        <td class="borderPlaceRight" colspan="3"> $!place1 </td>
+        <td class="borderPlace" colspan="4">  $!place1 </td>
       </tr>
 
       <tr>
@@ -546,8 +341,7 @@ table.roundrobin td {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td class="borderPlaceLeft">2:</td>
-        <td class="borderPlaceRight" colspan="3"> $!place2 </td>
+        <td class="borderPlace" colspan="4">  $!place2 </td>
       </tr>
 
       <tr>
@@ -559,8 +353,7 @@ table.roundrobin td {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td class="borderPlaceLeft">3:</td>
-        <td class="borderPlaceRight" colspan="3"> $!place3 </td>
+        <td class="borderPlace" colspan="4">  $!place3 </td>
       </tr>
 
       <tr>
@@ -572,8 +365,7 @@ table.roundrobin td {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td class="borderPlaceLeft">3:</td>
-        <td class="borderPlaceRight" colspan="3"> $!place4 </td>
+        <td class="borderPlace" colspan="4">  $!place4 </td>
       </tr>
 
       <tr>
@@ -585,8 +377,7 @@ table.roundrobin td {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td class="borderPlaceLeft">5:</td>
-        <td class="borderPlaceRight" colspan="3"> $!place5 </td>
+        <td class="borderPlace" colspan="4">  $!place5 </td>
       </tr>
 
       <tr>
@@ -598,8 +389,7 @@ table.roundrobin td {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td class="borderPlaceLeft">5:</td>
-        <td class="borderPlaceRight" colspan="3"> $!place6 </td>
+        <td class="borderPlace" colspan="4">  $!place6 </td>
       </tr>
 
       <tr>
@@ -611,8 +401,7 @@ table.roundrobin td {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td class="borderPlaceLeft">7:</td>
-        <td class="borderPlaceRight" colspan="3"> $!place7 </td>
+        <td class="borderPlace" colspan="4">  $!place7 </td>
       </tr>
 
       <tr>
@@ -624,8 +413,7 @@ table.roundrobin td {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td class="borderPlaceLeft">7:</td>
-        <td class="borderPlaceRight" colspan="3"> $!place8 </td>
+        <td class="borderPlace" colspan="4">  $!place8 </td>
       </tr>
 
       <tr>
