@@ -25,7 +25,8 @@ import org.apache.log4j.Logger;
 public class PlayerCodeParser {
     private static final Logger log = Logger.getLogger(PlayerCodeParser.class);
 
-    private static Pattern codePattern = Pattern.compile("(P++|[LW]++)(\\d++)");
+    // matches all possible player codes
+    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAT?|RBT?)([0-9]+)(?:\\[([0-9]+(?:,[0-9]+)*)\\])?");
     
     public static enum PlayerType {
         NORMAL, BYE, UNDECIDED, ERROR
@@ -74,13 +75,50 @@ public class PlayerCodeParser {
         else
             throw new IllegalArgumentException("Invalid player code: " + code);
     }
+
+    public static int[] getParameters(String code) {
+        Matcher matcher = codePattern.matcher(code);
+        if(matcher.matches()) {
+            if(matcher.groupCount() >= 3) {
+                String[] paramsStr = matcher.group(3).split(",");
+                int[] params = new int[paramsStr.length];
+                for(int i = 0; i < paramsStr.length; i++) {
+                    params[i] = Integer.valueOf(paramsStr[i]);
+                }
+                return params;
+            } else {
+                return new int[0];
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid player code: " + code);
+        }
+    }
     
     public static FightPlayer parseCode(String code, List<FightInfo> fights, List<PlayerPoolInfo> players) {
-        if(!isValidCode(code))
-            throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
         if(players == null || players.isEmpty())
             throw new IllegalArgumentException("Must supply a non-empty list of PlayerPoolInfos");
-        
+
+        // Use prefix to work out which parsing method to call
+        String prefix = getPrefix(code);
+        if(prefix.matches("P|[LW]+"))
+            return parsePLWCode(code, fights, players);
+        else if(prefix.matches("RAT?|RBT?"))
+            return parseRRCode(code, fights, players);
+        else
+            throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
+    }
+
+    private static FightPlayer parseRRCode(String code, List<FightInfo> fights, List<PlayerPoolInfo> players) {
+                                           // e.g. RBT2[3,4,5]
+        String prefix = getPrefix(code);   //      RBT
+        int number = getNumber(code);      //      2
+        int[] params = getParameters(code);//      3,4,5
+
+
+        throw new RuntimeException("I'm not implemented yet!");
+    }
+
+    private static FightPlayer parsePLWCode(String code, List<FightInfo> fights, List<PlayerPoolInfo> players) {
         FightPlayer fp = new FightPlayer();
 
         fp.code = code;
@@ -123,8 +161,8 @@ public class PlayerCodeParser {
 
                 String[] codes = fight.getAllPlayerCode();
                 FightPlayer[] fightPlayers = new FightPlayer[] {
-                    parseCode(codes[0], fights, players),
-                    parseCode(codes[1], fights, players)
+                    parsePLWCode(codes[0], fights, players),
+                    parsePLWCode(codes[1], fights, players)
                 };
                 for(int i = 0; i < 2; i++) {
                     int j = 1 - i; // other player
@@ -149,10 +187,10 @@ public class PlayerCodeParser {
                 return fp;
             } else {
                 if(prefix.equals("W"))
-                    return parseCode(fight.getWinningPlayerCode(), fights, players);
+                    return parsePLWCode(fight.getWinningPlayerCode(), fights, players);
 
                 if(prefix.equals("L"))
-                    return parseCode(fight.getLosingPlayerCode(), fights, players);
+                    return parsePLWCode(fight.getLosingPlayerCode(), fights, players);
 
                 switch(prefix.charAt(prefix.length()-1)) {
                     case 'W':
