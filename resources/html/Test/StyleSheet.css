@@ -244,6 +244,18 @@ table td.borderSquarePlayerNo2 {
     font-weight: bold;
 }
 
+table td.borderFightNumber1 {
+    border: 2px solid black;
+    background:orange;
+    border-width: 2px;
+}
+
+table td.borderFightNumber2 {
+    border: 2px solid black;
+    background:mediumseagreen;
+    border-width: 2px;
+}
+
 table td.borderSquareNoFight {
     border: 2px solid black;
     background-color: grey;
