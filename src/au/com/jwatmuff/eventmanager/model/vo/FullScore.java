@@ -87,6 +87,18 @@ public class FullScore implements Comparable<FullScore>, Serializable {
         return String.format("I:%d,W:%d,Y:%d,S:%d,D:%d", ippon, wazari, yuko, shido, decision);
     }
 
+    public String displayString() {
+        if(shido > 0 && decision > 0 ) {
+            return String.format("%d%d%ds%dd%d", ippon, wazari, yuko, shido, decision);
+        } else if(shido > 0 && decision == 0 ) {
+            return String.format("%d%d%ds%d", ippon, wazari, yuko, shido);
+        } else if(shido == 0 && decision > 0 ) {
+            return String.format("%d%d%dd%d", ippon, wazari, yuko, decision);
+        } else {
+            return String.format("%d%d%d", ippon, wazari, yuko);
+        }
+    }
+
     public int compareTo(FullScore o) {
         return getSimple() - o.getSimple();
     }

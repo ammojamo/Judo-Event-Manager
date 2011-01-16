@@ -83,4 +83,8 @@ public class Result extends DistributableObject<Integer> {
     public void setDuration(int duration) {
         this.duration = duration;
     }
+
+    public String getDurationString() {
+        return String.format("%d : %d", duration/60, duration%60);
+    }
 }
