@@ -1,0 +1,486 @@
+#if($fullDocument)
+#parse("resources/html/draw-header.html")
+#else
+#if($first)
+#set($first=false)
+#else
+<p class="break"/>
+#end
+#end
+
+
+    <table class="repechage" style="font-size: 90%">
+      <tr>
+        <th width ="1px">&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td class="borderTitle1" rowspan="2" colspan="12">$!competitionName</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td class="borderTitle2" colspan="12">$!competitionInfo</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td colspan="14" class ="borderFixWidth" >&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td class="borderTitle1" rowspan="2" colspan="12">$!division</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <th rowspan="500">&nbsp;</th>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th rowspan="500">&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td rowspan="2" class="borderPoolA"> A </td>
+        <td>(1)</td>
+        <td class="borderBluePlayer"> $!player1 </td>
+        <td class="borderBluePlayerInfo" > $!playerRegion1 </td>
+        <td rowspan="2" class="borderFightNumber"> $!fightNumber1 </td>
+        <td class="borderResultTop" > $!result_1 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>(5)</td>
+        <td class="borderWhitePlayer">$!player5 </td>
+        <td class="borderWhitePlayerInfo" > $!playerRegion5 </td>
+        <td class="borderBlue"> $!W1 &nbsp;</td>
+        <td rowspan="4" class="borderFightNumber"> $!fightNumber5 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderResultTop" > $!result_5 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderBlue"> $!W5 &nbsp;</td>
+        <td rowspan="8" class="borderFightFinal"> $!fightNumber9 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2"  class="borderPoolB"> B </td>
+        <td>(3)</td>
+        <td class="borderBluePlayer"> $!player3 </td>
+        <td class="borderBluePlayerInfo" > $!playerRegion3 </td>
+        <td rowspan="2" class="borderFightNumber"> $!fightNumber2 </td>
+        <td class="borderWhite"> $!W2 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>(7)</td>
+        <td class="borderWhitePlayer">$!player7 </td>
+        <td class="borderWhitePlayerInfo" > $!playerRegion7 </td>
+        <td class="borderResultBottom" > $!result_2 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderMedal"> $!W9 &nbsp;</td>
+        <td class="borderRepechage" >1.</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderResultBottom" > $!result_9 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2"  class="borderPoolC"> C </td>
+        <td>(2)</td>
+        <td class="borderBluePlayer"> $!player2 </td>
+        <td class="borderBluePlayerInfo" > $!playerRegion2 </td>
+        <td rowspan="2" class="borderFightNumber"> $!fightNumber3 </td>
+        <td class="borderResultTop" > $!result_3 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>(6)</td>
+        <td class="borderWhitePlayer">$!player6 </td>
+        <td class="borderWhitePlayerInfo" > $!playerRegion6 </td>
+        <td class="borderBlue"> $!W3 &nbsp;</td>
+        <td rowspan="4" class="borderFightNumber"> $!fightNumber6 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderWhite"> $!W6 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderResultBottom" > $!result_6 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2"  class="borderPoolD"> D </td>
+        <td>(4)</td>
+        <td class="borderBluePlayer"> $!player4 </td>
+        <td class="borderBluePlayerInfo" > $!playerRegion4 </td>
+        <td rowspan="2" class="borderFightNumber"> $!fightNumber4 </td>
+        <td class="borderWhite"> $!W4 &nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>(8)</td>
+        <td class="borderWhitePlayer">$!player8 </td>
+        <td class="borderWhitePlayerInfo" > $!playerRegion8 </td>
+        <td class="borderResultBottom" > $!result_4 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderTitle3" rowspan="2" colspan="4">Results</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderPlace" colspan="4"> $!place1 </td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderPlace" colspan="4"> $!place2 </td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderPlace" colspan="4"> $!place3 </td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderPlace" colspan="4"> $!place4 </td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+
+    <table class="repechage" style="font-size: 90%">
+      <tr>
+        <th width ="1px">&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th width ="1px">&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td colspan="14" class ="borderFixWidth" >&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td class="borderTop" colspan="14">&nbsp;</td>
+      </tr>
+
+      <tr>
+        <th rowspan="500">&nbsp;</th>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <th rowspan="500">&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderRepechage" >A1</td>
+        <td class="borderBlue">$!LW5 &nbsp;</td>
+        <td rowspan="2" class="borderFightNumber"> $!fightNumber7 </td>
+        <td class="borderMedal"> $!W7 &nbsp;</td>
+        <td class="borderRepechage" >3.</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderRepechage" >B1</td>
+        <td class="borderWhite">$!L5 &nbsp;</td>
+        <td class="borderResultBottom" > $!result_7 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderRepechage" >C1</td>
+        <td class="borderBlue">$!LW6 &nbsp;</td>
+        <td rowspan="2" class="borderFightNumber"> $!fightNumber8 </td>
+        <td class="borderMedal"> $!W8 &nbsp;</td>
+        <td class="borderRepechage" >3.</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="borderRepechage" >D1</td>
+        <td class="borderWhite">$!L6 &nbsp;</td>
+        <td class="borderResultBottom" > $!result_8 </td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+
+#if($fullDocument)
+#parse("resources/html/draw-footer.html")
+#end
+
