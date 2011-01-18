@@ -207,11 +207,15 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
             for(Place place : pool.getPlaces()) {
                 i++;
                 FightPlayer p = parser.parseCode(place.code);
-                PlayerDetails pd = database.get(PlayerDetails.class, p.player.getDetailsID());
-                if (pd.getClub() != null) {
-                    c.put("place" + i, place.name + ": " + p.player.getLastName() + ", " + p.player.getFirstName() + " -- " + pd.getClub());
+                if(p.player != null) {
+                    PlayerDetails pd = database.get(PlayerDetails.class, p.player.getDetailsID());
+                    if (pd.getClub() != null) {
+                        c.put("place" + i, place.name + ": " + p.player.getLastName() + ", " + p.player.getFirstName() + " -- " + pd.getClub());
+                    } else {
+                        c.put("place" + i, place.name + ": " + p.player.getLastName() + ", " + p.player.getFirstName());
+                    }
                 } else {
-                    c.put("place" + i, place.name + ": " + p.player.getLastName() + ", " + p.player.getFirstName());
+                    c.put("place" + i, place.name + ": UNDECIDED");
                 }
             }
         }
