@@ -339,16 +339,31 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                             playerIDs[i] = (currentPlayers[i] != null && currentPlayers[i].player != null) ?  currentPlayers[i].player.getID() : -1;
                         r.setPlayerIDs(playerIDs);
 
+                        boolean goldenScore = false;
+                        switch(model.getGoldenScoreMode()) {
+                            case ACTIVE:
+                            case FINISHED:
+                                goldenScore = true;
+                        }
+
                         FullScore[] scores = new FullScore[2];
                         for(int i=0; i<2; i++) {
                             FullScore score = new FullScore();
                             score.setIppon(model.getScore(i, ScoreboardModel.Score.IPPON));
                             score.setWazari(model.getScore(i, ScoreboardModel.Score.WAZARI));
                             score.setYuko(model.getScore(i, ScoreboardModel.Score.YUKO));
-                            score.setDecision(model.getScore(i, ScoreboardModel.Score.DECISION));
                             score.setShido(model.getShido(i));
+                            if(goldenScore && model.getWinningPlayer() == i) score.setDecision(1);
                             scores[i] = score;
                         }
+                        
+                        // Work out fight duration
+                        Pool pool = ScoreboardWindow.this.database.get(Pool.class, currentFight.getPoolID());
+                        int fightDuration = pool.getMatchTime() - model.getTime();
+                        if(goldenScore) fightDuration += pool.getGoldenScoreTime();
+                        r.setDuration(fightDuration);
+
+                        //model.getTime()
                         r.setScores(scores);
                         r.setEventLog(model.getEventLog());
                         ResultRecorder.recordResult(ScoreboardWindow.this.database, r);
