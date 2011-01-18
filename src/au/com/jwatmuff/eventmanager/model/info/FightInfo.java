@@ -70,8 +70,37 @@ public class FightInfo {
             return null;
     }
 
+    public int getWinningPlayerSimpleScore() {
+        if(resultKnown())
+            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? r.getSimpleScores()[0] : r.getSimpleScores()[1];
+        else
+            return 0;
+    }
+
+    public int[] getSimpleScores() {
+        return r.getSimpleScores();
+    }
+
     public String[] getAllPlayerCode() {
         return f.getPlayerCodes();
     }
-//    Leoanrd: add get codes that gets both codes, keep it general so return in a list or arraylist.  f.getPlayerCodes()
+
+    public int[] getAllPlayerID() {
+        return r.getPlayerIDs();
+    }
+    
+    public int getWinningPlayerID() {
+        if(resultKnown())
+            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? r.getPlayerIDs()[0] : r.getPlayerIDs()[1];
+        else
+            return 0;
+    }
+
+    public int getLosingPlayerID() {
+        if(resultKnown())
+            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? r.getPlayerIDs()[1] : r.getPlayerIDs()[0];
+        else
+            return 0;
+    }
+
 }

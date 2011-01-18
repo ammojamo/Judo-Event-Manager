@@ -29,28 +29,12 @@ public class FullScore implements Comparable<FullScore>, Serializable {
         }
     }
 
-    public int getDecision() {
-        return decision;
-    }
-
-    public void setDecision(int decision) {
-        this.decision = decision;
-    }
-
     public int getIppon() {
         return ippon;
     }
 
     public void setIppon(int ippon) {
         this.ippon = ippon;
-    }
-
-    public int getShido() {
-        return shido;
-    }
-
-    public void setShido(int shido) {
-        this.shido = shido;
     }
 
     public int getWazari() {
@@ -67,6 +51,22 @@ public class FullScore implements Comparable<FullScore>, Serializable {
 
     public void setYuko(int yuko) {
         this.yuko = yuko;
+    }
+
+    public int getShido() {
+        return shido;
+    }
+
+    public void setShido(int shido) {
+        this.shido = shido;
+    }
+
+    public int getDecision() {
+        return decision;
+    }
+
+    public void setDecision(int decision) {
+        this.decision = decision;
     }
 
     /**
@@ -100,13 +100,23 @@ public class FullScore implements Comparable<FullScore>, Serializable {
     }
 
     public int compareTo(FullScore o) {
-        return getSimple() - o.getSimple();
+        if (getIppon() != o.getIppon())
+            return getIppon() - o.getIppon();
+        if (getWazari() != o.getWazari())
+            return getWazari() - o.getWazari();
+        if (getYuko() != o.getYuko())
+            return getYuko() - o.getYuko();
+        return getDecision() - o.getDecision();
     }
 
-    public int getSimple() {
-        return (ippon == 1 || wazari == 2) ? 10 :
-               (wazari > 0) ? 7 :
-               (yuko > 0) ? 5 :
-               (decision > 0) ? 1 : 0;
-    }
+//    public int getSimple() {
+//        return (ippon == 1 || wazari == 2) ? 10 :
+//               (wazari > 0) ? 7 :
+//               (yuko > 0) ? 5 :
+//               (decision > 0) ? 1 : 0;
+//        return (ippon == 1 || wazari == 2) ? 100 :
+//               (wazari > 0) ? 10 :
+//               (yuko > 0) ? 1 :
+//               (decision > 0) ? 1 : 0;
+//    }
 }

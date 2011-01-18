@@ -148,7 +148,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                               p.player.getLastName() + ", " + p.player.getFirstName().charAt(0));
                         break;
                     case ERROR:
-                        c.put(code, "--"); // mark error with --
+                        c.put(code, "--"+code); // mark error with --
                         break;
                     case UNDECIDED:
                         c.put(code, code);
@@ -181,6 +181,15 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         wins.put(ids[1],wins.get(ids[1])+1);
                         points.put(ids[1],points.get(ids[1])+scores[1]);
                     }
+
+//                    List<PlayerScore> scores = new ArrayList<PlayerScore>();
+//                    for(Integer playerID : playerScores.keySet()) {
+//                        PlayerScore score = new PlayerScore();
+//                        score.playerID = playerID;
+//                        score.score = playerScores.get(playerID);
+//                        scores.add(score);
+//                    }
+
                 }
             }
 
@@ -199,14 +208,28 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 //Adds the place names and winning player names
 
             i = 0;
-            for(Place place : pool.getPlaces()) {
+            List<Place> places = pool.getPlaces();
+            Map<Place,FightPlayer> placeFightPlayer = parser.parsePlaces(places);
+            for(Place place : places) {
                 i++;
-                FightPlayer p = parser.parseCode(place.code);
-                PlayerDetails pd = database.get(PlayerDetails.class, p.player.getDetailsID());
-                if (pd.getClub() != null) {
-                    c.put("place" + i, place.name + ": " + p.player.getLastName() + ", " + p.player.getFirstName() + " -- " + pd.getClub());
-                } else {
-                    c.put("place" + i, place.name + ": " + p.player.getLastName() + ", " + p.player.getFirstName());
+                switch(placeFightPlayer.get(place).type) {
+                    case NORMAL:
+                        PlayerDetails pd = database.get(PlayerDetails.class, placeFightPlayer.get(place).player.getDetailsID());
+                        if (pd.getClub() != null) {
+                            c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName() + " -- " + pd.getClub());
+                        } else {
+                            c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName());
+                        }
+                        break;
+                    case ERROR:
+                        c.put("place" + i, "--"); // mark error with --
+                        break;
+                    case UNDECIDED:
+//                            c.put("place" + i, place.name + ": ");
+                        break;
+                    default:
+                        c.put("place" + i, place.name);
+                        break;
                 }
             }
         }

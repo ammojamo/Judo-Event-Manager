@@ -186,14 +186,14 @@ public class SQLitePoolDAO implements PoolDAO {
         return places;
     }
 
-    private static String placesToString(List<Place> places) {
-        String s = "";
-        for(Place place : places) {
-            if(!s.equals("")) s += ",";
-            s += place.name + ":" + place.code;
-        }
-        return s;
-    }
+     private static String placesToString(List<Place> places) {
+         String s = "";
+         for(Place place : places) {
+             if(!s.equals("")) s += ",";
+             s += place.name + ":" + place.code;
+         }
+         return s;
+     }
 
     private static Map<Integer, Integer> drawPoolsFromString(String drawPoolString) {
         Map<Integer, Integer> drawPools = new HashMap<Integer, Integer>();

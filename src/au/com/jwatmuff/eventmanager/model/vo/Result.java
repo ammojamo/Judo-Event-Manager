@@ -71,8 +71,22 @@ public class Result extends DistributableObject<Integer> {
     }
 
     public int[] getSimpleScores() {
-        int[] simple = new int[2];
-        for(int i = 0; i < 2; i++) simple[i] = scores[i].getSimple();
+        int[] simple = {0,0};
+        int simpleScore = 0;
+
+        if (scores[0].getIppon() != scores[1].getIppon())
+            simpleScore = 10;
+        else if(scores[0].getWazari() != scores[1].getWazari())
+            simpleScore = 7;
+        else if (scores[0].getYuko() != scores[1].getYuko())
+            simpleScore = 5;
+        else if (scores[0].getDecision() != scores[1].getDecision())
+            simpleScore = 1;
+        if (scores[0].compareTo(scores[1])>0)
+            simple[0] = simpleScore;
+        else
+            simple[1] = simpleScore;
+
         return simple;
     }
 
