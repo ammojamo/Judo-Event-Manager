@@ -19,6 +19,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.genericdb.Database;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,6 +40,8 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
     private boolean showResults;
     private boolean fullDocument;
     private boolean firstPage;
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     public DrawHTMLGenerator(Database database, int poolID, boolean showResults, boolean fullDocument, boolean firstPage) {
         this.database = database;
@@ -69,12 +73,13 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
         if(firstPage) c.put("first", "true");
 
 //Print the competition information and division
+        CompetitionInfo compInfo = database.get(CompetitionInfo.class, null);
 
-        c.put("competitionName", database.get(CompetitionInfo.class, null).getName());
+        c.put("competitionName", compInfo.getName());
         c.put("competitionInfo",
-                "Location: " + database.get(CompetitionInfo.class, null).getLocation() + ", " +
-                database.get(CompetitionInfo.class, null).getStartDate() + " to " +
-                database.get(CompetitionInfo.class, null).getEndDate());
+                "Location: " + compInfo.getLocation() + ", " +
+                DATE_FORMAT.format(compInfo.getStartDate()) + " to " +
+                DATE_FORMAT.format(compInfo.getEndDate()));
         
         Pool pool = database.get(Pool.class, poolID);
 
