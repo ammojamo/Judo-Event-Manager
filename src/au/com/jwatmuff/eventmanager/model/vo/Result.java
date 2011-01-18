@@ -99,6 +99,6 @@ public class Result extends DistributableObject<Integer> {
     }
 
     public String getDurationString() {
-        return String.format("%d : %d", duration/60, duration%60);
+        return String.format("%02d:%02d", duration/60, duration%60);
     }
 }
