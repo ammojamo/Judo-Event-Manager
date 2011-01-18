@@ -19,6 +19,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.genericdb.Database;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,6 +40,8 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
     private boolean showResults;
     private boolean fullDocument;
     private boolean firstPage;
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     public DrawHTMLGenerator(Database database, int poolID, boolean showResults, boolean fullDocument, boolean firstPage) {
         this.database = database;
@@ -69,12 +73,12 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
         if(firstPage) c.put("first", "true");
 
 //Print the competition information and division
-
-        c.put("competitionName", database.get(CompetitionInfo.class, null).getName());
+        CompetitionInfo compInfo = database.get(CompetitionInfo.class, null);
+        c.put("competitionName", compInfo.getName());
         c.put("competitionInfo",
-                "Location: " + database.get(CompetitionInfo.class, null).getLocation() + ", " +
-                database.get(CompetitionInfo.class, null).getStartDate() + " to " +
-                database.get(CompetitionInfo.class, null).getEndDate());
+                "Location: " + compInfo.getLocation() + ", " +
+                DATE_FORMAT.format(compInfo.getStartDate()) + " to " +
+                DATE_FORMAT.format(compInfo.getEndDate()));
         
         Pool pool = database.get(Pool.class, poolID);
 
@@ -214,21 +218,25 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                 i++;
                 switch(placeFightPlayer.get(place).type) {
                     case NORMAL:
-                        PlayerDetails pd = database.get(PlayerDetails.class, placeFightPlayer.get(place).player.getDetailsID());
-                        if (pd.getClub() != null) {
-                            c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName() + " -- " + pd.getClub());
+                        if(placeFightPlayer.get(place).player != null) {
+                            PlayerDetails pd = database.get(PlayerDetails.class, placeFightPlayer.get(place).player.getDetailsID());
+                            if (pd.getClub() != null) {
+                                c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName() + " -- " + pd.getClub());
+                            } else {
+                                c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName());
+                            }
                         } else {
-                            c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName());
+                            c.put("place" + i, place.name + ": UNDECIDED");
                         }
                         break;
                     case ERROR:
-                        c.put("place" + i, "--"); // mark error with --
+                        c.put("place" + i, place.name + "--"); // mark error with --
                         break;
                     case UNDECIDED:
-//                            c.put("place" + i, place.name + ": ");
+                            c.put("place" + i, place.name + ": UNDECIDED");
                         break;
                     default:
-                        c.put("place" + i, place.name);
+                        c.put("place" + i, place.name + "--");
                         break;
                 }
             }
