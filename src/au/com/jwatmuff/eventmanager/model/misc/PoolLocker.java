@@ -16,10 +16,12 @@ import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.util.ListUtils;
 import au.com.jwatmuff.eventmanager.util.ObjectCopier;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -150,9 +152,15 @@ public class PoolLocker {
                 }
 
                 Collection<PlayerPool> pps = database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID());
+                // Create randomized list of numbers from 1 to N
+                List<Integer> positions = ListUtils.getIntegerSequence(1, pps.size());
+                Collections.shuffle(positions);
+                int i = 0;
                 for(PlayerPool pp : pps) {
                     PlayerPool lockedpp = PlayerPool.getLockedCopy(pp, lockedPool);
+                    lockedpp.setPlayerPosition2(positions.get(i));
                     database.add(lockedpp);
+                    i++;
                 }
 
                 database.delete(pool);
