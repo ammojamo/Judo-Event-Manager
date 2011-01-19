@@ -15,7 +15,6 @@ import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -107,6 +106,15 @@ public class PlayerCodeParser {
             throw new IllegalArgumentException("Invalid player code: " + code);
         }
     }
+
+    public static Player getPlayer(int playerID, List<PlayerPoolInfo> playerInfoList) {
+        for(PlayerPoolInfo playerPoolInfo: playerInfoList ){
+            if(playerPoolInfo.getPlayer().getID() == playerID){
+                return playerPoolInfo.getPlayer();
+            }
+        }
+        return null;
+    }
     
     public static FightPlayer parseCode(String code, List<FightInfo> fightInfoList, List<PlayerPoolInfo> playerInfoList) {
         if(playerInfoList == null || playerInfoList.isEmpty())
@@ -164,54 +172,69 @@ public class PlayerCodeParser {
             }
 
             boolean isTie = false;
-            if(PlayerRRScore.size()>number){
-                if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number).Place ){
-                    isTie = true;
-                }
-            }else if (number>1){
-                if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number-2).Place ){
-                    isTie = true;
-                }
-            }
-            if(isTie){
-                switch(prefix.charAt(2)) {
-                    case 'T':
-                        for(PlayerPoolInfo playerPoolInfo : playerInfoList){
-                            if(playerPoolInfo.getPlayer().getID() == PlayerRRScore.get(number-1).PlayerID){
-                                fp.player = playerPoolInfo.getPlayer();
-                                fp.type = PlayerType.NORMAL;
-                                return fp;
+            switch(prefix.charAt(2)) {
+
+                case 'T':
+// Offset number by start of Tie
+                    for(int tieStart = 0 ; tieStart < PlayerRRScore.size()-1 ; tieStart++){
+                        if(PlayerRRScore.get(tieStart).Place == PlayerRRScore.get(tieStart+1).Place ){
+                            number = number + tieStart;
+                            break;
+                        }
+                    }
+
+// Check for Tie with another player
+                    isTie = false;
+                    if(PlayerRRScore.size() >= number){
+                        if(PlayerRRScore.size() > number){
+                            if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number).Place ){
+                                isTie = true;
                             }
                         }
-                    case 'P':
-                        fp.type = PlayerType.UNDECIDED;
+                        if (number > 1){
+                            if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number-2).Place ){
+                                isTie = true;
+                            }
+                        }
+                    }
+                    if(isTie){
+                        fp.type = PlayerType.NORMAL;
+                        fp.player = getPlayer(PlayerRRScore.get(number-1).PlayerID, playerInfoList);
                         return fp;
-                    default:
-                        fp.type = PlayerType.ERROR;
-                        return fp;
-                }
-            } else {
-                switch(prefix.charAt(2)) {
-                    case 'T':
+                    } else {
                         fp.type = PlayerType.BYE;
                         return fp;
-                    case 'P':
-                        for(PlayerPoolInfo playerPoolInfo : playerInfoList){
-                            if(playerPoolInfo.getPlayer().getID() == PlayerRRScore.get(number-1).PlayerID){
-                                fp.player = playerPoolInfo.getPlayer();
-                                fp.type = PlayerType.NORMAL;
-                                return fp;
-                            }
+                    }
+
+                case 'P':
+// Check for Tie with another player
+                    isTie = false;
+                    if(PlayerRRScore.size() > number){
+                        if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number).Place ){
+                            isTie = true;
                         }
-                    default:
-                        fp.type = PlayerType.ERROR;
+                    }
+                    if (number>1){
+                        if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number-2).Place ){
+                            isTie = true;
+                        }
+                    }
+                    if(isTie){
+                        fp.type = PlayerType.UNDECIDED;
                         return fp;
-                }
+                    } else {
+                        fp.type = PlayerType.NORMAL;
+                        fp.player = getPlayer(PlayerRRScore.get(number-1).PlayerID, playerInfoList);
+                        return fp;
+                    }
+
+                default:
+                    fp.type = PlayerType.ERROR;
+                    return fp;
             }
         }
 //        throw new RuntimeException("I'm not implemented yet!");
         fp.type = PlayerType.ERROR;
-        System.out.println("**fp.type = PlayerType.ERROR;**************************************************************************************");
         return fp;
     }
 
@@ -283,18 +306,20 @@ public class PlayerCodeParser {
                 for(int k = i; k <= j; k++)
                     playerRRTieList.add(playerRRScoresList.get(k));
             }
+// Are ZERO players tied?
             if(playerRRTieList.isEmpty()){
                 playerRRScoresList.get(i).Place = i;
-                
+
+// Are ALL players tied?
             } else if(playerRRScoresList.size()==playerRRTieList.size()){   //if all equal return place = 0
 
                 for(int k = 0; k < playerRRScoresList.size(); k++){
                     playerRRScoresList.get(k).Place = 0;
                 }
                 Collections.sort(playerRRScoresList, PLAYERS_POS_COMPARATOR);
-
                 return playerRRScoresList;
-                
+
+// Are SOME players tied?
             }else{
                 List<FightInfo> newFights = new ArrayList<FightInfo>();
                 int matchedIDs;
@@ -309,18 +334,15 @@ public class PlayerCodeParser {
                         newFights.add(fightInfo);
                 }
                 playerRRTieList = RoundRobinResults( newFights,  playerInfoList);
-                for(int k = 0; k <= playerRRTieList.size(); k++){
+                for(int k = 0; k < playerRRTieList.size(); k++){
                     playerRRTieList.get(k).Place = playerRRTieList.get(k).Place+i;
-                    playerRRScoresList.add(i+k, playerRRTieList.get(k));
+                    playerRRScoresList.set(i+k, playerRRTieList.get(k));
                 }
+                i = i + playerRRTieList.size()-1;
             }
 
             i++;
         }
-//System.out.println("*****************************************************************************************");
-//        for(int k = 0; k < playerRRScoresList.size(); k++){
-//System.out.println(playerRRScoresList.get(k).PlayerID + " Place: " + playerRRScoresList.get(k).Place + " Wins: " + playerRRScoresList.get(k).Wins);
-//        }
         
         return playerRRScoresList;
     }
@@ -354,12 +376,11 @@ public class PlayerCodeParser {
         }
 
         if(number > fightInfoList.size()) {
-        System.out.println("**if(number > fightInfoList.size()) {**************************************************************************************");
             fp.type = PlayerType.ERROR;
             return fp;
         }
+
         FightInfo fight = fightInfoList.get(number-1);
-        
         while(prefix.length() > 0) {
             isABye:
             if(!fight.resultKnown()) {
@@ -393,12 +414,23 @@ public class PlayerCodeParser {
                 }
                 fp.type = PlayerType.UNDECIDED;
                 return fp;
-            } else {
-                if(prefix.equals("W"))
-                    return parseCode(fight.getWinningPlayerCode(), fightInfoList, playerInfoList);
 
-                if(prefix.equals("L"))
-                    return parseCode(fight.getLosingPlayerCode(), fightInfoList, playerInfoList);
+            } else {
+
+                if(prefix.equals("W")){
+                    fp.type = PlayerType.NORMAL;
+                    fp.player = getPlayer( fight.getWinningPlayerID(), playerInfoList);
+                    if(fp.player == null)
+                        fp.type = PlayerType.ERROR;
+                    return fp;
+                }
+                if(prefix.equals("L")){
+                    fp.type = PlayerType.NORMAL;
+                    fp.player = getPlayer( fight.getLosingPlayerID(), playerInfoList);
+                    if(fp.player == null)
+                        fp.type = PlayerType.ERROR;
+                    return fp;
+                }
 
                 switch(prefix.charAt(prefix.length()-1)) {
                     case 'W':
@@ -408,7 +440,6 @@ public class PlayerCodeParser {
                         code = fight.getLosingPlayerCode();
                         break;
                     default:
-        System.out.println("**switch(prefix.charAt(prefix.length()-1)) {**************************************************************************************");
                         fp.type = PlayerType.ERROR;
                         return fp;
                 }
@@ -440,10 +471,6 @@ public class PlayerCodeParser {
 
     private PlayerCodeParser(Database database, int poolID) {
         piList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
-//System.out.println("*********************");
-//for(int k = 0; k < piList.size(); k++){
-//    System.out.println(piList.get(k).getPlayerPool().getPlayerID() + " pp2 " + piList.get(k).getPlayerPool().getPlayerPosition2());
-//}
         List<Fight> fights = new ArrayList<Fight>(database.findAll(Fight.class, FightDAO.FOR_POOL, poolID));
 
         fiList = new ArrayList<FightInfo>();
@@ -461,17 +488,29 @@ public class PlayerCodeParser {
     }
 
     public Map<Place,FightPlayer> parsePlaces(List<Place> places) {
-        List<FightPlayer> placeFightPlayer = new ArrayList<FightPlayer>();
         Map<Place,FightPlayer> placeAndFightPlayer = new HashMap<Place,FightPlayer>();
         for(Place place : places) {
             thisPlace:
             for(String placeCode : place.code.split("\\|")) {
                 FightPlayer p = parseCode(placeCode);
-
+                p.code = placeCode;
                 switch(p.type) {
                     case NORMAL:
-                        placeAndFightPlayer.put(place, p);
-                        break thisPlace;
+                        boolean placeTaken = false;
+                        for(FightPlayer fightPlayerCheck : placeAndFightPlayer.values()){
+                            if(fightPlayerCheck.player != null && p.player !=  null && fightPlayerCheck.player.getID() == p.player.getID()){
+                                placeTaken = true;
+                                break;
+                            }
+                        }
+                        if(placeTaken){
+                            p.type = PlayerType.UNDECIDED;
+                            placeAndFightPlayer.put(place, p);
+                            break;
+                        }else{
+                            placeAndFightPlayer.put(place, p);
+                            break thisPlace;
+                        }
                     case ERROR:
                         placeAndFightPlayer.put(place, p);
                         break thisPlace;
