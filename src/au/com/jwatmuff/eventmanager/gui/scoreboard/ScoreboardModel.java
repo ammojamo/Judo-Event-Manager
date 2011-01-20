@@ -77,6 +77,8 @@ public interface ScoreboardModel {
 
     GoldenScoreMode getGoldenScoreMode();
 
+    void setGoldenScoreMode(GoldenScoreMode mode);
+
     int getHolddownPlayer();
 
     int getHolddownTime();

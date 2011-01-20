@@ -44,6 +44,18 @@ public class SetTimeDialog extends javax.swing.JDialog {
         return holddownTime;
     }
 
+    public void setGoldenScoreEnabled(boolean enabled) {
+        goldenScoreCheckBox.setEnabled(enabled);
+    }
+
+    public void setGoldenScore(boolean goldenScore) {
+        goldenScoreCheckBox.setSelected(goldenScore);
+    }
+
+    public boolean getGoldenScore() {
+        return goldenScoreCheckBox.isSelected();
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -63,6 +75,7 @@ public class SetTimeDialog extends javax.swing.JDialog {
         mainTimerMinutesSpinner = new javax.swing.JSpinner();
         mainTimerSecondsSpinner = new javax.swing.JSpinner();
         holddownTimerSecondsSpinner = new javax.swing.JSpinner();
+        goldenScoreCheckBox = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Set Scoreboard Timers");
@@ -105,6 +118,8 @@ public class SetTimeDialog extends javax.swing.JDialog {
 
         holddownTimerSecondsSpinner.setEnabled(false);
 
+        goldenScoreCheckBox.setText("Golden Score");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -139,6 +154,10 @@ public class SetTimeDialog extends javax.swing.JDialog {
                         .addComponent(holddownTimerSecondsSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(holddownTimerCheckBox))
                 .addContainerGap(115, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(goldenScoreCheckBox)
+                .addContainerGap(147, Short.MAX_VALUE))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
@@ -162,6 +181,8 @@ public class SetTimeDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(holddownTimerSecondsSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(goldenScoreCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
@@ -202,6 +223,7 @@ private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JCheckBox goldenScoreCheckBox;
     private javax.swing.JCheckBox holddownTimerCheckBox;
     private javax.swing.JSpinner holddownTimerSecondsSpinner;
     private javax.swing.JLabel jLabel1;

@@ -558,7 +558,14 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return 0;
 
         int s = score[player][type.ordinal()];
-        if(shido[1-player] == (4-type.ordinal())) s++;
+
+        /* adjust for other players shido */
+        int otherPlayer = 1 - player;
+        if((shido[otherPlayer] == 2 && type == Score.YUKO) ||
+           (shido[otherPlayer] == 3 && type == Score.WAZARI) ||
+           (shido[otherPlayer] == 4 && type == Score.IPPON)) {
+            s++;
+        }
         return s;
     }
     
@@ -672,7 +679,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         else return win.score.points;
     }
     
-    private void setGoldenScoreMode(GoldenScoreMode goldenScoreMode) {
+    public void setGoldenScoreMode(GoldenScoreMode goldenScoreMode) {
         if(this.goldenScoreMode != goldenScoreMode) {
             this.goldenScoreMode = goldenScoreMode;
             notifyListeners(ScoreboardUpdate.GOLDEN_SCORE);
