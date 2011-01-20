@@ -679,7 +679,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         else return win.score.points;
     }
     
-    private void setGoldenScoreMode(GoldenScoreMode goldenScoreMode) {
+    public void setGoldenScoreMode(GoldenScoreMode goldenScoreMode) {
         if(this.goldenScoreMode != goldenScoreMode) {
             this.goldenScoreMode = goldenScoreMode;
             notifyListeners(ScoreboardUpdate.GOLDEN_SCORE);

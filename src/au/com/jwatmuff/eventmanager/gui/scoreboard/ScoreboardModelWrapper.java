@@ -206,6 +206,11 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
+    public void setGoldenScoreMode(GoldenScoreMode mode) {
+        model.setGoldenScoreMode(mode);
+    }
+
+    @Override
     public void startHolddownTimer() {
         model.startHolddownTimer();
     }

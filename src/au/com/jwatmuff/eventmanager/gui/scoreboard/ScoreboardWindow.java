@@ -7,6 +7,7 @@
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 import au.com.jwatmuff.eventmanager.db.SessionFightDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.GoldenScoreMode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Mode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardModelListener;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardUpdate;
@@ -692,12 +693,27 @@ private void setTimeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
     if(!interactive) return;
     model.stopTimer();
     SetTimeDialog dialog = new SetTimeDialog(this, true);
+    // if scores are equal, enable golden score tick box
+    boolean scoresEqual = true;
+    for(ScoreboardModel.Score score : ScoreboardModel.Score.values()) {
+        if(model.getScore(0, score) != model.getScore(1, score)) {
+            scoresEqual = false;
+            break;
+        }
+    }
+    dialog.setGoldenScoreEnabled(scoresEqual);
+    dialog.setGoldenScore(
+            model.getGoldenScoreMode() == GoldenScoreMode.ACTIVE ||
+            model.getGoldenScoreMode() == GoldenScoreMode.FINISHED);
     dialog.setVisible(true);
     if(dialog.isMainTimeSet()) {
         model.setTimer(dialog.getMainTime());
     }
     if(dialog.isHolddownTimeSet()) {
         model.setHolddownTimer(dialog.getHolddownTime());
+    }
+    if(scoresEqual) {
+        model.setGoldenScoreMode(dialog.getGoldenScore() ? GoldenScoreMode.ACTIVE : GoldenScoreMode.INACTIVE);
     }
 }//GEN-LAST:event_setTimeMenuItemActionPerformed
 
