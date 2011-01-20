@@ -30,8 +30,12 @@ import org.apache.log4j.Logger;
 public class PlayerCodeParser {
     private static final Logger log = Logger.getLogger(PlayerCodeParser.class);
 
+
     // matches all possible player codes
-    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
+    static String matcherPlayer = "P";
+    static String matcherWinnerLooser = "[LW]+";
+    static String matcherRoundRobin = "RAP?|RAT?|RBT?|RBP?";
+    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT|RBP?|RBT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
     
     public static enum PlayerType {
         NORMAL, BYE, UNDECIDED, ERROR
@@ -57,6 +61,18 @@ public class PlayerCodeParser {
         }
     }
     
+    public static enum CodeType {
+        PLAYER, WINNERLOOSER, ROUNDROBIN, ERROR
+    }
+
+    public static class CodeInfo {
+        public String code;
+        public CodeType type;
+        public String prefix;
+        public int number;
+        public int[] params;
+    }
+    
     public static class PlayerRRScore {
         int PlayerID;
         int PlayerPos2;
@@ -64,7 +80,6 @@ public class PlayerCodeParser {
         int Points;
         int Place;
         }
-
 
 
     private PlayerCodeParser() {}
@@ -115,18 +130,71 @@ public class PlayerCodeParser {
         }
         return null;
     }
-    
+
+    public static CodeInfo getCodeInfo(String code) {
+        CodeInfo codeInfo = new CodeInfo();
+        codeInfo.code = code;
+        if(!isValidCode(code)){
+            codeInfo.type = CodeType.ERROR;
+            return codeInfo;
+        }
+                                                // e.g. RBT2-3-4-5
+        codeInfo.prefix = getPrefix(code);      //      RBT
+        codeInfo.number = getNumber(code);      //      2
+
+        if(codeInfo.prefix.matches(matcherPlayer))
+            codeInfo.type = CodeType.PLAYER;
+        else if(codeInfo.prefix.matches(matcherWinnerLooser))
+            codeInfo.type = CodeType.WINNERLOOSER;
+        else if(codeInfo.prefix.matches(matcherRoundRobin)){
+            codeInfo.type = CodeType.ROUNDROBIN;
+            codeInfo.params = getParameters(code);  //      3,4,5
+        } else
+            throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
+        return codeInfo;
+    }
+
+    public static String[] getORCodes(String code) {
+        String[] codes = code.split("\\|");
+        return codes;
+    }
+
+    public static FightPlayer parseORCode(String code, List<FightInfo> fightInfoList, List<PlayerPoolInfo> playerInfoList) {
+System.out.println(code);
+        if(playerInfoList == null || playerInfoList.isEmpty())
+            throw new IllegalArgumentException("Must supply a non-empty list of PlayerPoolInfos");
+
+        for(String orCode : getORCodes(code)) {
+            FightPlayer fightPlayer = parseCode(orCode, fightInfoList, playerInfoList);
+            fightPlayer.code = orCode;
+            switch(fightPlayer.type) {
+                case NORMAL:
+                    return fightPlayer;
+                case ERROR:
+                    break;
+                case UNDECIDED:
+                    break;
+                default:
+                    break;
+            }
+        }
+        String[] orCodes = getORCodes(code);
+        return parseCode(orCodes[0], fightInfoList, playerInfoList);
+    }
+
     public static FightPlayer parseCode(String code, List<FightInfo> fightInfoList, List<PlayerPoolInfo> playerInfoList) {
         if(playerInfoList == null || playerInfoList.isEmpty())
             throw new IllegalArgumentException("Must supply a non-empty list of PlayerPoolInfos");
 
-        String[] codes = code.split("\\|");
+        String[] codes = getORCodes(code);
         if(codes.length == 1){
             // Use prefix to work out which parsing method to call
             String prefix = getPrefix(code);
-            if(prefix.matches("P|[LW]+"))
+            if(prefix.matches(matcherPlayer))
                 return parsePLWCode(code, fightInfoList, playerInfoList);
-            else if(prefix.matches("RAP?|RAT?|RCT?|RDT?"))
+            else if(prefix.matches(matcherWinnerLooser))
+                return parsePLWCode(code, fightInfoList, playerInfoList);
+            else if(prefix.matches(matcherRoundRobin))
                 return parseRRCode(code, fightInfoList, playerInfoList);
             else
                 throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
@@ -390,8 +458,8 @@ public class PlayerCodeParser {
 
                 String[] codes = fight.getAllPlayerCode();
                 FightPlayer[] fightPlayers = new FightPlayer[] {
-                    parseCode(codes[0], fightInfoList, playerInfoList),
-                    parseCode(codes[1], fightInfoList, playerInfoList)
+                    parseORCode(codes[0], fightInfoList, playerInfoList),
+                    parseORCode(codes[1], fightInfoList, playerInfoList)
                 };
                 for(int i = 0; i < 2; i++) {
                     int j = 1 - i; // other player
@@ -484,15 +552,17 @@ public class PlayerCodeParser {
     }
 
     public FightPlayer parseCode(String code) {
-        return PlayerCodeParser.parseCode(code, fiList, piList);
+System.out.println("*****************************************************************************************************");
+System.out.println(code);
+        return PlayerCodeParser.parseORCode(code, fiList, piList);
     }
 
     public Map<Place,FightPlayer> parsePlaces(List<Place> places) {
         Map<Place,FightPlayer> placeAndFightPlayer = new HashMap<Place,FightPlayer>();
         for(Place place : places) {
             thisPlace:
-            for(String placeCode : place.code.split("\\|")) {
-                FightPlayer p = parseCode(placeCode);
+            for(String placeCode : getORCodes(place.code)) {
+                FightPlayer p = parseORCode(placeCode, fiList, piList);
                 p.code = placeCode;
                 switch(p.type) {
                     case NORMAL:

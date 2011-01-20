@@ -162,7 +162,7 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
 
                     for(int i = 0; i < 2; i++) {
                         String code = fight.getPlayerCodes()[i];
-                        FightPlayer fp = PlayerCodeParser.parseCode(code, fi, ppi);
+                        FightPlayer fp = PlayerCodeParser.parseORCode(code, fi, ppi);
                         map.put("player" + (i+1), code + ": " + fp.toString());
                     }
 

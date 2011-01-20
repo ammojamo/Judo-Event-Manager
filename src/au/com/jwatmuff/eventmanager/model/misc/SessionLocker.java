@@ -115,7 +115,7 @@ public class SessionLocker {
 
                 for(int i = 0; i < 2; i++) {
                     String code = fight.getPlayerCodes()[i];
-                    FightPlayer fp = PlayerCodeParser.parseCode(code, fi, ppi);
+                    FightPlayer fp = PlayerCodeParser.parseORCode(code, fi, ppi);
                     if(fp.type == PlayerType.BYE){
                         isBye = true;
                     }

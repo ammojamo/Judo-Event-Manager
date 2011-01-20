@@ -43,7 +43,7 @@ public abstract class FightTableModel extends BeanMapperTableModel<Fight> implem
 
                 for(int i = 0; i < 2; i++) {
                     String code = bean.getPlayerCodes()[i];
-                    FightPlayer fp = PlayerCodeParser.parseCode(code, fi, ppi);
+                    FightPlayer fp = PlayerCodeParser.parseORCode(code, fi, ppi);
                     if(fp.type == PlayerType.NORMAL)
                       map.put("player" + (i+1), code + ": " + fp.toString());
                     else
