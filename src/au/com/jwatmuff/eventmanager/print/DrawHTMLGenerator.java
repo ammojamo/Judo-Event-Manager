@@ -157,6 +157,9 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                     case UNDECIDED:
                         c.put(code, code);
                         break;
+                    case BYE:
+                        c.put(code, "BYE");
+                        break;
                     default:
                         c.put(code, p.type.toString());
                         break;
@@ -185,15 +188,6 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         wins.put(ids[1],wins.get(ids[1])+1);
                         points.put(ids[1],points.get(ids[1])+scores[1]);
                     }
-
-//                    List<PlayerScore> scores = new ArrayList<PlayerScore>();
-//                    for(Integer playerID : playerScores.keySet()) {
-//                        PlayerScore score = new PlayerScore();
-//                        score.playerID = playerID;
-//                        score.score = playerScores.get(playerID);
-//                        scores.add(score);
-//                    }
-
                 }
             }
 
@@ -226,17 +220,17 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                                 c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName());
                             }
                         } else {
-                            c.put("place" + i, place.name + ": UNDECIDED");
+                            c.put("place" + i, place.name + ": Error" + "--" + placeFightPlayer.get(place).code);
                         }
                         break;
                     case ERROR:
-                        c.put("place" + i, place.name + "--"); // mark error with --
+                        c.put("place" + i, place.name + "--" + placeFightPlayer.get(place).code); // mark error with --
                         break;
                     case UNDECIDED:
                             c.put("place" + i, place.name + ": UNDECIDED");
                         break;
                     default:
-                        c.put("place" + i, place.name + "--");
+                        c.put("place" + i, place.name + "--" + placeFightPlayer.get(place).code);
                         break;
                 }
             }
