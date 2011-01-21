@@ -90,24 +90,24 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
         List<Player> ps = new ArrayList<Player>();
         List<PlayerDetails>pds = new ArrayList<PlayerDetails>();
-        List<PlayerPoolInfo> pPS = PoolPlayerSequencer.getPlayerSequence(database, poolID);
+        List<PlayerPoolInfo> playerPoolInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
         int i = 0;
-        for(PlayerPoolInfo player : pPS) {
+        for(PlayerPoolInfo playerPoolInfo : playerPoolInfoList) {
             i++;
-            if(player == null) {
+            if(playerPoolInfo == null) {
                 c.put("player" + i, "BYE");
                 continue;
             }
-            Player p = player.getPlayer();
-            PlayerDetails pd = database.get(PlayerDetails.class, p.getDetailsID());
-            ps.add(p);
+            Player player = playerPoolInfo.getPlayer();
+            PlayerDetails pd = database.get(PlayerDetails.class, player.getDetailsID());
+            ps.add(player);
             pds.add(pd);
 //            c.put("player" + i, p.getLastName() + ", " + p.getFirstName().charAt(0) );
-            c.put("player" + i, p.getLastName() + ", " + p.getFirstName() );
+            c.put("player" + i, player.getLastName() + ", " + player.getFirstName() );
             if (pd.getClub() != null) {
-                c.put("playerRegion" + i, pd.getClub() + " (" + p.getShortGrade() + ")" );
+                c.put("playerRegion" + i, pd.getClub() + " (" + player.getShortGrade() + ")" );
             } else {
-                c.put("playerRegion" + i, " (" + p.getShortGrade() + ")" );
+                c.put("playerRegion" + i, " (" + player.getShortGrade() + ")" );
             }
         }
         while(i++ < 64) { //TODO: this should not be an arbitrary limit
@@ -139,11 +139,11 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
             }
 
             for(String code : codes) {
-                FightPlayer p = parser.parseCode(code);
-                switch(p.type) {
+                FightPlayer fightPlayer = parser.parseCode(code);
+                switch(fightPlayer.type) {
                     case NORMAL:
                         c.put(PlayerCodeParser.getORCodes(code)[0],
-                              p.player.getLastName() + ", " + p.player.getFirstName().charAt(0));
+                              fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName().charAt(0));
                         break;
                     case ERROR:
                         c.put(PlayerCodeParser.getORCodes(code)[0], "--"+code); // mark error with --
@@ -155,7 +155,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         c.put(PlayerCodeParser.getORCodes(code)[0], "BYE");
                         break;
                     default:
-                        c.put(PlayerCodeParser.getORCodes(code)[0], p.type.toString());
+                        c.put(PlayerCodeParser.getORCodes(code)[0], fightPlayer.type.toString());
                         break;
                 }
             }
@@ -164,33 +164,33 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
             i = 0;
             List<Place> places = pool.getPlaces();
-            Map<Place,FightPlayer> placeFightPlayer = parser.parsePlaces(places);
             for(Place place : places) {
 //Add the place codes to list of codes
                 codes.addAll(Arrays.asList(PlayerCodeParser.getORCodes(place.code)));
+                FightPlayer fightPlayer = parser.parseCode(place.code);
 
                 i++;
-                switch(placeFightPlayer.get(place).type) {
+                switch(fightPlayer.type) {
                     case NORMAL:
-                        if(placeFightPlayer.get(place).player != null) {
-                            PlayerDetails pd = database.get(PlayerDetails.class, placeFightPlayer.get(place).player.getDetailsID());
-                            if (pd.getClub() != null) {
-                                c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName() + " -- " + pd.getClub());
+                        if(fightPlayer.player != null) {
+                            PlayerDetails playerDetails = database.get(PlayerDetails.class, fightPlayer.player.getDetailsID());
+                            if (playerDetails.getClub() != null) {
+                                c.put("place" + i, place.name + ": " + fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName() + " -- " + playerDetails.getClub());
                             } else {
-                                c.put("place" + i, place.name + ": " + placeFightPlayer.get(place).player.getLastName() + ", " + placeFightPlayer.get(place).player.getFirstName());
+                                c.put("place" + i, place.name + ": " + fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName());
                             }
                         } else {
-                            c.put("place" + i, place.name + ": Error" + "--" + placeFightPlayer.get(place).code);
+                            c.put("place" + i, place.name + ": Error" + "--" + fightPlayer.code);
                         }
                         break;
                     case ERROR:
-                        c.put("place" + i, place.name + "--" + placeFightPlayer.get(place).code); // mark error with --
+                        c.put("place" + i, place.name + "--" + fightPlayer.code); // mark error with --
                         break;
                     case UNDECIDED:
                             c.put("place" + i, place.name + ": UNDECIDED");
                         break;
                     default:
-                        c.put("place" + i, place.name + "--" + placeFightPlayer.get(place).code);
+                        c.put("place" + i, place.name + "--" + fightPlayer.code);
                         break;
                 }
             }
@@ -198,9 +198,9 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 //Adds the score and points for each fight
 
             i = 0;
-            for(Fight f : fights) {
+            for(Fight fight : fights) {
                 i++;
-                List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, f.getID());
+                List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, fight.getID());
                 if(!results.isEmpty()) {
                     c.put("result_" + i, results.get(0).getScores()[0].displayString() + " / " + results.get(0).getScores()[1].displayString() + "  " + results.get(0).getDurationString());
                 }
@@ -223,7 +223,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
                 Map<Integer,Integer> wins = new HashMap<Integer,Integer>();
                 Map<Integer,Integer> points = new HashMap<Integer,Integer>();
-                for(PlayerPoolInfo player : pPS) {
+                for(PlayerPoolInfo player : playerPoolInfoList) {
                     if(player!=null){
                         if(!wins.containsKey(player.getPlayer().getID()))
                             wins.put(player.getPlayer().getID(), 0);
@@ -254,12 +254,12 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 //Adds total wins and points
 
                 i = 0;
-                for(PlayerPoolInfo player : pPS) {
+                for(PlayerPoolInfo playerPoolInfo : playerPoolInfoList) {
                     i++;
-                    if(player!=null){
-                        Player p = player.getPlayer();
-                        c.put("R" + roundRobinPnt + "Wins" + i , wins.get(p.getID()) );
-                        c.put("R" + roundRobinPnt + "Points" + i , points.get(p.getID()) );
+                    if(playerPoolInfo!=null){
+                        Player player = playerPoolInfo.getPlayer();
+                        c.put("R" + roundRobinPnt + "Wins" + i , wins.get(player.getID()) );
+                        c.put("R" + roundRobinPnt + "Points" + i , points.get(player.getID()) );
                     }
                 }
             }
