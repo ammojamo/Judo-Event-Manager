@@ -289,13 +289,13 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         // end TODO
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-        ConfigurationFile drawConfig = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
-        if(drawConfig == null) {
+        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
+        if(configurationFile == null) {
             GUIUtils.displayError(this, "Unable to load draw configuration.");
             return false;
         }
 
-        String drawName = drawConfig.getDrawName(players.size());
+        String drawName = configurationFile.getDrawName(players.size());
         if(drawName == null) {
             GUIUtils.displayError(this, "The current draw configuration does not support divisions with " + players.size() + " players");
             return false;

@@ -41,7 +41,7 @@ public class ConfigurationFile {
 
     /*** Static utility methods ***/
 
-    private static Map<String, ConfigurationFile> drawConfigurations = new HashMap<String, ConfigurationFile>();
+    private static Map<String, ConfigurationFile> configurations = new HashMap<String, ConfigurationFile>();
 
     static {
         updateConfigurations();
@@ -55,7 +55,7 @@ public class ConfigurationFile {
                 props.load(new FileReader(f));
                 if(props.containsKey("name")) {
                     String name = props.getProperty("name");
-                    drawConfigurations.put(name, new ConfigurationFile(props));
+                    configurations.put(name, new ConfigurationFile(props));
                 }
             } catch(IOException e) {
                 log.error("IOException loading draw configurations", e);
@@ -64,12 +64,12 @@ public class ConfigurationFile {
     }
 
     public static List<ConfigurationFile> getConfigurations() {
-        return new ArrayList<ConfigurationFile>(drawConfigurations.values());
+        return new ArrayList<ConfigurationFile>(configurations.values());
     }
 
     public static String[] getConfigurationNames() {
         ArrayList<String> names = new ArrayList<String>();
-        for(ConfigurationFile config : drawConfigurations.values())
+        for(ConfigurationFile config : configurations.values())
             names.add(config.getName());
 
         // Sort alphabetically
@@ -81,8 +81,8 @@ public class ConfigurationFile {
     }
 
     public static ConfigurationFile getConfiguration(String name) {
-        if(!drawConfigurations.containsKey(name))
+        if(!configurations.containsKey(name))
             name = "Default";
-        return drawConfigurations.get(name);
+        return configurations.get(name);
     }
 }

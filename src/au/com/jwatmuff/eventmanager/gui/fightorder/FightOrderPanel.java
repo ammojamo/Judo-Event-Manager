@@ -418,8 +418,8 @@ public class FightOrderPanel extends javax.swing.JPanel {
             GUIUtils.displayError(parentWindow, e.getMessage());
         }*/
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-        ConfigurationFile dc = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
-        if(dc == null) {
+        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
+        if(configurationFile == null) {
             GUIUtils.displayMessage(parentWindow, "Could not load a valid draw configuration.\nPlease set a draw configuration in Competition Details or assign draws manually", "Auto Assign");
             return;
         }
@@ -430,9 +430,9 @@ public class FightOrderPanel extends javax.swing.JPanel {
             return;
         }
 
-        String fileName = dc.getDrawName(numPlayers);
+        String fileName = configurationFile.getDrawName(numPlayers);
         if(fileName == null) {
-            GUIUtils.displayMessage(parentWindow, "The draw configuration " + dc.getName() + " does not support divisions with " + numPlayers + " players", "Auto Assign");
+            GUIUtils.displayMessage(parentWindow, "The draw configuration " + configurationFile.getName() + " does not support divisions with " + numPlayers + " players", "Auto Assign");
             return;
         }
 

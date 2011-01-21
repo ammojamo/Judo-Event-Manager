@@ -784,10 +784,10 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     private void drawConfigurationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drawConfigurationComboBoxActionPerformed
 
 
-        ConfigurationFile dc = ConfigurationFile.getConfiguration((String)drawConfigurationComboBox.getSelectedItem());
-        String defaultDivisionsFileName = dc.getProperty("defaultDivisions");
-        String defaultDirectorName = dc.getProperty("defaultDirectorName");
-        String defaultDirectorContact = dc.getProperty("defaultDirectorContact");
+        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration((String)drawConfigurationComboBox.getSelectedItem());
+        String defaultDivisionsFileName = configurationFile.getProperty("defaultDivisions");
+        String defaultDirectorName = configurationFile.getProperty("defaultDirectorName");
+        String defaultDirectorContact = configurationFile.getProperty("defaultDirectorContact");
         if(defaultDirectorName != null && !defaultDirectorName.isEmpty() && directorNameTextField.getText().trim().isEmpty()){
             directorNameTextField.setText(defaultDirectorName);
         }
