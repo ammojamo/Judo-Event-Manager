@@ -34,7 +34,8 @@ public class PlayerCodeParser {
     static String matcherPlayer = "P";
     static String matcherWinnerLooser = "[LW]+";
     static String matcherRoundRobin = "RAP?|RAT?|RBT?|RBP?";
-    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT|RBP?|RBT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
+    static String matcherBestOfThree = "TAP?|TAT?";
+    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT|RBP?|RBT?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
     
     public static enum PlayerType {
         NORMAL, BYE, UNDECIDED, ERROR
@@ -61,7 +62,7 @@ public class PlayerCodeParser {
     }
     
     public static enum CodeType {
-        PLAYER, WINNERLOOSER, ROUNDROBIN, ERROR
+        PLAYER, WINNERLOOSER, ROUNDROBIN, BESTOFTHREE, ERROR
     }
 
     public static class CodeInfo {
@@ -80,7 +81,35 @@ public class PlayerCodeParser {
         int Place;
         }
 
+    private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_RR = new Comparator<PlayerRRScore>(){
+            @Override
+            public int compare(PlayerRRScore p0, PlayerRRScore p1) {
+                return (p1.Wins - p0.Wins != 0) ? p1.Wins - p0.Wins : p1.Points - p0.Points;
+            }
+        };
 
+    private static Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR_RR = new Comparator<PlayerRRScore>(){
+            @Override
+            public int compare(PlayerRRScore p0, PlayerRRScore p1) {
+                return p1.PlayerPos2 - p0.PlayerPos2;
+            }
+        };
+
+    private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_BT = new Comparator<PlayerRRScore>(){
+            @Override
+            public int compare(PlayerRRScore p0, PlayerRRScore p1) {
+                return (p1.Wins - p0.Wins != 0) ? p1.Wins - p0.Wins : p1.Points - p0.Points;
+            }
+        };
+
+    private static Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR_BT = new Comparator<PlayerRRScore>(){
+            @Override
+            public int compare(PlayerRRScore p0, PlayerRRScore p1) {
+                return 0;
+            }
+        };
+
+        
     private PlayerCodeParser() {}
     
     public static boolean isValidCode(String code) {
@@ -148,6 +177,9 @@ public class PlayerCodeParser {
         else if(codeInfo.prefix.matches(matcherRoundRobin)){
             codeInfo.type = CodeType.ROUNDROBIN;
             codeInfo.params = getParameters(code);  //      3,4,5
+        } else if (codeInfo.prefix.matches(matcherBestOfThree)) {
+            codeInfo.type = CodeType.ROUNDROBIN;
+            codeInfo.params = getParameters(code);  //      3,4,5
         } else
             throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
         return codeInfo;
@@ -173,9 +205,11 @@ public class PlayerCodeParser {
                 return parsePLWCode(code, fightInfoList, playerInfoList);
             else if(prefix.matches(matcherRoundRobin))
                 return parseRRCode(code, fightInfoList, playerInfoList);
+            else if(prefix.matches(matcherBestOfThree))
+                return parseRRCode(code, fightInfoList, playerInfoList);
             else
                 throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
-        } else if(getCodeInfo(codes[0]).type == CodeType.ROUNDROBIN){
+        } else if(getCodeInfo(codes[0]).type == CodeType.ROUNDROBIN || getCodeInfo(codes[0]).type == CodeType.BESTOFTHREE){
 
             String prefix = getPrefix(codes[0]);   //      RBT
             int number = getNumber(codes[0]);      //      2
@@ -203,6 +237,8 @@ public class PlayerCodeParser {
 
     private static FightPlayer parseRRCode(String code, List<FightInfo> fightInfoList, List<PlayerPoolInfo> playerInfoList) {
         FightPlayer fightPlayer = new FightPlayer();
+        CodeType codeType = getCodeInfo(code).type;
+
         List<FightInfo> roundRobinFights = new ArrayList<FightInfo>();
 
         fightPlayer.code = code;
@@ -231,7 +267,7 @@ public class PlayerCodeParser {
         }
 
         if(!roundRobinFights.isEmpty()){
-            List<PlayerRRScore> PlayerRRScore = RoundRobinResults(roundRobinFights, playerInfoList);
+            List<PlayerRRScore> PlayerRRScore = RoundRobinResults(codeType, roundRobinFights, playerInfoList);
             if(PlayerRRScore.size()<number){
                 fightPlayer.type = PlayerType.ERROR;
                 return fightPlayer;
@@ -304,7 +340,7 @@ public class PlayerCodeParser {
         return fightPlayer;
     }
 
-    private static List<PlayerRRScore> RoundRobinResults(List<FightInfo> fightInfoList, List<PlayerPoolInfo> playerInfoList) {
+    private static List<PlayerRRScore> RoundRobinResults(CodeType codeType, List<FightInfo> fightInfoList, List<PlayerPoolInfo> playerInfoList) {
 
 //Add all piList in fights to map
         Map<Integer,PlayerRRScore> playerRRScoresMap = new HashMap<Integer,PlayerRRScore>();
@@ -341,21 +377,15 @@ public class PlayerCodeParser {
         for(Integer playerID : playerRRScoresMap.keySet()) {
             playerRRScoresList.add(playerRRScoresMap.get(playerID));
         }
+
+        Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_RR;
+        Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR = PLAYERS_POS_COMPARATOR_RR;
+        if(codeType == CodeType.ROUNDROBIN){
+            PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_BT;
+            PLAYERS_POS_COMPARATOR = PLAYERS_POS_COMPARATOR_BT;
+        }
         
 //Sort List
-        Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR = new Comparator<PlayerRRScore>(){
-            @Override
-            public int compare(PlayerRRScore p0, PlayerRRScore p1) {
-                return (p1.Wins - p0.Wins != 0) ? p1.Wins - p0.Wins : p1.Points - p0.Points;
-            }
-        };
-        Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR = new Comparator<PlayerRRScore>(){
-            @Override
-            public int compare(PlayerRRScore p0, PlayerRRScore p1) {
-                return p1.PlayerPos2 - p0.PlayerPos2;
-            }
-        };
-        
         Collections.sort(playerRRScoresList, PLAYERS_SCORE_COMPARATOR);
         
         
@@ -399,7 +429,7 @@ public class PlayerCodeParser {
                     if(matchedIDs == 2)
                         newFights.add(fightInfo);
                 }
-                playerRRTieList = RoundRobinResults( newFights,  playerInfoList);
+                playerRRTieList = RoundRobinResults( codeType, newFights,  playerInfoList);
                 for(int k = 0; k < playerRRTieList.size(); k++){
                     playerRRTieList.get(k).Place = playerRRTieList.get(k).Place+i;
                     playerRRScoresList.set(i+k, playerRRTieList.get(k));
