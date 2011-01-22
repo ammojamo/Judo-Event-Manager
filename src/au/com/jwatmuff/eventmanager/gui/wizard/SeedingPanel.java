@@ -16,6 +16,7 @@ import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
 import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
+import au.com.jwatmuff.eventmanager.model.misc.PoolDraw;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
@@ -54,7 +55,7 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     private TransactionNotifier notifier;
     private TransactionListener listener;
     private Pool pool;
-    private List<PlayerPoolInfo> players = new ArrayList<PlayerPoolInfo>();
+    private List<PlayerPoolInfo> playerPoolInfoList = new ArrayList<PlayerPoolInfo>();
     private Map<Integer, Integer> seeds = new HashMap<Integer, Integer>();
     private Context context;
 
@@ -97,18 +98,18 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     }
 
     private void updateFromDatabase() {
-        players = new ArrayList<PlayerPoolInfo>();
+        playerPoolInfoList = new ArrayList<PlayerPoolInfo>();
         // filter out the null entries
         for(PlayerPoolInfo player : PoolPlayerSequencer.getPlayerSequence(database, pool.getID()))
             if(player != null)
-                players.add(player);
+                playerPoolInfoList.add(player);
 
-        seedingTable.getColumn("Seed").setCellEditor(getSeedingCellEditor(players.size()));
+        seedingTable.getColumn("Seed").setCellEditor(getSeedingCellEditor(playerPoolInfoList.size()));
 
         // clear table
         while(model.getRowCount() > 0) model.removeRow(0);
 
-        for(PlayerPoolInfo player : players) {
+        for(PlayerPoolInfo player : playerPoolInfoList) {
             model.addRow(getRowData(player));
         }
     }
@@ -121,91 +122,6 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
             playerDetails.getClub(),
             seeds.get(playerID) == null ? "None" : "" + seeds.get(playerID)
         };
-    }
-
-    private int getNumberOfPlayerPositions() {
-        List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID());
-        int max = 0;
-        for(Fight fight : fights) {
-            for(String code : fight.getPlayerCodes()) {
-                if(code.startsWith("P")) {
-                    try {
-                        max = Math.max(max, Integer.parseInt(code.substring(1)));
-                    } catch(NumberFormatException e) {
-                        log.warn("Number format exception while parsing code: " + code);
-                    }
-                }
-            }
-        }
-        return max;
-    }
-
-    private PlayerPoolInfo getPlayerById(int id) {
-        for(PlayerPoolInfo player : players)
-            if(player != null && player.getPlayer().getID() == id)
-                return player;
-        return null;
-    }
-
-    private List<PlayerPoolInfo> orderPlayers() {
-        /********************************************************************************/
-        /* Ordering of players based on seeds - TODO: it might be possible to simplify this :) yes I think so */
-        /* TODO: if this code needs to be used elsewhere, it should be moved to a shared utility class */
-        /* TODO: This should be moved to a shared utility class to ensure easy update and inspection*/
-        /********************************************************************************/
-
-        int numPlayers = getNumberOfPlayerPositions();
-
-        // create a list of all players, unordered
-        List<PlayerPoolInfo> unorderedPlayers = new ArrayList<PlayerPoolInfo>(players);
-
-        // add null (bye) players to fill the available positions in the draw
-        while(unorderedPlayers.size() < numPlayers/2)
-            unorderedPlayers.add(null);
-
-        // create a list to hold the players after they have been ordered
-        List<PlayerPoolInfo> orderedPlayers = new ArrayList<PlayerPoolInfo>();
-
-        // get the set of all seeds specified, in order from lowest to highest
-        List<Integer> seedSet = new ArrayList<Integer>();
-        for(Integer seed : seeds.values())
-            if(seed != null && !seedSet.contains(seed))
-                seedSet.add(seed);
-
-        Collections.sort(seedSet);
-
-        // build up ordered list of players from those players that had seeds specified
-        for(Integer seed : seedSet) {
-            for(Integer playerID : seeds.keySet()) {
-                if(seeds.get(playerID) == seed) {
-                    PlayerPoolInfo player = getPlayerById(playerID);
-                    unorderedPlayers.remove(player);
-                    orderedPlayers.add(player);
-                }
-            }
-        }
-
-        // randomize remaining unordered players
-        Collections.shuffle(unorderedPlayers);
-
-        // fill at least half the available position in the ordered players list
-        Iterator<PlayerPoolInfo> unorderedPlayersIterator = unorderedPlayers.iterator();
-        while(orderedPlayers.size() < numPlayers/2 && unorderedPlayersIterator.hasNext()) {
-            PlayerPoolInfo uoPlayer = unorderedPlayersIterator.next();
-                orderedPlayers.add(uoPlayer);
-        }
-        unorderedPlayers.removeAll(orderedPlayers);
-
-        // add null (bye) players to fill the available positions in the draw
-        while(unorderedPlayers.size() + orderedPlayers.size() < numPlayers)
-            unorderedPlayers.add(null);
-
-        // randomize remaining unordered players, and add them to the ordered players
-        Collections.shuffle(unorderedPlayers);
-
-        orderedPlayers.addAll(unorderedPlayers);
-
-        return orderedPlayers;
     }
 
     /** This method is called from within the constructor to
@@ -275,7 +191,7 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         // if there is a database update.
         // populate seeds map:
         int index = 0;
-        for(PlayerPoolInfo player : players) {
+        for(PlayerPoolInfo player : playerPoolInfoList) {
             if(player != null) {
                 String seed = (String)seedingTable.getModel().getValueAt(index, 2);
                 try {
@@ -295,16 +211,16 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
             return false;
         }
 
-        String drawName = configurationFile.getDrawName(players.size());
+        String drawName = configurationFile.getDrawName(playerPoolInfoList.size());
         if(drawName == null) {
-            GUIUtils.displayError(this, "The current draw configuration does not support divisions with " + players.size() + " players");
+            GUIUtils.displayError(this, "The current draw configuration does not support divisions with " + playerPoolInfoList.size() + " players");
             return false;
         }
 
         File csvFile = new File("resources/draw/" + drawName + ".csv");
 
         try {
-            CSVImporter.importFightDraw(csvFile, database, pool, players.size());
+            CSVImporter.importFightDraw(csvFile, database, pool, playerPoolInfoList.size());
         } catch(Exception e) {
             GUIUtils.displayError(this, "Failed to import fight draw (" + drawName + ")");
             log.error("Error importing fight draw", e);
@@ -312,7 +228,10 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
 
         // construct list of ordered players based on seeds, with null entries to
         // represent bye players
-        List<PlayerPoolInfo> orderedPlayers = orderPlayers();
+//        List<PlayerPoolInfo> orderedPlayers = orderPlayers();
+
+        PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), seeds);
+        List<PlayerPoolInfo> orderedPlayers = poolDraw.getOrderedPlayers();
 
         PoolPlayerSequencer.savePlayerSequence(database, pool.getID(), orderedPlayers);
 
