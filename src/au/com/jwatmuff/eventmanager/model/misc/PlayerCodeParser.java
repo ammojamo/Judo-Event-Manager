@@ -152,7 +152,7 @@ public class PlayerCodeParser {
 
     public static Player getPlayer(int playerID, List<PlayerPoolInfo> playerInfoList) {
         for(PlayerPoolInfo playerPoolInfo: playerInfoList ){
-            if(playerPoolInfo.getPlayer().getID() == playerID){
+            if(playerPoolInfo != null && playerPoolInfo.getPlayer().getID() == playerID){
                 return playerPoolInfo.getPlayer();
             }
         }
