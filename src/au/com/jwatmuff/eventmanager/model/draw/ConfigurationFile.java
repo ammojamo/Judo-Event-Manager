@@ -39,6 +39,14 @@ public class ConfigurationFile {
         return properties.getProperty(propertyName);
     }
 
+    public int getIntegerProperty(String propertyName, int defaultValue) {
+        try {
+            return Integer.parseInt(properties.getProperty(propertyName));
+        } catch(Exception e) {
+            return defaultValue;
+        }
+    }
+
     /*** Static utility methods ***/
 
     private static Map<String, ConfigurationFile> configurations = new HashMap<String, ConfigurationFile>();

@@ -14,8 +14,6 @@ import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.db.SessionFightDAO;
 import au.com.jwatmuff.eventmanager.db.SessionLinkDAO;
 import au.com.jwatmuff.eventmanager.db.SessionPoolDAO;
-import au.com.jwatmuff.eventmanager.model.info.FightInfo;
-import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.info.SessionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
@@ -24,7 +22,6 @@ import au.com.jwatmuff.eventmanager.model.vo.Session.LockedStatus;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
 import au.com.jwatmuff.eventmanager.model.vo.SessionLink;
 import au.com.jwatmuff.eventmanager.model.vo.SessionPool;
-//import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.util.IDGenerator;
@@ -32,7 +29,6 @@ import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.util.Collection;
-import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
@@ -110,14 +106,17 @@ public class SessionLocker {
             for(Fight fight : database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID())) {
 //                if fight isn't bye Add them to the session
                 isBye = false;
-                List<FightInfo>fi = FightInfo.getFightInfo(database, pool.getID());
-                List<PlayerPoolInfo>ppi = PoolPlayerSequencer.getPlayerSequence(database, pool.getID());
+                
+                // I'm not sure this needs to be re-initialized ever iteration of the loop
+                // Performance could be an issue
+                PlayerCodeParser playerCodeParser = PlayerCodeParser.getInstance(database, pool.getID());
 
                 for(int i = 0; i < 2; i++) {
                     String code = fight.getPlayerCodes()[i];
-                    FightPlayer fp = PlayerCodeParser.parseCode(code, fi, ppi);
+                    FightPlayer fp = playerCodeParser.parseCode(code);
                     if(fp.type == PlayerType.BYE){
                         isBye = true;
+                        break;
                     }
                 }
                 if (!isBye) {
@@ -125,7 +124,6 @@ public class SessionLocker {
                     sf.setID(new SessionFight.Key(session.getID(), fight.getID()));
                     sf.setPosition(pos++);
                     database.add(sf);
-
                 }
             }
         }

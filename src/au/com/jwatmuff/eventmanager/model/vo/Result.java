@@ -9,7 +9,9 @@
 
 package au.com.jwatmuff.eventmanager.model.vo;
 
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.util.IDGenerator;
+import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.distributed.DistributableObject;
 
 /**
@@ -70,25 +72,25 @@ public class Result extends DistributableObject<Integer> {
         this.scores = scores;
     }
 
-    public int[] getSimpleScores() {
+
+    public int[] getSimpleScores(Database database) {
+        CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
+        return getSimpleScores(configurationFile);
+    }
+
+    public int[] getSimpleScores(ConfigurationFile configurationFile) {
         int[] simple = {0,0};
         int simpleScore = 0;
-        
-//        CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-//        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
 
         if (scores[0].getIppon() != scores[1].getIppon())
-            simpleScore = 10;
-//            simpleScore  = configurationFile.getProperty("defaultVictoryPointsIppon");
+            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
         else if(scores[0].getWazari() != scores[1].getWazari())
-            simpleScore = 7;
-//            simpleScore  = configurationFile.getProperty("defaultVictoryPointsWazari");
+            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsWazari", 7);
         else if (scores[0].getYuko() != scores[1].getYuko())
-            simpleScore = 5;
-//            simpleScore  = configurationFile.getProperty("defaultVictoryPointsYuko");
+            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsYuko", 5);
         else if (scores[0].getDecision() != scores[1].getDecision())
-            simpleScore = 1;
-//            simpleScore  = configurationFile.getProperty("defaultVictoryPointsDecision");
+            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsDecision", 1);
         if (scores[0].compareTo(scores[1])>0)
             simple[0] = simpleScore;
         else
