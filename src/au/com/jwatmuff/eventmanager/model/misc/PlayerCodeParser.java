@@ -113,11 +113,17 @@ public class PlayerCodeParser {
     private PlayerCodeParser() {}
     
     public static boolean isValidCode(String code) {
-        return codePattern.matcher(code).matches();
+        String[] orCodes = getORCodes(code);
+        for(String orCode:orCodes){
+            if(!codePattern.matcher(orCode).matches())
+            return false;
+        }
+        return true;
     }
     
     public static String getPrefix(String code) {
-        Matcher matcher = codePattern.matcher(code);
+        String[] orCodes = getORCodes(code);
+        Matcher matcher = codePattern.matcher(orCodes[0]);
         if(matcher.matches())
             return matcher.group(1);
         else
@@ -125,7 +131,8 @@ public class PlayerCodeParser {
     }
     
     public static int getNumber(String code) {
-        Matcher matcher = codePattern.matcher(code);
+        String[] orCodes = getORCodes(code);
+        Matcher matcher = codePattern.matcher(orCodes[0]);
         if(matcher.matches())
             return Integer.parseInt(matcher.group(2));
         else
@@ -133,7 +140,8 @@ public class PlayerCodeParser {
     }
 
     public static int[] getParameters(String code) {
-        Matcher matcher = codePattern.matcher(code);
+        String[] orCodes = getORCodes(code);
+        Matcher matcher = codePattern.matcher(orCodes[0]);
         if(matcher.matches()) {
             if(matcher.groupCount() >= 3) {
                 String[] paramsStr = matcher.group(3).split("-");
@@ -342,7 +350,7 @@ public class PlayerCodeParser {
 
     private static List<PlayerRRScore> RoundRobinResults(CodeType codeType, List<FightInfo> fightInfoList, List<PlayerPoolInfo> playerInfoList) {
 
-//Add all piList in fights to map
+//Add all playerPoolInfoList in fights to map
         Map<Integer,PlayerRRScore> playerRRScoresMap = new HashMap<Integer,PlayerRRScore>();
         for(FightInfo fightInfo : fightInfoList) {
             for(int playerID : fightInfo.getAllPlayerID()){
@@ -562,16 +570,16 @@ public class PlayerCodeParser {
 
     /* Parser instance stuff */
 
-    List<PlayerPoolInfo> piList;
-    List<FightInfo> fiList;
+    List<PlayerPoolInfo> playerPoolInfoList;
+    List<FightInfo> fightInfoList;
 
     private PlayerCodeParser(Database database, int poolID) {
-        piList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
+        playerPoolInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
         List<Fight> fights = new ArrayList<Fight>(database.findAll(Fight.class, FightDAO.FOR_POOL, poolID));
 
-        fiList = new ArrayList<FightInfo>();
+        fightInfoList = new ArrayList<FightInfo>();
         for(Fight fight : fights)
-            fiList.add(FightInfo.getFightInfo(database, fight));
+            fightInfoList.add(FightInfo.getFightInfo(database, fight));
     }
 
     public static PlayerCodeParser getInstance(Database database, int poolID) {
@@ -580,7 +588,7 @@ public class PlayerCodeParser {
     }
 
     public FightPlayer parseCode(String code) {
-        return PlayerCodeParser.parseCode(code, fiList, piList);
+        return PlayerCodeParser.parseCode(code, fightInfoList, playerPoolInfoList);
     }
 
     public static FightPlayer parseCode(Database database, String code, int poolID) throws DatabaseStateException {

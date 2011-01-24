@@ -88,24 +88,25 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
 //Print the player names and information
 
-        List<Player> ps = new ArrayList<Player>();
-        List<PlayerDetails>pds = new ArrayList<PlayerDetails>();
+        List<Player> playerList = new ArrayList<Player>();
+        List<PlayerDetails>playerDetailsdList = new ArrayList<PlayerDetails>();
         List<PlayerPoolInfo> playerPoolInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
         int i = 0;
         for(PlayerPoolInfo playerPoolInfo : playerPoolInfoList) {
             i++;
+            
             if(playerPoolInfo == null) {
                 c.put("player" + i, "BYE");
                 continue;
             }
             Player player = playerPoolInfo.getPlayer();
-            PlayerDetails pd = database.get(PlayerDetails.class, player.getDetailsID());
-            ps.add(player);
-            pds.add(pd);
+            PlayerDetails playerDetails = database.get(PlayerDetails.class, player.getDetailsID());
+            playerList.add(player);
+            playerDetailsdList.add(playerDetails);
 //            c.put("player" + i, p.getLastName() + ", " + p.getFirstName().charAt(0) );
             c.put("player" + i, player.getLastName() + ", " + player.getFirstName() );
-            if (pd.getClub() != null) {
-                c.put("playerRegion" + i, pd.getClub() + " (" + player.getShortGrade() + ")" );
+            if (playerDetails.getClub() != null) {
+                c.put("playerRegion" + i, playerDetails.getClub() + " (" + player.getShortGrade() + ")" );
             } else {
                 c.put("playerRegion" + i, " (" + player.getShortGrade() + ")" );
             }
