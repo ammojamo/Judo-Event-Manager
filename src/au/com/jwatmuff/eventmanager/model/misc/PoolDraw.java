@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
 
@@ -47,9 +48,9 @@ public class PoolDraw {
     }
 
     private PlayerPoolInfo getPlayerById(int id) {
-        for(PlayerPoolInfo player : playerPoolInfoList)
-            if(player != null && player.getPlayer().getID() == id)
-                return player;
+        for(PlayerPoolInfo playerPoolInfo : playerPoolInfoList)
+            if(playerPoolInfo != null && playerPoolInfo.getPlayer().getID() == id)
+                return playerPoolInfo;
         return null;
     }
 
@@ -61,17 +62,41 @@ public class PoolDraw {
         /* TODO: This should be moved to a shared utility class to ensure easy update and inspection*/
         /********************************************************************************/
 
+//
+//        int noPlayers = 16;
+//        List<Integer> playerNumbers = PoolNumber.GetFightList(noPlayers);
+//System.out.println("*****************************************************************");
+//System.out.println("Places **********************************************************");
+//        for(int i = 0; i<noPlayers; i++){
+//            System.out.println("Player " + i + "     Place " + playerNumbers.get(i) );
+//        }
+
+
+//System.out.println("Corners *****************************************************************");
+//        for(int i = 0; i<order; i++){
+//            System.out.println("newPoolNoPath0 " + newpoolNoPaths.get(0).Corners.get(i) + "     newPoolNoPath1 " + newpoolNoPaths.get(1).Corners.get(i) + "     newPoolNoPath2 " + newpoolNoPaths.get(2).Corners.get(i) + "     newPoolNoPath3 " + newpoolNoPaths.get(3).Corners.get(i) + "     poolNoPath0 " + poolNoPaths.get(0).Corners.get(i) + "     poolNoPath1 " + poolNoPaths.get(1).Corners.get(i) + "     poolNoPath2 " + poolNoPaths.get(2).Corners.get(i) + "     poolNoPath3 " + poolNoPaths.get(3).Corners.get(i) );
+//        }
+//System.out.println("Directions *****************************************************************");
+//        for(int i = 0; i<order; i++){
+//            System.out.println("newPoolNoPath0 " + newpoolNoPaths.get(0).Directions.get(i) + "     newPoolNoPath1 " + newpoolNoPaths.get(1).Directions.get(i) + "     newPoolNoPath2 " + newpoolNoPaths.get(2).Directions.get(i) + "     newPoolNoPath3 " + newpoolNoPaths.get(3).Directions.get(i) + "     poolNoPath0 " + poolNoPaths.get(0).Directions.get(i) + "     poolNoPath1 " + poolNoPaths.get(1).Directions.get(i) + "     poolNoPath2 " + poolNoPaths.get(2).Directions.get(i) + "     poolNoPath3 " + poolNoPaths.get(3).Directions.get(i) );
+//        }
+
+
+
         int numPlayers = getNumberOfPlayerPositions();
 
         // create a list of all players, unordered
-        List<PlayerPoolInfo> unorderedPlayers = new ArrayList<PlayerPoolInfo>(playerPoolInfoList);
+        List<PlayerPoolInfo> unorderedPlayerPoolInfo = new ArrayList<PlayerPoolInfo>(playerPoolInfoList);
 
         // add null (bye) players to fill the available positions in the draw
-        while(unorderedPlayers.size() < numPlayers/2)
-            unorderedPlayers.add(null);
+        while(unorderedPlayerPoolInfo.size() < numPlayers/2)
+            unorderedPlayerPoolInfo.add(null);
 
         // create a list to hold the players after they have been ordered
-        List<PlayerPoolInfo> orderedPlayers = new ArrayList<PlayerPoolInfo>();
+        List<PlayerPoolInfo> seedOrderPlayerPoolInfo = new ArrayList<PlayerPoolInfo>();
+
+        // create a list to hold the players after pool positions are converted to player positions
+        List<PlayerPoolInfo> finalPlayerPoolInfo = new ArrayList<PlayerPoolInfo>(numPlayers);
 
         // get the set of all seeds specified, in order from lowest to highest
         List<Integer> seedSet = new ArrayList<Integer>();
@@ -86,33 +111,46 @@ public class PoolDraw {
             for(Integer playerID : seeds.keySet()) {
                 if(seeds.get(playerID) == seed) {
                     PlayerPoolInfo player = getPlayerById(playerID);
-                    unorderedPlayers.remove(player);
-                    orderedPlayers.add(player);
+                    unorderedPlayerPoolInfo.remove(player);
+                    seedOrderPlayerPoolInfo.add(player);
                 }
             }
         }
 
         // randomize remaining unordered players
-        Collections.shuffle(unorderedPlayers);
+        Collections.shuffle(unorderedPlayerPoolInfo);
 
         // fill at least half the available position in the ordered players list
-        Iterator<PlayerPoolInfo> unorderedPlayersIterator = unorderedPlayers.iterator();
-        while(orderedPlayers.size() < numPlayers/2 && unorderedPlayersIterator.hasNext()) {
-            PlayerPoolInfo uoPlayer = unorderedPlayersIterator.next();
-                orderedPlayers.add(uoPlayer);
+        Iterator<PlayerPoolInfo> unorderedPlayersIterator = unorderedPlayerPoolInfo.iterator();
+        while(seedOrderPlayerPoolInfo.size() < numPlayers/2 && unorderedPlayersIterator.hasNext()) {
+            PlayerPoolInfo unorderedPlayer = unorderedPlayersIterator.next();
+                seedOrderPlayerPoolInfo.add(unorderedPlayer);
         }
-        unorderedPlayers.removeAll(orderedPlayers);
+        unorderedPlayerPoolInfo.removeAll(seedOrderPlayerPoolInfo);
 
         // add null (bye) players to fill the available positions in the draw
-        while(unorderedPlayers.size() + orderedPlayers.size() < numPlayers)
-            unorderedPlayers.add(null);
+        while(unorderedPlayerPoolInfo.size() + seedOrderPlayerPoolInfo.size() < numPlayers)
+            unorderedPlayerPoolInfo.add(null);
 
         // randomize remaining unordered players, and add them to the ordered players
-        Collections.shuffle(unorderedPlayers);
+        Collections.shuffle(unorderedPlayerPoolInfo);
 
-        orderedPlayers.addAll(unorderedPlayers);
+        seedOrderPlayerPoolInfo.addAll(unorderedPlayerPoolInfo);
 
-        return orderedPlayers;
+        Map<Integer, Integer> seedToPoolMap = PoolNumber.SeedToPoolMap(numPlayers);
+        Map<Integer, Integer> poolToPositionMap = pool.getDrawPools();
+        Map<Integer, Integer> finalPlayerPoolInfoMap = new HashMap<Integer, Integer>();
+
+        for(int i = 0; i < numPlayers; i++ ){
+            int PoolPosition = seedToPoolMap.get(i);
+            int PlayerPosition = poolToPositionMap.get(PoolPosition+1)-1;
+            finalPlayerPoolInfoMap.put(PlayerPosition, i);
+        }
+
+        for(int i = 0; i < numPlayers; i++ ){
+            finalPlayerPoolInfo.add(i, seedOrderPlayerPoolInfo.get(finalPlayerPoolInfoMap.get(i)));
+        }
+        return finalPlayerPoolInfo;
     }
 
     /* Parser instance stuff */

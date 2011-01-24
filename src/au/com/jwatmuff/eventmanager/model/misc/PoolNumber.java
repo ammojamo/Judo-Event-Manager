@@ -1,0 +1,283 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package au.com.jwatmuff.eventmanager.model.misc;
+
+
+import org.apache.log4j.Logger; 
+import java.util.ArrayList;
+import java.util.List;
+
+import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ *
+ * @author Leonard Hall
+ */
+public class PoolNumber {
+    
+    private static final Logger log = Logger.getLogger(PoolNumber.class);
+
+    public static class PoolNo {
+        public int poolNumber;
+        public int poolOrder;
+    }
+
+    public static class PoolNoPath {
+        public List<Integer> Corners = new ArrayList<Integer>();
+        public List<Integer> Directions = new ArrayList<Integer>();
+    }
+
+    
+    /** Creates a new instance of PlayerPoolInfo */
+    public static PoolNo PoolNumber(int poolNumber, int poolOrder) {
+        PoolNo poolNo = new PoolNo();
+        poolNo.poolNumber = poolNumber;
+        poolNo.poolOrder = poolOrder;
+        return poolNo;
+    }
+
+//    public static PoolNo PoolNumber(int poolNumber) {
+//        PoolNo poolNo = new PoolNo();
+//        poolNo.poolNumber = poolNumber;
+//        poolNo.poolOrder = poolNo.poolNumber.bitLength();
+//        return poolNo;
+//    }
+
+    public static int GetPoolNumber(PoolNo poolNo) {
+        return poolNo.poolNumber;
+    }
+
+    public static PoolNoPath GetPoolNumberPath(PoolNo poolNo) {
+        PoolNoPath poolNoPath = new PoolNoPath();
+        int Order = poolNo.poolOrder;
+        for(int i = 0; i<Order; i++){
+            poolNoPath.Directions.add(0,GetLeading(poolNo));
+            poolNoPath.Corners.add(0,poolNo.poolNumber);
+            poolNo = ReduceOrder(poolNo);
+        }
+        return poolNoPath;
+    }
+
+    public static PoolNo FollowPath(List<Integer> path) {
+        PoolNo poolNo = PoolNumber(0, 0);
+        for(int i = 0; i<path.size(); i++){
+            poolNo = IncreaseOrder(poolNo, path.get(i));
+        }
+        return poolNo;
+    }
+
+    public static int GetPoolOrder(PoolNo poolNo) {
+        return poolNo.poolOrder;
+    }
+
+    public static int NumberToOrder(int number) {
+        int order = 0;
+        while (number > 0){
+            number = number >>> 1;
+            order++;
+        }
+        return order;
+    }
+
+    public static int MinimumOrder(int number) {
+        int order = 0;
+        number = number - 1;
+        while (number > 0){
+            number = number >>> 1;
+            order++;
+        }
+        order++;
+        return order;
+    }
+
+    public static int OrderToNumber(int order) {
+        int number = 1;
+        for(int i = 0; i < order-1; i++)
+            number = number << 1;
+        return number;
+    }
+
+    private static int GetLeading(PoolNo poolNo) {
+        int leading = poolNo.poolNumber >> (poolNo.poolOrder - 1);
+        int mask = 1;
+        leading = leading & mask;
+        return leading;
+    }
+
+    private static PoolNo AddLeading(PoolNo poolNo) {
+        poolNo.poolOrder++;
+        return poolNo;
+    }
+
+    private static PoolNo RemoveLeading(PoolNo poolNo) {
+        int mask = (1 << poolNo.poolOrder)-1;
+        poolNo.poolNumber = poolNo.poolNumber & mask;
+        poolNo.poolOrder--;
+        return poolNo;
+    }
+
+    private static PoolNo InvertAll(PoolNo poolNo) {
+        poolNo.poolNumber = ~poolNo.poolNumber;
+        int mask = (1 << poolNo.poolOrder) - 1;
+        poolNo.poolNumber = poolNo.poolNumber & mask;
+        return poolNo;
+    }
+
+    private static PoolNo ReduceOrder(PoolNo poolNo) {
+        int mask = 1 << (poolNo.poolOrder-1);
+        if((poolNo.poolNumber & mask) > 0)
+            poolNo = InvertAll(poolNo);
+        poolNo = RemoveLeading(poolNo);
+        return poolNo;
+    }
+
+    private static PoolNo IncreaseOrder(PoolNo poolNo, int sign) {
+        poolNo = AddLeading(poolNo);
+        if(sign == 1)
+            poolNo = InvertAll(poolNo);
+        return poolNo;
+    }
+
+    public static List<PoolNo> IncreasePoolOrder(List<PoolNo> poolNos){
+
+        List<PoolNo> newPoolNumbers = new ArrayList<PoolNo>();
+            PoolNo poolNo0 = new PoolNo();
+            for(int i = 0; i < poolNos.size(); i++){
+                poolNo0 = new PoolNo();
+                poolNo0.poolNumber = poolNos.get(i).poolNumber;
+                poolNo0.poolOrder = poolNos.get(i).poolOrder;
+                poolNo0 = IncreaseOrder(poolNo0, 0);
+                newPoolNumbers.add(poolNo0);
+            }
+            for(int i = 0; i < poolNos.size(); i++){
+                poolNo0 = new PoolNo();
+                poolNo0.poolNumber = poolNos.get(i).poolNumber;
+                poolNo0.poolOrder = poolNos.get(i).poolOrder;
+                poolNo0 = IncreaseOrder(poolNo0, 1);
+                newPoolNumbers.add(poolNo0);
+            }
+        return newPoolNumbers;
+    }
+
+    public static List<PoolNo> GetPoolOrder(PoolNo poolNo, int newOrder){
+        List<PoolNo> poolNos = new ArrayList<PoolNo>();
+        if(newOrder == GetPoolOrder(poolNo)){
+            poolNos.add(poolNo);
+            return poolNos;
+
+        } else if(newOrder < GetPoolOrder(poolNo)) {
+            for(int i = GetPoolOrder(poolNo); i > newOrder; i--){
+                poolNo = ReduceOrder(poolNo);
+            }
+            poolNos.add(poolNo);
+            return poolNos;
+
+        } else {
+            poolNos.add(poolNo);
+            for(int i = GetPoolOrder(poolNo); i < newOrder-1; i++){
+                poolNos = IncreasePoolOrder(poolNos);
+            }
+            return poolNos;
+        }
+    }
+
+
+    public static List<Integer> GetFightList(int order){
+
+        int noPlayers = OrderToNumber(order);
+        List<Integer> playerNumbers = new ArrayList<Integer>();
+        List<Integer> fightNumbers = new ArrayList<Integer>();
+        List<Integer> lastFightNumbers = new ArrayList<Integer>();
+
+        for(int i = 0; i<noPlayers/2; i++){
+            fightNumbers.add(i, i);
+        }
+        for(int i = fightNumbers.size(); i<noPlayers; i++){
+            lastFightNumbers.add(i);
+        }
+
+        Random randomGenerator = new Random();
+
+        Map<Integer, PoolNoPath> poolNoPaths = new HashMap<Integer, PoolNoPath>();
+        for(int i = 0; i<16; i++){
+            poolNoPaths.put(i, GetPoolNumberPath(PoolNumber(i, order)));
+        }
+
+        Map<Integer, PoolNoPath> newpoolNoPaths = new HashMap<Integer, PoolNoPath>();
+
+        playerNumbers.add(randomGenerator.nextInt(fightNumbers.size()));
+        for(int j = 0; j < fightNumbers.size() ; j++){
+            if(fightNumbers.get(j) == playerNumbers.get(0)){
+                fightNumbers.remove(j);
+                break;
+            }
+        }
+        
+        newpoolNoPaths.put(0, GetPoolNumberPath(PoolNumber(playerNumbers.get(0), order)));
+
+        for(int k = 1; k < noPlayers; k++){
+            int newOrder = NumberToOrder(k);
+            List<Integer> newPath = new ArrayList<Integer>();
+            int nextCorner = 0;
+            for(int i = 0; i < newOrder-1 ; i++){
+                nextCorner = poolNoPaths.get(k).Corners.get(i);
+                newPath.add(newpoolNoPaths.get(nextCorner).Directions.get(i));
+            }
+            int direction = newpoolNoPaths.get(nextCorner).Directions.get(newOrder-1) ^ 1;
+            newPath.add(direction);
+
+            PoolNo rootPoolNo = FollowPath(newPath);
+            List<PoolNo> poolNos = GetPoolOrder(rootPoolNo, order);
+
+
+            for(int i = 0; i < poolNos.size() ; i++){
+                boolean found = false;
+                for(int j = 0; j < fightNumbers.size() ; j++){
+                    if(poolNos.get(i).poolNumber == fightNumbers.get(j)){
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found){
+                    poolNos.remove(i);
+                    i--;
+                }
+            }
+            playerNumbers.add(poolNos.get(randomGenerator.nextInt(poolNos.size())).poolNumber);
+            for(int j = 0; j < fightNumbers.size() ; j++){
+                if(fightNumbers.get(j) == playerNumbers.get(k)){
+                    fightNumbers.remove(j);
+                    break;
+                }
+            }
+            if(fightNumbers.isEmpty())
+                fightNumbers.addAll(lastFightNumbers);
+
+            newpoolNoPaths.put(k, GetPoolNumberPath(PoolNumber(playerNumbers.get(k), order)));
+
+        }
+        return playerNumbers;
+    }
+
+
+    public static Map<Integer, Integer> SeedToPoolMap(int noPlayers){
+        int order = MinimumOrder(noPlayers);
+        Map<Integer, Integer> seedToPoolMap = new HashMap<Integer, Integer>();
+        List<Integer> seedToPool = GetFightList(order);
+        int position = 0;
+        for(int i = 0; i < seedToPool.size(); i++){
+            if(seedToPool.get(i) < noPlayers){
+                seedToPoolMap.put(position, seedToPool.get(i));
+                position ++;
+            }
+        }
+        return seedToPoolMap;
+    }
+
+}
