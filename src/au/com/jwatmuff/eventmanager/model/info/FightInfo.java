@@ -11,6 +11,7 @@ package au.com.jwatmuff.eventmanager.model.info;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.genericdb.Database;
@@ -55,30 +56,35 @@ public class FightInfo {
     public boolean resultKnown() {
         return (r != null);
     }
+
+    private int getWinningPlayerIndex() {
+        return (r.getScores()[0].compareTo(r.getScores()[1]) > 0) ? 0 : 1;
+    }
+
+    private int getLosingPlayerIndex() {
+        return 1 - getWinningPlayerIndex();
+    }
     
     public String getWinningPlayerCode() {
         if(resultKnown())
-            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? f.getPlayerCodes()[0] : f.getPlayerCodes()[1];
+            return f.getPlayerCodes()[getWinningPlayerIndex()];
         else
             return null;
     }
 
     public String getLosingPlayerCode() {
         if(resultKnown())
-            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? f.getPlayerCodes()[1] : f.getPlayerCodes()[0];
+            return f.getPlayerCodes()[getLosingPlayerIndex()];
         else
             return null;
     }
 
-    public int getWinningPlayerSimpleScore() {
+    public int getWinningPlayerSimpleScore(ConfigurationFile configurationFile) {
+        int[] simpleScores = r.getSimpleScores(configurationFile);
         if(resultKnown())
-            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? r.getSimpleScores()[0] : r.getSimpleScores()[1];
+            return simpleScores[getWinningPlayerIndex()];
         else
             return 0;
-    }
-
-    public int[] getSimpleScores() {
-        return r.getSimpleScores();
     }
 
     public String[] getAllPlayerCode() {
@@ -91,16 +97,15 @@ public class FightInfo {
     
     public int getWinningPlayerID() {
         if(resultKnown())
-            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? r.getPlayerIDs()[0] : r.getPlayerIDs()[1];
+            return r.getPlayerIDs()[getWinningPlayerIndex()];
         else
             return 0;
     }
 
     public int getLosingPlayerID() {
         if(resultKnown())
-            return (r.getSimpleScores()[0] > r.getSimpleScores()[1]) ? r.getPlayerIDs()[1] : r.getPlayerIDs()[0];
+            return r.getPlayerIDs()[getLosingPlayerIndex()];
         else
             return 0;
     }
-
 }

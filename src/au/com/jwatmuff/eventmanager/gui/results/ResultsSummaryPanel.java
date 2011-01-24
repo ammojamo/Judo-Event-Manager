@@ -83,7 +83,7 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
                 map.put("playerId" + (i + 1), (player != null) ? player.getVisibleID() : "N/A");
             }
 
-            int[] scores = bean.getResult().getSimpleScores();
+            int[] scores = bean.getResult().getSimpleScores(database);
             map.put("score", scores[0] + " : " + scores[1]);
             if(scores[0] > scores[1])
                 map.put("winner", bean.getPlayerName()[0]);

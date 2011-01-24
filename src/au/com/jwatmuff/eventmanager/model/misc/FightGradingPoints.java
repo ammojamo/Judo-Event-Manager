@@ -33,7 +33,7 @@ public class FightGradingPoints {
     public FightGradingPoints(ResultInfo ri, Database database) {
         result = ri;
         Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
-        int[] scores = ri.getResult().getSimpleScores();
+        int[] scores = ri.getResult().getSimpleScores(database);
         int winner = scores[0] > scores[1] ? 0 : 1;
         int loser = 1 - winner;
         
@@ -42,7 +42,7 @@ public class FightGradingPoints {
         
         pool = database.get(Pool.class, ri.getFight().getPoolID());
         effectiveLoserGrade = PoolChecker.getEffectiveGrade(losingPlayer, pool, censusDate);
-        points = calculatePoints(ri, effectiveLoserGrade);
+        points = calculatePoints(ri, effectiveLoserGrade, database);
     }
 
     public int getPoints() {
@@ -69,10 +69,10 @@ public class FightGradingPoints {
         return pool;
     }
 
-    public int calculatePoints(ResultInfo info, Grade loserGrade) {
+    public int calculatePoints(ResultInfo info, Grade loserGrade, Database database) {
         if(loserGrade == null) return 0;
 
-        int[] score = info.getResult().getSimpleScores();
+        int[] score = info.getResult().getSimpleScores(database);
         if(score[0] == score[1]) return 0;
         int w = (score[0] > score[1]) ? 0 : 1;
         int l = 1-w;

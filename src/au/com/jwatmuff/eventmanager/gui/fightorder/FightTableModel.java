@@ -1,12 +1,9 @@
 package au.com.jwatmuff.eventmanager.gui.fightorder;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
-import au.com.jwatmuff.eventmanager.model.info.FightInfo;
-import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
-import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
@@ -25,8 +22,7 @@ import java.util.Map;
  * @author James
  */
 public abstract class FightTableModel extends BeanMapperTableModel<Fight> implements TransactionListener {
-    private List<FightInfo> fi;
-    private List<PlayerPoolInfo> ppi;
+    private PlayerCodeParser playerCodeParser;
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
 
@@ -43,7 +39,7 @@ public abstract class FightTableModel extends BeanMapperTableModel<Fight> implem
 
                 for(int i = 0; i < 2; i++) {
                     String code = bean.getPlayerCodes()[i];
-                    FightPlayer fp = PlayerCodeParser.parseCode(code, fi, ppi);
+                    FightPlayer fp = playerCodeParser.parseCode(code);
                     if(fp.type == PlayerType.NORMAL)
                       map.put("player" + (i+1), code + ": " + fp.toString());
                     else
@@ -63,8 +59,7 @@ public abstract class FightTableModel extends BeanMapperTableModel<Fight> implem
     public void updateFromDatabase() {
         Pool pool = getPool();
         if(pool != null) {
-            fi = FightInfo.getFightInfo(database, pool.getID());
-            ppi = PoolPlayerSequencer.getPlayerSequence(database, pool.getID());
+            playerCodeParser = PlayerCodeParser.getInstance(database, pool.getID());
             Collection<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID());
             setBeans(fights);
         }

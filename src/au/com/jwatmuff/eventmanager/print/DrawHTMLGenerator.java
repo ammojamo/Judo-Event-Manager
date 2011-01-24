@@ -236,7 +236,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                 for(int fightNumber : roundRobinMap.get(roundRobinPnt)) {
                     List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, fights.get(fightNumber-1).getID());
                     if(!results.isEmpty()) {
-                        int[] scores = results.get(0).getSimpleScores();
+                        int[] scores = results.get(0).getSimpleScores(database);
                         int[] ids = results.get(0).getPlayerIDs();
 
                         c.put("R" + roundRobinPnt + fightNumber + "P1", scores[0]);

@@ -11,11 +11,9 @@ import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
 import au.com.jwatmuff.eventmanager.db.SessionDAO;
 import au.com.jwatmuff.eventmanager.gui.pool.PoolDetailsDialog;
-import au.com.jwatmuff.eventmanager.model.info.FightInfo;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
-import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
@@ -148,8 +146,7 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
     }
 
     private class FightTableModel extends BeanMapperTableModel<Fight> implements TransactionListener {
-        private List<FightInfo> fi;
-        private List<PlayerPoolInfo> ppi;
+        private PlayerCodeParser playerCodeParser;
 
         public FightTableModel(TransactionNotifier notifier) {
             notifier.addListener(this, Fight.class);
@@ -162,7 +159,7 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
 
                     for(int i = 0; i < 2; i++) {
                         String code = fight.getPlayerCodes()[i];
-                        FightPlayer fp = PlayerCodeParser.parseCode(code, fi, ppi);
+                        FightPlayer fp = playerCodeParser.parseCode(code);
                         map.put("player" + (i+1), code + ": " + fp.toString());
                     }
 
@@ -198,8 +195,7 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
         public void updateFromDatabase() {
             Pool pool = getSelectedPool();
             if(pool != null) {
-                fi = FightInfo.getFightInfo(database, pool.getID());
-                ppi = PoolPlayerSequencer.getPlayerSequence(database, pool.getID());
+                playerCodeParser = PlayerCodeParser.getInstance(database, pool.getID());
                 Collection<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID());
                 setBeans(fights);
             }
