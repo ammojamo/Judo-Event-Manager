@@ -187,10 +187,9 @@ public class PoolNumber {
         }
     }
 
-
     public static List<Integer> GetFightList(int order){
 
-        int noPlayers = OrderToNumber(order);
+        int noPlayers = OrderToNumber(order+1);
         List<Integer> playerNumbers = new ArrayList<Integer>();
         List<Integer> fightNumbers = new ArrayList<Integer>();
         List<Integer> lastFightNumbers = new ArrayList<Integer>();
@@ -205,7 +204,7 @@ public class PoolNumber {
         Random randomGenerator = new Random();
 
         Map<Integer, PoolNoPath> poolNoPaths = new HashMap<Integer, PoolNoPath>();
-        for(int i = 0; i<16; i++){
+        for(int i = 0; i<noPlayers; i++){
             poolNoPaths.put(i, GetPoolNumberPath(PoolNumber(i, order)));
         }
 
@@ -265,9 +264,8 @@ public class PoolNumber {
         return playerNumbers;
     }
 
-
     public static Map<Integer, Integer> SeedToPoolMap(int noPlayers){
-        int order = MinimumOrder(noPlayers);
+        int order = NumberToOrder(noPlayers-1);
         Map<Integer, Integer> seedToPoolMap = new HashMap<Integer, Integer>();
         List<Integer> seedToPool = GetFightList(order);
         int position = 0;
@@ -280,4 +278,35 @@ public class PoolNumber {
         return seedToPoolMap;
     }
 
+    public static Map<Integer, Integer> PlayerIDToScore(Map<Integer, Integer> playerIDToPoolNo, int noPlayers ){
+
+        int order = NumberToOrder(noPlayers);
+        Map<Integer, Integer> playerIDToScore = new HashMap<Integer, Integer>();
+        Map<Integer, PoolNoPath> playerIDToPoolNoPath = new HashMap<Integer, PoolNoPath>();
+        
+        for(Integer playerID : playerIDToPoolNo.keySet()) {
+            PoolNo poolNo = PoolNumber(playerIDToPoolNo.get(playerID), order);
+            PoolNoPath poolNoPath = GetPoolNumberPath(poolNo);
+            playerIDToPoolNoPath.put(playerID, poolNoPath);
+        }
+        
+        for(Integer playerID : playerIDToPoolNo.keySet()) {
+            List<Integer> corners = playerIDToPoolNoPath.get(playerID).Corners;
+            int Score = 0;
+            for(Integer compareToPlayerID : playerIDToPoolNo.keySet()) {
+                if(playerID != compareToPlayerID){
+                    List<Integer> compareTocorners = playerIDToPoolNoPath.get(compareToPlayerID).Corners;
+//                    if(corners.size() != compareTocorners.size())
+//                        Error
+                    for(int i = 0 ; i < corners.size(); i++){
+                        if(corners.get(i) == compareTocorners.get(i))
+                            Score = Score + 1;
+                    }
+                }
+            }
+            playerIDToScore.put(playerID, Score);
+        }
+
+        return playerIDToScore;
+    }
 }
