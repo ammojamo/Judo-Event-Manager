@@ -226,9 +226,6 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
             log.error("Error importing fight draw", e);
         }
 
-        // construct list of ordered players based on seeds, with null entries to
-        // represent bye players
-//        List<PlayerPoolInfo> orderedPlayers = orderPlayers();
 
         PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), seeds);
         List<PlayerPoolInfo> orderedPlayers = poolDraw.getOrderedPlayers();

@@ -280,7 +280,7 @@ public class PoolNumber {
 
     public static Map<Integer, Integer> PlayerIDToScore(Map<Integer, Integer> playerIDToPoolNo, int noPlayers ){
 
-        int order = NumberToOrder(noPlayers);
+        int order = NumberToOrder(noPlayers-1);
         Map<Integer, Integer> playerIDToScore = new HashMap<Integer, Integer>();
         Map<Integer, PoolNoPath> playerIDToPoolNoPath = new HashMap<Integer, PoolNoPath>();
         
@@ -292,18 +292,19 @@ public class PoolNumber {
         
         for(Integer playerID : playerIDToPoolNo.keySet()) {
             List<Integer> corners = playerIDToPoolNoPath.get(playerID).Corners;
-            int Score = 0;
+System.out.println("playerID  : " + playerID + " corners : " + corners );
+            int Score = 1;
             for(Integer compareToPlayerID : playerIDToPoolNo.keySet()) {
                 if(playerID != compareToPlayerID){
                     List<Integer> compareTocorners = playerIDToPoolNoPath.get(compareToPlayerID).Corners;
-//                    if(corners.size() != compareTocorners.size())
-//                        Error
                     for(int i = 0 ; i < corners.size(); i++){
                         if(corners.get(i) == compareTocorners.get(i))
                             Score = Score + 1;
                     }
                 }
             }
+            if(playerIDToPoolNo.size() == 1)
+                Score = 0;  // I realise this is shit but it works
             playerIDToScore.put(playerID, Score);
         }
 

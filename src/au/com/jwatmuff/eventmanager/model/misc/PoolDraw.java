@@ -71,7 +71,7 @@ public class PoolDraw {
         Map<Integer, Integer> seedToPoolMap = PoolNumber.SeedToPoolMap(numberOfPlayerPositions);
 
 //Map of pool to position
-        Map<Integer, Integer> poolToPositionMap = pool.getDrawPools();
+        Map<Integer, Integer> positionToPoolMap = pool.getDrawPools();
 
 //Map of seed number to playerID array
         Map<Integer, List<Integer>> seedToPlayerID = new HashMap<Integer, List<Integer>>();
@@ -86,20 +86,22 @@ public class PoolDraw {
         List<PlayerPoolInfo> seededPlayers = new ArrayList<PlayerPoolInfo>();
 
 // create a list to hold the players after pool positions are converted to player positions
-        List<PlayerPoolInfo> positionedPlayers = new ArrayList<PlayerPoolInfo>(numberOfPlayerPositions);
+        List<PlayerPoolInfo> positionedPlayers = new ArrayList<PlayerPoolInfo>();
 
         for(PlayerPoolInfo playerPoolInfo : playerPoolInfoList){
+            if(playerPoolInfo != null){
             int playerID = playerPoolInfo.getPlayer().getID();
-            String team = playerPoolInfo.getPlayerDetails().getClub();
-            if(team != null){
-                List<Integer> playerIDArray = new ArrayList<Integer>();
-                if(!teamToPlayerID.containsKey(team)){
-                    playerIDArray.add(playerID);
-                    teamToPlayerID.put(team, playerIDArray);
-                } else {
-                    playerIDArray = teamToPlayerID.get(team);
-                    playerIDArray.add(playerID);
-                    teamToPlayerID.put(team, playerIDArray);
+                String team = playerPoolInfo.getPlayerDetails().getClub();
+                if(team != null){
+                    List<Integer> playerIDArray = new ArrayList<Integer>();
+                    if(!teamToPlayerID.containsKey(team)){
+                        playerIDArray.add(playerID);
+                        teamToPlayerID.put(team, playerIDArray);
+                    } else {
+                        playerIDArray = teamToPlayerID.get(team);
+                        playerIDArray.add(playerID);
+                        teamToPlayerID.put(team, playerIDArray);
+                    }
                 }
             }
         }
@@ -162,41 +164,54 @@ public class PoolDraw {
 // Check for Team disadvantage in seeds
 // Start from first seed and work up to no seed
             System.out.println("********************************************************************************");
+            
+        Map<Integer, Integer> playerIDToPoolNo = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> playerIDToScore = new HashMap<Integer, Integer>();
+        for(int seedNo = 0; seedNo < seededPlayers.size(); seedNo++){
+            if(seededPlayers.get(seedNo) != null ){
+                playerIDToPoolNo.put(seededPlayers.get(seedNo).getPlayer().getID(), seedToPoolMap.get(seedNo));
+            }
+        }
         for(String team : teamToPlayerID.keySet()) {
-            Map<Integer, Integer> playerIDToPoolNo = new HashMap<Integer, Integer>();
+            Map<Integer, Integer> teamPlayerIDToPoolNo = new HashMap<Integer, Integer>();
             for(int playerID:teamToPlayerID.get(team)){
-                for(int i = 0; i < seededPlayers.size(); i++){
-                    if(seededPlayers.get(i).getPlayer().getID() == playerID){
-                        playerIDToPoolNo.put(playerID, i);
-                    }
-                }
+                teamPlayerIDToPoolNo.put(playerID, playerIDToPoolNo.get(playerID));
             }
-            Map<Integer, Integer> playerIDToScore = PoolNumber.PlayerIDToScore(playerIDToPoolNo, numberOfPlayerPositions );
-            for(Integer playerID : playerIDToScore.keySet()) {
-                for(int i = 0; i < seededPlayers.size(); i++){
-                    int testID = seededPlayers.get(i).getPlayer().getID();
-                    if(testID == playerID){
-                        System.out.println("Player Name : " + seededPlayers.get(i).getPlayer().getLastName() + "     PlayerID : " + playerID + "     Score : " + playerIDToScore.get(playerID));
-                    }
-                }
-            }
-            System.out.println("********************************************************************************");
+            Map<Integer, Integer> teamPlayerIDToScore = PoolNumber.PlayerIDToScore(teamPlayerIDToPoolNo, numberOfPlayerPositions );
+            playerIDToScore.putAll(teamPlayerIDToScore);
         }
         
+        for(Integer playerID : playerIDToScore.keySet()) {
+            for(int i = 0; i < seededPlayers.size(); i++){
+                if(seededPlayers.get(i) != null && seededPlayers.get(i).getPlayer().getID().equals(playerID) ){
+                    System.out.println("Player Name : " + seededPlayers.get(i).getPlayer().getLastName() + "     PlayerID : " + playerID + "     Score : " + playerIDToScore.get(playerID));
+                }
+            }
+        }
+        System.out.println("********************************************************************************");
+
 // Create a map of player and team
 // Create a score for the draw
 // Swap players to reduce the score
 
-        Map<Integer, Integer> finalPlayerPoolInfoMap = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> poolToPositionMap = new HashMap<Integer, Integer>();
 
-        for(int i = 0; i < numberOfPlayerPositions; i++ ){
-            int PoolPosition = seedToPoolMap.get(i);
-            int PlayerPosition = poolToPositionMap.get(PoolPosition+1)-1;
-            finalPlayerPoolInfoMap.put(PlayerPosition, i);
+        for(int positionNo = 0; positionNo < numberOfPlayerPositions; positionNo++ ){
+            int poolLocation = positionToPoolMap.get(positionNo+1)-1;
+            poolToPositionMap.put(poolLocation, positionNo);
+        }
+        Map<Integer, Integer> positionToSeedMap = new HashMap<Integer, Integer>();
+
+        for(int seedNo = 0; seedNo < numberOfPlayerPositions; seedNo++ ){
+            int poolLocation = seedToPoolMap.get(seedNo);
+//            int poolLocation = seedNo;
+            int playerLocation = poolToPositionMap.get(poolLocation);
+            positionToSeedMap.put(playerLocation, seedNo);
         }
 
-        for(int i = 0; i < numberOfPlayerPositions; i++ ){
-            positionedPlayers.add(i, seededPlayers.get(finalPlayerPoolInfoMap.get(i)));
+        for(int playerLocation = 0; playerLocation < numberOfPlayerPositions; playerLocation++ ){
+            PlayerPoolInfo playerPoolInfo = seededPlayers.get(positionToSeedMap.get(playerLocation));
+            positionedPlayers.add(playerLocation, playerPoolInfo);
         }
         return positionedPlayers;
     }

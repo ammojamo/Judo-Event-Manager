@@ -204,19 +204,19 @@ public class PoolPlayerSequencer {
         return newPlayers;
     }
     
-    public static void savePlayerSequence(final TransactionalDatabase database, int poolID, final List<PlayerPoolInfo> players) {
+    public static void savePlayerSequence(final TransactionalDatabase database, int poolID, final List<PlayerPoolInfo> playerPoolInfolist) {
         database.perform(new Transaction() {
 
             @Override
             public void perform() {
                 int pos = 0;
-                for(PlayerPoolInfo player : players) {
+                for(PlayerPoolInfo playerPoolInfo : playerPoolInfolist) {
                     pos++;
-                    if(player != null) {
-                        PlayerPool pp = player.getPlayerPool();
-                        if(pp.getPlayerPosition() != pos) {
-                            pp.setPlayerPosition(pos);
-                            database.update(pp);
+                    if(playerPoolInfo != null) {
+                        PlayerPool playerPool = playerPoolInfo.getPlayerPool();
+                        if(playerPool.getPlayerPosition() != pos) {
+                            playerPool.setPlayerPosition(pos);
+                            database.update(playerPool);
                         }
                     }
                 }
