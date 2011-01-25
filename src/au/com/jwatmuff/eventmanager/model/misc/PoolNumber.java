@@ -42,13 +42,6 @@ public class PoolNumber {
         return poolNo;
     }
 
-//    public static PoolNo PoolNumber(int poolNumber) {
-//        PoolNo poolNo = new PoolNo();
-//        poolNo.poolNumber = poolNumber;
-//        poolNo.poolOrder = poolNo.poolNumber.bitLength();
-//        return poolNo;
-//    }
-
     public static int GetPoolNumber(PoolNo poolNo) {
         return poolNo.poolNumber;
     }
@@ -292,7 +285,6 @@ public class PoolNumber {
         
         for(Integer playerID : playerIDToPoolNo.keySet()) {
             List<Integer> corners = playerIDToPoolNoPath.get(playerID).Corners;
-System.out.println("playerID  : " + playerID + " corners : " + corners );
             int Score = 1;
             for(Integer compareToPlayerID : playerIDToPoolNo.keySet()) {
                 if(playerID != compareToPlayerID){
@@ -310,4 +302,68 @@ System.out.println("playerID  : " + playerID + " corners : " + corners );
 
         return playerIDToScore;
     }
+
+
+    public static Map<Integer, Integer> PlayerScores(Map<Integer, Integer> playerIDToPoolNo, Map<String, List<Integer>> teamToPlayerID, int numberOfPlayerPositions ){
+
+        Map<Integer, Integer> playerIDToScore = new HashMap<Integer, Integer>();
+        for(String team : teamToPlayerID.keySet()) {
+            Map<Integer, Integer> teamPlayerIDToPoolNo = new HashMap<Integer, Integer>();
+            for(int playerID : teamToPlayerID.get(team)){
+                teamPlayerIDToPoolNo.put(playerID, playerIDToPoolNo.get(playerID));
+            }
+            Map<Integer, Integer> teamPlayerIDToScore = PoolNumber.PlayerIDToScore(teamPlayerIDToPoolNo, numberOfPlayerPositions );
+            playerIDToScore.putAll(teamPlayerIDToScore);
+        }
+        return playerIDToScore;
+    }
+
+
+    public static Map<Integer, Integer> SeperateTeams(Map<Integer, Integer> poolNoToPlayerID, Map<String, List<Integer>> teamToPlayerID, Map<Integer, Integer> playerIDToSeed, int numberOfPlayerPositions ){
+
+        int bestScore = 0;
+        Map<Integer, Integer> playerIDToPoolNo = new HashMap<Integer, Integer>();
+        for(int poolNo : poolNoToPlayerID.keySet()) {
+            if(poolNoToPlayerID.get(poolNo) != null){
+                int playerID = poolNoToPlayerID.get(poolNo);
+                playerIDToPoolNo.put(playerID, poolNo);
+                if(!playerIDToSeed.containsKey(playerID)){
+                    playerIDToSeed.put(playerID, 0);
+                }
+            }
+        }
+        Map<Integer, Integer> playerIDToScore = PlayerScores(playerIDToPoolNo, teamToPlayerID, numberOfPlayerPositions );
+        for(int poolNo1 : poolNoToPlayerID.keySet()) {
+            for(int poolNo2 : poolNoToPlayerID.keySet()) {
+                if(poolNo1 != poolNo2) {
+                    Integer playerID1 = poolNoToPlayerID.get(poolNo1);
+                    Integer playerID2 = poolNoToPlayerID.get(poolNo2);
+                    if (playerID1 == null || playerID2 == null || playerIDToSeed.get(playerID1).equals(playerIDToSeed.get(playerID2))) {
+
+                        Map<Integer, Integer> newPoolNoToPlayerID = new HashMap<Integer, Integer>(poolNoToPlayerID);
+                        newPoolNoToPlayerID.put(poolNo1, poolNoToPlayerID.get(poolNo2));
+                        newPoolNoToPlayerID.put(poolNo2, poolNoToPlayerID.get(poolNo1));
+
+                        playerIDToPoolNo.clear();
+                        for(int poolNo : newPoolNoToPlayerID.keySet()) {
+                            if(newPoolNoToPlayerID.get(poolNo) != null){
+                                playerIDToPoolNo.put(newPoolNoToPlayerID.get(poolNo), poolNo);
+                            }
+                        }
+
+                        Map<Integer, Integer> newPlayerIDToScore = PlayerScores(playerIDToPoolNo, teamToPlayerID, numberOfPlayerPositions );
+
+                        int oldScore = Math.max(playerIDToScore.get(playerID1) , playerIDToScore.get(playerID2));
+                        int score = Math.max(newPlayerIDToScore.get(playerID1) , newPlayerIDToScore.get(playerID2));
+                        if(score < oldScore){
+                            playerIDToScore = newPlayerIDToScore;
+                            poolNoToPlayerID = newPoolNoToPlayerID;
+                        }
+                    }
+                }
+            }
+        }
+        return poolNoToPlayerID;
+    }
+
 }
