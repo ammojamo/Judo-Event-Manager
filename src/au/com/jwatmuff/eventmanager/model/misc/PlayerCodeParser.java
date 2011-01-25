@@ -235,8 +235,10 @@ public class PlayerCodeParser {
                     if(parseCode(newCode).type == PlayerType.UNDECIDED)
                         codePnt = codePnt + 1;
                 }
-                fightPlayer = parseCode(codes[codePnt]);
-                fightPlayer.code = codes[0];
+                if(codePnt<codes.length){
+                    fightPlayer = parseCode(codes[codePnt]);
+                    fightPlayer.code = codes[0];
+                }
             }
             fightPlayer.code = codes[0];
             return fightPlayer;
@@ -249,7 +251,7 @@ public class PlayerCodeParser {
         FightPlayer fightPlayer = new FightPlayer();
         CodeType codeType = getCodeInfo(code).type;
 
-        List<FightInfo> roundRobinFights = new ArrayList<FightInfo>();
+        List<FightInfo> roundRobinFightInfoList = new ArrayList<FightInfo>();
 
         fightPlayer.code = code;
         for(PlayerPoolInfo playerPoolInfo : playerInfoList) {
@@ -273,11 +275,11 @@ public class PlayerCodeParser {
                 fightPlayer.type = PlayerType.UNDECIDED;
                 return fightPlayer;
             }
-            roundRobinFights.add(fight);
+            roundRobinFightInfoList.add(fight);
         }
 
-        if(!roundRobinFights.isEmpty()){
-            List<PlayerRRScore> PlayerRRScore = roundRobinResults(codeType);
+        if(!roundRobinFightInfoList.isEmpty()){
+            List<PlayerRRScore> PlayerRRScore = roundRobinResults(codeType, roundRobinFightInfoList);
             if(PlayerRRScore.size()<number){
                 fightPlayer.type = PlayerType.ERROR;
                 return fightPlayer;
@@ -350,11 +352,11 @@ public class PlayerCodeParser {
         return fightPlayer;
     }
 
-    private List<PlayerRRScore> roundRobinResults(CodeType codeType) {
+    private List<PlayerRRScore> roundRobinResults(CodeType codeType, List<FightInfo> roundRobinFightInfoList) {
 
 //Add all playerPoolInfoList in fights to map
         Map<Integer,PlayerRRScore> playerRRScoresMap = new HashMap<Integer,PlayerRRScore>();
-        for(FightInfo fightInfo : fightInfoList) {
+        for(FightInfo fightInfo : roundRobinFightInfoList) {
             for(int playerID : fightInfo.getAllPlayerID()){
                 if (!playerRRScoresMap.containsKey(playerID)){
                     PlayerRRScore playerRRScore = new PlayerRRScore();
@@ -374,7 +376,7 @@ public class PlayerCodeParser {
         }
 
 //Calculate accumulated wins and points
-        for(FightInfo fightInfo : fightInfoList) {
+        for(FightInfo fightInfo : roundRobinFightInfoList) {
             int winningPlayerSimpleScore = fightInfo.getWinningPlayerSimpleScore(configurationFile);
             PlayerRRScore playerRRScore = playerRRScoresMap.get(fightInfo.getWinningPlayerID());
             playerRRScore.Wins = playerRRScore.Wins+1;
@@ -427,9 +429,9 @@ public class PlayerCodeParser {
 
 // Are SOME players tied?
             }else{
-                List<FightInfo> newFights = new ArrayList<FightInfo>();
+                List<FightInfo> pairsOfFightInfoList = new ArrayList<FightInfo>();
                 int matchedIDs;
-                for(FightInfo fightInfo : fightInfoList){
+                for(FightInfo fightInfo : roundRobinFightInfoList){
                     matchedIDs = 0;
                     for(int k = 0; k < playerRRTieList.size(); k++){
                         if(playerRRTieList.get(k).PlayerID==fightInfo.getLosingPlayerID() || playerRRTieList.get(k).PlayerID==fightInfo.getWinningPlayerID()){
@@ -437,9 +439,9 @@ public class PlayerCodeParser {
                         }
                     }
                     if(matchedIDs == 2)
-                        newFights.add(fightInfo);
+                        pairsOfFightInfoList.add(fightInfo);
                 }
-                playerRRTieList = roundRobinResults(codeType);
+                playerRRTieList = roundRobinResults(codeType, pairsOfFightInfoList);
                 for(int k = 0; k < playerRRTieList.size(); k++){
                     playerRRTieList.get(k).Place = playerRRTieList.get(k).Place+i;
                     playerRRScoresList.set(i+k, playerRRTieList.get(k));
