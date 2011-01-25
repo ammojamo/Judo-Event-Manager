@@ -353,8 +353,18 @@ public class PoolNumber {
 
                         Map<Integer, Integer> newPlayerIDToScore = PlayerScores(playerIDToPoolNo, teamToPlayerID, numberOfPlayerPositions );
 
-                        int oldScore = Math.max(playerIDToScore.get(playerID1) , playerIDToScore.get(playerID2));
-                        int score = Math.max(newPlayerIDToScore.get(playerID1) , newPlayerIDToScore.get(playerID2));
+                        int oldScore = 0;
+                        int score = -1;
+                        if(playerID1 == null && playerID2 != null){
+                            oldScore = playerIDToScore.get(playerID2);
+                            score = newPlayerIDToScore.get(playerID2);
+                        }else if(playerID1 != null && playerID2 == null){
+                            oldScore = playerIDToScore.get(playerID1);
+                            score = newPlayerIDToScore.get(playerID1);
+                        } else if(playerID1 != null && playerID2 != null) {
+                            oldScore = Math.max(playerIDToScore.get(playerID1) , playerIDToScore.get(playerID2));
+                            score = Math.max(newPlayerIDToScore.get(playerID1) , newPlayerIDToScore.get(playerID2));
+                        }
                         if(score < oldScore){
                             playerIDToScore = newPlayerIDToScore;
                             poolNoToPlayerID = newPoolNoToPlayerID;

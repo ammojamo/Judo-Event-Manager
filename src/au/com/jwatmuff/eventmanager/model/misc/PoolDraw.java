@@ -182,9 +182,11 @@ public class PoolDraw {
             Integer playerID = poolNoToPlayerID.get(seedNo);
             if(playerID != null){
                 for(PlayerPoolInfo playerPoolInfo:seededPlayers){
-                    if(playerPoolInfo.getPlayer().getID().equals(playerID)){
-                        teamSeededPlayers.add(playerPoolInfo);
-                        break;
+                    if(playerPoolInfo != null) {
+                        if(playerPoolInfo.getPlayer().getID().equals(playerID)){
+                            teamSeededPlayers.add(playerPoolInfo);
+                            break;
+                        }
                     }
                 }
             }else{
