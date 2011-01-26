@@ -32,6 +32,17 @@ public class ConfigurationFile {
     }
 
     public String getDrawName(int players) {
+//        Check for value in this paramater file
+        for(int numberOfPlayers = players; numberOfPlayers <=64; numberOfPlayers++)
+            if(properties.containsKey("" + numberOfPlayers))
+                return properties.getProperty("" + numberOfPlayers);
+
+//        Check for value in this default paramater file
+        for(int numberOfPlayers = players; numberOfPlayers <=64; numberOfPlayers++)
+            if(properties.getProperty("" + numberOfPlayers) != null)
+                return properties.getProperty("" + numberOfPlayers);
+        
+//        return null - as it was before I changed anything :)
         return properties.getProperty("" + players);
     }
 
