@@ -140,6 +140,34 @@ public class PlayerCodeParser {
         else
             throw new IllegalArgumentException("Invalid player code: " + code);
     }
+    
+    public static List<Integer> getAscendant(String code) {
+        List<Integer> fightNumbers = new ArrayList<Integer>();
+        String[] codes = getORCodes(code);
+        for(String thisCode : codes){
+            CodeInfo codeInfo = getCodeInfo(thisCode);
+            switch(codeInfo.type) {
+                case PLAYER:
+                    break;
+                case WINNERLOOSER:
+                    fightNumbers.add(codeInfo.number);
+                    break;
+                case ROUNDROBIN:
+                    for(int newNumber : codeInfo.params)
+                        fightNumbers.add(newNumber);
+                    break;
+                case BESTOFTHREE:
+                    for(int newNumber : codeInfo.params)
+                        fightNumbers.add(newNumber);
+                    break;
+                case ERROR:
+                    break;
+                default:
+                    break;
+            }
+        }
+        return fightNumbers;
+    }
 
     public static int[] getParameters(String code) {
         String[] orCodes = getORCodes(code);
@@ -459,9 +487,9 @@ public class PlayerCodeParser {
         FightPlayer fightPlayer = new FightPlayer();
 
         fightPlayer.code = code;
-        for(PlayerPoolInfo player : playerInfoList) {
-            if(player != null) {
-                fightPlayer.division = player.getPool();
+        for(PlayerPoolInfo playerPoolInfo : playerInfoList) {
+            if(playerPoolInfo != null) {
+                fightPlayer.division = playerPoolInfo.getPool();
                 break;
             }
         }

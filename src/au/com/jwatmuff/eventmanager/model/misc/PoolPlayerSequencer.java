@@ -6,6 +6,7 @@
 package au.com.jwatmuff.eventmanager.model.misc;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
@@ -126,6 +127,7 @@ public class PoolPlayerSequencer {
     public static ArrayList<Player> getPossiblePlayers(Database database, int poolID, int fightPosition) {
         PoolPlayerSequencer pps = getInstance(database);
         ArrayList<Player> possiblePlayers = new ArrayList<Player>();
+        PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
 
         if(!pps.poolFights.containsKey(poolID)) {
             Pool p = database.get(Pool.class, poolID);
@@ -139,18 +141,13 @@ public class PoolPlayerSequencer {
         List<Fight> fights = pps.poolFights.get(poolID);
 
         for(String code : fights.get(fightPosition-1).getPlayerCodes()) {
-            if(PlayerCodeParser.getPrefix(code).equals("P")) {
-// TODO: I don't know if I have handeled this exception correctly
-                try {
-// TODO: I don't really like this, I think I should probably be checking to see if the player is a bye..... maybe....
-                    Player pTemp = PlayerCodeParser.parseCode(database, code, poolID).player;
-                    if(pTemp != null)
-                        possiblePlayers.add(pTemp);
-                } catch (DatabaseStateException ex) {
-                        log.warn("Number format exception while parsing code: " + code);
-                }
+            if(PlayerCodeParser.getCodeInfo(code).type == PlayerCodeParser.CodeType.PLAYER) {
+                FightPlayer tempPlayer = parser.parseCode(code);
+                if(tempPlayer.type == PlayerCodeParser.PlayerType.NORMAL)
+                    possiblePlayers.add(tempPlayer.player);
             } else {
-                possiblePlayers.addAll(getPossiblePlayers(database, poolID,  PlayerCodeParser.getNumber(code)));
+                for(int newNumber : PlayerCodeParser.getAscendant(code))
+                    possiblePlayers.addAll(getPossiblePlayers(database, poolID, newNumber ));
             }
         }
         return possiblePlayers;
