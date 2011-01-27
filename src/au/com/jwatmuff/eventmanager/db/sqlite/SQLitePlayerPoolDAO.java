@@ -91,8 +91,10 @@ public class SQLitePlayerPoolDAO implements PlayerPoolDAO {
         
     @Override
     public void update(PlayerPool pp) {
-        if(pp.isLocked() || get(pp.getID()).isLocked())
-            throw new RuntimeException("Cannot update locked PlayerPool");
+        // had to comment this out to get player withdrawals working
+        // TODO: revisit and think about what will happen if computers get out of sync
+        //if(pp.isLocked() || get(pp.getID()).isLocked())
+        //    throw new RuntimeException("Cannot update locked PlayerPool");
         final String sql = "UPDATE player_has_pool SET approved=:approved, player_pos=:playerPosition, player_pos_2=:playerPosition2, status=:status, is_locked=:locked, is_valid=:valid, last_updated=:timestamp WHERE player_id=:playerID AND pool_id=:poolID";
         SqlParameterSource params = new BeanPropertySqlParameterSource(pp);
         template.update(sql, params);        

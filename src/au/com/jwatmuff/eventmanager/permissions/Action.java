@@ -45,7 +45,8 @@ public enum Action {
     REMOVE_DIVISION(MASTER),
     REMOVE_PLAYER(PERSONAL_DETAILS),
     REMOVE_SESSION(MASTER),
-    SCOREBOARD_ENTRY(SCOREBOARD);
+    SCOREBOARD_ENTRY(SCOREBOARD),
+    WITHDRAW_PLAYER(MASTER);
 
     public final String description;
     public final PasswordType requiredPassword;
