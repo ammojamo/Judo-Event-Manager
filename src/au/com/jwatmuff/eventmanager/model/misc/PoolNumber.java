@@ -323,7 +323,6 @@ public class PoolNumber {
 
     public static Map<Integer, Integer> SeperateTeams(Map<Integer, Integer> poolNoToPlayerID, Map<String, List<Integer>> teamToPlayerID, Map<Integer, Integer> playerIDToSeed, int numberOfPlayerPositions ){
 
-        int bestScore = 0;
         Map<Integer, Integer> playerIDToPoolNo = new HashMap<Integer, Integer>();
         for(int poolNo : poolNoToPlayerID.keySet()) {
             if(poolNoToPlayerID.get(poolNo) != null){
