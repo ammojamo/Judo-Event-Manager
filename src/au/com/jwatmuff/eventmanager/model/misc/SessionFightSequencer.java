@@ -119,6 +119,7 @@ public class SessionFightSequencer {
 
                 boolean positionOk = true;
 
+// Do two fights of the same division share a player. Do I need to do this given what comes after next?
                 for(int k = 1; k <= spacing && i-k >= 0; k++) {
                     Fight f2 = fights.get(up?n-(i-k)-1:i-k).getFight();
                     if(f1.getPoolID() == f2.getPoolID() &&
@@ -129,6 +130,9 @@ public class SessionFightSequencer {
                     }
                 }
 
+// Make sure same team fights stay at the front of the division
+
+// Make sure dependent fights stay in order
                 if(positionOk) {
                     if(!up) {
                         ArrayList<Integer> dependentFights =  PoolPlayerSequencer.getDependentFights(database,  f1.getPoolID(), f1.getPosition());
@@ -155,6 +159,7 @@ public class SessionFightSequencer {
                     }
                 }
 
+// Could the two fights possibly share the same player even if from a different division.
                 if(positionOk) {
                 pPCheck:
                     for(int l = j-1; l >= i-spacing && l >= 0; l--) {
