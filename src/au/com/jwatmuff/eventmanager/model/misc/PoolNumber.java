@@ -217,6 +217,10 @@ public class PoolNumber {
             int newOrder = NumberToOrder(k);
             List<Integer> newPath = new ArrayList<Integer>();
             int nextCorner = 0;
+
+            if(fightNumbers.isEmpty())
+                fightNumbers.addAll(lastFightNumbers);
+
             for(int i = 0; i < newOrder-1 ; i++){
                 nextCorner = poolNoPaths.get(k).Corners.get(i);
                 newPath.add(newpoolNoPaths.get(nextCorner).Directions.get(i));
@@ -248,8 +252,6 @@ public class PoolNumber {
                     break;
                 }
             }
-            if(fightNumbers.isEmpty())
-                fightNumbers.addAll(lastFightNumbers);
 
             newpoolNoPaths.put(k, GetPoolNumberPath(PoolNumber(playerNumbers.get(k), order)));
 
