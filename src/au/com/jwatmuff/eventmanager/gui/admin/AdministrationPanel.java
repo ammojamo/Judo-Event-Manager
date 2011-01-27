@@ -74,6 +74,9 @@ public class AdministrationPanel extends javax.swing.JPanel {
         jSeparator2 = new javax.swing.JSeparator();
         reviewDataButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        withdrawPlayersButton = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel1.setText("Administration tasks");
@@ -114,6 +117,17 @@ public class AdministrationPanel extends javax.swing.JPanel {
 
         jLabel3.setText("Manually enter or update results");
 
+        withdrawPlayersButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/user_gray.png"))); // NOI18N
+        withdrawPlayersButton.setText("Withdraw/Disqualify Players..");
+        withdrawPlayersButton.setIconTextGap(8);
+        withdrawPlayersButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                withdrawPlayersButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setText("Withdraw or disqualify players from divisions");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -144,10 +158,19 @@ public class AdministrationPanel extends javax.swing.JPanel {
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addContainerGap(282, Short.MAX_VALUE))))
+                        .addContainerGap(282, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jSeparator3, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(withdrawPlayersButton)
+                        .addContainerGap(239, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addContainerGap(225, Short.MAX_VALUE))))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {enterCompDetailsButton, managePasswordsButton, reviewDataButton});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {enterCompDetailsButton, managePasswordsButton, reviewDataButton, withdrawPlayersButton});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -172,7 +195,13 @@ public class AdministrationPanel extends javax.swing.JPanel {
                 .addComponent(reviewDataButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(withdrawPlayersButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -218,6 +247,12 @@ private void reviewDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//
         setCursor(Cursor.getDefaultCursor());
     }
 }//GEN-LAST:event_reviewDataButtonActionPerformed
+
+private void withdrawPlayersButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_withdrawPlayersButtonActionPerformed
+    if(!PermissionChecker.isAllowed(Action.WITHDRAW_PLAYER, database)) return;
+    WithdrawPlayerDialog wpd = new WithdrawPlayerDialog(parentWindow, true, database, notifier);
+    wpd.setVisible(true);
+}//GEN-LAST:event_withdrawPlayersButtonActionPerformed
     
     public void setParentWindow(Frame parentWindow)
     {
@@ -229,12 +264,15 @@ private void reviewDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JButton managePasswordsButton;
     private javax.swing.JButton reviewDataButton;
+    private javax.swing.JButton withdrawPlayersButton;
     // End of variables declaration//GEN-END:variables
     
 }

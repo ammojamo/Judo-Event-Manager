@@ -28,7 +28,7 @@
                       <Component id="deleteButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jToolBar1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="63" max="32767" attributes="0"/>
+                      <EmptySpace pref="108" max="32767" attributes="0"/>
                       <Component id="importButton" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -92,7 +92,7 @@
               </Table>
             </Property>
             <Property name="gridColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="cc" green="cc" red="cc" type="rgb"/>
+              <Color blue="ed" green="ed" red="ed" type="rgb"/>
             </Property>
             <Property name="rowHeight" type="int" value="19"/>
           </Properties>

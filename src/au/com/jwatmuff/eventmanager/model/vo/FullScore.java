@@ -108,15 +108,4 @@ public class FullScore implements Comparable<FullScore>, Serializable {
             return getYuko() - o.getYuko();
         return getDecision() - o.getDecision();
     }
-
-//    public int getSimple() {
-//        return (ippon == 1 || wazari == 2) ? 10 :
-//               (wazari > 0) ? 7 :
-//               (yuko > 0) ? 5 :
-//               (decision > 0) ? 1 : 0;
-//        return (ippon == 1 || wazari == 2) ? 100 :
-//               (wazari > 0) ? 10 :
-//               (yuko > 0) ? 1 :
-//               (decision > 0) ? 1 : 0;
-//    }
 }
