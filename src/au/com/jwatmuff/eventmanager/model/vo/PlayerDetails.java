@@ -18,8 +18,6 @@ import java.io.Serializable;
  * @author James
  */
 public class PlayerDetails extends DistributableObject<Integer> implements Serializable {    
-    private String club;
-    
     private String homeNumber;
     private String workNumber;
     private String mobileNumber;
@@ -41,14 +39,6 @@ public class PlayerDetails extends DistributableObject<Integer> implements Seria
     /** Creates a new instance of Player */
     public PlayerDetails() {
         setID(IDGenerator.generate());
-    }
-    
-    public String getClub() {
-        return club;
-    }
-    
-    public void setClub(String club) {
-        this.club = club;
     }
 
     public String getHomeNumber() {

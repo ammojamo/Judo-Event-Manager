@@ -16,7 +16,6 @@ import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
-import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
@@ -89,7 +88,6 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 //Print the player names and information
 
         List<Player> playerList = new ArrayList<Player>();
-        List<PlayerDetails>playerDetailsdList = new ArrayList<PlayerDetails>();
         List<PlayerPoolInfo> playerPoolInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
         int i = 0;
         for(PlayerPoolInfo playerPoolInfo : playerPoolInfoList) {
@@ -100,13 +98,11 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                 continue;
             }
             Player player = playerPoolInfo.getPlayer();
-            PlayerDetails playerDetails = database.get(PlayerDetails.class, player.getDetailsID());
             playerList.add(player);
-            playerDetailsdList.add(playerDetails);
 //            c.put("player" + i, p.getLastName() + ", " + p.getFirstName().charAt(0) );
             c.put("player" + i, player.getLastName() + ", " + player.getFirstName() );
-            if (playerDetails.getClub() != null) {
-                c.put("playerRegion" + i, playerDetails.getClub() + " (" + player.getShortGrade() + ")" );
+            if (player.getTeam() != null) {
+                c.put("playerRegion" + i, player.getTeam() + " (" + player.getShortGrade() + ")" );
             } else {
                 c.put("playerRegion" + i, " (" + player.getShortGrade() + ")" );
             }
@@ -174,9 +170,8 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                 switch(fightPlayer.type) {
                     case NORMAL:
                         if(fightPlayer.player != null) {
-                            PlayerDetails playerDetails = database.get(PlayerDetails.class, fightPlayer.player.getDetailsID());
-                            if (playerDetails.getClub() != null) {
-                                c.put("place" + i, place.name + ": " + fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName() + " -- " + playerDetails.getClub());
+                            if (fightPlayer.player.getTeam() != null) {
+                                c.put("place" + i, place.name + ": " + fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName() + " -- " + fightPlayer.player.getTeam());
                             } else {
                                 c.put("place" + i, place.name + ": " + fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName());
                             }

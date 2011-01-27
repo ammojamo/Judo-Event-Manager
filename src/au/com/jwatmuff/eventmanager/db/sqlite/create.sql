@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS competition (
 
 CREATE TABLE IF NOT EXISTS player_details (
   id INTEGER NOT NULL,
-  club VARCHAR(255),
   home_phone VARCHAR(20),
   work_phone VARCHAR(20),
   mobile VARCHAR(20),
@@ -53,6 +52,7 @@ CREATE TABLE IF NOT EXISTS player (
   dob DATE,
   weight REAL,
   grade VARCHAR(20),
+  team VARCHAR(512),
   locked_status VARCHAR(20),
   is_valid BOOL,
   last_updated TIME NOT NULL,

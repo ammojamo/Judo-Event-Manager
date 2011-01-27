@@ -94,7 +94,7 @@ public class PoolDraw {
         for(PlayerPoolInfo playerPoolInfo : playerPoolInfoList){
             if(playerPoolInfo != null){
             int playerID = playerPoolInfo.getPlayer().getID();
-                String team = playerPoolInfo.getPlayerDetails().getClub();
+                String team = playerPoolInfo.getPlayer().getTeam();
                 if(team != null){
                     List<Integer> playerIDArray = new ArrayList<Integer>();
                     if(!teamToPlayerID.containsKey(team)){

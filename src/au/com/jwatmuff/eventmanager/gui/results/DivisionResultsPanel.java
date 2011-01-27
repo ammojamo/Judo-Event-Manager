@@ -11,7 +11,6 @@ import au.com.jwatmuff.eventmanager.export.CSVExporter;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.model.cache.DivisionResultCache;
 import au.com.jwatmuff.eventmanager.model.cache.DivisionResultCache.DivisionResult;
-import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.print.DivisionResultHTMLGenerator;
@@ -118,8 +117,7 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
                     Map<String, Object> map = new HashMap<String, Object>();
                     map.put("division", bean.pool.getDescription());
                     map.put("player", bean.player.getFirstName() + " " + bean.player.getLastName());
-                    PlayerDetails details = database.get(PlayerDetails.class, bean.player.getDetailsID());
-                    map.put("club", (details != null) ? details.getClub() : "");
+                    map.put("team", bean.player.getTeam());
                     map.put("place", bean.place);
                     return map;
                 } 
@@ -128,7 +126,7 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
             addColumn("Division", "division");
             addColumn("Place", "place");
             addColumn("Player", "player");
-            addColumn("Club", "club");
+            addColumn("Team", "team");
         }
     }
 

@@ -38,6 +38,7 @@ public class SQLitePlayerDAO implements PlayerDAO {
             DOB_FIELD = "dob",
             GRADE_FIELD = "grade",
             WEIGHT_FIELD = "weight",
+            TEAM_FIELD = "team",
             LOCKED_STATUS_FIELD = "locked_status",
             VALID_FIELD = "is_valid",
             TIMESTAMP_FIELD = "last_updated";
@@ -61,6 +62,7 @@ public class SQLitePlayerDAO implements PlayerDAO {
             p.setDob(data.getDate(DOB_FIELD));
             p.setGrade(Player.Grade.fromString(data.getString(GRADE_FIELD)));
             p.setWeight(data.getDouble(WEIGHT_FIELD));
+            p.setTeam(data.getString(TEAM_FIELD));
             p.setValid(data.getString(VALID_FIELD).equals("true"));
             p.setTimestamp(new Timestamp(data.getDate(TIMESTAMP_FIELD).getTime()));
 
@@ -114,13 +116,13 @@ public class SQLitePlayerDAO implements PlayerDAO {
         final String sql = "INSERT INTO player (" +
                       "id, details_id, " +
                       "visible_id, first_name, last_name, gender, dob, " +
-                      "grade, weight, " +
+                      "grade, weight, team, " +
                       "locked_status, " +
                       "is_valid, last_updated " + 
                       ") VALUES ( " +
                       ":ID, :detailsID, " +
                       ":visibleID, :firstName, :lastName, :gender, :dob, " +
-                      ":grade, :weight, " +
+                      ":grade, :weight, :team, " +
                       ":lockedStatus, " +
                       ":valid, :timestamp );";
         SqlParameterSource params = new BeanPropertySqlParameterSource(p);
@@ -139,6 +141,7 @@ public class SQLitePlayerDAO implements PlayerDAO {
                       "dob=:dob, " +
                       "grade=:grade, " +
                       "weight=:weight, " +
+                      "team=:team, " +
                       "locked_status=:lockedStatus, " +
                       "is_valid=:valid, " +
                       "last_updated=:timestamp " +

@@ -29,7 +29,6 @@ public class SQLitePlayerDetailsDAO implements PlayerDetailsDAO {
     
     private static final String
             ID_FIELD = "id",
-            CLUB_FIELD = "club",
             HOME_NUMBER_FIELD = "home_phone",
             WORK_NUMBER_FIELD = "work_phone",
             MOBILE_NUMBER_FIELD = "mobile",
@@ -58,7 +57,6 @@ public class SQLitePlayerDetailsDAO implements PlayerDetailsDAO {
             PlayerDetails p = new PlayerDetails();
 
             p.setID(data.getInt(ID_FIELD));
-            p.setClub(data.getString(CLUB_FIELD));
             p.setHomeNumber(data.getString(HOME_NUMBER_FIELD));
             p.setWorkNumber(data.getString(WORK_NUMBER_FIELD));
             p.setMobileNumber(data.getString(MOBILE_NUMBER_FIELD));
@@ -96,14 +94,14 @@ public class SQLitePlayerDetailsDAO implements PlayerDetailsDAO {
     {
         final String sql = "INSERT INTO player_details (" +
                       "id, " +
-                      "club, home_phone, work_phone, mobile, " +
+                      "home_phone, work_phone, mobile, " +
                       "addr_street, addr_city, addr_postcode, email, " +
                       "emergency_name, emergency_phone, emergency_mobile, " +
                       "medical_conditions, medical_info, injury_info, " +
                       "is_valid, last_updated " + 
                       ") VALUES ( " +
                       ":ID, " +
-                      ":club, :homeNumber, :workNumber, :mobileNumber, " +
+                      ":homeNumber, :workNumber, :mobileNumber, " +
                       ":street, :city, :postcode, :email, " +
                       ":emergencyName, :emergencyPhone, :emergencyMobile, " +
                       ":medicalConditions, :medicalInfo, :injuryInfo, " +
@@ -116,7 +114,6 @@ public class SQLitePlayerDetailsDAO implements PlayerDetailsDAO {
     public void update(PlayerDetails p)
     {
         final String sql = "UPDATE player_details SET " +
-                      "club=:club, " +
                       "home_phone=:homeNumber, " +
                       "work_phone=:workNumber, " +
                       "mobile=:mobileNumber, " +
