@@ -153,7 +153,6 @@ public class PoolPlayerSequencer {
         return possiblePlayers;
     }
 
-    
     public static List<PlayerPoolInfo> getPlayerSequence(Database database, int poolID) {
         int numPlayerPositions = getNumberOfPlayerPositions(database, poolID);
         List<PlayerPoolInfo> players = new ArrayList<PlayerPoolInfo>(PlayerPoolInfo.getForPool(database, poolID));
