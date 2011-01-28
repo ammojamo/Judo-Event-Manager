@@ -1,4 +1,4 @@
-Name "Event Manager 2010 Update 4"
+Name "Event Manager 2011"
 Caption "Event Manager"
 ;Icon "YourProgram.ico"
 OutFile "EventManagerSetup.exe"
