@@ -11,7 +11,6 @@
 
 package au.com.jwatmuff.eventmanager.gui.wizard;
 
-import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
 import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
@@ -19,8 +18,6 @@ import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.model.misc.PoolDraw;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
-import au.com.jwatmuff.eventmanager.model.vo.Fight;
-import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
@@ -31,9 +28,7 @@ import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultCellEditor;
@@ -115,11 +110,10 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     }
 
     private Object[] getRowData(PlayerPoolInfo player) {
-        PlayerDetails playerDetails = database.get(PlayerDetails.class, player.getPlayer().getDetailsID());
         int playerID = player.getPlayer().getID();
         return new Object[] {
             player.getPlayer().getLastName() + ", " + player.getPlayer().getFirstName(),
-            playerDetails.getClub(),
+            player.getPlayer().getTeam(),
             seeds.get(playerID) == null ? "None" : "" + seeds.get(playerID)
         };
     }

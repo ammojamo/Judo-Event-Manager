@@ -335,6 +335,11 @@ public class CSVImporter {
             if(lastName != null && lastName.length() > 0)
                 p.setLastName(lastName);
 
+            String team = row.get("club");
+            if(team != null && !team.isEmpty())
+                p.setTeam(team);
+
+
             /**** Grade: try to handle lots of possibilities *****/
             try {
                 String grade = row.get("grade");
@@ -387,10 +392,6 @@ public class CSVImporter {
             }
 
             /****** Player details stuff ***********/
-
-            String club = row.get("club");
-            if(club != null && !club.isEmpty())
-                pd.setClub(club);
 
             String homeNumber = row.get("homeNumber");
             if(homeNumber != null && !homeNumber.isEmpty())

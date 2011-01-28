@@ -72,6 +72,8 @@ public class Player extends DistributableObject<Integer> implements Serializable
     
     private Grade grade = Grade.UNSPECIFIED;
     private double weight;
+
+    private String team = "";
     
     private LockedStatus lockedStatus = LockedStatus.UNLOCKED;
         
@@ -161,6 +163,14 @@ public class Player extends DistributableObject<Integer> implements Serializable
 
     public void setWeight(double weight) {
         this.weight = weight;
+    }
+
+    public String getTeam() {
+        return team;
+    }
+
+    public void setTeam(String team) {
+        this.team = team;
     }
     
     public static Player getLockedCopy(Player p, LockedStatus lockedStatus) {

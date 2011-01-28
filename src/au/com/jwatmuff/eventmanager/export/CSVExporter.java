@@ -98,14 +98,14 @@ public class CSVExporter {
                 player.getLastName(),
                 player.getGender(),
                 player.getGrade(),
-                dateFormat.format(player.getDob())
+                dateFormat.format(player.getDob()),
+                player.getTeam()
             };
             
             PlayerDetails details = database.get(PlayerDetails.class, player.getDetailsID());
             Object[] fields2;
             if(details != null) {
                 fields2 = new Object[]{
-                            details.getClub(),
                             details.getHomeNumber(),
                             details.getWorkNumber(),
                             details.getMobileNumber(),
@@ -121,7 +121,7 @@ public class CSVExporter {
                             details.getMedicalInfo(),
                             details.getInjuryInfo()};
             } else {
-                fields2 = new Object[15];
+                fields2 = new Object[14];
                 Arrays.fill(fields2, null);
             }
 

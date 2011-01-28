@@ -20,7 +20,6 @@ import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
-import au.com.jwatmuff.eventmanager.model.vo.PlayerDetails;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.permissions.Action;
@@ -242,9 +241,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         if(team == null) return true;
         String team1 = team.name;
         if(team1.equals("All Teams")) return true;
-        PlayerDetails details = database.get(PlayerDetails.class, player.getDetailsID());
-        if(details == null) return false;
-        String team2 = details.getClub();
+        String team2 = player.getTeam();
         if(team2 == null || team2.isEmpty())
             return team1.equals("Other");
         else
@@ -255,8 +252,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         HashMap<String,Team> teamMap = new HashMap<String,Team>();
         /* Make sure we have teams of all eligible players */
         for(Player player : eligiblePlayers) {
-            PlayerDetails details = database.get(PlayerDetails.class, player.getDetailsID());
-            String name = details.getClub();
+            String name = player.getTeam();
             if(name == null || name.isEmpty())
                 continue;
             else if(!teamMap.containsKey(name))
@@ -266,8 +262,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         /* Now collect team player counts of all players actually in each pool */
         int playersWithoutTeam = 0;
         for(Player player : playersInPool) {
-            PlayerDetails details = database.get(PlayerDetails.class, player.getDetailsID());
-            String name = details.getClub();
+            String name = player.getTeam();
             if(name == null || name.isEmpty())
                 playersWithoutTeam++;
             else if(teamMap.containsKey(name))
@@ -352,7 +347,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         divisionNameLabel.setText(pool.getDescription() + ": Player Selection");
         censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
         updateFromDatabase();
-        this.notifier.addListener(listener, Player.class, PlayerDetails.class, Pool.class, PlayerPool.class);
+        this.notifier.addListener(listener, Player.class, Pool.class, PlayerPool.class);
     }
 
     @Override
