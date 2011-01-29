@@ -7,18 +7,24 @@ package au.com.jwatmuff.eventmanager.print;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
+import au.com.jwatmuff.eventmanager.db.SessionDAO;
+import au.com.jwatmuff.eventmanager.db.SessionFightDAO;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.CodeInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.CodeType;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
+import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer;
+import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer.FightMatInfo;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
+import au.com.jwatmuff.eventmanager.model.vo.Session;
+import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
 import au.com.jwatmuff.genericdb.Database;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -113,10 +119,37 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
 //Print the draw fight number or the mat fight number
 
+        // Work out if this division been assigned to a locked session
+        boolean divisionAssignedToSession = false;
+        for(Session session : database.findAll(Session.class, SessionDAO.FOR_POOL, poolID)) {
+            if(session.getLockedStatus() != Session.LockedStatus.UNLOCKED) {
+                divisionAssignedToSession = true;
+                break;
+            }
+        }
+
         List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
         /* add fight numbers */
-        for(i = 1; i <= fights.size(); i++) {
-            c.put("fightNumber" + i, i);
+        if(divisionAssignedToSession) {
+            for(i = 1; i <= fights.size(); i++) {
+                try {
+                    Fight fight = fights.get(i - 1);
+                    SessionFight sessionFight = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, fight.getID());
+                    FightMatInfo fightMatInfo = SessionFightSequencer.getFightMatInfo(database, sessionFight);
+                    c.put("fightNumber" + i, fightMatInfo.fightNumber);
+                    c.put("fightMat" + i, fightMatInfo.matName);
+                } catch(Exception e) {
+                    // This will happen if the fight has not been added to a session (i.e. no SessionFight exists).
+                    // Because we know the division has been added to a session, this means it must be a bye fight.
+                    c.put("fightNumber" + i, "BYE");
+                    c.put("fightMat" + i, "");
+                }
+            }
+        } else {
+            for(i = 1; i <= fights.size(); i++) {
+                c.put("fightNumber" + i, i);
+                c.put("fightMat" + i, "");
+            }
         }
 
 //Add and convert the draw codes to player names. Adds WX and LX codes for individual fight results.

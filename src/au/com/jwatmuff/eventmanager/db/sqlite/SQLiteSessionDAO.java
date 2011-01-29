@@ -103,6 +103,17 @@ public class SQLiteSessionDAO implements SessionDAO {
     }
 
     @Override
+    public Collection<Session> findForPool(int poolID) {
+        String sql =
+                "SELECT session.* FROM session, session_has_pool " +
+                "WHERE session.id = session_has_pool.session_id " +
+                "AND session_has_pool.pool_id = ? " +
+                "AND session.is_valid = 'true' " +
+                "AND session_has_pool.is_valid = 'true'";
+        return template.query(sql, mapper, poolID);
+    }
+
+    @Override
     public void add(Session item) {
         String sql = "INSERT INTO session (id, name, session_type, mat, locked_status, is_valid, last_updated) VALUES (:ID, :name, :type, :mat, :lockedStatus, :valid, :timestamp);";
         SqlParameterSource params = new BeanPropertySqlParameterSource(item);
