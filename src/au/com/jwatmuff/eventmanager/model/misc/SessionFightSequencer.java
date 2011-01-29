@@ -119,7 +119,7 @@ public class SessionFightSequencer {
 
                 boolean positionOk = true;
 
-// Do two fights of the same division share a player. Do I need to do this given what comes after next?
+// Does fight f1 have a player that has already had a fight in the previous spacing fights
                 for(int k = 1; k <= spacing && i-k >= 0; k++) {
                     Fight f2 = fights.get(up?n-(i-k)-1:i-k).getFight();
                     if(f1.getPoolID() == f2.getPoolID() &&
@@ -130,9 +130,37 @@ public class SessionFightSequencer {
                     }
                 }
 
-// Make sure same team fights stay at the front of the division
+// If F1 is moved to i, will to be moved before a fight with two team mates
+                if(positionOk) {
+                    ArrayList<Integer> sameTeamFights =  PoolPlayerSequencer.getSameTeamFights(database,  f1.getPoolID());
+                    if(!up) {
+                        if(!sameTeamFights.contains(f1.getPosition())){
+                            for(int l = i; l < j; l++) {
+                                Fight f2 = fights.get(l).getFight();
+                                if(f1.getPoolID() == f2.getPoolID() && sameTeamFights.contains(f2.getPosition())) {
+                                    // means that fight in position j is dependent on fight at position l
+                                    positionOk = false;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        if(sameTeamFights.contains(f1.getPosition())){
+                            for(int l = i; l < j; l++) {
+                                Fight f2 = fights.get(n-l-1).getFight();
+                                if(f1.getPoolID() == f2.getPoolID()) {
+                                    if(!sameTeamFights.contains(f2.getPosition())) {
+                                        // means that fight in position l is dependent on fight at position j
+                                        positionOk = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
-// Make sure dependent fights stay in order
+// If F1 is moved to i, will it be moved before a fight it is dependent on.
                 if(positionOk) {
                     if(!up) {
                         ArrayList<Integer> dependentFights =  PoolPlayerSequencer.getDependentFights(database,  f1.getPoolID(), f1.getPosition());
@@ -190,7 +218,6 @@ public class SessionFightSequencer {
                     }
                     break;
                 }
-
             }
         }
         fixPositions(fights);
@@ -199,17 +226,29 @@ public class SessionFightSequencer {
     public static void resetOrder(Database database, List<SessionFightInfo> fights) {
         ArrayList<Pool> pools = new ArrayList<Pool>();
         ArrayList<SessionFightInfo> resetFights = new ArrayList<SessionFightInfo>();
-
+        Map<Integer,ArrayList<Integer>> sameTeamFightsInPool = new HashMap<Integer,ArrayList<Integer>>();
+        
         Collections.sort(fights, Fight_COMPARATOR);
 
         for(SessionFightInfo fight : fights){
             Pool pool = database.get(Pool.class, fight.getFight().getPoolID());
-            if(!pools.contains(pool))
+            if(!pools.contains(pool)){
                 pools.add(pool);
+                sameTeamFightsInPool.put(fight.getFight().getPoolID(), PoolPlayerSequencer.getSameTeamFights(database, fight.getFight().getPoolID() ));
+            }
         }
 
-        Collections.sort(pools, POOL_COMPARATOR);
+        for(SessionFightInfo fight : fights){
+            if(!sameTeamFightsInPool.get(fight.getFight().getPoolID()).contains(fight.getFight().getPosition())){
+                resetFights.add(fight);
+            }
+        }
+        fights.removeAll(resetFights);
+        fights.addAll(resetFights);
 
+        Collections.sort(pools, POOL_COMPARATOR);
+        
+        resetFights.clear();
         for(Pool pool : pools){
             for(SessionFightInfo fight : fights){
                 if(fight.getFight().getPoolID() == pool.getID())

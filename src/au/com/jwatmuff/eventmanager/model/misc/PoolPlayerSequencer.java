@@ -7,6 +7,7 @@ package au.com.jwatmuff.eventmanager.model.misc;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
@@ -116,12 +117,43 @@ public class PoolPlayerSequencer {
         List<Fight> fights = pps.poolFights.get(poolID);
 
         for(String code : fights.get(fightPosition-1).getPlayerCodes()) {
-            if(!PlayerCodeParser.getPrefix(code).equals("P")) {
-                dependentFights.addAll(getDependentFights(database, poolID,  PlayerCodeParser.getNumber(code)));
+            List<Integer> ascendantNumbers = PlayerCodeParser.getAscendant(code);
+            for(Integer ascendantNumber : ascendantNumbers) {
+                dependentFights.addAll(getDependentFights(database, poolID, ascendantNumber));
             }
         }
 
         return dependentFights;
+    }
+    public static ArrayList<Integer> getSameTeamFights(Database database, int poolID) {
+        PoolPlayerSequencer pps = getInstance(database);
+        PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
+        ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
+
+        if(!pps.poolFights.containsKey(poolID)) {
+            Pool p = database.get(Pool.class, poolID);
+            if(p.getLockedStatus() != Pool.LockedStatus.FIGHTS_LOCKED){
+                System.out.println("***I don't think this should happen");
+                return null;
+            }
+
+            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
+            pps.poolFights.put(poolID, fights);
+        }
+
+        List<Fight> fights = pps.poolFights.get(poolID);
+
+        for(Fight fight : fights) {
+            String[] codes = fight.getPlayerCodes();
+            FightPlayer fightPlayer0 = parser.parseCode(codes[0]);
+            FightPlayer fightPlayer1 = parser.parseCode(codes[1]);
+            if(fightPlayer0.type == PlayerType.NORMAL && fightPlayer1.type == PlayerType.NORMAL){
+                if(fightPlayer0.player.getTeam().equals(fightPlayer1.player.getTeam()))
+                    sameTeamFights.add(fight.getPosition());
+            }
+        }
+
+        return sameTeamFights;
     }
 
     public static ArrayList<Player> getPossiblePlayers(Database database, int poolID, int fightPosition) {
