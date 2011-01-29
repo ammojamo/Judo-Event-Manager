@@ -40,7 +40,7 @@ public class PlayerCodeParser {
     private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT|RBP?|RBT?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
     
     public static enum PlayerType {
-        NORMAL, BYE, UNDECIDED, ERROR
+        NORMAL, BYE, UNDECIDED, EMPTY, ERROR
     }
     
     public static class FightPlayer {
@@ -56,6 +56,8 @@ public class PlayerCodeParser {
                     return player.getFirstName() + " " + player.getLastName();
                 case BYE:
                     return "Bye";
+                case EMPTY:
+                    return "Reserved";
                 case UNDECIDED:
                     return code + " : " + division.getDescription();
             }
@@ -299,17 +301,25 @@ public class PlayerCodeParser {
                 return fightPlayer;
             }
             FightInfo fight = fightInfoList.get(roundRobinFight-1);
-            if(!fight.resultKnown()) {
-                fightPlayer.type = PlayerType.UNDECIDED;
-                return fightPlayer;
+
+            String[] codes = fight.getAllPlayerCode();
+            FightPlayer[] fightPlayers = new FightPlayer[] {
+                parseCode(codes[0]),
+                parseCode(codes[1])
+            };
+            if(fightPlayers[0].type != PlayerType.BYE && fightPlayers[1].type != PlayerType.BYE){
+                if(!fight.resultKnown()) {
+                    fightPlayer.type = PlayerType.EMPTY;
+                    return fightPlayer;
+                }
+                roundRobinFightInfoList.add(fight);
             }
-            roundRobinFightInfoList.add(fight);
         }
 
         if(!roundRobinFightInfoList.isEmpty()){
             List<PlayerRRScore> PlayerRRScore = roundRobinResults(codeType, roundRobinFightInfoList);
             if(PlayerRRScore.size()<number){
-                fightPlayer.type = PlayerType.ERROR;
+                fightPlayer.type = PlayerType.EMPTY;
                 return fightPlayer;
             }
 
@@ -344,7 +354,7 @@ public class PlayerCodeParser {
                         fightPlayer.player = getPlayer(PlayerRRScore.get(number-1).PlayerID);
                         return fightPlayer;
                     } else {
-                        fightPlayer.type = PlayerType.BYE;
+                        fightPlayer.type = PlayerType.EMPTY;
                         return fightPlayer;
                     }
 
@@ -390,10 +400,11 @@ public class PlayerCodeParser {
                     PlayerRRScore playerRRScore = new PlayerRRScore();
                     playerRRScore.PlayerID = playerID;
                     for(PlayerPoolInfo playerInfo : playerInfoList){
-                        if(playerInfo.getPlayerPool().getPlayerID() == playerID){
-                            playerRRScore.PlayerPos2 = playerInfo.getPlayerPool().getPlayerPosition2();
-                            break;
-                        }
+                        if(playerInfo != null)
+                            if(playerInfo.getPlayerPool().getPlayerID() == playerID){
+                                playerRRScore.PlayerPos2 = playerInfo.getPlayerPool().getPlayerPosition2();
+                                break;
+                            }
                     }
                     playerRRScore.Wins = 0;
                     playerRRScore.Points = 0;
@@ -526,9 +537,10 @@ public class PlayerCodeParser {
 
                 String[] codes = fight.getAllPlayerCode();
                 FightPlayer[] fightPlayers = new FightPlayer[] {
-                    parsePLWCode(codes[0]),
-                    parsePLWCode(codes[1])
+                    parseCode(codes[0]),
+                    parseCode(codes[1])
                 };
+// Bye: Return other fight code
                 for(int i = 0; i < 2; i++) {
                     int j = 1 - i; // other player
                     if(fightPlayers[i].type == PlayerType.BYE) {
@@ -546,6 +558,13 @@ public class PlayerCodeParser {
                                 fightPlayer.type = PlayerType.ERROR;
                                 return fightPlayer;
                         }
+                    }
+                }
+// Empty: Return Empty
+                for(int i = 0; i < 2; i++) {
+                    if(fightPlayers[i].type == PlayerType.EMPTY) {
+                        fightPlayer.type = PlayerType.EMPTY;
+                        return fightPlayer;
                     }
                 }
                 fightPlayer.type = PlayerType.UNDECIDED;

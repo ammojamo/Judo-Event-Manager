@@ -148,6 +148,9 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                     case UNDECIDED:
                         c.put(PlayerCodeParser.getORCodes(code)[0], code);
                         break;
+                    case EMPTY:
+                        c.put(PlayerCodeParser.getORCodes(code)[0], " ");
+                        break;
                     case BYE:
                         c.put(PlayerCodeParser.getORCodes(code)[0], "BYE");
                         break;

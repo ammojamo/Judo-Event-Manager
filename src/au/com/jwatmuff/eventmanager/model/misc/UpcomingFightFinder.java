@@ -26,7 +26,7 @@ public class UpcomingFightFinder {
     
     public static List<Fight> findUpcomingFights(Database database, int sessionID, int numFights) throws DatabaseStateException {
         List<Fight> fights = new ArrayList<Fight>();
-        boolean isBye = false;
+        boolean isByeOrEmpty = false;
         
         Session session = database.get(Session.class, sessionID);
         if(session == null || session.getType() != Session.SessionType.MAT)
@@ -47,15 +47,15 @@ public class UpcomingFightFinder {
             List<Fight> unplayed = database.findAll(Fight.class, FightDAO.UNPLAYED_IN_SESSION, s.getID());
 
             while(unplayed.size() > 0 && fights.size() < numFights) {
-                isBye = false;
+                isByeOrEmpty = false;
                 for(int i = 0; i < 2; i++) {
                     String code = unplayed.get(0).getPlayerCodes()[i];
                     FightPlayer fp = PlayerCodeParser.parseCode(database, code, unplayed.get(0).getPoolID());
-                    if(fp.type == PlayerType.BYE){
-                        isBye = true;
+                    if(fp.type == PlayerType.BYE || fp.type == PlayerType.EMPTY){
+                        isByeOrEmpty = true;
                     }
                 }
-                if(isBye) {
+                if(isByeOrEmpty) {
                     unplayed.remove(0);
                 } else {
                     fights.add(unplayed.remove(0));
