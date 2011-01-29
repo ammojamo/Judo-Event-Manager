@@ -39,4 +39,7 @@ public interface SessionDAO extends GenericDAO<Session> {
 
     public static String FOR_FIGHT = "forFight";
     public Session findForFight(int fightID);
+
+    public static String FOR_POOL = "forPool";
+    public Collection<Session> findForPool(int poolID);
 }
