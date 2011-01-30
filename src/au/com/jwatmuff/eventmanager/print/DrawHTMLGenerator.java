@@ -236,9 +236,16 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         c.put("place" + i, place.name + "--" + fightPlayer.code); // mark error with --
                         break;
                     case UNDECIDED:
-                            c.put("place" + i, place.name + ": UNDECIDED");
+                        c.put("place" + i, place.name + ": UNDECIDED");
                         break;
                     case BYE:
+                        if(fightPlayer.playerPoolInfo != null && fightPlayer.playerPoolInfo.isWithdrawn() )
+                            if (fightPlayer.player.getTeam() != null) {
+                                c.put("place" + i, place.name + ": " + fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName() + " -- " + fightPlayer.player.getTeam());
+                            } else {
+                                c.put("place" + i, place.name + ": " + fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName());
+                            }
+                        else
                             c.put("place" + i, place.name + ": UNDECIDED");
                         break;
                     default:

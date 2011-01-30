@@ -57,6 +57,10 @@ public class FightInfo {
         return (r != null);
     }
 
+    public int getFightPostion() {
+        return f.getPosition();
+    }
+
     private int getWinningPlayerIndex() {
         return (r.getScores()[0].compareTo(r.getScores()[1]) > 0) ? 0 : 1;
     }
