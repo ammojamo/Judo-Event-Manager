@@ -115,62 +115,10 @@ public class WithdrawPlayerDialog extends javax.swing.JDialog {
 
     // TODO: move to utility class
     private boolean hasMissedFights(PlayerPool playerPool) {
-        // TODO: move this to utility class
-        List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, playerPool.getPoolID());
-        if (fights.isEmpty()) {
-            return false;
-        }
-
-        // workout what player number we are
-        // maybe we can just use playerPool.getPlayerPosition() + 1, but I wasn't 100% sure without spending time more time to check
-        List<PlayerPoolInfo> playerList = PoolPlayerSequencer.getPlayerSequence(database, playerPool.getPoolID());
-        int position = -1;
-        for (PlayerPoolInfo playerPoolInfo : playerList) {
-            if (playerPoolInfo.getPlayer().getID().equals(playerPool.getPlayerID())) {
-                position = playerList.indexOf(playerPoolInfo) + 1;
-                break;
-            }
-        }
-
-        // not sure if this can ever happen, but it's probably safe to assume the player hasn't missed any fights
-        if (position == -1) {
-            return false;
-        }
 
         PlayerCodeParser playerCodeParser = PlayerCodeParser.getInstance(database, playerPool.getPoolID());
-
-        // now we are looking for fights that may involve our player
-        // i.e. ewith code Pn where n = position
-        String playerCode = "P" + position;
-        boolean previousNonByeFightNotFought = false;
-        for (Fight fight : fights) {
-            if(previousNonByeFightNotFought) {
-                List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, fight.getID());
-                if(!results.isEmpty()) {
-                    // we have missed a fight because this fight has been fought, and a previous
-                    // fight involving our player vs a non-bye player was not fought! phew!
-                    return true;
-                }
-            } else {
-                for (int i = 0; i < 2; i++) {
-                    String code = fight.getPlayerCodes()[i];
-                    if (playerCode.equals(code)) {
-                        // if this fight has no result then it may have been missed
-                        List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, fight.getID());
-                        if (!results.isEmpty()) {
-                            // was the other player was a bye/disqualified/etc?
-                            FightPlayer opponent = playerCodeParser.parseCode(fight.getPlayerCodes()[1 - i]);
-                            if (opponent.type != PlayerType.NORMAL) {
-                                previousNonByeFightNotFought = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // yay, we didn't find any missed fights
-        return false;
+        
+        return !playerCodeParser.canPlayerUnWithdraw(playerPool.getPlayerID());
     }
 
     private class PlayerTableModel extends BeanMapperTableModel<PlayerPool> implements TransactionListener {

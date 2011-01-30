@@ -687,6 +687,39 @@ public class PlayerCodeParser {
         return fightPlayer;
     }
 
+    public boolean canPlayerUnWithdraw(int playerID) {
+        List<Integer> fightNumbers = new ArrayList<Integer>();
+        for(FightInfo fightInfo:fightInfoList){
+            if(!fightInfo.resultKnown()){
+                String[] codes = fightInfo.getAllPlayerCode();
+                FightPlayer[] fightPlayers = new FightPlayer[] {
+                    parseCode(codes[0]),
+                    parseCode(codes[1])
+                };
+                for(FightPlayer fightPlayer:fightPlayers){
+                    if(fightPlayer.type==PlayerType.BYE)
+                        if(fightPlayer.playerPoolInfo != null)
+                            if(fightPlayer.playerPoolInfo.isWithdrawn())
+                                if(fightPlayer.player.getID() == playerID)
+                                    fightNumbers.add(fightInfo.getFightPostion());
+                }
+            }
+        }
+        for(FightInfo fightInfo:fightInfoList){
+            if(fightInfo.resultKnown()){
+                String[] codes = fightInfo.getAllPlayerCode();
+                List<Integer> pastFightNumbers = new ArrayList<Integer>();
+                pastFightNumbers.addAll(getAscendant(codes[0]));
+                pastFightNumbers.addAll(getAscendant(codes[1]));
+                for(Integer pastFightNumber : pastFightNumbers){
+                    if(fightNumbers.contains(pastFightNumber))
+                        return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     /* Parser instance stuff */
 
     private List<PlayerPoolInfo> playerInfoList;
