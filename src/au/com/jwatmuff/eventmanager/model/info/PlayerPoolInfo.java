@@ -94,5 +94,9 @@ public class PlayerPoolInfo {
 
     public PlayerPool getPlayerPool() {
         return playerPool;
-    }    
+    }
+
+    public boolean isWithdrawn() {
+        return (playerPool.getStatus()==PlayerPool.Status.WITHDRAWN || playerPool.getStatus()==PlayerPool.Status.DISQUALIFIED);
+    }
 }

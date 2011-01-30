@@ -9,6 +9,7 @@ import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
 import au.com.jwatmuff.eventmanager.db.SessionDAO;
 import au.com.jwatmuff.eventmanager.db.SessionFightDAO;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.CodeInfo;
@@ -77,17 +78,22 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
         if(firstPage) c.put("first", "true");
 
-//Print the competition information and division
+//Print the competition name and division
         CompetitionInfo compInfo = database.get(CompetitionInfo.class, null);
+        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(compInfo.getDrawConfiguration());
         c.put("competitionName", compInfo.getName());
-        c.put("competitionInfo",
-                "Location: " + compInfo.getLocation() + ", " +
-                DATE_FORMAT.format(compInfo.getStartDate()) + " to " +
-                DATE_FORMAT.format(compInfo.getEndDate()));
+        if(compInfo.getLocation().isEmpty())
+            c.put("competitionInfo",
+                    DATE_FORMAT.format(compInfo.getStartDate()) + " to " +
+                    DATE_FORMAT.format(compInfo.getEndDate()));
+        else
+            c.put("competitionInfo",
+                    "Location: " + compInfo.getLocation() + ", " +
+                    DATE_FORMAT.format(compInfo.getStartDate()) + " to " +
+                    DATE_FORMAT.format(compInfo.getEndDate()));
         
         Pool pool = database.get(Pool.class, poolID);
 
-        c.put("division", pool.getDescription());
         
         assert(pool != null && pool.getLockedStatus() != Pool.LockedStatus.UNLOCKED);
 
@@ -130,26 +136,33 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 
         List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
         /* add fight numbers */
-        if(divisionAssignedToSession) {
+        if(showResults && divisionAssignedToSession) {
+            List<String> matNames = new ArrayList<String>();
             for(i = 1; i <= fights.size(); i++) {
                 try {
                     Fight fight = fights.get(i - 1);
                     SessionFight sessionFight = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, fight.getID());
                     FightMatInfo fightMatInfo = SessionFightSequencer.getFightMatInfo(database, sessionFight);
                     c.put("fightNumber" + i, fightMatInfo.fightNumber);
-                    c.put("fightMat" + i, fightMatInfo.matName);
+                    if(!matNames.contains(fightMatInfo.matName))
+                        matNames.add(fightMatInfo.matName);
+//                    c.put("fightMat" + i, fightMatInfo.matName);
                 } catch(Exception e) {
                     // This will happen if the fight has not been added to a session (i.e. no SessionFight exists).
                     // Because we know the division has been added to a session, this means it must be a bye fight.
-                    c.put("fightNumber" + i, "BYE");
-                    c.put("fightMat" + i, "");
+                    c.put("fightNumber" + i, "--");
+//                    c.put("fightMat" + i, "");
                 }
             }
+// Print the competition info
+            c.put("division", pool.getDescription() + ". " + matNames);
         } else {
             for(i = 1; i <= fights.size(); i++) {
                 c.put("fightNumber" + i, i);
                 c.put("fightMat" + i, "");
             }
+// Print the division
+            c.put("division", pool.getDescription());
         }
 
 //Add and convert the draw codes to player names. Adds WX and LX codes for individual fight results.
@@ -185,7 +198,11 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         c.put(PlayerCodeParser.getORCodes(code)[0], " ");
                         break;
                     case BYE:
-                        c.put(PlayerCodeParser.getORCodes(code)[0], "BYE");
+                        if(fightPlayer.playerPoolInfo != null && fightPlayer.playerPoolInfo.isWithdrawn())
+                            c.put(PlayerCodeParser.getORCodes(code)[0], 
+                              fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName().charAt(0) + " (FG)");
+                        else
+                            c.put(PlayerCodeParser.getORCodes(code)[0], "BYE");
                         break;
                     default:
                         c.put(PlayerCodeParser.getORCodes(code)[0], fightPlayer.type.toString());
@@ -221,8 +238,11 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                     case UNDECIDED:
                             c.put("place" + i, place.name + ": UNDECIDED");
                         break;
+                    case BYE:
+                            c.put("place" + i, place.name + ": UNDECIDED");
+                        break;
                     default:
-                        c.put("place" + i, place.name + "--" + fightPlayer.code);
+                        c.put("place" + i, place.name + "--" + fightPlayer.code); // mark error with --
                         break;
                 }
             }
@@ -279,6 +299,30 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         } else {
                             wins.put(ids[1],wins.get(ids[1])+1);
                             points.put(ids[1],points.get(ids[1])+scores[1]);
+                        }
+                    } else {
+// Check for withdrawal and print results
+                        String[] fightCodes = fights.get(fightNumber-1).getPlayerCodes();
+                        FightPlayer[] fightPlayers = new FightPlayer[] {
+                            parser.parseCode(fightCodes[0]),
+                            parser.parseCode(fightCodes[1])
+                        };
+                        if(fightPlayers[0].playerPoolInfo.isWithdrawn() ^ fightPlayers[1].playerPoolInfo.isWithdrawn()){
+                            int score = configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+                            if(fightPlayers[0].playerPoolInfo.isWithdrawn()){
+                                wins.put(fightPlayers[1].player.getID(),wins.get(fightPlayers[1].player.getID())+1);
+                                points.put(fightPlayers[1].player.getID(),points.get(fightPlayers[1].player.getID())+score);
+
+                                c.put("R" + roundRobinPnt + fightNumber + "P1", 0);
+                                c.put("R" + roundRobinPnt + fightNumber + "P2", score);
+
+                            }else if(fightPlayers[1].playerPoolInfo.isWithdrawn()){
+                                wins.put(fightPlayers[0].player.getID(),wins.get(fightPlayers[0].player.getID())+1);
+                                points.put(fightPlayers[0].player.getID(),points.get(fightPlayers[0].player.getID())+score);
+
+                                c.put("R" + roundRobinPnt + fightNumber + "P1", score);
+                                c.put("R" + roundRobinPnt + fightNumber + "P2", 0);
+                            }
                         }
                     }
                 }

@@ -46,6 +46,7 @@ public class PlayerCodeParser {
     public static class FightPlayer {
         public PlayerType type;
         public Player player;
+        public PlayerPoolInfo playerPoolInfo;
         public String code;
         public Pool division;
         
@@ -190,10 +191,10 @@ public class PlayerCodeParser {
         }
     }
 
-    private Player getPlayer(int playerID) {
+    private PlayerPoolInfo getPlayerPoolInfo(int playerID) {
         for(PlayerPoolInfo playerPoolInfo: playerInfoList ){
             if(playerPoolInfo != null && playerPoolInfo.getPlayer().getID() == playerID){
-                return playerPoolInfo.getPlayer();
+                return playerPoolInfo;
             }
         }
         return null;
@@ -256,13 +257,13 @@ public class PlayerCodeParser {
             int[] params = getParameters(codes[0]);//      3,4,5
 
             FightPlayer fightPlayer = parseCode(codes[0]);
-            if(fightPlayer.type == PlayerType.UNDECIDED) {
+            if(fightPlayer.type == PlayerType.EMPTY) {
                 int codePnt = 1;
                 for(int i=1; i < number; i++) {
                     String newCode = prefix + i;
                     for(int j = 0; j < params.length; j++)
                         newCode = newCode + "-" + params[j];
-                    if(parseCode(newCode).type == PlayerType.UNDECIDED)
+                    if(parseCode(newCode).type == PlayerType.EMPTY)
                         codePnt = codePnt + 1;
                 }
                 if(codePnt<codes.length){
@@ -309,17 +310,32 @@ public class PlayerCodeParser {
             };
             if(fightPlayers[0].type != PlayerType.BYE && fightPlayers[1].type != PlayerType.BYE){
                 if(!fight.resultKnown()) {
-                    fightPlayer.type = PlayerType.EMPTY;
-                    return fightPlayer;
+                    switch(prefix.charAt(2)) {
+                        case 'T':
+                            fightPlayer.type = PlayerType.EMPTY;
+                            return fightPlayer;
+                        case 'P':
+                            fightPlayer.type = PlayerType.UNDECIDED;
+                            return fightPlayer;
+                        default:
+                            fightPlayer.type = PlayerType.ERROR;
+                            return fightPlayer;
+                    }
                 }
                 roundRobinFightInfoList.add(fight);
+            } else {
+                if(fightPlayers[0].playerPoolInfo != null && fightPlayers[1].playerPoolInfo != null){
+                    if(fightPlayers[0].playerPoolInfo.isWithdrawn() || fightPlayers[1].playerPoolInfo.isWithdrawn()){
+                        roundRobinFightInfoList.add(fight);
+                    }
+                }
             }
         }
 
         if(!roundRobinFightInfoList.isEmpty()){
             List<PlayerRRScore> PlayerRRScore = roundRobinResults(codeType, roundRobinFightInfoList);
             if(PlayerRRScore.size()<number){
-                fightPlayer.type = PlayerType.EMPTY;
+                fightPlayer.type = PlayerType.BYE;
                 return fightPlayer;
             }
 
@@ -351,10 +367,13 @@ public class PlayerCodeParser {
                     }
                     if(isTie){
                         fightPlayer.type = PlayerType.NORMAL;
-                        fightPlayer.player = getPlayer(PlayerRRScore.get(number-1).PlayerID);
+                        fightPlayer.playerPoolInfo = getPlayerPoolInfo(PlayerRRScore.get(number-1).PlayerID);
+                        fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
+                        if(fightPlayer.playerPoolInfo.isWithdrawn())
+                            fightPlayer.type = PlayerType.BYE;
                         return fightPlayer;
                     } else {
-                        fightPlayer.type = PlayerType.EMPTY;
+                        fightPlayer.type = PlayerType.BYE;
                         return fightPlayer;
                     }
 
@@ -372,11 +391,12 @@ public class PlayerCodeParser {
                         }
                     }
                     if(isTie){
-                        fightPlayer.type = PlayerType.UNDECIDED;
+                        fightPlayer.type = PlayerType.EMPTY;
                         return fightPlayer;
                     } else {
                         fightPlayer.type = PlayerType.NORMAL;
-                        fightPlayer.player = getPlayer(PlayerRRScore.get(number-1).PlayerID);
+                        fightPlayer.playerPoolInfo = getPlayerPoolInfo(PlayerRRScore.get(number-1).PlayerID);
+                        fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
                         return fightPlayer;
                     }
 
@@ -394,33 +414,55 @@ public class PlayerCodeParser {
 
 //Add all playerPoolInfoList in fights to map
         Map<Integer,PlayerRRScore> playerRRScoresMap = new HashMap<Integer,PlayerRRScore>();
+
         for(FightInfo fightInfo : roundRobinFightInfoList) {
-            for(int playerID : fightInfo.getAllPlayerID()){
-                if (!playerRRScoresMap.containsKey(playerID)){
+            String[] codes = fightInfo.getAllPlayerCode();
+            FightPlayer[] fightPlayers = new FightPlayer[] {
+                parseCode(codes[0]),
+                parseCode(codes[1])
+            };
+            for(FightPlayer fightPlayer : fightPlayers){
+                if (!playerRRScoresMap.containsKey(fightPlayer.player.getID())){
                     PlayerRRScore playerRRScore = new PlayerRRScore();
-                    playerRRScore.PlayerID = playerID;
-                    for(PlayerPoolInfo playerInfo : playerInfoList){
-                        if(playerInfo != null)
-                            if(playerInfo.getPlayerPool().getPlayerID() == playerID){
-                                playerRRScore.PlayerPos2 = playerInfo.getPlayerPool().getPlayerPosition2();
-                                break;
-                            }
-                    }
+                    playerRRScore.PlayerID = fightPlayer.player.getID();
+                    playerRRScore.PlayerPos2 = fightPlayer.playerPoolInfo.getPlayerPool().getPlayerPosition2();
                     playerRRScore.Wins = 0;
                     playerRRScore.Points = 0;
                     playerRRScore.Place = 0;
-                    playerRRScoresMap.put(playerID,playerRRScore);
+                    playerRRScoresMap.put(playerRRScore.PlayerID,playerRRScore);
                 }
             }
         }
 
 //Calculate accumulated wins and points
         for(FightInfo fightInfo : roundRobinFightInfoList) {
-            int winningPlayerSimpleScore = fightInfo.getWinningPlayerSimpleScore(configurationFile);
-            PlayerRRScore playerRRScore = playerRRScoresMap.get(fightInfo.getWinningPlayerID());
-            playerRRScore.Wins = playerRRScore.Wins+1;
-            playerRRScore.Points = playerRRScore.Points + winningPlayerSimpleScore;
-            playerRRScoresMap.put(fightInfo.getWinningPlayerID(), playerRRScore);
+            if(fightInfo.resultKnown()){
+                int winningPlayerSimpleScore = fightInfo.getWinningPlayerSimpleScore(configurationFile);
+                PlayerRRScore playerRRScore = playerRRScoresMap.get(fightInfo.getWinningPlayerID());
+                playerRRScore.Wins = playerRRScore.Wins+1;
+                playerRRScore.Points = playerRRScore.Points + winningPlayerSimpleScore;
+                playerRRScoresMap.put(fightInfo.getWinningPlayerID(), playerRRScore);
+            } else {
+                String[] codes = fightInfo.getAllPlayerCode();
+                FightPlayer[] fightPlayers = new FightPlayer[] {
+                    parseCode(codes[0]),
+                    parseCode(codes[1])
+                };
+                if(fightPlayers[0].playerPoolInfo.isWithdrawn() ^ fightPlayers[1].playerPoolInfo.isWithdrawn()){
+                    if(fightPlayers[0].playerPoolInfo.isWithdrawn()){
+                        PlayerRRScore playerRRScore = playerRRScoresMap.get(fightPlayers[1].player.getID());
+                        playerRRScore.Wins = playerRRScore.Wins+1;
+                        playerRRScore.Points = playerRRScore.Points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+                        playerRRScoresMap.put(fightPlayers[1].player.getID(), playerRRScore);
+
+                    }else if(fightPlayers[1].playerPoolInfo.isWithdrawn()){
+                        PlayerRRScore playerRRScore = playerRRScoresMap.get(fightPlayers[0].player.getID());
+                        playerRRScore.Wins = playerRRScore.Wins+1;
+                        playerRRScore.Points = playerRRScore.Points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+                        playerRRScoresMap.put(fightPlayers[0].player.getID(), playerRRScore);
+                    }
+                }
+            }
         }
         
 //Convert mat to a list for sorting
@@ -453,6 +495,16 @@ public class PlayerCodeParser {
                 for(int k = i; k <= j; k++)
                     playerRRTieList.add(playerRRScoresList.get(k));
             }
+
+// Detect all withdrawn
+            boolean allWithdrawn = true;
+            for(PlayerRRScore playerRRTie : playerRRTieList){
+                if(!getPlayerPoolInfo(playerRRTie.PlayerID).isWithdrawn()){
+                    allWithdrawn = false;
+                    break;
+                }
+            }
+
 // Are ZERO players tied?
             if(playerRRTieList.isEmpty()){
                 playerRRScoresList.get(i).Place = i;
@@ -466,6 +518,11 @@ public class PlayerCodeParser {
                 Collections.sort(playerRRScoresList, PLAYERS_POS_COMPARATOR);
                 return playerRRScoresList;
 
+// Are all players witdhrawn
+            }else if(allWithdrawn){
+                for(int k = i; k <= j; k++){
+                    playerRRScoresList.get(k).Place = j;
+                }
 // Are SOME players tied?
             }else{
                 List<FightInfo> pairsOfFightInfoList = new ArrayList<FightInfo>();
@@ -516,8 +573,13 @@ public class PlayerCodeParser {
                 fightPlayer.type = PlayerType.BYE;
                 return fightPlayer;
             } else {
-                fightPlayer.type = PlayerType.NORMAL;
-                fightPlayer.player = playerInfoList.get(number-1).getPlayer();
+                fightPlayer.playerPoolInfo = playerInfoList.get(number-1);
+                fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
+                if(fightPlayer.playerPoolInfo.isWithdrawn()){
+                    fightPlayer.type = PlayerType.BYE;
+                }else{
+                    fightPlayer.type = PlayerType.NORMAL;
+                }
                 return fightPlayer;
             }
         }
@@ -574,14 +636,20 @@ public class PlayerCodeParser {
 
                 if(prefix.equals("W")){
                     fightPlayer.type = PlayerType.NORMAL;
-                    fightPlayer.player = getPlayer( fight.getWinningPlayerID());
+                    fightPlayer.playerPoolInfo = getPlayerPoolInfo(fight.getWinningPlayerID());
+                    fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
+                    if(fightPlayer.playerPoolInfo.isWithdrawn())
+                        fightPlayer.type = PlayerType.BYE;
                     if(fightPlayer.player == null)
                         fightPlayer.type = PlayerType.ERROR;
                     return fightPlayer;
                 }
                 if(prefix.equals("L")){
                     fightPlayer.type = PlayerType.NORMAL;
-                    fightPlayer.player = getPlayer( fight.getLosingPlayerID());
+                    fightPlayer.playerPoolInfo = getPlayerPoolInfo(fight.getLosingPlayerID());
+                    fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
+                    if(fightPlayer.playerPoolInfo.isWithdrawn())
+                        fightPlayer.type = PlayerType.BYE;
                     if(fightPlayer.player == null)
                         fightPlayer.type = PlayerType.ERROR;
                     return fightPlayer;
