@@ -28,6 +28,8 @@ import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,15 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     private List<PlayerPoolInfo> playerPoolInfoList = new ArrayList<PlayerPoolInfo>();
     private Map<Integer, Integer> seeds = new HashMap<Integer, Integer>();
     private Context context;
+
+    private static final Comparator<PlayerPoolInfo> PLAYERS_COMPARATOR_POSITION = new Comparator<PlayerPoolInfo>() {
+        @Override
+        public int compare(PlayerPoolInfo pp1, PlayerPoolInfo pp2) {
+            String n1 = pp1.getPlayer().getLastName() + pp1.getPlayer().getFirstName();
+            String n2 = pp2.getPlayer().getLastName() + pp2.getPlayer().getFirstName();
+            return n1.compareTo(n2);
+        }
+    };
 
     /** Creates new form SeedingPanel */
     public SeedingPanel(TransactionalDatabase database, TransactionNotifier notifier, Context context) {
@@ -98,6 +109,8 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         for(PlayerPoolInfo player : PoolPlayerSequencer.getPlayerSequence(database, pool.getID()))
             if(player != null)
                 playerPoolInfoList.add(player);
+
+        Collections.sort(playerPoolInfoList, PLAYERS_COMPARATOR_POSITION);
 
         seedingTable.getColumn("Seed").setCellEditor(getSeedingCellEditor(playerPoolInfoList.size()));
 
