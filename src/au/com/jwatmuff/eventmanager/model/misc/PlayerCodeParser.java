@@ -530,7 +530,12 @@ public class PlayerCodeParser {
                 for(FightInfo fightInfo : roundRobinFightInfoList){
                     matchedIDs = 0;
                     for(int k = 0; k < playerRRTieList.size(); k++){
-                        if(playerRRTieList.get(k).PlayerID==fightInfo.getLosingPlayerID() || playerRRTieList.get(k).PlayerID==fightInfo.getWinningPlayerID()){
+                        String[] codes = fightInfo.getAllPlayerCode();
+                        FightPlayer[] fightPlayers = new FightPlayer[] {
+                            parseCode(codes[0]),
+                            parseCode(codes[1])
+                        };
+                        if(playerRRTieList.get(k).PlayerID == fightPlayers[0].player.getID() || playerRRTieList.get(k).PlayerID == fightPlayers[1].player.getID()){
                             matchedIDs++;
                         }
                     }

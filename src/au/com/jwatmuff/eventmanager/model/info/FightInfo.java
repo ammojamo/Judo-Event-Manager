@@ -100,16 +100,10 @@ public class FightInfo {
     }
     
     public int getWinningPlayerID() {
-        if(resultKnown())
             return r.getPlayerIDs()[getWinningPlayerIndex()];
-        else
-            return 0;
     }
 
     public int getLosingPlayerID() {
-        if(resultKnown())
             return r.getPlayerIDs()[getLosingPlayerIndex()];
-        else
-            return 0;
     }
 }
