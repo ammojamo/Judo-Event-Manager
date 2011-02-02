@@ -1,8 +1,8 @@
 #EventManager License File
 #WARNING! Editing this file will cause the license to stop working
-#Wed May 19 00:40:54 CST 2010
-contact=00000000
+#Wed Feb 02 20:50:26 CST 2011
+contact=12345678
 name=Free
-expiry=20110301
+expiry=20120301
 type=C
-hash=25cc78b
+hash=16a8d5f0
