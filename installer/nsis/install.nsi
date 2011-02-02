@@ -8,7 +8,7 @@ LicenseForceSelection checkbox
 
 InstallDir $PROGRAMFILES\EventManager
 
-DirText "This will install EventManager 2010 Update 4 on your computer."
+DirText "This will install EventManager 2011 on your computer."
 
 Section ""
   SetOutPath $INSTDIR
