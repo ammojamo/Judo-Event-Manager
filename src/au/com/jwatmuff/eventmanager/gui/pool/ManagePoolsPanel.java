@@ -11,6 +11,7 @@ import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.AutoAssign;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
@@ -63,6 +64,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     private PoolPlayerListModel approvedListModel;
     
     private Date censusDate;
+    private ConfigurationFile configurationFile;
 
     /** Creates new form ManagePoolsPanel */
     public ManagePoolsPanel() {
@@ -86,6 +88,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         poolListTable.setModel(tableModel);
         
         censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
+        configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
               
         PlayerListCellRenderer playerListRenderer = new PlayerListCellRenderer(censusDate);
         
@@ -180,12 +183,13 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean hasFocus) {
+            final ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
             if (value instanceof Player) {
                 Player player = (Player) value;
                 Pool pool = getSelectedPool();
                 boolean ok = true;
                 if (pool != null && pool.getID() != 0) {
-                    ok = PoolChecker.checkPlayer(player, pool, censusDate);
+                    ok = PoolChecker.checkPlayer(player, pool, censusDate, configurationFile);
                 }
                 String str = player.getFirstName() + " " + player.getLastName() + (ok ? "" : " (!)");
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, str, index, isSelected, hasFocus);
@@ -525,7 +529,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
         for(Player player : players) {
             try {
-                if(PoolChecker.checkPlayer(player, pool, censusDate)) {
+                if(PoolChecker.checkPlayer(player, pool, censusDate, configurationFile)) {
                     PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
                     pp.setApproved(true);
                     database.update(pp);

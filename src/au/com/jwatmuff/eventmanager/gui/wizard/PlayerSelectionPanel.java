@@ -15,6 +15,7 @@ import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
@@ -80,6 +81,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     private final Context context;
 
     private Date censusDate;
+    private ConfigurationFile configurationFile;
 
     /** Creates new form PlayerSelectionPanel */
     public PlayerSelectionPanel(final TransactionalDatabase database, TransactionNotifier notifier, Context context) {
@@ -113,7 +115,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
 
                     boolean ok = false;
                     if (pool != null && pool.getID() != 0) {
-                        if (player.getLockedStatus() == Player.LockedStatus.LOCKED && PoolChecker.checkPlayer(player, pool, censusDate))
+                        if (player.getLockedStatus() == Player.LockedStatus.LOCKED && PoolChecker.checkPlayer(player, pool, censusDate, configurationFile))
                             ok = true;
                     }
 
@@ -343,6 +345,8 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
 
     @Override
     public void beforeShow() {
+        
+        configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
         pool = context.pool;
         divisionNameLabel.setText(pool.getDescription() + ": Player Selection");
         censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
@@ -650,7 +654,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                 Player player = (Player) value;
                 boolean ok = true;
                 if (pool != null && pool.getID() != 0) {
-                    ok = PoolChecker.checkPlayer(player, pool, censusDate);
+                    ok = PoolChecker.checkPlayer(player, pool, censusDate, configurationFile);
                 }
                 String str =  player.getLastName() + ", " + player.getFirstName();
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, str, index, isSelected, hasFocus);

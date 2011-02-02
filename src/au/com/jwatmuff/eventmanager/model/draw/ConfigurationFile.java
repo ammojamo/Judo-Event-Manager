@@ -58,6 +58,14 @@ public class ConfigurationFile {
         }
     }
 
+    public boolean getBooleanProperty(String propertyName, boolean defaultValue) {
+        try {
+            return properties.getProperty(propertyName).equalsIgnoreCase("true");
+        } catch(Exception e) {
+            return defaultValue;
+        }
+    }
+
     /*** Static utility methods ***/
 
     private static Map<String, ConfigurationFile> configurations = new HashMap<String, ConfigurationFile>();

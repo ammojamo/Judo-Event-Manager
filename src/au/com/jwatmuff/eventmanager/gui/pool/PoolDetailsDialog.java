@@ -7,6 +7,7 @@
 package au.com.jwatmuff.eventmanager.gui.pool;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
@@ -270,6 +271,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         populate();
         populate(pool);
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
         playerListModel.clear();
 
         List<Player> players = database.findAll(Player.class, PlayerDAO.ALL);
@@ -280,7 +282,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         });
 
         for(Player player : players)
-            if(PoolChecker.checkPlayer(player, pool, ci.getAgeThresholdDate())) {
+            if(PoolChecker.checkPlayer(player, pool, ci.getAgeThresholdDate(), configurationFile)) {
                 Selectable s = new DefaultSelectable(player);
                 PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
                 if(pp != null && pp.isValid()) {

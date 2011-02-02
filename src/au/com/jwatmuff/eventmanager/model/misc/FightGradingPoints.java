@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.eventmanager.model.misc;
 
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
@@ -32,6 +33,7 @@ public class FightGradingPoints {
 
     public FightGradingPoints(ResultInfo ri, Database database) {
         result = ri;
+        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
         Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
         int[] scores = ri.getResult().getSimpleScores(database);
         int winner = scores[0] > scores[1] ? 0 : 1;
@@ -41,7 +43,7 @@ public class FightGradingPoints {
         losingPlayer = ri.getPlayer()[loser].player;
         
         pool = database.get(Pool.class, ri.getFight().getPoolID());
-        effectiveLoserGrade = PoolChecker.getEffectiveGrade(losingPlayer, pool, censusDate);
+        effectiveLoserGrade = PoolChecker.getEffectiveGrade(losingPlayer, pool, censusDate, configurationFile);
         points = calculatePoints(ri, effectiveLoserGrade, database);
     }
 

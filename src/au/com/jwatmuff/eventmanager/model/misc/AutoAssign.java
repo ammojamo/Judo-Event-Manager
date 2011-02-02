@@ -11,6 +11,7 @@ package au.com.jwatmuff.eventmanager.model.misc;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
@@ -51,13 +52,14 @@ public class AutoAssign {
             throw new DatabaseStateException("Competition Info must have an age threshold date");
         
         database.perform(new Transaction() {
+        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
 
             @Override
             public void perform() {
                 for(Player player : players)
                     for(Pool pool : pools)
                         if(pool.getLockedStatus() == Pool.LockedStatus.UNLOCKED)
-                            if(PoolChecker.checkPlayer(player, pool, ci.getAgeThresholdDate())) {
+                            if(PoolChecker.checkPlayer(player, pool, ci.getAgeThresholdDate(), configurationFile)) {
                                 PlayerPool pp = new PlayerPool();
                                 pp.setPlayerID(player.getID());
                                 pp.setPoolID(pool.getID());
@@ -72,6 +74,7 @@ public class AutoAssign {
     }
     
     public static void autoApprovePlayers(final TransactionalDatabase database, final Pool pool) throws DatabaseStateException {
+        final ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
         if(pool.getLockedStatus() != Pool.LockedStatus.UNLOCKED)
             throw new DatabaseStateException("Cannot approve players in a locked pool");
         
@@ -80,7 +83,7 @@ public class AutoAssign {
             public void perform() {
                 CompetitionInfo ci = database.get(CompetitionInfo.class, null);
                 for(PlayerPoolInfo ppi : PlayerPoolInfo.getForPool(database, pool.getID())) {
-                    if(PoolChecker.checkPlayer(ppi.getPlayer(), ppi.getPool(), ci.getAgeThresholdDate())) {
+                    if(PoolChecker.checkPlayer(ppi.getPlayer(), ppi.getPool(), ci.getAgeThresholdDate(), configurationFile)) {
                         PlayerPool pp = ppi.getPlayerPool();
                         pp.setApproved(true);
                         database.update(pp);

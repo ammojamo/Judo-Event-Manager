@@ -9,6 +9,7 @@
 package au.com.jwatmuff.eventmanager.model.misc;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Player.Grade;
@@ -64,7 +65,7 @@ public class PoolChecker {
         return Grade.values()[Math.max(g.ordinal() - amount, 0)];
     }
 
-    public static Grade getEffectiveGrade(Player p, Pool pool, Date censusDate) {
+    public static Grade getEffectiveGrade(Player p, Pool pool, Date censusDate, ConfigurationFile configurationFile) {
         Grade g = p.getGrade();
 
         if(g == Grade.UNSPECIFIED || g == null)
@@ -74,15 +75,21 @@ public class PoolChecker {
 
         int maxAge = pool.getMaximumAge();
 
-        if (maxAge > 16 || maxAge == 0) {
-            if(age <= 16) g = reduceGrade(g, 2);
-            if(age <= 14) g = reduceGrade(g, 2);
-            if(age <= 9) g = reduceGrade(g, 2);
-        } else if(maxAge > 14) {
-            if(age <= 14) g = reduceGrade(g, 2);
-            if(age <= 9) g = reduceGrade(g, 2);
-        } else if(maxAge > 9) {
-            if(age <= 9) g = reduceGrade(g, 2);
+        if(configurationFile.getBooleanProperty("defaultAdjustGrade", false)){
+            int age1 = configurationFile.getIntegerProperty("defaultAgeThreshold1", 9);
+            int age2 = configurationFile.getIntegerProperty("defaultAgeThreshold2", 14);
+            int age3 = configurationFile.getIntegerProperty("defaultAgeThreshold3", 16);
+            int gradeDrop = configurationFile.getIntegerProperty("defaultBeltDrop", 2);
+            if (maxAge > age3 || maxAge == 0) {
+                if(age <= age3) g = reduceGrade(g, gradeDrop);
+                if(age <= age2) g = reduceGrade(g, gradeDrop);
+                if(age <= age1) g = reduceGrade(g, gradeDrop);
+            } else if(maxAge > age2) {
+                if(age <= age2) g = reduceGrade(g, gradeDrop);
+                if(age <= age1) g = reduceGrade(g, gradeDrop);
+            } else if(maxAge > age1) {
+                if(age <= age1) g = reduceGrade(g, gradeDrop);
+            }
         }
 
         return g;
@@ -98,7 +105,7 @@ public class PoolChecker {
      * 
      * @return              True if the player is eligible, false otherwise.
      */
-    public static boolean checkPlayer(Player p, Pool pool, Date censusDate) {
+    public static boolean checkPlayer(Player p, Pool pool, Date censusDate, ConfigurationFile configurationFile) {
         if (p.getLockedStatus() != Player.LockedStatus.LOCKED) {
             return false;
         }
@@ -141,7 +148,7 @@ public class PoolChecker {
         }
 
         // adjust belt if necessary
-        Grade grade = getEffectiveGrade(p, pool, censusDate);
+        Grade grade = getEffectiveGrade(p, pool, censusDate, configurationFile);
 
         // check grade/belt
         Grade maxGrade = pool.getMaximumGrade();
@@ -162,10 +169,11 @@ public class PoolChecker {
 
     public static List<Player> findEligiblePlayers(final Pool pool, Database database) {
         final CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        final ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
         List<Player> players = database.findAll(Player.class, PlayerDAO.ALL);
         CollectionUtils.filter(players, new Predicate() {
             public boolean evaluate(Object arg0) {
-                return checkPlayer((Player)arg0, pool, ci.getAgeThresholdDate());
+                return checkPlayer((Player)arg0, pool, ci.getAgeThresholdDate(), configurationFile);
             }
         });
         return players;

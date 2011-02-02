@@ -9,6 +9,7 @@ package au.com.jwatmuff.eventmanager.gui.results;
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
 import au.com.jwatmuff.eventmanager.export.CSVExporter;
+import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
@@ -158,6 +159,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                     map.put("pool", pool.getDescription());
 
                     Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
+                    ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
 
                     int[] scores = bean.getResult().getSimpleScores(database);
 
@@ -170,7 +172,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                         map.put("loser", bean.getPlayerName()[loserIndex]);
                         Player loser = bean.getPlayer()[loserIndex].player;
                         Player winner = bean.getPlayer()[winnerIndex].player;
-                        loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate);
+                        loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate, configurationFile);
                         map.put("rank", (loserGrade==null)?"N/A": loserGrade.shortGrade);
                         map.put("loserId", (loser == null) ? "N/A" : loser.getVisibleID());
                         map.put("winnerId", (winner == null) ? "N/A" : winner.getVisibleID());
