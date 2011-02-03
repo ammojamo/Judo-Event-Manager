@@ -109,10 +109,14 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                 c.put("player" + i, "BYE");
                 continue;
             }
+
             Player player = playerPoolInfo.getPlayer();
             playerList.add(player);
-//            c.put("player" + i, p.getLastName() + ", " + p.getFirstName().charAt(0) );
-            c.put("player" + i, player.getLastName() + ", " + player.getFirstName() );
+            if(playerPoolInfo.isWithdrawn())
+                c.put("player" + i, player.getLastName() + ", " + player.getFirstName() + " (FG)" );
+            else
+                c.put("player" + i, player.getLastName() + ", " + player.getFirstName() );
+            
             if (player.getTeam() != null) {
                 c.put("playerRegion" + i, player.getTeam() + " (" + player.getShortGrade() + ")" );
             } else {
@@ -198,10 +202,6 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         c.put(PlayerCodeParser.getORCodes(code)[0], " ");
                         break;
                     case BYE:
-                        if(fightPlayer.playerPoolInfo != null && fightPlayer.playerPoolInfo.isWithdrawn())
-                            c.put(PlayerCodeParser.getORCodes(code)[0], 
-                              fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName().charAt(0) + " (FG)");
-                        else
                             c.put(PlayerCodeParser.getORCodes(code)[0], "BYE");
                         break;
                     default:
