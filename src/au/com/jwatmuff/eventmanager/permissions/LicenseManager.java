@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -30,7 +31,7 @@ public class LicenseManager {
         this.directory = licenseDirectory;
         try {
             loadLicense();
-            PermissionChecker.setLicenseType(license.getType());
+            updatePermissionChecker();
         } catch(Exception e) {
         }
     }
@@ -41,8 +42,18 @@ public class LicenseManager {
 
     public void setLicense(License license) throws IOException {
         this.license = license;
-        PermissionChecker.setLicenseType(license.getType());
+        updatePermissionChecker();
         saveLicense();
+    }
+
+    public final void updatePermissionChecker() {
+        LicenseType licenseType;
+        if(license == null || license.getExpiry().before(new Date())) {
+            licenseType = LicenseType.DEFAULT_LICENSE;
+        } else {
+            licenseType = license.getType();
+        }
+        PermissionChecker.setLicenseType(licenseType);
     }
 
     private void loadLicense() {

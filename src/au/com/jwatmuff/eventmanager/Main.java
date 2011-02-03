@@ -17,6 +17,8 @@ import au.com.jwatmuff.eventmanager.gui.main.SynchronizingWindow;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.permissions.License;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
+import au.com.jwatmuff.eventmanager.permissions.LicenseType;
+import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.LogUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
@@ -35,10 +37,8 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.util.Log4jConfigurer;
 
 /**
  *
@@ -192,6 +192,8 @@ public class Main {
             log.info("Starting Load Competition Dialog");
 
             while(true) {
+                // reset permission checker to use our license
+                licenseManager.updatePermissionChecker();
 
                 GUIUtils.runModalJFrame(loadCompetitionWindow);
 
@@ -225,7 +227,10 @@ public class Main {
                         database.add(ci);
                     }
 
-                    //DataEventNotifier notifier = new DataEventNotifier();
+                    // Set PermissionChecker to use database's license type
+                    String competitionLicenseType = database.get(CompetitionInfo.class, null).getLicenseType();
+                    PermissionChecker.setLicenseType(LicenseType.valueOf(competitionLicenseType));
+
                     TransactionNotifier notifier = new TransactionNotifier();
                     database.setListener(notifier);
 
