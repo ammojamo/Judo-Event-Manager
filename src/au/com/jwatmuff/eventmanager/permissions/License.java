@@ -113,8 +113,12 @@ public class License {
             int hash = Integer.valueOf(props.getProperty(HASH_PROPERTY), 16);
             if(name == null || expiry == null || type == null || hash == 0)
                 throw new RuntimeException("Missing or invalid properties");
-
+              
             License license =  new License(name, contactPhone, expiry, type);
+
+            long daysToExpiry = (license.getExpiry().getTime() - new Date().getTime());
+            if(daysToExpiry < 0)
+                throw new RuntimeException("License has expired");
 
             if(license.hashCode() != hash)
                 throw new RuntimeException("License key invalid");
