@@ -116,9 +116,10 @@ public class License {
               
             License license =  new License(name, contactPhone, expiry, type);
 
-            long daysToExpiry = (license.getExpiry().getTime() - new Date().getTime());
-            if(daysToExpiry < 0)
-                throw new RuntimeException("License has expired");
+            // We allow loading of out of date license, but it will just get ignored
+            //long daysToExpiry = (license.getExpiry().getTime() - new Date().getTime());
+            //if(daysToExpiry < 0)
+            //    throw new RuntimeException("License has expired");
 
             if(license.hashCode() != hash)
                 throw new RuntimeException("License key invalid");
