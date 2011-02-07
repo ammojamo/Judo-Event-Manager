@@ -86,7 +86,10 @@ public class Result extends DistributableObject<Integer> {
         if (scores[0].getIppon() != scores[1].getIppon())
             simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
         else if(scores[0].getWazari() != scores[1].getWazari())
-            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsWazari", 7);
+            if(Math.max(scores[0].getWazari(),scores[1].getWazari()) == 2)
+                simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+            else
+                simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsWazari", 7);
         else if (scores[0].getYuko() != scores[1].getYuko())
             simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsYuko", 5);
         else if (scores[0].getDecision() != scores[1].getDecision())

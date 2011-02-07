@@ -4,7 +4,7 @@
     <title>Division List - EventManager</title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
     <style type="text/css">
-#include("resources/html/styles.css")
+#include("resources/html/StyleSheet.css")
     </style>
     <script type="text/javascript">
         function p()
@@ -18,33 +18,90 @@
     <h2>${competitionName}</h2>
 
     <table>
+      <tr>
+        <th>&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td colspan="9" class ="borderFixWidth" ></td>
+      </tr>
 <!--
 #foreach($pool in $pools)
 <!-- -->
 
       <tr>
-        <th colspan="5"><br><b>$pool.description [$pool.lockedStatus]</b></th>
+        <td>&nbsp;</td>
+        <td class="borderTitle1" rowspan="2" colspan="8">$pool.description [$pool.lockedStatus]</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td colspan="10">&nbsp;</td>
+      </tr>
+
+      <tr>
+        <th>&nbsp;</td>
+        <th><b>ID</b></th>
+        <th><b>Last Name</b></th>
+        <th><b>First Name</b></th>
+        <th><b>Gender</b></th>
+        <th><b>DOB</b></th>
+        <th><b>Grade</b></th>
+        <th><b>Team</b></th>
+        <th><b>Weight</b></th>
+        <th>&nbsp;</td>
       </tr>
 
 <!--
 #foreach($player in $players.get($pool.ID))
 <!-- -->
       <tr>
+        <td>&nbsp;</td>
         <td>$!player.visibleID</td>
         <td>$!player.lastName</td>
         <td>$!player.firstName</td>
+        <td>$!player.gender</td>
+#if($player.dob)
+        <td>$date.format("dd/MM/yyyy", $!player.dob) &nbsp;</td>
+#else
+        <td>---</td>
+#end
         <td>$!player.shortGrade</td>
+        <td>$!player.team</td>
 #if($!player.weight == 0.0)
             <td>_________ (kg)</td>
 #else
             <td>$!player.weight (kg)</td>
 #end
+        <td>&nbsp;</td>
       </tr>
 <!--
 #end
 -->
+
       <tr>
-        <th colspan="5"><hr><b></b></th>
+        <td colspan="10">&nbsp;</td>
+      </tr>
+      <tr>
+        <th colspan="10"><hr><b></b></th>
+      </tr>
+
+      <tr>
+        <td colspan="10">&nbsp;</td>
       </tr>
 
 <!--
