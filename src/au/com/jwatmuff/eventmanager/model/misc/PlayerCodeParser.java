@@ -37,7 +37,7 @@ public class PlayerCodeParser {
     static String matcherWinnerLooser = "[LW]+";
     static String matcherRoundRobin = "RAP?|RAT?|RBT?|RBP?";
     static String matcherBestOfThree = "TAP?|TAT?";
-    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT|RBP?|RBT?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
+    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT?|RBP?|RBT?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
     
     public static enum PlayerType {
         NORMAL, BYE, UNDECIDED, EMPTY, ERROR
