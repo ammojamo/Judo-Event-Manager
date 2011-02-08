@@ -607,6 +607,11 @@ public class PlayerCodeParser {
                     parseCode(codes[0]),
                     parseCode(codes[1])
                 };
+// Both Bye: Return bye
+                if(fightPlayers[0].type == PlayerType.BYE && fightPlayers[1].type == PlayerType.BYE){
+                    fightPlayer.type = PlayerType.BYE;
+                    return fightPlayer;
+                }
 // Bye: Return other fight code
                 for(int i = 0; i < 2; i++) {
                     int j = 1 - i; // other player
