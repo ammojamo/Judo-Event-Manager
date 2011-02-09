@@ -87,6 +87,8 @@ public class Main {
      * Main method.
      */
     public static void main(String args[]) {
+        LogUtils.setupUncaughtExceptionHandler();
+
         /* Set timeout for RMI connections - TODO: move to external file */
         System.setProperty("sun.rmi.transport.tcp.handshakeTimeout", "2000");
         try {
@@ -272,5 +274,5 @@ public class Main {
             GUIUtils.displayError(null, "An unexpected error has occured.\n\n" + e.getClass().getSimpleName() + "\n" + message);
             System.exit(0);
         }
-    }        
+    }
 }
