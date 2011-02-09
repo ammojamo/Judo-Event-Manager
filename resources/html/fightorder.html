@@ -4,7 +4,7 @@
     <title>Fight Order - EventManager</title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
     <style type="text/css">
-#include("resources/html/styles.css")
+#include("resources/html/StyleSheet.css")
     </style>
     <script type="text/javascript">
         function p()
@@ -18,36 +18,48 @@
     <h2>Mat: ${mat} - ${competitionName}</h2>
 
     <table>
+
+      <tr>
+        <td colspan="7" class ="borderFixWidth" ></td>
+      </tr>
 <!--
 #set($i = 0)
 #foreach($session in $sessions)
 <!-- -->
       <tr>
-        <th colspan="4"><b>Session: $session.name [$session.lockedStatus]</b></th>
+        <th class="borderTitle1" colspan="7"><b>Session: $session.name [$session.lockedStatus]</b></th>
       </tr>
 <!--
 <!-- -->
       <tr>
+        <td>&nbsp;</td>
         <td><b>No.</b></td>
         <td><b>Blue</b></td>
         <td><b>White</b></td>
         <td><b>Division</b></td>
         <td><b>Draw Fight No.</b></td>
+        <td>&nbsp;</td>
       </tr>
 <!--
 #foreach($fight in $fights.get($session.ID))
 <!-- -->
       <tr>
+        <td>&nbsp;</td>
         <td>$!fightNumbers.get($i)</td>
         <td>$!fight.player1</td>
         <td>$!fight.player2</td>
         <td>$!fight.pool</td>
         <td>$!fight.poolNumber</td>
+        <td>&nbsp;</td>
       </tr>
 <!--
 #set($i = $i + 1)
 #end
 -->
+
+      <tr>
+        <td colspan="7">&nbsp;</td>
+      </tr>
 
 <!--
 #end

@@ -163,6 +163,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
                     int[] scores = bean.getResult().getSimpleScores(database);
 
+                    Grade winnerGrade = null;
                     Grade loserGrade = null;
 
                     if(scores[0] != scores[1]) {
@@ -172,15 +173,18 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                         map.put("loser", bean.getPlayerName()[loserIndex]);
                         Player loser = bean.getPlayer()[loserIndex].player;
                         Player winner = bean.getPlayer()[winnerIndex].player;
+                        winnerGrade = (winner == null) ? null : PoolChecker.getEffectiveGrade(winner, pool, censusDate, configurationFile);
+                        map.put("winnerRank", (winnerGrade==null)?"N/A": winnerGrade.shortGrade);
                         loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate, configurationFile);
-                        map.put("rank", (loserGrade==null)?"N/A": loserGrade.shortGrade);
+                        map.put("loserRank", (loserGrade==null)?"N/A": loserGrade.shortGrade);
                         map.put("loserId", (loser == null) ? "N/A" : loser.getVisibleID());
                         map.put("winnerId", (winner == null) ? "N/A" : winner.getVisibleID());
                     }
                     else {
                         map.put("winner", "Draw");
                         map.put("loser", "Draw");
-                        map.put("rank", "N/A");
+                        map.put("winnerRank", "N/A");
+                        map.put("loserRank", "N/A");
                         map.put("winnerId", "N/A");
                         map.put("loserId", "N/A");
                     }
@@ -196,10 +200,12 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
             addColumn("Date", "date");
             addColumn("Player", "winner");
             addColumn("Player ID", "winnerId");
+            addColumn("Player Rank", "winnerRank");
             addColumn("Competition", "compname");
             addColumn("Division", "pool");
             addColumn("Opponent", "loser");
-            addColumn("Rank", "rank");
+            addColumn("Opponent ID", "loserId");
+            addColumn("Opponent Rank", "loserRank");
             addColumn("Points", "points");
             addColumn("Signature", "signature");
         }

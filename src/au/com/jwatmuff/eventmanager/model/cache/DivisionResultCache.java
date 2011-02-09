@@ -114,13 +114,20 @@ public class DivisionResultCache {
 
         for(Place place : pool.getPlaces()) {
             try {
-                FightPlayer fp = PlayerCodeParser.parseCode(database, place.code, poolID);
+                FightPlayer fightplayer = PlayerCodeParser.parseCode(database, place.code, poolID);
                 // can't assume that all places resolve to actual players
-                if(fp.type == PlayerType.NORMAL) {
+                if(fightplayer.type == PlayerType.NORMAL) {
                     DivisionResult result = new DivisionResult();
                     result.place = place.name;
                     result.pool = pool;
-                    result.player = fp.player;
+                    result.player = fightplayer.player;
+                    drs.add(result);
+                }
+               else if (fightplayer.type == PlayerType.BYE && fightplayer.playerPoolInfo!= null && fightplayer.playerPoolInfo.isWithdrawn()) {
+                    DivisionResult result = new DivisionResult();
+                    result.place = place.name;
+                    result.pool = pool;
+                    result.player = fightplayer.player;
                     drs.add(result);
                 }
             } catch(DatabaseStateException e) {

@@ -4,7 +4,7 @@
     <title>Result List - EventManager</title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
     <style type="text/css">
-#include("resources/html/styles.css")
+#include("resources/html/StyleSheet.css")
     </style>
     <script type="text/javascript">
         function p()
@@ -17,20 +17,39 @@
     <h1>Result List</h1>
     <h2>${competitionName}</h2>
 
-    <table>
+    <table style="font-size: 70%">
         <tr>
-            <th>Fight</th>
-            <th>Division</th>
-            <th>Player 1</th>
-            <th>Player 2</th>
-            <th>Score</th>
-            <th>Winner</th>
-            <th>Time Recorded</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+            <th>&nbsp;</th>
+        </tr>
+
+        <tr>
+            <td colspan="9" class ="borderFixWidth" ></td>
+        </tr>
+
+        <tr>
+            <th>&nbsp;</th>
+            <th><b>Fight</b></th>
+            <th><b>Division</b></th>
+            <th><b>Player 1</b></th>
+            <th><b>Player 2</b></th>
+            <th><b>Score</b></th>
+            <th><b>Winner</b></th>
+            <th><b>Time Recorded</b></th>
+            <th>&nbsp;</th>
         </tr>
 <!--
 #foreach($result in $results)
 <!-- -->
         <tr>
+            <td>&nbsp;</td>
             <td>$result.matfight</td>
             <td>$result.division</td>
             <td>$result.player1</td>
@@ -38,7 +57,7 @@
             <td>$result.score</td>
             <td>$result.winner</td>
             <td>$date.format("dd-MM-yy HH:mm:ss", $result.timerec)</td>
-
+            <td>&nbsp;</td>
         </tr>
 <!--
 #end

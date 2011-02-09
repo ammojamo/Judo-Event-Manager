@@ -4,7 +4,7 @@
     <title>Player List - EventManager</title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
     <style type="text/css">
-#include("resources/html/styles.css")
+#include("resources/html/StyleSheet.css")
     </style>
     <script type="text/javascript">
         function p()
@@ -18,15 +18,36 @@
     <h2>${competitionName}</h2>
 
     <table>
-        <tr>
-            <th>ID</th>
-            <th>Last Name</th>
-            <th>First Name</th>
-            <th>DOB</th>
-            <th>Grade</th>
-            <th>Gender</th>
-            <th>Weight</th>
-        </tr>
+      <tr>
+        <th>&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td colspan="9" class ="borderFixWidth" ></td>
+      </tr>
+
+      <tr>
+        <th>&nbsp;</td>
+        <th><b>ID</b></th>
+        <th><b>Last Name</b></th>
+        <th><b>First Name</b></th>
+        <th><b>Gender</b></th>
+        <th><b>DOB</b></th>
+        <th><b>Grade</b></th>
+        <th><b>Team</b></th>
+        <th><b>Weight</b></th>
+        <th>&nbsp;</td>
+      </tr>
+
 <!--
 #foreach($player in $players)
 #set($weight = $player.weight)
@@ -34,19 +55,26 @@
   #set($weight = "_________")
 #end
 <!-- -->
-        <tr>
-            <td>$!player.visibleID</td>
-            <td>$!player.lastName</td>
-            <td>$!player.firstName</td>
+      <tr>
+        <td>&nbsp;</td>
+        <td>$!player.visibleID</td>
+        <td>$!player.lastName</td>
+        <td>$!player.firstName</td>
+        <td>$!player.gender</td>
 #if($player.dob)
-            <td>$date.format("dd/MM/yyyy", $!player.dob)</td>
+        <td>$date.format("dd/MM/yyyy", $!player.dob) &nbsp;</td>
 #else
-            <td>---</td>
+        <td>---</td>
 #end
-            <td>$!player.shortGrade</td>
-            <td>$!player.gender</td>
-            <td>$!weight  (kg)</td>
-        </tr>
+        <td>$!player.shortGrade</td>
+        <td>$!player.team</td>
+#if($!player.weight == 0.0)
+            <td>_________ (kg)</td>
+#else
+            <td>$!player.weight (kg)</td>
+#end
+        <td>&nbsp;</td>
+      </tr>
 <!--
 #end
 -->

@@ -4,7 +4,7 @@
     <title>Division Results - EventManager</title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
     <style type="text/css">
-#include("resources/html/styles.css")
+#include("resources/html/StyleSheet.css")
     </style>
     <script type="text/javascript">
         function p()
@@ -18,29 +18,76 @@
     <h2>${competitionName}</h2>
 
     <table>
+      <tr>
+        <th>&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+
+      <tr>
+        <td colspan="7" class ="borderFixWidth" ></td>
+      </tr>
+
 <!--
 #foreach($pool in $pools)
 <!-- -->
 
+
       <tr>
-        <th colspan="3"><br><b>$pool.description</b></th>
-	  <th><b>Position</b></th>
+        <td>&nbsp;</td>
+        <td class="borderTitle1" rowspan="2" colspan="5">$pool.description</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td colspan="7">&nbsp;</td>
+      </tr>
+
+      <tr>
+        <th>&nbsp;</th>
+        <th><b>Position</b></th>
+        <th><b>Last Name</b></th>
+        <th><b>First Name</b></th>
+        <th><b>Grade</b></th>
+        <th><b>Team</b></th>
+        <th>&nbsp;</th>
       </tr>
 
 <!--
 #foreach($result in $results.get($pool.ID))
 <!-- -->
       <tr>
+        <td>&nbsp;</td>
+        <td>$result.place</td>
         <td>$result.player.lastName</td>
         <td>$result.player.firstName</td>
-        <td>#if($result.details.club != "")($!result.details.club)#end</td>
-        <td>$result.place</td>
+        <td>$result.player.shortGrade</td>
+        <td>$result.player.team</td>
+        <td>&nbsp;</td>
       </tr>
 <!--
 #end
 -->
+
       <tr>
-        <th colspan="4"><hr><b></b></th>
+        <td colspan="6">&nbsp;</td>
+      </tr>
+      
+      <tr>
+        <th colspan="7"><hr><b></b></th>
+      </tr>
+
+      <tr>
+        <td colspan="6">&nbsp;</td>
       </tr>
 
 <!--

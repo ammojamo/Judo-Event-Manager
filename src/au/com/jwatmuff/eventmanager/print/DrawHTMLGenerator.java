@@ -202,6 +202,10 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                         c.put(PlayerCodeParser.getORCodes(code)[0], " ");
                         break;
                     case BYE:
+                        if(fightPlayer.playerPoolInfo != null && fightPlayer.playerPoolInfo.isWithdrawn() )
+                            c.put(PlayerCodeParser.getORCodes(code)[0],
+                                  fightPlayer.player.getLastName() + ", " + fightPlayer.player.getFirstName().charAt(0));
+                        else
                             c.put(PlayerCodeParser.getORCodes(code)[0], "BYE");
                         break;
                     default:

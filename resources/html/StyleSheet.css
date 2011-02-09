@@ -190,6 +190,7 @@ table.roundrobin {
     margin: 0;
     font-family: serif;
 }
+
 table.roundrobin td {
     border: none;
     border-spacing: 0px;
@@ -271,3 +272,5 @@ table td.borderSquareNoFight {
     text-align: center;
     color: grey;
 }
+
+/*** Output table styles ***/

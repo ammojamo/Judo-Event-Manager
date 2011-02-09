@@ -4,7 +4,7 @@
     <title>Player Grading Points - EventManager</title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
     <style type="text/css">
-#include("resources/html/styles.css")
+#include("resources/html/StyleSheet.css")
         table {
             font-size: 80%; /* so print out will fit on one page ok */
         }
@@ -21,10 +21,18 @@
     <h2>${competitionName}</h2>
 
     <table>
+
+      <tr>
+        <td colspan="7" class ="borderFixWidth" ></td>
+      </tr>
 <!--
 #foreach($player in $players)
 #set($p = $player.player)
 <!-- -->
+
+      <tr>
+        <td colspan="7">&nbsp;</td>
+      </tr>
 
       <tr>
         <th colspan="7"><b>$p.firstName $p.lastName</b></th>
