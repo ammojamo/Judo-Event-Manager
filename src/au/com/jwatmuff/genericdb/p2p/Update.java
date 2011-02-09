@@ -30,6 +30,8 @@ import org.apache.log4j.Logger;
  * @author James
  */
 public class Update implements Serializable {
+    private static final long serialVersionUID = 8474484567520664967L;
+
     private static final Logger log = Logger.getLogger(Update.class);
 
     private Map<UUID, EventList> updateMap = Collections.synchronizedMap(new HashMap<UUID, EventList>());
