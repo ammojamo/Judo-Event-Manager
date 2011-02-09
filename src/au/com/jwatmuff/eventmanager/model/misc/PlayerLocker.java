@@ -27,7 +27,10 @@ public class PlayerLocker {
         
         if(player.getLockedStatus() == Player.LockedStatus.LOCKED)
             throw new DatabaseStateException("Unable to lock player: player already locked");
-        
+
+        if(player.getWeight() == 0.0)
+            throw new DatabaseStateException("Unable to lock player: recorded weight is zero");
+
         final Collection<PlayerPool> pps = database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_PLAYER, player.getID());
         final Player lockedPlayer = Player.getLockedCopy(player, Player.LockedStatus.LOCKED);
         
