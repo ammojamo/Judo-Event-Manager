@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.genericdb.p2p;
 
+import au.com.jwatmuff.genericdb.distributed.Clock;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.distributed.DataEvent.TransactionStatus;
 import java.io.Serializable;
@@ -222,6 +223,16 @@ public class Update implements Serializable {
             //event.getTimestamp().setTime(event.getTimestamp().getTime() + amount);
     }
     */
+
+    /**
+     * Updates the clock using timestamps all events we ever received
+     */
+    public void updateClock() {
+        for(EventList list : updateMap.values())
+            for(DataEvent event : list)
+                Clock.setEarliestTime(event.getTimestamp());
+    }
+
     private String makeWidth(String s, int n) {
         if(s == null)
             s = "";

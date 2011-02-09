@@ -77,6 +77,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         ourID = peerManager.getUUID();
 
         Update updateFromFile = loadUpdatesFromFile();
+        updateFromFile.updateClock();
 
         if(updateFromFile == null) {
             log.info("Creating new update store");

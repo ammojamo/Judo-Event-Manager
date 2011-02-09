@@ -23,10 +23,10 @@ public class Clock {
     }
 
     private static void setTime(long time) {
-        log.debug("Setting time to: " + new Date(time));
+        // log.debug("Setting time to: " + new Date(time));
         startNano = System.nanoTime();
         startTime = time;
-        log.debug("Verifying time is: " + getTime());
+        // log.debug("Verifying time is: " + getTime());
     }
 
     /* returns clock time now in milliseconds */
