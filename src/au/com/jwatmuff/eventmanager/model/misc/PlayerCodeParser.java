@@ -228,6 +228,9 @@ public class PlayerCodeParser {
 
     public static String[] getORCodes(String code) {
         String[] codes = code.split("\\|");
+        for(int i = 0; i < codes.length; i++){
+            codes[i] = codes[i].trim();
+        }
         return codes;
     }
 
