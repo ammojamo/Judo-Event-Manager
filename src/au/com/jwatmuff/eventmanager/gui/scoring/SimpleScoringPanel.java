@@ -10,6 +10,7 @@ import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors.Area;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.ResultRecorder;
 import au.com.jwatmuff.eventmanager.model.misc.UpcomingFightFinder;
@@ -247,6 +248,18 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
         Collection<Fight> fights;
         try {
             fights = UpcomingFightFinder.findUpcomingFights(database, matSession.getID(), 1);
+            if(fights.size() > 0) {
+                Fight nextFight = fights.iterator().next();
+                for(int i=0; i<2; i++) {
+                    FightPlayer nextPlayer = PlayerCodeParser.parseCode(database, nextFight.getPlayerCodes()[i], nextFight.getPoolID());
+                    if(nextPlayer.type == PlayerType.UNDECIDED){
+                        ssp1.playerLabel.setText("---");
+                        ssp2.playerLabel.setText("---");
+                        currentFight = null;
+                        return;
+                    }
+                }
+            }
         } catch (DatabaseStateException e) {
             log.error("Unable to find upcoming fight", e);
             return;
