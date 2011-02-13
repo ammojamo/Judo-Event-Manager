@@ -14,7 +14,9 @@ import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
@@ -35,6 +37,7 @@ public class UpcomingFightFinder {
         SessionInfo si = new SessionInfo(database, session);
         
         Collection<Session> following = si.getFollowingMatSessions();
+        Map<Integer,PlayerCodeParser> playerCodeParser = new HashMap<Integer,PlayerCodeParser>();
         while(following.size() > 0) {
             if(following.size() > 1)
                 log.warn("Session " + si.getSession().getMat() + " has more than one following session");
@@ -47,10 +50,13 @@ public class UpcomingFightFinder {
             List<Fight> unplayed = database.findAll(Fight.class, FightDAO.UNPLAYED_IN_SESSION, s.getID());
 
             while(unplayed.size() > 0 && fights.size() < numFights) {
+                if(!playerCodeParser.containsKey(unplayed.get(0).getPoolID())){
+                    playerCodeParser.put(unplayed.get(0).getPoolID(), PlayerCodeParser.getInstance(database, unplayed.get(0).getPoolID()));
+                }
                 isByeOrEmpty = false;
                 for(int i = 0; i < 2; i++) {
                     String code = unplayed.get(0).getPlayerCodes()[i];
-                    FightPlayer fp = PlayerCodeParser.parseCode(database, code, unplayed.get(0).getPoolID());
+                    FightPlayer fp = playerCodeParser.get(unplayed.get(0).getPoolID()).parseCode(code);
                     if(fp.type == PlayerType.BYE || fp.type == PlayerType.EMPTY){
                         isByeOrEmpty = true;
                     }

@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Map;	
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.log4j.Logger;  
+import org.apache.log4j.Logger;
+import org.apache.velocity.context.Context;
 
 /**
  *
@@ -35,9 +36,9 @@ public class PlayerCodeParser {
     // matches all possible player codes
     static String matcherPlayer = "P";
     static String matcherWinnerLooser = "[LW]+";
-    static String matcherRoundRobin = "RAP?|RAT?|RBT?|RBP?";
+    static String matcherRoundRobin = "RAP?|RAT?|RBT?|RBP?|RFT?|RFP?";
     static String matcherBestOfThree = "TAP?|TAT?";
-    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT?|RBP?|RBT?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
+    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT?|RBP?|RBT?|RFP?|RFT?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
     
     public static enum PlayerType {
         NORMAL, BYE, UNDECIDED, EMPTY, ERROR
@@ -60,7 +61,7 @@ public class PlayerCodeParser {
                 case EMPTY:
                     return "Reserved";
                 case UNDECIDED:
-                    return code + " : " + division.getDescription();
+                    return getPrefix(code) + getNumber(code) + " : " + division.getDescription();
             }
             return "Error";
         }
@@ -79,31 +80,40 @@ public class PlayerCodeParser {
     }
     
     public static class PlayerRRScore {
-        int PlayerID;
-        int PlayerPos2;
-        int Wins;
-        int Points;
-        int Place;
+        int playerID;
+        int playerPos1;
+        int playerPos2;
+        Map<Integer,Integer>  fightPoints = new HashMap<Integer,Integer>();
+        int wins;
+        int points;
+        int place;
         }
 
     private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_RR = new Comparator<PlayerRRScore>(){
             @Override
             public int compare(PlayerRRScore p0, PlayerRRScore p1) {
-                return (p1.Wins - p0.Wins != 0) ? p1.Wins - p0.Wins : p1.Points - p0.Points;
+                return (p1.wins - p0.wins != 0) ? p1.wins - p0.wins : p1.points - p0.points;
             }
         };
 
-    private static Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR_RR = new Comparator<PlayerRRScore>(){
+    private static Comparator<PlayerRRScore> PLAYERS_POS1_COMPARATOR_RR = new Comparator<PlayerRRScore>(){
             @Override
             public int compare(PlayerRRScore p0, PlayerRRScore p1) {
-                return p1.PlayerPos2 - p0.PlayerPos2;
+                return p0.playerPos1 - p1.playerPos1;
+            }
+        };
+
+    private static Comparator<PlayerRRScore> PLAYERS_POS2_COMPARATOR_RR = new Comparator<PlayerRRScore>(){
+            @Override
+            public int compare(PlayerRRScore p0, PlayerRRScore p1) {
+                return p0.playerPos2 - p1.playerPos2;
             }
         };
 
     private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_BT = new Comparator<PlayerRRScore>(){
             @Override
             public int compare(PlayerRRScore p0, PlayerRRScore p1) {
-                return (p1.Wins - p0.Wins != 0) ? p1.Wins - p0.Wins : p1.Points - p0.Points;
+                return p1.wins - p0.wins;
             }
         };
 
@@ -219,7 +229,7 @@ public class PlayerCodeParser {
             codeInfo.type = CodeType.ROUNDROBIN;
             codeInfo.params = getParameters(code);  //      3,4,5
         } else if (codeInfo.prefix.matches(matcherBestOfThree)) {
-            codeInfo.type = CodeType.ROUNDROBIN;
+            codeInfo.type = CodeType.BESTOFTHREE;
             codeInfo.params = getParameters(code);  //      3,4,5
         } else
             throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
@@ -237,20 +247,40 @@ public class PlayerCodeParser {
     public FightPlayer parseCode(String code) {
         if(playerInfoList == null || playerInfoList.isEmpty())
             throw new IllegalArgumentException("Must supply a non-empty list of PlayerPoolInfos");
+        
+//System.out.println(code);
+//if(code.contentEquals("RAT1-1-2-3")){
+//    for(PlayerPoolInfo playerPoolInfo : playerInfoList) {
+//        if(playerPoolInfo != null) {
+//System.out.println(playerPoolInfo.getPool().getDescription());
+//            break;
+//        }
+//    }
+//}
 
         String[] codes = getORCodes(code);
         
         if(codes.length == 1){
+            if(parseredCodes.containsKey(codes[0]))
+                return parseredCodes.get(codes[0]);
             // Use prefix to work out which parsing method to call
-            String prefix = getPrefix(code);
-            if(prefix.matches(matcherPlayer))
-                return parsePLWCode(code);
-            else if(prefix.matches(matcherWinnerLooser))
-                return parsePLWCode(code);
-            else if(prefix.matches(matcherRoundRobin))
-                return parseRRCode(code);
-            else if(prefix.matches(matcherBestOfThree))
-                return parseRRCode(code);
+            String prefix = getPrefix(codes[0]);
+            if(prefix.matches(matcherPlayer)){
+                parseredCodes.put(codes[0], parsePLWCode(codes[0]));
+                return parseredCodes.get(codes[0]);
+            }
+            else if(prefix.matches(matcherWinnerLooser)){
+                parseredCodes.put(codes[0], parsePLWCode(codes[0]));
+                return parseredCodes.get(codes[0]);
+            }
+            else if(prefix.matches(matcherRoundRobin)){
+                parseredCodes.put(codes[0], parseRRCode(codes[0]));
+                return parseredCodes.get(codes[0]);
+            }
+            else if(prefix.matches(matcherBestOfThree)){
+                parseredCodes.put(codes[0], parseRRCode(codes[0]));
+                return parseredCodes.get(codes[0]);
+            }
             else
                 throw new IllegalArgumentException("Code not formatted correctly: '" + code + "'");
         } else if(getCodeInfo(codes[0]).type == CodeType.ROUNDROBIN || getCodeInfo(codes[0]).type == CodeType.BESTOFTHREE){
@@ -275,17 +305,113 @@ public class PlayerCodeParser {
                 }
             }
             fightPlayer.code = codes[0];
-            return fightPlayer;
+            parseredCodes.put(codes[0], fightPlayer);
+            return parseredCodes.get(codes[0]);
         } else {
             throw new IllegalArgumentException("Invalid player code: " + code);
         }
     }
 
+    private List<FightInfo> getRRFightList(String code) {
+        List<FightInfo> roundRobinFightInfoList = new ArrayList<FightInfo>();
+        List<String> allCodes = new ArrayList<String>();
+        List<Integer> allPlayerIDs = new ArrayList<Integer>();
+        
+        int[] params = getParameters(code);//      3,4,5
+
+        for(int roundRobinFight : params) {
+            if(roundRobinFight > fightInfoList.size()) {
+                throw new RuntimeException("Round Robin fight numbers bigger than number of fights");
+            }
+            FightInfo fightInfo = fightInfoList.get(roundRobinFight-1);
+
+            String[] codes = fightInfo.getAllPlayerCode();
+            FightPlayer[] fightPlayers = new FightPlayer[] {
+                parseCode(codes[0]),
+                parseCode(codes[1])
+            };
+            if(fightPlayers[0].type != PlayerType.BYE && fightPlayers[1].type != PlayerType.BYE){
+                if(!fightInfo.resultKnown()) {
+                    roundRobinFightInfoList.clear();
+                    return roundRobinFightInfoList;
+                }
+                roundRobinFightInfoList.add(fightInfo);
+                if(fightPlayers[0].type != PlayerType.UNDECIDED && !allPlayerIDs.contains(fightPlayers[0].player.getID())){
+                    allPlayerIDs.add(fightPlayers[0].player.getID());
+                    allCodes.add(codes[0]);
+                }
+                if(fightPlayers[1].type != PlayerType.UNDECIDED && !allPlayerIDs.contains(fightPlayers[1].player.getID())){
+                    allPlayerIDs.add(fightPlayers[1].player.getID());
+                    allCodes.add(codes[1]);
+                }
+            } else {
+                if(fightPlayers[0].playerPoolInfo != null && fightPlayers[1].playerPoolInfo != null){
+                    if(fightPlayers[0].playerPoolInfo.isWithdrawn() || fightPlayers[1].playerPoolInfo.isWithdrawn()){
+                        roundRobinFightInfoList.add(fightInfo);
+                        if(!allPlayerIDs.contains(fightPlayers[0].player.getID())){
+                            allPlayerIDs.add(fightPlayers[0].player.getID());
+                            allCodes.add(codes[0]);
+                        }
+                        if(!allPlayerIDs.contains(fightPlayers[1].player.getID())){
+                            allPlayerIDs.add(fightPlayers[1].player.getID());
+                            allCodes.add(codes[1]);
+                        }
+                    }
+                }
+            }
+        }
+        for(int i = 0; i<allPlayerIDs.size(); i++){
+            for(int j = 0; j<allPlayerIDs.size(); j++){
+                boolean hasFight = false;
+                for(FightInfo fightInfo: roundRobinFightInfoList){
+                    String[] codes = fightInfo.getAllPlayerCode();
+                    FightPlayer[] fightPlayers = new FightPlayer[] {
+                        parseCode(codes[0]),
+                        parseCode(codes[1])
+                    };
+                    if(fightPlayers[0].player != null && fightPlayers[1].player != null){
+                        if((fightPlayers[0].player.getID() == allPlayerIDs.get(i) || fightPlayers[1].player.getID() == allPlayerIDs.get(i))){
+                            if((fightPlayers[0].player.getID() == allPlayerIDs.get(j) || fightPlayers[1].player.getID() == allPlayerIDs.get(j))){
+                                hasFight = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(!hasFight){
+                    if(getCodeInfo(allCodes.get(i)).type == CodeType.ROUNDROBIN){
+                        int[] newParams = getParameters(allCodes.get(i));
+                        for(int roundRobinFight : newParams) {
+                            if(roundRobinFight > fightInfoList.size()) {
+                                throw new RuntimeException("Round Robin fight numbers bigger than number of fights");
+                            }
+                            FightInfo fight = fightInfoList.get(roundRobinFight-1);
+
+                            String[] codes = fight.getAllPlayerCode();
+                            FightPlayer[] fightPlayers = new FightPlayer[] {
+                                parseCode(codes[0]),
+                                parseCode(codes[1])
+                            };
+                            if(fightPlayers[0].playerPoolInfo != null && fightPlayers[1].playerPoolInfo != null){
+                                if(fightPlayers[0].playerPoolInfo.getPlayer().getID().equals(allPlayerIDs.get(i)) || fightPlayers[1].playerPoolInfo.getPlayer().getID().equals(allPlayerIDs.get(i))){
+                                    if(fightPlayers[0].playerPoolInfo.getPlayer().getID().equals(allPlayerIDs.get(j)) || fightPlayers[1].playerPoolInfo.getPlayer().getID().equals(allPlayerIDs.get(j))){
+                                        roundRobinFightInfoList.add(fight);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return roundRobinFightInfoList;
+    }
+
     private FightPlayer parseRRCode(String code) {
+
         FightPlayer fightPlayer = new FightPlayer();
         CodeType codeType = getCodeInfo(code).type;
-
-        List<FightInfo> roundRobinFightInfoList = new ArrayList<FightInfo>();
 
         fightPlayer.code = code;
         for(PlayerPoolInfo playerPoolInfo : playerInfoList) {
@@ -294,17 +420,15 @@ public class PlayerCodeParser {
                 break;
             }
         }
+
+        List<FightInfo> roundRobinFightInfoList = getRRFightList(code);
+
                                            // e.g. RBT2-3-4-5
         String prefix = getPrefix(code);   //      RBT
         int number = getNumber(code);      //      2
         int[] params = getParameters(code);//      3,4,5
 
-        for(int roundRobinFight : params) {
-            if(roundRobinFight > fightInfoList.size()) {
-                fightPlayer.type = PlayerType.ERROR;
-                return fightPlayer;
-            }
-            FightInfo fight = fightInfoList.get(roundRobinFight-1);
+        for(FightInfo fight : roundRobinFightInfoList) {
 
             String[] codes = fight.getAllPlayerCode();
             FightPlayer[] fightPlayers = new FightPlayer[] {
@@ -325,17 +449,22 @@ public class PlayerCodeParser {
                             return fightPlayer;
                     }
                 }
-                roundRobinFightInfoList.add(fight);
-            } else {
-                if(fightPlayers[0].playerPoolInfo != null && fightPlayers[1].playerPoolInfo != null){
-                    if(fightPlayers[0].playerPoolInfo.isWithdrawn() || fightPlayers[1].playerPoolInfo.isWithdrawn()){
-                        roundRobinFightInfoList.add(fight);
-                    }
-                }
             }
         }
 
-        if(!roundRobinFightInfoList.isEmpty()){
+        if(roundRobinFightInfoList.isEmpty()){
+            switch(prefix.charAt(2)) {
+                case 'T':
+                    fightPlayer.type = PlayerType.EMPTY;
+                    return fightPlayer;
+                case 'P':
+                    fightPlayer.type = PlayerType.UNDECIDED;
+                    return fightPlayer;
+                default:
+                    fightPlayer.type = PlayerType.ERROR;
+                    return fightPlayer;
+            }
+        } else {
             List<PlayerRRScore> PlayerRRScore = roundRobinResults(codeType, roundRobinFightInfoList);
             if(PlayerRRScore.size()<number){
                 fightPlayer.type = PlayerType.BYE;
@@ -348,7 +477,7 @@ public class PlayerCodeParser {
                 case 'T':
 // Offset number by start of Tie
                     for(int tieStart = 0 ; tieStart < PlayerRRScore.size()-1 ; tieStart++){
-                        if(PlayerRRScore.get(tieStart).Place == PlayerRRScore.get(tieStart+1).Place ){
+                        if(PlayerRRScore.get(tieStart).place == PlayerRRScore.get(tieStart+1).place ){
                             number = number + tieStart;
                             break;
                         }
@@ -358,19 +487,19 @@ public class PlayerCodeParser {
                     isTie = false;
                     if(PlayerRRScore.size() >= number){
                         if(PlayerRRScore.size() > number){
-                            if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number).Place ){
+                            if(PlayerRRScore.get(number-1).place == PlayerRRScore.get(number).place ){
                                 isTie = true;
                             }
                         }
                         if (number > 1){
-                            if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number-2).Place ){
+                            if(PlayerRRScore.get(number-1).place == PlayerRRScore.get(number-2).place ){
                                 isTie = true;
                             }
                         }
                     }
                     if(isTie){
                         fightPlayer.type = PlayerType.NORMAL;
-                        fightPlayer.playerPoolInfo = getPlayerPoolInfo(PlayerRRScore.get(number-1).PlayerID);
+                        fightPlayer.playerPoolInfo = getPlayerPoolInfo(PlayerRRScore.get(number-1).playerID);
                         fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
                         if(fightPlayer.playerPoolInfo.isWithdrawn())
                             fightPlayer.type = PlayerType.BYE;
@@ -384,12 +513,12 @@ public class PlayerCodeParser {
 // Check for Tie with another player
                     isTie = false;
                     if(PlayerRRScore.size() > number){
-                        if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number).Place ){
+                        if(PlayerRRScore.get(number-1).place == PlayerRRScore.get(number).place ){
                             isTie = true;
                         }
                     }
                     if (number>1){
-                        if(PlayerRRScore.get(number-1).Place == PlayerRRScore.get(number-2).Place ){
+                        if(PlayerRRScore.get(number-1).place == PlayerRRScore.get(number-2).place ){
                             isTie = true;
                         }
                     }
@@ -398,7 +527,7 @@ public class PlayerCodeParser {
                         return fightPlayer;
                     } else {
                         fightPlayer.type = PlayerType.NORMAL;
-                        fightPlayer.playerPoolInfo = getPlayerPoolInfo(PlayerRRScore.get(number-1).PlayerID);
+                        fightPlayer.playerPoolInfo = getPlayerPoolInfo(PlayerRRScore.get(number-1).playerID);
                         fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
                         return fightPlayer;
                     }
@@ -408,12 +537,9 @@ public class PlayerCodeParser {
                     return fightPlayer;
             }
         }
-//        throw new RuntimeException("I'm not implemented yet!");
-        fightPlayer.type = PlayerType.ERROR;
-        return fightPlayer;
     }
 
-    private List<PlayerRRScore> roundRobinResults(CodeType codeType, List<FightInfo> roundRobinFightInfoList) {
+    private List<PlayerRRScore> roundRobinScores(List<FightInfo> roundRobinFightInfoList) {
 
 //Add all playerPoolInfoList in fights to map
         Map<Integer,PlayerRRScore> playerRRScoresMap = new HashMap<Integer,PlayerRRScore>();
@@ -425,14 +551,15 @@ public class PlayerCodeParser {
                 parseCode(codes[1])
             };
             for(FightPlayer fightPlayer : fightPlayers){
-                if (!playerRRScoresMap.containsKey(fightPlayer.player.getID())){
+                if (fightPlayer.player != null && !playerRRScoresMap.containsKey(fightPlayer.player.getID())){
                     PlayerRRScore playerRRScore = new PlayerRRScore();
-                    playerRRScore.PlayerID = fightPlayer.player.getID();
-                    playerRRScore.PlayerPos2 = fightPlayer.playerPoolInfo.getPlayerPool().getPlayerPosition2();
-                    playerRRScore.Wins = 0;
-                    playerRRScore.Points = 0;
-                    playerRRScore.Place = 0;
-                    playerRRScoresMap.put(playerRRScore.PlayerID,playerRRScore);
+                    playerRRScore.playerID = fightPlayer.player.getID();
+                    playerRRScore.playerPos1 = fightPlayer.playerPoolInfo.getPlayerPool().getPlayerPosition();
+                    playerRRScore.playerPos2 = fightPlayer.playerPoolInfo.getPlayerPool().getPlayerPosition2();
+                    playerRRScore.wins = 0;
+                    playerRRScore.points = 0;
+                    playerRRScore.place = 0;
+                    playerRRScoresMap.put(playerRRScore.playerID,playerRRScore);
                 }
             }
         }
@@ -441,50 +568,105 @@ public class PlayerCodeParser {
         for(FightInfo fightInfo : roundRobinFightInfoList) {
             if(fightInfo.resultKnown()){
                 int winningPlayerSimpleScore = fightInfo.getWinningPlayerSimpleScore(configurationFile);
-                PlayerRRScore playerRRScore = playerRRScoresMap.get(fightInfo.getWinningPlayerID());
-                playerRRScore.Wins = playerRRScore.Wins+1;
-                playerRRScore.Points = playerRRScore.Points + winningPlayerSimpleScore;
-                playerRRScoresMap.put(fightInfo.getWinningPlayerID(), playerRRScore);
+                PlayerRRScore winPlayerRRScore = playerRRScoresMap.get(fightInfo.getWinningPlayerID());
+                winPlayerRRScore.wins = winPlayerRRScore.wins+1;
+                winPlayerRRScore.points = winPlayerRRScore.points + winningPlayerSimpleScore;
+                playerRRScoresMap.put(fightInfo.getWinningPlayerID(), winPlayerRRScore);
+                winPlayerRRScore.fightPoints.put(fightInfo.getLosingPlayerID(),winningPlayerSimpleScore);
+                playerRRScoresMap.put(fightInfo.getWinningPlayerID(), winPlayerRRScore);
+
+                PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightInfo.getLosingPlayerID());
+                losePlayerRRScore.fightPoints.put(fightInfo.getWinningPlayerID(),0);
+                playerRRScoresMap.put(fightInfo.getLosingPlayerID(), losePlayerRRScore);
             } else {
                 String[] codes = fightInfo.getAllPlayerCode();
                 FightPlayer[] fightPlayers = new FightPlayer[] {
                     parseCode(codes[0]),
                     parseCode(codes[1])
                 };
-                if(fightPlayers[0].playerPoolInfo.isWithdrawn() ^ fightPlayers[1].playerPoolInfo.isWithdrawn()){
+                if(fightPlayers[0].playerPoolInfo != null && fightPlayers[1].playerPoolInfo != null && fightPlayers[0].playerPoolInfo.isWithdrawn() ^ fightPlayers[1].playerPoolInfo.isWithdrawn()){
                     if(fightPlayers[0].playerPoolInfo.isWithdrawn()){
-                        PlayerRRScore playerRRScore = playerRRScoresMap.get(fightPlayers[1].player.getID());
-                        playerRRScore.Wins = playerRRScore.Wins+1;
-                        playerRRScore.Points = playerRRScore.Points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
-                        playerRRScoresMap.put(fightPlayers[1].player.getID(), playerRRScore);
+                        PlayerRRScore winPlayerRRScore = playerRRScoresMap.get(fightPlayers[1].player.getID());
+                        winPlayerRRScore.wins = winPlayerRRScore.wins+1;
+                        winPlayerRRScore.points = winPlayerRRScore.points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+                        playerRRScoresMap.put(fightPlayers[1].player.getID(), winPlayerRRScore);
+
+                        PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightPlayers[0].player.getID());
+                        losePlayerRRScore.fightPoints.put(fightPlayers[1].player.getID(),0);
+                        playerRRScoresMap.put(fightPlayers[0].player.getID(), losePlayerRRScore);
 
                     }else if(fightPlayers[1].playerPoolInfo.isWithdrawn()){
-                        PlayerRRScore playerRRScore = playerRRScoresMap.get(fightPlayers[0].player.getID());
-                        playerRRScore.Wins = playerRRScore.Wins+1;
-                        playerRRScore.Points = playerRRScore.Points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
-                        playerRRScoresMap.put(fightPlayers[0].player.getID(), playerRRScore);
+                        PlayerRRScore winPlayerRRScore = playerRRScoresMap.get(fightPlayers[0].player.getID());
+                        winPlayerRRScore.wins = winPlayerRRScore.wins+1;
+                        winPlayerRRScore.points = winPlayerRRScore.points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+                        playerRRScoresMap.put(fightPlayers[0].player.getID(), winPlayerRRScore);
+
+                        PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightPlayers[1].player.getID());
+                        losePlayerRRScore.fightPoints.put(fightPlayers[0].player.getID(),0);
+                        playerRRScoresMap.put(fightPlayers[1].player.getID(), losePlayerRRScore);
                     }
                 }
             }
         }
-        
-//Convert mat to a list for sorting
+
+//Convert map to a list for sorting
         List<PlayerRRScore> playerRRScoresList = new ArrayList<PlayerRRScore>();
         for(Integer playerID : playerRRScoresMap.keySet()) {
             playerRRScoresList.add(playerRRScoresMap.get(playerID));
         }
 
+//Sort List
+        Collections.sort(playerRRScoresList, PLAYERS_POS1_COMPARATOR_RR);
+
+        return playerRRScoresList;
+    }
+
+    public Context roundRobinContext(String code, Context c) {
+
+                                           // e.g. RBT2-3-4-5
+        String prefix = getPrefix(code);   //      RBT
+        int number = getNumber(code);      //      2
+        int[] params = getParameters(code);//      3,4,5
+
+        List<FightInfo> roundRobinFightInfoList = getRRFightList(code);
+        List<PlayerRRScore> playerRRScoresList = roundRobinScores(roundRobinFightInfoList);
+        Collections.sort(playerRRScoresList, PLAYERS_POS1_COMPARATOR_RR);
+
+        for(int i = 0; i < playerRRScoresList.size(); i++ ){
+            PlayerRRScore playerRRScores = playerRRScoresList.get(i);
+            PlayerPoolInfo playerPoolInfo = getPlayerPoolInfo(playerRRScores.playerID);
+            Player player = playerPoolInfo.getPlayer();
+            if(playerPoolInfo.isWithdrawn())
+                c.put("R" + prefix.charAt(1) + "P" + (i+1) , player.getLastName() + ", " + player.getFirstName() + " (FG)" );
+            else
+                c.put("R" + prefix.charAt(1) + "P" + (i+1) , player.getLastName() + ", " + player.getFirstName() );
+            
+            c.put("R" + prefix.charAt(1) + "PRegion" + (i+1) , player.getTeam() + " (" + player.getShortGrade() + ")" );
+            for(int j = 0; j < playerRRScoresList.size(); j++ ){
+                if(i !=j && playerRRScores.fightPoints.get(playerRRScoresList.get(j).playerID) != null)
+                    c.put("R" + prefix.charAt(1) + "P" + (i+1) + "P" + (j+1) , playerRRScores.fightPoints.get(playerRRScoresList.get(j).playerID)+"" );
+            }
+            c.put("R" + prefix.charAt(1) + "Wins" + (i+1) , playerRRScores.wins+"" );
+            c.put("R" + prefix.charAt(1) + "Points" + (i+1) , playerRRScores.points+"" );
+        }
+        return c;
+    }
+
+    private List<PlayerRRScore> roundRobinResults(CodeType codeType, List<FightInfo> roundRobinFightInfoList) {
+
+        List<PlayerRRScore> playerRRScoresList = roundRobinScores(roundRobinFightInfoList);
+
         Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_RR;
-        Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR = PLAYERS_POS_COMPARATOR_RR;
-        if(codeType == CodeType.ROUNDROBIN){
+        Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR = PLAYERS_POS2_COMPARATOR_RR;
+        if(codeType == CodeType.BESTOFTHREE){
             PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_BT;
             PLAYERS_POS_COMPARATOR = PLAYERS_POS_COMPARATOR_BT;
         }
-        
+
 //Sort List
         Collections.sort(playerRRScoresList, PLAYERS_SCORE_COMPARATOR);
-        
-        
+
+
 //find equals
         List<PlayerRRScore> playerRRTieList = new ArrayList<PlayerRRScore>();
         int i = 0;
@@ -502,7 +684,7 @@ public class PlayerCodeParser {
 // Detect all withdrawn
             boolean allWithdrawn = true;
             for(PlayerRRScore playerRRTie : playerRRTieList){
-                if(!getPlayerPoolInfo(playerRRTie.PlayerID).isWithdrawn()){
+                if(!getPlayerPoolInfo(playerRRTie.playerID).isWithdrawn()){
                     allWithdrawn = false;
                     break;
                 }
@@ -510,13 +692,13 @@ public class PlayerCodeParser {
 
 // Are ZERO players tied?
             if(playerRRTieList.isEmpty()){
-                playerRRScoresList.get(i).Place = i;
+                playerRRScoresList.get(i).place = i;
 
 // Are ALL players tied?
             } else if(playerRRScoresList.size()==playerRRTieList.size()){   //if all equal return place = 0
 
                 for(int k = 0; k < playerRRScoresList.size(); k++){
-                    playerRRScoresList.get(k).Place = 0;
+                    playerRRScoresList.get(k).place = 0;
                 }
                 Collections.sort(playerRRScoresList, PLAYERS_POS_COMPARATOR);
                 return playerRRScoresList;
@@ -524,7 +706,7 @@ public class PlayerCodeParser {
 // Are all players witdhrawn
             }else if(allWithdrawn){
                 for(int k = i; k <= j; k++){
-                    playerRRScoresList.get(k).Place = j;
+                    playerRRScoresList.get(k).place = j;
                 }
 // Are SOME players tied?
             }else{
@@ -538,7 +720,7 @@ public class PlayerCodeParser {
                             parseCode(codes[0]),
                             parseCode(codes[1])
                         };
-                        if(playerRRTieList.get(k).PlayerID == fightPlayers[0].player.getID() || playerRRTieList.get(k).PlayerID == fightPlayers[1].player.getID()){
+                        if(playerRRTieList.get(k).playerID == fightPlayers[0].player.getID() || playerRRTieList.get(k).playerID == fightPlayers[1].player.getID()){
                             matchedIDs++;
                         }
                     }
@@ -547,7 +729,7 @@ public class PlayerCodeParser {
                 }
                 playerRRTieList = roundRobinResults(codeType, pairsOfFightInfoList);
                 for(int k = 0; k < playerRRTieList.size(); k++){
-                    playerRRTieList.get(k).Place = playerRRTieList.get(k).Place+i;
+                    playerRRTieList.get(k).place = playerRRTieList.get(k).place+i;
                     playerRRScoresList.set(i+k, playerRRTieList.get(k));
                 }
                 i = i + playerRRTieList.size()-1;
@@ -555,7 +737,7 @@ public class PlayerCodeParser {
 
             i++;
         }
-        
+
         return playerRRScoresList;
     }
 
@@ -740,6 +922,7 @@ public class PlayerCodeParser {
     private List<PlayerPoolInfo> playerInfoList;
     private List<FightInfo> fightInfoList;
     private ConfigurationFile configurationFile;
+    Map<String,FightPlayer> parseredCodes = new HashMap<String,FightPlayer>();
 
     private PlayerCodeParser(Database database, int poolID) {
         playerInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
@@ -760,5 +943,9 @@ public class PlayerCodeParser {
 
     public static FightPlayer parseCode(Database database, String code, int poolID) throws DatabaseStateException {
         return PlayerCodeParser.getInstance(database, poolID).parseCode(code);
+    }
+
+    public static Context getRRResults(Database database, String code, int poolID, Context c) throws DatabaseStateException {
+        return PlayerCodeParser.getInstance(database, poolID).roundRobinContext(code, c);
     }
 }
