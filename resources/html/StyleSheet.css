@@ -252,6 +252,23 @@ table td.borderSquarePlayerNo2 {
     font-weight: bold;
 }
 
+table td.borderSquareTitleF {
+    border: 2px solid black;
+    background-color: gold;
+    width: 2.5em;
+    height: 2.5em;
+    text-align: center;
+}
+
+table td.borderSquarePlayerNoF {
+    border: 2px solid black;
+    background-color:  yellow;
+    width: 2.5em;
+    height: 2.5em;
+    text-align: center;
+    font-weight: bold;
+}
+
 table td.borderFightNumber1 {
     border: 2px solid black;
     background:orange;
@@ -261,6 +278,12 @@ table td.borderFightNumber1 {
 table td.borderFightNumber2 {
     border: 2px solid black;
     background:mediumseagreen;
+    border-width: 2px;
+}
+
+table td.borderFightNumberF {
+    border: 2px solid black;
+    background:yellow;
     border-width: 2px;
 }
 
