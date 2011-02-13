@@ -75,7 +75,7 @@
     <target name="-post-clean">
     </target>
 
-    <property name="nsis.dir" value="C:/Program Files/NSIS"/>
+    <property name="nsis.dir" value="C:/Program Files (x86)/NSIS"/>
 
     <target name="build-installer" description="Create Installer" depends="clean,jar">
       <exec executable="${nsis.dir}/makensis.exe">

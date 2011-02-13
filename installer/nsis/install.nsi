@@ -1,14 +1,14 @@
-Name "Event Manager 2011 Update 1"
+Name "Event Manager 2011 Update 2"
 Caption "Event Manager"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2011u1.exe"
+OutFile "EventManagerSetup-2011u2.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
 
 InstallDir $PROGRAMFILES\EventManager
 
-DirText "This will install EventManager 2011 Update 1 on your computer."
+DirText "This will install EventManager 2011 Update 2 on your computer."
 
 Section ""
   SetOutPath $INSTDIR
@@ -60,8 +60,8 @@ Section "Install Java"
 
   installjava:
 
-  File ..\thirdparty\jre-6u22-windows-i586-s.exe
-  ExecWait "$INSTDIR\jre-6u22-windows-i586-s.exe"
+  File ..\thirdparty\jre-6u23-windows-i586-s.exe
+  ExecWait "$INSTDIR\jre-6u23-windows-i586-s.exe"
 
   installjavadone:
 
