@@ -331,10 +331,10 @@ public class PlayerCodeParser {
                 parseCode(codes[1])
             };
             if(fightPlayers[0].type != PlayerType.BYE && fightPlayers[1].type != PlayerType.BYE){
-                if(!fightInfo.resultKnown()) {
-                    roundRobinFightInfoList.clear();
-                    return roundRobinFightInfoList;
-                }
+//                if(!fightInfo.resultKnown()) {
+//                    roundRobinFightInfoList.clear();
+//                    return roundRobinFightInfoList;
+//                }
                 roundRobinFightInfoList.add(fightInfo);
                 if(fightPlayers[0].type != PlayerType.UNDECIDED && !allPlayerIDs.contains(fightPlayers[0].player.getID())){
                     allPlayerIDs.add(fightPlayers[0].player.getID());
