@@ -277,7 +277,9 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         List<Player> players = database.findAll(Player.class, PlayerDAO.ALL);
         Collections.sort(players, new Comparator<Player>() {
             public int compare(Player p1, Player p2) {
-                return p1.getFirstName().compareTo(p2.getFirstName());
+                String n1 = p1.getLastName() + p1.getFirstName();
+                String n2 = p2.getLastName() + p2.getFirstName();
+                return n1.compareTo(n2);
             }
         });
 
