@@ -38,6 +38,7 @@ public class PlayerCodeParser {
     static String matcherWinnerLooser = "[LW]+";
     static String matcherRoundRobin = "RAP?|RAT?|RBT?|RBP?|RFT?|RFP?";
     static String matcherBestOfThree = "TAP?|TAT?";
+    static String matcherTieBreak = "RAT?|RBT?|RFT?|TAT?";
     private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT?|RBP?|RBT?|RFP?|RFT?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
     
     public static enum PlayerType {
@@ -201,15 +202,6 @@ public class PlayerCodeParser {
         }
     }
 
-    private PlayerPoolInfo getPlayerPoolInfo(int playerID) {
-        for(PlayerPoolInfo playerPoolInfo: playerInfoList ){
-            if(playerPoolInfo != null && playerPoolInfo.getPlayer().getID() == playerID){
-                return playerPoolInfo;
-            }
-        }
-        return null;
-    }
-
     public static CodeInfo getCodeInfo(String code) {
         CodeInfo codeInfo = new CodeInfo();
         codeInfo.code = code;
@@ -244,19 +236,26 @@ public class PlayerCodeParser {
         return codes;
     }
 
+    public static boolean isTieBreak(String code) {
+        if(!isValidCode(code)){
+            return false;
+        }
+        String prefix = getPrefix(code);      //      RBT
+        return prefix.matches(matcherPlayer);
+    }
+
+    private PlayerPoolInfo getPlayerPoolInfo(int playerID) {
+        for(PlayerPoolInfo playerPoolInfo: playerInfoList ){
+            if(playerPoolInfo != null && playerPoolInfo.getPlayer().getID() == playerID){
+                return playerPoolInfo;
+            }
+        }
+        return null;
+    }
+
     public FightPlayer parseCode(String code) {
         if(playerInfoList == null || playerInfoList.isEmpty())
             throw new IllegalArgumentException("Must supply a non-empty list of PlayerPoolInfos");
-        
-//System.out.println(code);
-//if(code.contentEquals("RAT1-1-2-3")){
-//    for(PlayerPoolInfo playerPoolInfo : playerInfoList) {
-//        if(playerPoolInfo != null) {
-//System.out.println(playerPoolInfo.getPool().getDescription());
-//            break;
-//        }
-//    }
-//}
 
         String[] codes = getORCodes(code);
         
@@ -915,6 +914,63 @@ public class PlayerCodeParser {
             }
         }
         return true;
+    }
+
+    public boolean isSameTeam(String[] codes) {
+        if(!isValidCode(codes[0]) || !isValidCode(codes[1])){
+            return false;
+        }
+        System.out.print(codes);
+        FightPlayer fightPlayer0 = parseCode(codes[0]);
+        FightPlayer fightPlayer1 = parseCode(codes[1]);
+        if(fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.player != null && fightPlayer1.player != null)
+            return fightPlayer0.player.getTeam().equalsIgnoreCase(fightPlayer1.player.getTeam());
+        else
+            return false;
+    }
+
+    public ArrayList<Integer> getDependentFights(int fightPosition) {
+        ArrayList<Integer> dependentFights = new ArrayList<Integer>();
+        dependentFights.add(fightPosition);
+
+        for(String code : fightInfoList.get(fightPosition-1).getAllPlayerCode()) {
+            List<Integer> ascendantNumbers = PlayerCodeParser.getAscendant(code);
+            for(Integer ascendantNumber : ascendantNumbers) {
+                dependentFights.addAll(getDependentFights(ascendantNumber));
+            }
+        }
+
+        return dependentFights;
+    }
+
+    public ArrayList<Integer> getSameTeamFights() {
+        ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
+
+        for(FightInfo fightInfo : fightInfoList) {
+            String[] codes = fightInfo.getAllPlayerCode();
+            if(isSameTeam(codes))
+                sameTeamFights.add(fightInfo.getFightPostion());
+        }
+
+        return sameTeamFights;
+    }
+
+    public boolean hasCommonPlayers(int[] fightPositions) {
+        int i = fightPositions[0];
+        int j = fightPositions[1];
+        if(i < j) { int k = i; i = j; j = k; } //swap
+
+        for(String code : fightInfoList.get(i-1).getAllPlayerCode()) {
+            if(PlayerCodeParser.getPrefix(code).equals("P")) {
+                for(String code2 : fightInfoList.get(j-1).getAllPlayerCode())
+                    if(code.equals(code2)) return true;
+            } else {
+                int n = PlayerCodeParser.getNumber(code);
+                if(n == j) return true;
+            }
+        }
+
+        return false;
     }
     
     /* Parser instance stuff */

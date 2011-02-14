@@ -28,6 +28,8 @@ import au.com.jwatmuff.eventmanager.util.IDGenerator;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Collection;
 import org.apache.log4j.Logger;
 
@@ -101,15 +103,22 @@ public class SessionLocker {
     private static void assignFights(Database database, Session session) {
         int pos = 1;
         boolean isBye = false;
-
-        for(Pool pool : database.findAll(Pool.class, PoolDAO.FOR_SESSION, session.getID())) {
-            for(Fight fight : database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID())) {
+        ArrayList<Pool> pools = new ArrayList<Pool>(database.findAll(Pool.class, PoolDAO.FOR_SESSION, session.getID()));
+        Collections.sort(pools, SessionFightSequencer.POOL_COMPARATOR);
+        for(Pool pool : pools) {
+            PlayerCodeParser playerCodeParser = PlayerCodeParser.getInstance(database, pool.getID());
+            ArrayList<Fight> fights = new ArrayList<Fight>(database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID()));
+            ArrayList<Fight> newFights = new ArrayList<Fight>();
+            for(Fight fight : fights) {
+                if(playerCodeParser.isSameTeam(fight.getPlayerCodes())){
+                    newFights.add(fight);
+                }
+            }
+            fights.removeAll(newFights);
+            newFights.addAll(fights);
+            for(Fight fight : newFights) {
 //                if fight isn't bye Add them to the session
                 isBye = false;
-                
-                // I'm not sure this needs to be re-initialized ever iteration of the loop
-                // Performance could be an issue
-                PlayerCodeParser playerCodeParser = PlayerCodeParser.getInstance(database, pool.getID());
 
                 for(int i = 0; i < 2; i++) {
                     String code = fight.getPlayerCodes()[i];

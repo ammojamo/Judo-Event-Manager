@@ -125,6 +125,7 @@ public class PoolPlayerSequencer {
 
         return dependentFights;
     }
+
     public static ArrayList<Integer> getSameTeamFights(Database database, int poolID) {
         PoolPlayerSequencer pps = getInstance(database);
         PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);

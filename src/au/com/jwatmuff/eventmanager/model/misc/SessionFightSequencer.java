@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 public class SessionFightSequencer {
     private static final Logger log = Logger.getLogger(SessionFightSequencer.class);
 
-    private static final Comparator<SessionFightInfo> Fight_COMPARATOR = new Comparator<SessionFightInfo>() {
+    public static final Comparator<SessionFightInfo> Fight_COMPARATOR = new Comparator<SessionFightInfo>() {
         @Override
         public int compare(SessionFightInfo sf1, SessionFightInfo sf2) {
             Fight f1 = sf1.getFight();
@@ -43,7 +43,7 @@ public class SessionFightSequencer {
         }
     };
 
-    private static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
+    public static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
         @Override
         public int compare(Pool p1, Pool p2) {
             if(p1.getMaximumAge() == p2.getMaximumAge()){
@@ -90,26 +90,31 @@ public class SessionFightSequencer {
 
         int n = fights.size();
         Map<SessionFightInfo,ArrayList<Player>> possiblePlayersInFights = new HashMap<SessionFightInfo,ArrayList<Player>>();
+        Map<Integer,PlayerCodeParser> playerCodeParser = new HashMap<Integer,PlayerCodeParser>();
         for(int i = 0; i < n; i++) {
             SessionFightInfo sFI = fights.get(i);
             Fight f = fights.get(i).getFight();
             ArrayList<Player> possiblePlayersF = PoolPlayerSequencer.getPossiblePlayers(database,  f.getPoolID(), f.getPosition());
             possiblePlayersInFights.put(sFI,possiblePlayersF);
+            if(!playerCodeParser.containsKey(f.getPoolID())){
+                playerCodeParser.put(f.getPoolID(), PlayerCodeParser.getInstance(database, f.getPoolID()));
+            }
         }
 
         while(spacing >= 1) {
-            autoOrder(database, fights, possiblePlayersInFights, spacing, false);
-            autoOrder(database, fights, possiblePlayersInFights, spacing, true);
-            autoOrder(database, fights, possiblePlayersInFights, spacing, false);
+            autoOrder(database, fights, playerCodeParser, possiblePlayersInFights, spacing, false);
+            autoOrder(database, fights, playerCodeParser, possiblePlayersInFights, spacing, true);
+            autoOrder(database, fights, playerCodeParser, possiblePlayersInFights, spacing, false);
             spacing--;
         }
     }
     
-    public static void autoOrder(Database database, List<SessionFightInfo> fights, Map<SessionFightInfo,ArrayList<Player>> possiblePlayersInFights, int spacing, boolean up) {
+    public static void autoOrder(Database database, List<SessionFightInfo> fights, Map<Integer,PlayerCodeParser> playerCodeParser, Map<SessionFightInfo,ArrayList<Player>> possiblePlayersInFights, int spacing, boolean up) {
 
         log.debug("Auto-order: " + (up?"UP":"DOWN") + ", spacing " + spacing);
 
         int n = fights.size();
+        int spacingAfterTie = spacing;
         for(int i = 1; i < n; i++) {
 
             for(int j = i; j < n; j++) {
@@ -120,10 +125,13 @@ public class SessionFightSequencer {
                 boolean positionOk = true;
 
 // Does fight f1 have a player that has already had a fight in the previous spacing fights
-                for(int k = 1; k <= spacing && i-k >= 0; k++) {
+                spacingAfterTie = spacing;
+                for(int k = 1; k <= spacingAfterTie && i-k >= 0; k++) {
                     Fight f2 = fights.get(up?n-(i-k)-1:i-k).getFight();
+                    if(PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[0]) || PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[1]))
+                        spacingAfterTie = spacingAfterTie + 1;
                     if(f1.getPoolID() == f2.getPoolID() &&
-                       PoolPlayerSequencer.hasCommonPlayers(database, f1.getPoolID(), new int[] { f1.getPosition(), f2.getPosition() })) {
+                            playerCodeParser.get(f1.getPoolID()).hasCommonPlayers(new int[] { f1.getPosition(), f2.getPosition() })){
                         // means that fight f1 is NOT in an ok position
                         positionOk = false;
                         break;
@@ -132,7 +140,7 @@ public class SessionFightSequencer {
 
 // If F1 is moved to i, will to be moved before a fight with two team mates
                 if(positionOk) {
-                    ArrayList<Integer> sameTeamFights =  PoolPlayerSequencer.getSameTeamFights(database,  f1.getPoolID());
+                    ArrayList<Integer> sameTeamFights = playerCodeParser.get(f1.getPoolID()).getSameTeamFights();
                     if(!up) {
                         if(!sameTeamFights.contains(f1.getPosition())){
                             for(int l = i; l < j; l++) {
@@ -163,7 +171,7 @@ public class SessionFightSequencer {
 // If F1 is moved to i, will it be moved before a fight it is dependent on.
                 if(positionOk) {
                     if(!up) {
-                        ArrayList<Integer> dependentFights =  PoolPlayerSequencer.getDependentFights(database,  f1.getPoolID(), f1.getPosition());
+                        ArrayList<Integer> dependentFights = playerCodeParser.get(f1.getPoolID()).getDependentFights(f1.getPosition());
                         for(int l = i; l < j; l++) {
                             Fight f2 = fights.get(up?n-l-1:l).getFight();
                             if(f1.getPoolID() == f2.getPoolID() && dependentFights.contains(f2.getPosition())) {
@@ -176,7 +184,7 @@ public class SessionFightSequencer {
                         for(int l = i; l < j; l++) {
                             Fight f2 = fights.get(up?n-l-1:l).getFight();
                             if(f1.getPoolID() == f2.getPoolID()) {
-                                ArrayList<Integer> dependentFights =  PoolPlayerSequencer.getDependentFights(database,  f2.getPoolID(), f2.getPosition());
+                                ArrayList<Integer> dependentFights = playerCodeParser.get(f2.getPoolID()).getDependentFights(f2.getPosition());
                                 if(dependentFights.contains(f1.getPosition())) {
                                     // means that fight in position l is dependent on fight at position j
                                     positionOk = false;
@@ -189,10 +197,13 @@ public class SessionFightSequencer {
 
 // Could the two fights possibly share the same player even if from a different division.
                 if(positionOk) {
-                pPCheck:
-                    for(int l = j-1; l >= i-spacing && l >= 0; l--) {
+                    spacingAfterTie = spacing;
+                    pPCheck:
+                    for(int l = j-1; l >= i-spacingAfterTie && l >= 0; l--) {
                         SessionFightInfo sFI2 = fights.get(up?n-l-1:l);
                         Fight f2 = sFI2.getFight();
+                        if(PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[0]) || PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[1]))
+                            spacingAfterTie = spacingAfterTie + 1;
                         if(f1.getPoolID() != f2.getPoolID()) {
                             ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
                             ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
@@ -417,7 +428,6 @@ public class SessionFightSequencer {
                 //SessionFightSequencer.saveFightSequence(database, precedingFights, true);                
     }
 
-    
     public static List<SessionFightInfo> getFightSequence(Database database, int sessionID) {
         Session session = database.get(Session.class, sessionID);
         List<SessionFightInfo> fights = new ArrayList<SessionFightInfo>(SessionFightInfo.getForSession(database, session));
