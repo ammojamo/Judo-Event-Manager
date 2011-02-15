@@ -126,6 +126,10 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
         while(i++ < 64) { //TODO: this should not be an arbitrary limit
             c.put("player" + i, "BYE");
         }
+            
+            PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
+
+            Set<String> codes = new HashSet<String>();
 
 //Print the draw fight number or the mat fight number
 
@@ -139,6 +143,19 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
         }
 
         List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
+            /* add all codes used in any fights */
+            for(Fight fight : fights) {
+                codes.addAll(Arrays.asList(fight.getPlayerCodes()));
+            }
+//Look for round robins and print them
+
+            for(String code : codes) {
+                CodeInfo codeInfo = PlayerCodeParser.getCodeInfo(code);
+                if(codeInfo.type == CodeType.ROUNDROBIN){
+                    c = parser.roundRobinContext(codeInfo.code, c, showResults);
+                }
+            }
+            
         /* add fight numbers */
         if(showResults && divisionAssignedToSession) {
             List<String> matNames = new ArrayList<String>();
@@ -172,13 +189,6 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
 //Add and convert the draw codes to player names. Adds WX and LX codes for individual fight results.
 
         if(showResults) {
-            PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
-
-            Set<String> codes = new HashSet<String>();
-            /* add all codes used in any fights */
-            for(Fight fight : fights) {
-                codes.addAll(Arrays.asList(fight.getPlayerCodes()));
-            }
             /* add winner and loser codes for all fights */
             for(i = 1; i <= fights.size(); i++) {
                 codes.add("W" + i);
@@ -268,92 +278,6 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
                     c.put("result_" + i, results.get(0).getScores()[0].displayString() + " / " + results.get(0).getScores()[1].displayString() + "  " + results.get(0).getDurationString());
                 }
             }
-            
-//Look for round robins
-
-            Map<Character,int[]> roundRobinMap = new HashMap<Character,int[]>();
-            for(String code : codes) {
-                CodeInfo codeInfo = PlayerCodeParser.getCodeInfo(code);
-                if(codeInfo.type == CodeType.ROUNDROBIN){
-                    c = parser.roundRobinContext(codeInfo.code,c);
-//                    if(!roundRobinMap.containsKey(codeInfo.prefix.charAt(1)))
-//                        roundRobinMap.put(codeInfo.prefix.charAt(1), codeInfo.params);
-                }
-            }
-            
-//Print results of round robin fights
-            
-//            for(Character roundRobinPnt : roundRobinMap.keySet() ){
-//
-//                Map<Integer,Integer> wins = new HashMap<Integer,Integer>();
-//                Map<Integer,Integer> points = new HashMap<Integer,Integer>();
-//                for(PlayerPoolInfo player : playerPoolInfoList) {
-//                    if(player!=null){
-//                        if(!wins.containsKey(player.getPlayer().getID()))
-//                            wins.put(player.getPlayer().getID(), 0);
-//                        if(!points.containsKey(player.getPlayer().getID()))
-//                            points.put(player.getPlayer().getID(), 0);
-//                    }
-//                }
-
-//                for(int fightNumber : roundRobinMap.get(roundRobinPnt)) {
-//                    List<Result> results = database.findAll(Result.class, ResultDAO.FOR_FIGHT, fights.get(fightNumber-1).getID());
-//                    if(!results.isEmpty()) {
-//                        int[] scores = results.get(0).getSimpleScores(database);
-//                        int[] ids = results.get(0).getPlayerIDs();
-//
-//                        c.put("R" + roundRobinPnt + fightNumber + "P1", scores[0]);
-//                        c.put("R" + roundRobinPnt + fightNumber + "P2", scores[1]);
-//                                System.out.println("R" + roundRobinPnt + fightNumber + "P1 -- " + scores[0] + " ---- R" + roundRobinPnt + fightNumber + "P2 -- " + scores[1]);
-//
-//                        if(scores[0] > scores[1]) {
-//                            wins.put(ids[0],wins.get(ids[0])+1);
-//                            points.put(ids[0],points.get(ids[0])+scores[0]);
-//                        } else {
-//                            wins.put(ids[1],wins.get(ids[1])+1);
-//                            points.put(ids[1],points.get(ids[1])+scores[1]);
-//                        }
-//                    } else {
-//// Check for withdrawal and print results
-//                        String[] fightCodes = fights.get(fightNumber-1).getPlayerCodes();
-//                        FightPlayer[] fightPlayers = new FightPlayer[] {
-//                            parser.parseCode(fightCodes[0]),
-//                            parser.parseCode(fightCodes[1])
-//                        };
-//                        if(fightPlayers[0].playerPoolInfo != null && fightPlayers[1].playerPoolInfo != null && (fightPlayers[0].playerPoolInfo.isWithdrawn() ^ fightPlayers[1].playerPoolInfo.isWithdrawn())){
-//                            int score = configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
-//                            if(fightPlayers[0].playerPoolInfo.isWithdrawn()){
-//                                wins.put(fightPlayers[1].player.getID(),wins.get(fightPlayers[1].player.getID())+1);
-//                                points.put(fightPlayers[1].player.getID(),points.get(fightPlayers[1].player.getID())+score);
-//
-//                                c.put("R" + roundRobinPnt + fightNumber + "P1", 0);
-//                                c.put("R" + roundRobinPnt + fightNumber + "P2", score);
-//                                System.out.println("R" + roundRobinPnt + fightNumber + "P2 -- " + score);
-//
-//                            }else if(fightPlayers[1].playerPoolInfo.isWithdrawn()){
-//                                wins.put(fightPlayers[0].player.getID(),wins.get(fightPlayers[0].player.getID())+1);
-//                                points.put(fightPlayers[0].player.getID(),points.get(fightPlayers[0].player.getID())+score);
-//
-//                                c.put("R" + roundRobinPnt + fightNumber + "P1", score);
-//                                c.put("R" + roundRobinPnt + fightNumber + "P2", 0);
-//                                System.out.println("R" + roundRobinPnt + fightNumber + "P1 -- " + score);
-//                            }
-//                        }
-//                    }
-//                }
-
-//Adds total wins and points
-
-//                i = 0;
-//                for(PlayerPoolInfo playerPoolInfo : playerPoolInfoList) {
-//                    i++;
-//                    if(playerPoolInfo!=null){
-//                        Player player = playerPoolInfo.getPlayer();
-//                        c.put("R" + roundRobinPnt + "Wins" + i , wins.get(player.getID()) );
-//                        c.put("R" + roundRobinPnt + "Points" + i , points.get(player.getID()) );
-//                    }
-//                }
-//            }
 
         }
         c.put("fullDocument", fullDocument);

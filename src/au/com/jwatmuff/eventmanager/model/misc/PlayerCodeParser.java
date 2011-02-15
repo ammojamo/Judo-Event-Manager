@@ -15,6 +15,7 @@ import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -154,6 +155,25 @@ public class PlayerCodeParser {
         else
             throw new IllegalArgumentException("Invalid player code: " + code);
     }
+
+    public static int[] getParameters(String code) {
+        String[] orCodes = getORCodes(code);
+        Matcher matcher = codePattern.matcher(orCodes[0]);
+        if(matcher.matches()) {
+            if(matcher.groupCount() >= 3) {
+                String[] paramsStr = matcher.group(3).split("-");
+                int[] params = new int[paramsStr.length];
+                for(int i = 0; i < paramsStr.length; i++) {
+                    params[i] = Integer.valueOf(paramsStr[i]);
+                }
+                return params;
+            } else {
+                return new int[0];
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid player code: " + code);
+        }
+    }
     
     public static List<Integer> getAscendant(String code) {
         List<Integer> fightNumbers = new ArrayList<Integer>();
@@ -181,25 +201,6 @@ public class PlayerCodeParser {
             }
         }
         return fightNumbers;
-    }
-
-    public static int[] getParameters(String code) {
-        String[] orCodes = getORCodes(code);
-        Matcher matcher = codePattern.matcher(orCodes[0]);
-        if(matcher.matches()) {
-            if(matcher.groupCount() >= 3) {
-                String[] paramsStr = matcher.group(3).split("-");
-                int[] params = new int[paramsStr.length];
-                for(int i = 0; i < paramsStr.length; i++) {
-                    params[i] = Integer.valueOf(paramsStr[i]);
-                }
-                return params;
-            } else {
-                return new int[0];
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid player code: " + code);
-        }
     }
 
     public static CodeInfo getCodeInfo(String code) {
@@ -528,6 +529,8 @@ public class PlayerCodeParser {
                         fightPlayer.type = PlayerType.NORMAL;
                         fightPlayer.playerPoolInfo = getPlayerPoolInfo(PlayerRRScore.get(number-1).playerID);
                         fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
+                        if(fightPlayer.playerPoolInfo.isWithdrawn())
+                            fightPlayer.type = PlayerType.BYE;
                         return fightPlayer;
                     }
 
@@ -588,6 +591,7 @@ public class PlayerCodeParser {
                         PlayerRRScore winPlayerRRScore = playerRRScoresMap.get(fightPlayers[1].player.getID());
                         winPlayerRRScore.wins = winPlayerRRScore.wins+1;
                         winPlayerRRScore.points = winPlayerRRScore.points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+                        winPlayerRRScore.fightPoints.put(fightPlayers[0].player.getID(),configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10));
                         playerRRScoresMap.put(fightPlayers[1].player.getID(), winPlayerRRScore);
 
                         PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightPlayers[0].player.getID());
@@ -598,6 +602,7 @@ public class PlayerCodeParser {
                         PlayerRRScore winPlayerRRScore = playerRRScoresMap.get(fightPlayers[0].player.getID());
                         winPlayerRRScore.wins = winPlayerRRScore.wins+1;
                         winPlayerRRScore.points = winPlayerRRScore.points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+                        winPlayerRRScore.fightPoints.put(fightPlayers[1].player.getID(),configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10));
                         playerRRScoresMap.put(fightPlayers[0].player.getID(), winPlayerRRScore);
 
                         PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightPlayers[1].player.getID());
@@ -620,12 +625,10 @@ public class PlayerCodeParser {
         return playerRRScoresList;
     }
 
-    public Context roundRobinContext(String code, Context c) {
+    public Context roundRobinContext(String code, Context c, Boolean showResults) {
 
                                            // e.g. RBT2-3-4-5
         String prefix = getPrefix(code);   //      RBT
-        int number = getNumber(code);      //      2
-        int[] params = getParameters(code);//      3,4,5
 
         List<FightInfo> roundRobinFightInfoList = getRRFightList(code);
         List<PlayerRRScore> playerRRScoresList = roundRobinScores(roundRobinFightInfoList);
@@ -641,12 +644,14 @@ public class PlayerCodeParser {
                 c.put("R" + prefix.charAt(1) + "P" + (i+1) , player.getLastName() + ", " + player.getFirstName() );
             
             c.put("R" + prefix.charAt(1) + "PRegion" + (i+1) , player.getTeam() + " (" + player.getShortGrade() + ")" );
-            for(int j = 0; j < playerRRScoresList.size(); j++ ){
-                if(i !=j && playerRRScores.fightPoints.get(playerRRScoresList.get(j).playerID) != null)
-                    c.put("R" + prefix.charAt(1) + "P" + (i+1) + "P" + (j+1) , playerRRScores.fightPoints.get(playerRRScoresList.get(j).playerID)+"" );
+            if(showResults){
+                for(int j = 0; j < playerRRScoresList.size(); j++ ){
+                    if(i !=j && playerRRScores.fightPoints.get(playerRRScoresList.get(j).playerID) != null)
+                        c.put("R" + prefix.charAt(1) + "P" + (i+1) + "P" + (j+1) , playerRRScores.fightPoints.get(playerRRScoresList.get(j).playerID)+"" );
+                }
+                c.put("R" + prefix.charAt(1) + "Wins" + (i+1) , playerRRScores.wins+"" );
+                c.put("R" + prefix.charAt(1) + "Points" + (i+1) , playerRRScores.points+"" );
             }
-            c.put("R" + prefix.charAt(1) + "Wins" + (i+1) , playerRRScores.wins+"" );
-            c.put("R" + prefix.charAt(1) + "Points" + (i+1) , playerRRScores.points+"" );
         }
         return c;
     }
@@ -959,18 +964,100 @@ public class PlayerCodeParser {
         int i = fightPositions[0];
         int j = fightPositions[1];
         if(i < j) { int k = i; i = j; j = k; } //swap
-
+        
+        List<String> codesi = new ArrayList<String>();
         for(String code : fightInfoList.get(i-1).getAllPlayerCode()) {
-            if(PlayerCodeParser.getPrefix(code).equals("P")) {
-                for(String code2 : fightInfoList.get(j-1).getAllPlayerCode())
-                    if(code.equals(code2)) return true;
-            } else {
-                int n = PlayerCodeParser.getNumber(code);
-                if(n == j) return true;
+            codesi.addAll(Arrays.asList(getORCodes(code)));
+        }
+        
+        List<String> codesj = new ArrayList<String>();
+        for(String code : fightInfoList.get(j-1).getAllPlayerCode()) {
+            codesj.addAll(Arrays.asList(getORCodes(code)));
+        }
+        
+        for(String codei : codesi) {
+            CodeInfo codeInfo = getCodeInfo(codei);
+            switch(codeInfo.type) {
+                case PLAYER:
+                    for(String codej : codesj)
+                        if(codei.equals(codej)) return true;
+                    break;
+                case WINNERLOOSER:{
+                    int n = getNumber(codei);
+                    if(n == j){
+                        return true;
+                    }
+                    for(String codej : codesj){
+                        if(codei.equals(codej)){
+                            return true;
+                        }
+                    }
+                    break;
+                }
+                case ROUNDROBIN:
+                    for(String codej : codesj){
+                        if(codei.equals(codej)){
+                            return true;
+                        }
+                    }
+                    break;
+                case BESTOFTHREE:
+                    int[] params = getParameters(codei);
+                    for(String codej : codesj){
+                        if(codei.equals(codej)){
+                            return true;
+                        }
+                    }
+                    break;
+                case ERROR:
+                    break;
+                default:
+                    break;
             }
         }
-
         return false;
+    }
+
+    public ArrayList<Player> getPossiblePlayers(int fightPosition) {
+
+        ArrayList<Player> possiblePlayers = new ArrayList<Player>();
+        for(String code : fightInfoList.get(fightPosition-1).getAllPlayerCode()) {
+            if(PlayerCodeParser.getCodeInfo(code).type == PlayerCodeParser.CodeType.PLAYER) {
+                FightPlayer tempPlayer = parseCode(code);
+                if(tempPlayer.type == PlayerCodeParser.PlayerType.NORMAL)
+                    if(tempPlayer.player != null){
+                        possiblePlayers.add(tempPlayer.player);
+                    }
+            } else {
+                for(int newNumber : getAscendant(code))
+                    possiblePlayers.addAll(getPossiblePlayers(newNumber));
+            }
+        }
+        return possiblePlayers;
+    }
+
+    public int totalNumberOfFights() {
+
+        return fightInfoList.size();
+    }
+
+    public int minimumNumberOfFights() {
+
+        int minimumNumberOfFights = 0;
+        for(FightInfo fightInfo: fightInfoList){
+
+            String[] codes = fightInfo.getAllPlayerCode();
+            FightPlayer[] fightPlayers = new FightPlayer[] {
+                parseCode(codes[0]),
+                parseCode(codes[1])
+            };
+            if(fightPlayers[0].type != PlayerType.BYE && fightPlayers[1].type != PlayerType.BYE){
+                if(fightPlayers[0].type != PlayerType.EMPTY && fightPlayers[1].type != PlayerType.EMPTY){
+                    minimumNumberOfFights++;
+                }
+            }
+        }
+        return minimumNumberOfFights;
     }
     
     /* Parser instance stuff */
@@ -1001,7 +1088,7 @@ public class PlayerCodeParser {
         return PlayerCodeParser.getInstance(database, poolID).parseCode(code);
     }
 
-    public static Context getRRResults(Database database, String code, int poolID, Context c) throws DatabaseStateException {
-        return PlayerCodeParser.getInstance(database, poolID).roundRobinContext(code, c);
+    public static Context getRRResults(Database database, String code, int poolID, Context c, Boolean showResults) throws DatabaseStateException {
+        return PlayerCodeParser.getInstance(database, poolID).roundRobinContext(code, c, showResults);
     }
 }

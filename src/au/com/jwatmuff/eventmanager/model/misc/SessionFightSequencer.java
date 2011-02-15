@@ -94,11 +94,11 @@ public class SessionFightSequencer {
         for(int i = 0; i < n; i++) {
             SessionFightInfo sFI = fights.get(i);
             Fight f = fights.get(i).getFight();
-            ArrayList<Player> possiblePlayersF = PoolPlayerSequencer.getPossiblePlayers(database,  f.getPoolID(), f.getPosition());
-            possiblePlayersInFights.put(sFI,possiblePlayersF);
             if(!playerCodeParser.containsKey(f.getPoolID())){
                 playerCodeParser.put(f.getPoolID(), PlayerCodeParser.getInstance(database, f.getPoolID()));
             }
+            ArrayList<Player> possiblePlayersF = playerCodeParser.get(f.getPoolID()).getPossiblePlayers(f.getPosition());
+            possiblePlayersInFights.put(sFI,possiblePlayersF);
         }
 
         while(spacing >= 1) {
@@ -114,7 +114,7 @@ public class SessionFightSequencer {
         log.debug("Auto-order: " + (up?"UP":"DOWN") + ", spacing " + spacing);
 
         int n = fights.size();
-        int spacingAfterTie = spacing;
+        int spacingAfterTie = 0;
         for(int i = 1; i < n; i++) {
 
             for(int j = i; j < n; j++) {
@@ -124,17 +124,24 @@ public class SessionFightSequencer {
 
                 boolean positionOk = true;
 
-// Does fight f1 have a player that has already had a fight in the previous spacing fights
-                spacingAfterTie = spacing;
-                for(int k = 1; k <= spacingAfterTie && i-k >= 0; k++) {
-                    Fight f2 = fights.get(up?n-(i-k)-1:i-k).getFight();
-                    if(PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[0]) || PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[1]))
-                        spacingAfterTie = spacingAfterTie + 1;
-                    if(f1.getPoolID() == f2.getPoolID() &&
-                            playerCodeParser.get(f1.getPoolID()).hasCommonPlayers(new int[] { f1.getPosition(), f2.getPosition() })){
-                        // means that fight f1 is NOT in an ok position
-                        positionOk = false;
-                        break;
+// Could the two fights possibly share the same player even if from a different division.
+                if(positionOk) {
+                    spacingAfterTie = 0;
+                    pPCheck:
+                    for(int l = j-1; l >= i-(spacing+spacingAfterTie) && l >= 0; l--) {
+                        SessionFightInfo sFI2 = fights.get(up?n-l-1:l);
+                        Fight f2 = sFI2.getFight();
+                        ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
+                        ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
+                        for(Player player1 : possiblePlayersF1){
+                            for(Player player2 : possiblePlayersF2){
+                                if(player1.getVisibleID().equals(player2.getVisibleID())){
+                                    // means that fight at position j could have a player in it that is in another pool between i-spacing and j-1
+                                    positionOk = false;
+                                    break pPCheck;
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -195,30 +202,6 @@ public class SessionFightSequencer {
                     }
                 }
 
-// Could the two fights possibly share the same player even if from a different division.
-                if(positionOk) {
-                    spacingAfterTie = spacing;
-                    pPCheck:
-                    for(int l = j-1; l >= i-spacingAfterTie && l >= 0; l--) {
-                        SessionFightInfo sFI2 = fights.get(up?n-l-1:l);
-                        Fight f2 = sFI2.getFight();
-                        if(PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[0]) || PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[1]))
-                            spacingAfterTie = spacingAfterTie + 1;
-                        if(f1.getPoolID() != f2.getPoolID()) {
-                            ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
-                            ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
-                            for(Player player1 : possiblePlayersF1){
-                                for(Player player2 : possiblePlayersF2){
-                                    if(player1.getVisibleID().equals(player2.getVisibleID())){
-                                        // means that fight at position j could have a player in it that is in another pool between i-spacing and j-1
-                                        positionOk = false;
-                                        break pPCheck;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
                 if(positionOk) {
                     if(j != i) {

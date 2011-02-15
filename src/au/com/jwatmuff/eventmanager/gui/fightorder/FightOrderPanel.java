@@ -14,6 +14,7 @@ import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter.TooFewPlayersException;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
@@ -152,15 +153,20 @@ public class FightOrderPanel extends javax.swing.JPanel {
                     map.put("description", p.getDescription());
                     int playersInPool = database.findAll(Player.class, PlayerDAO.FOR_POOL, p.getID(), true).size();
                     map.put("playersInPool", playersInPool);
-                    int fightsInPool = database.findAll(Fight.class, FightDAO.FOR_POOL, p.getID()).size();
-                    map.put("fightsInPool", fightsInPool);
+                    PlayerCodeParser parser = PlayerCodeParser.getInstance(database, p.getID());
+                    List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, p.getID());
+                    int fightsInPool = parser.totalNumberOfFights();
+                    int nonTieBreakFightsInPool = parser.minimumNumberOfFights();
+                    map.put("maxFightsInPool", fightsInPool);
+                    map.put("minFightsInPool", nonTieBreakFightsInPool);
                     map.put("fightsLocked", p.getLockedStatus() == Pool.LockedStatus.FIGHTS_LOCKED);
                     return map;
                 }
             });
             addColumn("Division", "description");
             addColumn("Players In Division", "playersInPool");
-            addColumn("Fights In Division", "fightsInPool");
+            addColumn("Fights In Draw", "maxFightsInPool");
+            addColumn("Minimum Fights In Division", "minFightsInPool");
             addColumn("Fights Locked", "fightsLocked");
             updateTableFromDatabase();
         }
