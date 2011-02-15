@@ -121,7 +121,10 @@ public class PoolDraw {
 // build up ordered list of players from those players that had seeds specified
         for(Integer seed : seedSet) {
             List<PlayerPoolInfo> seedPlayers = new ArrayList<PlayerPoolInfo>();
-            for(Integer playerID : seeds.keySet()) {
+            List<Integer> playerIDs = new ArrayList<Integer>();
+            playerIDs.addAll(seeds.keySet());
+            Collections.shuffle(playerIDs);
+            for(Integer playerID : playerIDs) {
                 if(seeds.get(playerID) == seed) {
 // fill in a seed to playerID list map
                     List<Integer> seedArray = new ArrayList<Integer>();
@@ -138,11 +141,11 @@ public class PoolDraw {
                     seedPlayers.add(player);
                 }
 // ensure that like seeds are randomised
-                Collections.shuffle(seedPlayers);
-                seededPlayers.addAll(seedPlayers);
-                unorderedPLayers.removeAll(seedPlayers);
-                seedPlayers.clear(); // not needed I think
             }
+            Collections.shuffle(seedPlayers);
+            seededPlayers.addAll(seedPlayers);
+            unorderedPLayers.removeAll(seedPlayers);
+            seedPlayers.clear(); // not needed I think
         }
 
 // randomize remaining unordered players
