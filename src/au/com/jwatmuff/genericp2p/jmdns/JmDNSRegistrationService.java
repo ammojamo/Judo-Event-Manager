@@ -25,7 +25,7 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
     private String ourName;
     private final int port;
 
-    private final JmDNS jmdns;
+    private JmDNS jmdns;
     private final ServiceInfo service;
     private boolean registered = false;
 
@@ -35,7 +35,7 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
         try {
             jmdns = JmDNS.create();
         } catch(IOException e) {
-            throw new RuntimeException("IOException while initializing JmDNS", e);
+            log.error("IOException while initializing JmDNS", e);
         }
 
         try {
@@ -49,6 +49,8 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
 
     @Override
     public void register() {
+        if(jmdns == null) return;
+
         log.debug("Attempting to register as service (" + ourName + ")");
 
         final AtomicBoolean failed = new AtomicBoolean(false);
@@ -83,6 +85,8 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
 
     @Override
     public void unregister() {
+        if(jmdns == null) return;
+
         jmdns.unregisterService(service);
         registered = false;
     }
@@ -91,5 +95,9 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
         //if(!registered)
         //    throw new RuntimeException("Invalid state - service is not running");
         return ourName;
+    }
+
+    public boolean initialisedOk() {
+        return jmdns != null;
     }
 }

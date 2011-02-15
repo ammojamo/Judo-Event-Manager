@@ -48,6 +48,11 @@ public class JmDNSRMIPeerManager implements PeerManager {
 
         discoverer.start();
     }
+
+    @Override
+    public boolean initialisedOk() {
+        return registrar.initialisedOk() && discoverer.initialisedOk();
+    }
     
     public void stop() {
         discoverer.stop();

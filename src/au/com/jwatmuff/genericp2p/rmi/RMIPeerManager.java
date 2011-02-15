@@ -475,6 +475,11 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
         return peerServiceMap.containsKey(serviceName);
     }
 
+    @Override
+    public boolean initialisedOk() {
+        return true;
+    }
+
     private static enum PeerStatus {
         DISCONNECTED, CONNECTED
     }

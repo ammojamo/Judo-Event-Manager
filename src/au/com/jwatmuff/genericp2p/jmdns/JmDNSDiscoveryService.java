@@ -28,7 +28,7 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
 
     public final static String REG_TYPE = "_eventmanager._tcp.local.";
 
-    private final JmDNS jmdns;
+    private JmDNS jmdns;
     private final MyListener listener = new MyListener();
 
     /** Creates a new instance of JmDNSDiscoveryService */
@@ -36,12 +36,14 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
         try {
             jmdns = JmDNS.create();
         } catch(IOException e) {
-            throw new RuntimeException("IOException while initializing JmDNS", e);
+            log.error("IOException while initializing JmDNS", e);
         }
     }
 
     @Override
     public void start() {
+        if(jmdns == null) return;
+
         log.debug("Browsing for services");
         jmdns.addServiceListener(REG_TYPE, listener);
         setRunning(true);
@@ -49,6 +51,8 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
 
     @Override
     public void stop() {
+        if(jmdns == null) return;
+
         jmdns.removeServiceListener(REG_TYPE, listener);
         setRunning(false);
     }
@@ -78,5 +82,9 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
             log.info("Peer found (" + serviceName + ")");
             addPeer(peer);
         }
+    }
+
+    public boolean initialisedOk() {
+        return jmdns != null;
     }
 }

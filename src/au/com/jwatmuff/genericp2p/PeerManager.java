@@ -22,4 +22,5 @@ public interface PeerManager {
     public void unregisterService(String serviceName);
     public Collection<Peer> getPeers();
     public boolean isRegistered(String serviceName);
+    public boolean initialisedOk();
 }

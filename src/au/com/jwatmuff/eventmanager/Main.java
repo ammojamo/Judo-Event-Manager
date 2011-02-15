@@ -26,6 +26,7 @@ import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import au.com.jwatmuff.genericdb.p2p.DistributedDatabase;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericp2p.JmDNSRMIPeerManager;
+import au.com.jwatmuff.genericp2p.PeerManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -175,7 +176,10 @@ public class Main {
             loadWindow.addMessage("Loading Peer Manager..");
             log.info("Loading Peer Manager");
 
-            JmDNSRMIPeerManager peerManager = new JmDNSRMIPeerManager(rmiPort, new File(workingDir, "peerid.dat"));
+            PeerManager peerManager = new JmDNSRMIPeerManager(rmiPort, new File(workingDir, "peerid.dat"));
+            if(!peerManager.initialisedOk()) {
+                GUIUtils.displayMessage(loadWindow, "Event Manager could not find a network connection.\nTo connect to other computers you will need to establish a network connection and restart the Event Manager.", "No Network Connection");
+            }
 
             loadWindow.addMessage("Loading Database Manager..");
             log.info("Loading Database Manager");
