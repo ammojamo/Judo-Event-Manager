@@ -1,14 +1,14 @@
 Name "Event Manager 2011 Update 3"
 Caption "Event Manager"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2011u3.exe"
+OutFile "EventManagerSetup-2011u4beta.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
 
 InstallDir $PROGRAMFILES\EventManager
 
-DirText "This will install EventManager 2011 Update 3 on your computer."
+DirText "This will install EventManager 2011 Update 4 on your computer."
 
 Section ""
   SetOutPath $INSTDIR
