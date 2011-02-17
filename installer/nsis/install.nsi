@@ -1,7 +1,7 @@
-Name "Event Manager 2011 Update 3"
+Name "Event Manager 2011 Update 4"
 Caption "Event Manager"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2011u4beta.exe"
+OutFile "EventManagerSetup-2011u4.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
