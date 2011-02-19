@@ -76,7 +76,7 @@ public class PoolChecker {
         int maxAge = pool.getMaximumAge();
 
         if(configurationFile.getBooleanProperty("defaultAdjustGrade", false)){
-            int age1 = configurationFile.getIntegerProperty("defaultAgeThreshold1", 9);
+            int age1 = configurationFile.getIntegerProperty("defaultAgeThreshold1", 11);
             int age2 = configurationFile.getIntegerProperty("defaultAgeThreshold2", 14);
             int age3 = configurationFile.getIntegerProperty("defaultAgeThreshold3", 16);
             int gradeDrop = configurationFile.getIntegerProperty("defaultBeltDrop", 2);
