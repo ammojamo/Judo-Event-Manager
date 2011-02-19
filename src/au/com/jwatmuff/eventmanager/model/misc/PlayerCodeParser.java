@@ -57,7 +57,11 @@ public class PlayerCodeParser {
         public String toString() {
             switch(type) {
                 case NORMAL:
-                    return player.getFirstName() + " " + player.getLastName();
+                    if(player.getTeam().isEmpty()){
+                        return player.getFirstName() + " " + player.getLastName();
+                    } else {
+                        return player.getFirstName() + " " + player.getLastName() + " (" + player.getTeam() + ")";
+                    }
                 case BYE:
                     return "Bye";
                 case EMPTY:
