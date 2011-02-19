@@ -125,21 +125,21 @@ public class SessionFightSequencer {
                 boolean positionOk = true;
 
 // Could the two fights possibly share the same player even if from a different division.
-                if(positionOk) {
-                    spacingAfterTie = 0;
-                    pPCheck:
-                    for(int l = j-1; l >= i-(spacing+spacingAfterTie) && l >= 0; l--) {
-                        SessionFightInfo sFI2 = fights.get(up?n-l-1:l);
-                        Fight f2 = sFI2.getFight();
-                        ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
-                        ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
-                        for(Player player1 : possiblePlayersF1){
-                            for(Player player2 : possiblePlayersF2){
-                                if(player1.getVisibleID().equals(player2.getVisibleID())){
-                                    // means that fight at position j could have a player in it that is in another pool between i-spacing and j-1
-                                    positionOk = false;
-                                    break pPCheck;
-                                }
+                spacingAfterTie = 0;
+                pPCheck:
+                for(int k = 1; k <= (spacing+spacingAfterTie/2) && i-k >= 0; k++) {
+                    SessionFightInfo sFI2 = fights.get(up?n-(i-k)-1:i-k);
+                    Fight f2 = sFI2.getFight();
+                    if(PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[0]) || PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[1]))
+                        spacingAfterTie = spacingAfterTie + 1;
+                    ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
+                    ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
+                    for(Player player1 : possiblePlayersF1){
+                        for(Player player2 : possiblePlayersF2){
+                            if(player1.getVisibleID().equals(player2.getVisibleID())){
+                                // means that fight at position j could have a player in it that is in another pool between i-spacing and j-1
+                                positionOk = false;
+                                break pPCheck;
                             }
                         }
                     }
