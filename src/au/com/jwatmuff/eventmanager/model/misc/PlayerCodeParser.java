@@ -246,7 +246,7 @@ public class PlayerCodeParser {
             return false;
         }
         String prefix = getPrefix(code);      //      RBT
-        return prefix.matches(matcherPlayer);
+        return prefix.matches(matcherTieBreak);
     }
 
     private PlayerPoolInfo getPlayerPoolInfo(int playerID) {
@@ -1030,11 +1030,16 @@ public class PlayerCodeParser {
                 FightPlayer tempPlayer = parseCode(code);
                 if(tempPlayer.type == PlayerCodeParser.PlayerType.NORMAL)
                     if(tempPlayer.player != null){
-                        possiblePlayers.add(tempPlayer.player);
+                        if(!possiblePlayers.contains(tempPlayer.player))
+                            possiblePlayers.add(tempPlayer.player);
                     }
             } else {
-                for(int newNumber : getAscendant(code))
-                    possiblePlayers.addAll(getPossiblePlayers(newNumber));
+                for(int newNumber : getAscendant(code)){
+                    for(Player player : getPossiblePlayers(newNumber)){
+                        if(!possiblePlayers.contains(player))
+                            possiblePlayers.add(player);
+                    }
+                }
             }
         }
         return possiblePlayers;

@@ -117,7 +117,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             
             try {
-                SessionFightSequencer.saveFightSequence(database, fights, true);
+                                 SessionFightSequencer.saveFightSequence(database, fights, true, false);
             } catch(DatabaseStateException e) {
                 this.setCursor(Cursor.getDefaultCursor());
                 GUIUtils.displayError(parentWindow, e.getMessage());
@@ -157,11 +157,11 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         undeferFightButton.setEnabled(enabled);
         upButton.setEnabled(enabled);
         downButton.setEnabled(enabled);
-        autoOrderButton.setEnabled(enabled);
-        resetButton.setEnabled(enabled);
-        spacingSpinner.setEnabled(enabled);
-        spacingLabel.setEnabled(enabled);
         lockSessionButton.setEnabled(enabled);
+        autoOrderButton.setEnabled(true);
+        resetButton.setEnabled(true);
+        spacingSpinner.setEnabled(true);
+        spacingLabel.setEnabled(true);
     }
     
     private class SessionTableModel extends JexlBeanTableModel<Session> implements TransactionListener {
@@ -205,7 +205,10 @@ public class SessionFightsPanel extends javax.swing.JPanel {
                 @Override
                 public Map<String, Object> mapBean(SessionFightInfo bean) {
                     Map<String, Object> map = new HashMap<String, Object>();
-                    map.put("fight_pos", (fightNumberOffset >= 0) ? bean.getSessionFight().getPosition() + fightNumberOffset : -1);
+                    if(bean.resultKnown())
+                        map.put("fight_pos", (fightNumberOffset >= 0) ? bean.getSessionFight().getPosition() + fightNumberOffset + " -- Done" : -1);
+                    else
+                        map.put("fight_pos", (fightNumberOffset >= 0) ? bean.getSessionFight().getPosition() + fightNumberOffset : -1);
                     Pool pool = database.get(Pool.class, bean.getFight().getPoolID());
                     String poolDesc = (pool == null)?"(null)":pool.getDescription();
                     map.put("pool_pos", poolDesc + " : " + bean.getFight().getPosition());
@@ -543,7 +546,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             if(fightsDirty) {
                 setFightsDirty(false);
-                SessionFightSequencer.saveFightSequence(database, fights, true);
+                SessionFightSequencer.saveFightSequence(database, fights, true, false);
             }
             SessionLocker.lockFights(database, session);
         } catch(Exception e) {
@@ -566,7 +569,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         try {
             if(fightsDirty) {
                 setFightsDirty(false);
-                SessionFightSequencer.saveFightSequence(database, fights, true);
+                                 SessionFightSequencer.saveFightSequence(database, fights, true, false);
             }
             SessionFightSequencer.undeferFight(database, sfi);
         } catch(DatabaseStateException e) {
@@ -588,7 +591,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         try {
             if(fightsDirty) {
                 setFightsDirty(false);
-                SessionFightSequencer.saveFightSequence(database, fights, true);
+                                 SessionFightSequencer.saveFightSequence(database, fights, true, false);
             }
             SessionFightSequencer.deferFight(database, sfi);
         } catch(DatabaseStateException e) {
@@ -612,13 +615,25 @@ public class SessionFightsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_printButtonActionPerformed
 
     private void autoOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoOrderButtonActionPerformed
-        if(selectedSession == null) return;
+        if(selectedSession == null) return; 
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         setFightsDirty(false);
         SessionFightSequencer.nPassAutoOrder(database, fights, (Integer)spacingSpinner.getValue());
-        //SessionFightSequencer.autoOrder(database, fights, (Integer)spacingSpinner.getValue(), true);    
-        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        //SessionFightSequencer.autoOrder(database, fights, (Integer)spacingSpinner.getValue(), true);   
         try {
-            SessionFightSequencer.saveFightSequence(database, fights, true);
+            if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
+                if(JOptionPane.showConfirmDialog(
+                    parentWindow,
+                    "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",
+                    "Confirm Re-Order",
+                    JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION){
+                    this.setCursor(Cursor.getDefaultCursor());
+                    return;
+                }
+                SessionFightSequencer.saveFightSequence(database, fights, true, true);
+            } else {
+                SessionFightSequencer.saveFightSequence(database, fights, true, false);
+            }
         } catch(DatabaseStateException e) {
             this.setCursor(Cursor.getDefaultCursor());
             GUIUtils.displayError(parentWindow, e.getMessage());
@@ -661,7 +676,19 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
-            SessionFightSequencer.saveFightSequence(database, fights, true);
+            if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
+                if(JOptionPane.showConfirmDialog(
+                    parentWindow,
+                    "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",
+                    "Confirm Re-Order",
+                    JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION){
+                    this.setCursor(Cursor.getDefaultCursor());
+                    return;
+                }
+                SessionFightSequencer.saveFightSequence(database, fights, true, true);
+            } else {
+                SessionFightSequencer.saveFightSequence(database, fights, true, false);
+            }
         } catch(DatabaseStateException e) {
             this.setCursor(Cursor.getDefaultCursor());
             GUIUtils.displayError(parentWindow, e.getMessage());

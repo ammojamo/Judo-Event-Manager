@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
 /**
@@ -123,71 +124,100 @@ public class SessionFightSequencer {
                 Fight f1 = sFI1.getFight();
 
                 boolean positionOk = true;
+                if(!sFI1.resultKnown()){
 
-// Could the two fights possibly share the same player even if from a different division.
-                spacingAfterTie = 0;
-                pPCheck:
-                for(int k = 1; k <= (spacing+spacingAfterTie) && i-k >= 0; k++) {
-                    SessionFightInfo sFI2 = fights.get(up?n-(i-k)-1:i-k);
-                    Fight f2 = sFI2.getFight();
-                    if(PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[0]) || PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[1]))
-                        spacingAfterTie = spacingAfterTie + 1;
-                    ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
-                    ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
-                    for(Player player1 : possiblePlayersF1){
-                        for(Player player2 : possiblePlayersF2){
-                            if(player1.getVisibleID().equals(player2.getVisibleID())){
-                                // means that fight at position j could have a player in it between i-spacing and i-1
-                                positionOk = false;
-                                break pPCheck;
+    // Could the two fights possibly share the same player even if from a different division.
+                    spacingAfterTie = 0;
+                    pPCheck:
+                    for(int k = 1; k <= (spacing+spacingAfterTie) && i-k >= 0; k++) {
+                        SessionFightInfo sFI2 = fights.get(up?n-(i-k)-1:i-k);
+                        Fight f2 = sFI2.getFight();
+                        if(PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[0]) || PlayerCodeParser.isTieBreak(f2.getPlayerCodes()[1]))
+                            spacingAfterTie = spacingAfterTie + 1;
+                        ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
+                        ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
+                        for(Player player1 : possiblePlayersF1){
+                            for(Player player2 : possiblePlayersF2){
+                                if(player1.getVisibleID().equals(player2.getVisibleID())){
+                                    // means that fight at position j could have a player in it between i-spacing and i-1
+                                    positionOk = false;
+                                    break pPCheck;
+                                }
                             }
                         }
                     }
-                }
-                
-// If F1 is moved to i, two divisions the player is in be mixed up.
-                if(positionOk) {
-                    spacingAfterTie = 0;
-                    pPCheck:
-                    for(int l = j-1; l >= i && l >= 0; l--) {
-                        SessionFightInfo sFI2 = fights.get(up?n-l-1:l);
-                        Fight f2 = sFI2.getFight();
-                        if(f1.getPoolID() != f2.getPoolID()){
-                            ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
-                            ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
-                            for(Player player1 : possiblePlayersF1){
-                                for(Player player2 : possiblePlayersF2){
-                                    if(player1.getVisibleID().equals(player2.getVisibleID())){
-                                        // means that fight at position j could have a player in it that is in another pool between i and j-1
-                                        positionOk = false;
-                                        break pPCheck;
+
+    // If F1 is moved to i, two divisions the player is in be mixed up.
+                    if(positionOk) {
+                        spacingAfterTie = 0;
+                        pPCheck:
+                        for(int l = j-1; l >= i && l >= 0; l--) {
+                            SessionFightInfo sFI2 = fights.get(up?n-l-1:l);
+                            Fight f2 = sFI2.getFight();
+                            if(f1.getPoolID() != f2.getPoolID()){
+                                ArrayList<Player> possiblePlayersF1 = possiblePlayersInFights.get(sFI1);
+                                ArrayList<Player> possiblePlayersF2 = possiblePlayersInFights.get(sFI2);
+                                for(Player player1 : possiblePlayersF1){
+                                    for(Player player2 : possiblePlayersF2){
+                                        if(player1.getVisibleID().equals(player2.getVisibleID())){
+                                            // means that fight at position j could have a player in it that is in another pool between i and j-1
+                                            positionOk = false;
+                                            break pPCheck;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-// If F1 is moved to i, will to be moved before a fight with two team mates
-                if(positionOk) {
-                    ArrayList<Integer> sameTeamFights = playerCodeParser.get(f1.getPoolID()).getSameTeamFights();
-                    if(!up) {
-                        if(!sameTeamFights.contains(f1.getPosition())){
+    // If F1 is moved to i, will to be moved before a fight with two team mates
+                    if(positionOk) {
+                        ArrayList<Integer> sameTeamFights = playerCodeParser.get(f1.getPoolID()).getSameTeamFights();
+                        if(!up) {
+                            if(!sameTeamFights.contains(f1.getPosition())){
+                                for(int l = i; l < j; l++) {
+                                    Fight f2 = fights.get(l).getFight();
+                                    if(f1.getPoolID() == f2.getPoolID() && sameTeamFights.contains(f2.getPosition())) {
+                                        // means that fight in position j is dependent on fight at position l
+                                        positionOk = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            if(sameTeamFights.contains(f1.getPosition())){
+                                for(int l = i; l < j; l++) {
+                                    Fight f2 = fights.get(n-l-1).getFight();
+                                    if(f1.getPoolID() == f2.getPoolID()) {
+                                        if(!sameTeamFights.contains(f2.getPosition())) {
+                                            // means that fight in position l is dependent on fight at position j
+                                            positionOk = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+    // If F1 is moved to i, will it be moved before a fight it is dependent on.
+                    if(positionOk) {
+                        if(!up) {
+                            ArrayList<Integer> dependentFights = playerCodeParser.get(f1.getPoolID()).getDependentFights(f1.getPosition());
                             for(int l = i; l < j; l++) {
-                                Fight f2 = fights.get(l).getFight();
-                                if(f1.getPoolID() == f2.getPoolID() && sameTeamFights.contains(f2.getPosition())) {
+                                Fight f2 = fights.get(up?n-l-1:l).getFight();
+                                if(f1.getPoolID() == f2.getPoolID() && dependentFights.contains(f2.getPosition())) {
                                     // means that fight in position j is dependent on fight at position l
                                     positionOk = false;
                                     break;
                                 }
                             }
-                        }
-                    } else {
-                        if(sameTeamFights.contains(f1.getPosition())){
+                        } else {
                             for(int l = i; l < j; l++) {
-                                Fight f2 = fights.get(n-l-1).getFight();
+                                Fight f2 = fights.get(up?n-l-1:l).getFight();
                                 if(f1.getPoolID() == f2.getPoolID()) {
-                                    if(!sameTeamFights.contains(f2.getPosition())) {
+                                    ArrayList<Integer> dependentFights = playerCodeParser.get(f2.getPoolID()).getDependentFights(f2.getPosition());
+                                    if(dependentFights.contains(f1.getPosition())) {
                                         // means that fight in position l is dependent on fight at position j
                                         positionOk = false;
                                         break;
@@ -196,33 +226,8 @@ public class SessionFightSequencer {
                             }
                         }
                     }
-                }
-
-// If F1 is moved to i, will it be moved before a fight it is dependent on.
-                if(positionOk) {
-                    if(!up) {
-                        ArrayList<Integer> dependentFights = playerCodeParser.get(f1.getPoolID()).getDependentFights(f1.getPosition());
-                        for(int l = i; l < j; l++) {
-                            Fight f2 = fights.get(up?n-l-1:l).getFight();
-                            if(f1.getPoolID() == f2.getPoolID() && dependentFights.contains(f2.getPosition())) {
-                                // means that fight in position j is dependent on fight at position l
-                                positionOk = false;
-                                break;
-                            }
-                        }
-                    } else {
-                        for(int l = i; l < j; l++) {
-                            Fight f2 = fights.get(up?n-l-1:l).getFight();
-                            if(f1.getPoolID() == f2.getPoolID()) {
-                                ArrayList<Integer> dependentFights = playerCodeParser.get(f2.getPoolID()).getDependentFights(f2.getPosition());
-                                if(dependentFights.contains(f1.getPosition())) {
-                                    // means that fight in position l is dependent on fight at position j
-                                    positionOk = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                }else if(up && sFI1.resultKnown()){
+                    positionOk = false;
                 }
 
 
@@ -369,8 +374,8 @@ public class SessionFightSequencer {
             }
         });
 
-        SessionFightSequencer.saveFightSequence(database, fights, true);
-        SessionFightSequencer.saveFightSequence(database, followingFights, true);
+        SessionFightSequencer.saveFightSequence(database, fights, true, false);
+        SessionFightSequencer.saveFightSequence(database, followingFights, true, false);
     }
     
     /**
@@ -430,7 +435,7 @@ public class SessionFightSequencer {
 
             }
         });
-        SessionFightSequencer.saveFightSequence(database, fights, true);
+        SessionFightSequencer.saveFightSequence(database, fights, true, false);
                 //SessionFightSequencer.saveFightSequence(database, precedingFights, true);                
     }
 
@@ -447,8 +452,8 @@ public class SessionFightSequencer {
         return fights;
     }
 
-    public static void saveFightSequence(final TransactionalDatabase database, final List<SessionFightInfo> fights, final boolean updateAll)  throws DatabaseStateException {
-        if(fights.size() > 0 && fights.iterator().next().getSession().getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED)
+    public static void saveFightSequence(final TransactionalDatabase database, final List<SessionFightInfo> fights, final boolean updateAll, final boolean overwriteLocked)  throws DatabaseStateException {
+        if(!overwriteLocked && fights.size() > 0 && fights.iterator().next().getSession().getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED)
             throw new DatabaseStateException("Cannot update fight order for a session with locked fights");
         
         database.perform(new Transaction() {
