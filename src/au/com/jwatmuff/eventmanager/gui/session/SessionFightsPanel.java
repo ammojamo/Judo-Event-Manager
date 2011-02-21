@@ -617,6 +617,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
     private void autoOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoOrderButtonActionPerformed
         if(selectedSession == null) return;
         if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
+            if(!PermissionChecker.isAllowed(Action.LOCK_SESSION_FIGHT_ORDER, database)) return;
             if(JOptionPane.showConfirmDialog(
                 parentWindow,
                 "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",
@@ -668,6 +669,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
         if(selectedSession == null) return;
         if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
+            if(!PermissionChecker.isAllowed(Action.LOCK_SESSION_FIGHT_ORDER, database)) return;
             if(JOptionPane.showConfirmDialog(
                 parentWindow,
                 "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",

@@ -91,26 +91,44 @@ public class SessionFightSequencer {
 
         int n = fights.size();
         Map<SessionFightInfo,ArrayList<Player>> possiblePlayersInFights = new HashMap<SessionFightInfo,ArrayList<Player>>();
-        Map<Integer,PlayerCodeParser> playerCodeParser = new HashMap<Integer,PlayerCodeParser>();
+        Map<Integer,PlayerCodeParser> playerCodeParsers = new HashMap<Integer,PlayerCodeParser>();
         for(int i = 0; i < n; i++) {
             SessionFightInfo sFI = fights.get(i);
             Fight f = fights.get(i).getFight();
-            if(!playerCodeParser.containsKey(f.getPoolID())){
-                playerCodeParser.put(f.getPoolID(), PlayerCodeParser.getInstance(database, f.getPoolID()));
+            if(!playerCodeParsers.containsKey(f.getPoolID())){
+                playerCodeParsers.put(f.getPoolID(), PlayerCodeParser.getInstance(database, f.getPoolID()));
             }
-            ArrayList<Player> possiblePlayersF = playerCodeParser.get(f.getPoolID()).getPossiblePlayers(f.getPosition());
+            ArrayList<Player> possiblePlayersF = playerCodeParsers.get(f.getPoolID()).getPossiblePlayers(f.getPosition());
             possiblePlayersInFights.put(sFI,possiblePlayersF);
         }
 
+        finishedFightsReset(fights);
+
         while(spacing >= 1) {
-            autoOrder(database, fights, playerCodeParser, possiblePlayersInFights, spacing, false);
-            autoOrder(database, fights, playerCodeParser, possiblePlayersInFights, spacing, true);
-            autoOrder(database, fights, playerCodeParser, possiblePlayersInFights, spacing, false);
+            autoOrder(fights, playerCodeParsers, possiblePlayersInFights, spacing, false);
+            autoOrder(fights, playerCodeParsers, possiblePlayersInFights, spacing, true);
+            autoOrder(fights, playerCodeParsers, possiblePlayersInFights, spacing, false);
             spacing--;
         }
     }
+
+    public static void finishedFightsReset(List<SessionFightInfo> fights) {
+
+        log.debug("Auto-order: Moving fights with result to the top.");
+
+        int n = fights.size();
+        int i = 0;
+        for(int j = 1; j < n; j++) {
+            SessionFightInfo sFI1 = fights.get(j);
+            if(sFI1.resultKnown()){
+                fights.add(i, fights.remove(j));
+                i++;
+            }
+        }
+        fixPositions(fights);
+    }
     
-    public static void autoOrder(Database database, List<SessionFightInfo> fights, Map<Integer,PlayerCodeParser> playerCodeParser, Map<SessionFightInfo,ArrayList<Player>> possiblePlayersInFights, int spacing, boolean up) {
+    public static void autoOrder(List<SessionFightInfo> fights, Map<Integer,PlayerCodeParser> playerCodeParsers, Map<SessionFightInfo,ArrayList<Player>> possiblePlayersInFights, int spacing, boolean up) {
 
         log.debug("Auto-order: " + (up?"UP":"DOWN") + ", spacing " + spacing);
 
@@ -172,7 +190,7 @@ public class SessionFightSequencer {
 
     // If F1 is moved to i, will to be moved before a fight with two team mates
                     if(positionOk) {
-                        ArrayList<Integer> sameTeamFights = playerCodeParser.get(f1.getPoolID()).getSameTeamFights();
+                        ArrayList<Integer> sameTeamFights = playerCodeParsers.get(f1.getPoolID()).getSameTeamFights();
                         if(!up) {
                             if(!sameTeamFights.contains(f1.getPosition())){
                                 for(int l = i; l < j; l++) {
@@ -203,7 +221,7 @@ public class SessionFightSequencer {
     // If F1 is moved to i, will it be moved before a fight it is dependent on.
                     if(positionOk) {
                         if(!up) {
-                            ArrayList<Integer> dependentFights = playerCodeParser.get(f1.getPoolID()).getDependentFights(f1.getPosition());
+                            ArrayList<Integer> dependentFights = playerCodeParsers.get(f1.getPoolID()).getDependentFights(f1.getPosition());
                             for(int l = i; l < j; l++) {
                                 Fight f2 = fights.get(up?n-l-1:l).getFight();
                                 if(f1.getPoolID() == f2.getPoolID() && dependentFights.contains(f2.getPosition())) {
@@ -216,7 +234,7 @@ public class SessionFightSequencer {
                             for(int l = i; l < j; l++) {
                                 Fight f2 = fights.get(up?n-l-1:l).getFight();
                                 if(f1.getPoolID() == f2.getPoolID()) {
-                                    ArrayList<Integer> dependentFights = playerCodeParser.get(f2.getPoolID()).getDependentFights(f2.getPosition());
+                                    ArrayList<Integer> dependentFights = playerCodeParsers.get(f2.getPoolID()).getDependentFights(f2.getPosition());
                                     if(dependentFights.contains(f1.getPosition())) {
                                         // means that fight in position l is dependent on fight at position j
                                         positionOk = false;
@@ -244,12 +262,12 @@ public class SessionFightSequencer {
         }
         fixPositions(fights);
     }
-    
+
     public static void resetOrder(Database database, List<SessionFightInfo> fights) {
         ArrayList<Pool> pools = new ArrayList<Pool>();
         ArrayList<SessionFightInfo> resetFights = new ArrayList<SessionFightInfo>();
         Map<Integer,ArrayList<Integer>> sameTeamFightsInPool = new HashMap<Integer,ArrayList<Integer>>();
-        
+
         Collections.sort(fights, Fight_COMPARATOR);
 
         for(SessionFightInfo fight : fights){
@@ -269,7 +287,7 @@ public class SessionFightSequencer {
         fights.addAll(resetFights);
 
         Collections.sort(pools, POOL_COMPARATOR);
-        
+
         resetFights.clear();
         for(Pool pool : pools){
             for(SessionFightInfo fight : fights){
@@ -279,6 +297,7 @@ public class SessionFightSequencer {
         }
         fights.removeAll(resetFights);
         fights.addAll(resetFights);
+        finishedFightsReset(fights);
         fixPositions(fights);
     }
     
