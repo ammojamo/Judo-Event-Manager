@@ -41,7 +41,7 @@ public abstract class FightTableModel extends BeanMapperTableModel<Fight> implem
                     String code = bean.getPlayerCodes()[i];
                     FightPlayer fp = playerCodeParser.parseCode(code);
                     if(fp.type == PlayerType.NORMAL)
-                      map.put("player" + (i+1), code + ": " + fp.toString());
+                      map.put("player" + (i+1), code + ": " + fp.toStringTeam());
                     else
                       map.put("player" + (i+1), code + ": " + fp.type);
                 }

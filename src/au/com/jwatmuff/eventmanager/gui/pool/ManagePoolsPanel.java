@@ -191,7 +191,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 if (pool != null && pool.getID() != 0) {
                     ok = PoolChecker.checkPlayer(player, pool, censusDate, configurationFile);
                 }
-                String str = player.getFirstName() + " " + player.getLastName() + (ok ? "" : " (!)");
+                String str = (ok ? "" : "(!) ") + player.getFirstName() + " " + player.getLastName() + "   (" + player.getTeam() + ")";
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, str, index, isSelected, hasFocus);
                 if (player.getLockedStatus() != Player.LockedStatus.LOCKED) {
                     label.setIcon(Icons.UNLOCKED_PLAYER);

@@ -57,10 +57,24 @@ public class PlayerCodeParser {
         public String toString() {
             switch(type) {
                 case NORMAL:
+                    return player.getFirstName() + " " + player.getLastName();
+                case BYE:
+                    return "Bye";
+                case EMPTY:
+                    return "Reserved";
+                case UNDECIDED:
+                    return getPrefix(code) + getNumber(code) + " : " + division.getDescription();
+            }
+            return "Error";
+        }
+
+        public String toStringTeam() {
+            switch(type) {
+                case NORMAL:
                     if(player.getTeam().isEmpty()){
                         return player.getFirstName() + " " + player.getLastName();
                     } else {
-                        return player.getFirstName() + " " + player.getLastName() + " (" + player.getTeam() + ")";
+                        return player.getFirstName() + " " + player.getLastName() + "   (" + player.getTeam() + ")";
                     }
                 case BYE:
                     return "Bye";
