@@ -214,13 +214,13 @@ public class SessionFightsPanel extends javax.swing.JPanel {
                     map.put("pool_pos", poolDesc + " : " + bean.getFight().getPosition());
                     
                     try {
-                        map.put("player1", PlayerCodeParser.parseCode(database, bean.getFight().getPlayerCodes()[0], pool.getID()).toString());
+                        map.put("player1", PlayerCodeParser.parseCode(database, bean.getFight().getPlayerCodes()[0], pool.getID()).toStringTeam());
                     } catch(DatabaseStateException e) {
                         map.put("player1", bean.getFight().getPlayerCodes()[0]);
                     }
 
                     try {
-                        map.put("player2", PlayerCodeParser.parseCode(database, bean.getFight().getPlayerCodes()[1], pool.getID()).toString());
+                        map.put("player2", PlayerCodeParser.parseCode(database, bean.getFight().getPlayerCodes()[1], pool.getID()).toStringTeam());
                     } catch(DatabaseStateException e) {
                         map.put("player2", bean.getFight().getPlayerCodes()[1]);
                     }
@@ -615,25 +615,21 @@ public class SessionFightsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_printButtonActionPerformed
 
     private void autoOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoOrderButtonActionPerformed
-        if(selectedSession == null) return; 
+        if(selectedSession == null) return;
+        if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
+            if(JOptionPane.showConfirmDialog(
+                parentWindow,
+                "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",
+                "Confirm Re-Order",
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION){
+                return;
+            }
+        }
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         setFightsDirty(false);
         SessionFightSequencer.nPassAutoOrder(database, fights, (Integer)spacingSpinner.getValue());
-        //SessionFightSequencer.autoOrder(database, fights, (Integer)spacingSpinner.getValue(), true);   
         try {
-            if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
-                if(JOptionPane.showConfirmDialog(
-                    parentWindow,
-                    "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",
-                    "Confirm Re-Order",
-                    JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION){
-                    this.setCursor(Cursor.getDefaultCursor());
-                    return;
-                }
-                SessionFightSequencer.saveFightSequence(database, fights, true, true);
-            } else {
-                SessionFightSequencer.saveFightSequence(database, fights, true, false);
-            }
+            SessionFightSequencer.saveFightSequence(database, fights, true, true);
         } catch(DatabaseStateException e) {
             this.setCursor(Cursor.getDefaultCursor());
             GUIUtils.displayError(parentWindow, e.getMessage());
@@ -671,24 +667,21 @@ public class SessionFightsPanel extends javax.swing.JPanel {
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
         if(selectedSession == null) return;
+        if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
+            if(JOptionPane.showConfirmDialog(
+                parentWindow,
+                "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",
+                "Confirm Re-Order",
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION){
+                return;
+            }
+        }
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         setFightsDirty(false);
         SessionFightSequencer.resetOrder(database, fights);
         
-        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
-            if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
-                if(JOptionPane.showConfirmDialog(
-                    parentWindow,
-                    "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",
-                    "Confirm Re-Order",
-                    JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION){
-                    this.setCursor(Cursor.getDefaultCursor());
-                    return;
-                }
-                SessionFightSequencer.saveFightSequence(database, fights, true, true);
-            } else {
-                SessionFightSequencer.saveFightSequence(database, fights, true, false);
-            }
+            SessionFightSequencer.saveFightSequence(database, fights, true, true);
         } catch(DatabaseStateException e) {
             this.setCursor(Cursor.getDefaultCursor());
             GUIUtils.displayError(parentWindow, e.getMessage());
