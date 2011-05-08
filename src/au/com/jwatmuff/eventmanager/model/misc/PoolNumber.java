@@ -339,7 +339,9 @@ public class PoolNumber {
                 if(poolNo1 != poolNo2) {
                     Integer playerID1 = poolNoToPlayerID.get(poolNo1);
                     Integer playerID2 = poolNoToPlayerID.get(poolNo2);
-                    if (playerID1 == null || playerID2 == null || playerIDToSeed.get(playerID1).equals(playerIDToSeed.get(playerID2))) {
+                    if ((playerID1 == null && playerID2 != null && playerIDToSeed.get(playerID2).equals(0)) 
+                            || (playerID1 != null && playerID2 == null && playerIDToSeed.get(playerID1).equals(0)) 
+                            || (playerID1 != null && playerID2 != null && playerIDToSeed.get(playerID1).equals(playerIDToSeed.get(playerID2)))) {
 
                         Map<Integer, Integer> newPoolNoToPlayerID = new HashMap<Integer, Integer>(poolNoToPlayerID);
                         newPoolNoToPlayerID.put(poolNo1, poolNoToPlayerID.get(poolNo2));
