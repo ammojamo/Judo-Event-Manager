@@ -46,9 +46,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Personal">
-              <Border PropertyName="innerBorder" info="null"/>
-            </TitledBorder>
+            <TitledBorder title="Personal"/>
           </Border>
         </Property>
       </Properties>
@@ -78,14 +76,16 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="dobDatePicker" min="-2" pref="100" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="dobDatePicker" pref="175" max="32767" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="firstNameTextField" alignment="0" pref="271" max="32767" attributes="0"/>
-                              <Component id="ageTextField" alignment="0" min="-2" pref="37" max="-2" attributes="0"/>
-                              <Component id="genderComboBox" alignment="0" min="-2" pref="80" max="-2" attributes="0"/>
+                              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="ageTextField" alignment="0" max="32767" attributes="1"/>
+                                  <Component id="genderComboBox" alignment="0" pref="80" max="32767" attributes="1"/>
+                              </Group>
                           </Group>
                       </Group>
                   </Group>
@@ -112,9 +112,9 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="dobDatePicker" min="-2" max="-2" attributes="0"/>
                       <Component id="dobLabel" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                      <Component id="dobDatePicker" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -210,15 +210,15 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel1" min="-2" pref="100" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="gradeComboBox" min="-2" max="-2" attributes="0"/>
+                          <Component id="gradeComboBox" pref="271" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel2" min="-2" pref="100" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="weightTextField" min="-2" pref="79" max="-2" attributes="0"/>
+                          <Component id="weightTextField" pref="271" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="202" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
