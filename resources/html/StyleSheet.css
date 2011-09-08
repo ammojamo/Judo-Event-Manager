@@ -65,7 +65,7 @@ table td.borderTitle3 {
 }
 
 table td.borderBlue {
-    background: aliceblue;
+    background: white;
     border-top: 2px solid black;
     border-left: 2px solid black;
     border-bottom: 1px solid black;
@@ -74,7 +74,7 @@ table td.borderBlue {
 }
 
 table td.borderBluePlayer {
-    background: aliceblue;
+    background: white;
     border-top: 2px solid black;
     border-left: 2px solid black;
     border-bottom: 1px solid black;
@@ -83,7 +83,7 @@ table td.borderBluePlayer {
 }
 
 table td.borderBluePlayerInfo {
-    background: aliceblue;
+    background: white;
     border-top: 2px solid black;
     border-left: none;
     border-bottom: 1px solid black;
@@ -93,7 +93,7 @@ table td.borderBluePlayerInfo {
 }
 
 table td.borderWhite {
-    background: white;
+    background: aliceblue;
     border-top: 1px solid black;
     border-left: 2px solid black;
     border-bottom: 2px solid black;
@@ -102,7 +102,7 @@ table td.borderWhite {
 }
 
 table td.borderWhitePlayer {
-    background: white;
+    background: aliceblue;
     border-top: 1px solid black;
     border-left: 2px solid black;
     border-bottom: 2px solid black;
@@ -111,7 +111,7 @@ table td.borderWhitePlayer {
 }
 
 table td.borderWhitePlayerInfo {
-    background: white;
+    background: aliceblue;
     border-top: 1px solid black;
     border-left: none;
     border-bottom: 2px solid black;
