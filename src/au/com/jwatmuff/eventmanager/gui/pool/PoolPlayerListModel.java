@@ -17,6 +17,8 @@ import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -32,6 +34,15 @@ public class PoolPlayerListModel extends DefaultListModel implements Transaction
     private boolean approved;
     private Pool selectedPool = null;
 
+    private static final Comparator<Player> PLAYERS_COMPARATOR = new Comparator<Player>() {
+        @Override
+        public int compare(Player p1, Player p2) {
+            String n1 = p1.getLastName() + p1.getFirstName();
+            String n2 = p2.getLastName() + p2.getFirstName();
+            return n1.compareTo(n2);
+        }
+    };
+
     /** Creates a new instance of PoolPlayerListModel */
     public PoolPlayerListModel(Database database, TransactionNotifier notifier, boolean approved) {
         this.database = database;
@@ -42,7 +53,7 @@ public class PoolPlayerListModel extends DefaultListModel implements Transaction
     private void updateFromDatabase() {
         this.removeAllElements();
         if (selectedPool != null) {
-            Collection<Player> players;
+            List<Player> players;
             if (selectedPool.getID() == 0) {
                 if (approved) {
                     players = database.findAll(Player.class, PlayerDAO.WITHOUT_POOL);
@@ -52,6 +63,7 @@ public class PoolPlayerListModel extends DefaultListModel implements Transaction
             } else {
                 players = database.findAll(Player.class, PlayerDAO.FOR_POOL, selectedPool.getID(), approved);
             }
+            Collections.sort(players, PLAYERS_COMPARATOR);
             for (Player player : players) {
                 this.addElement(player);
             }

@@ -13,6 +13,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool.LockedStatus;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +28,15 @@ import org.apache.velocity.context.Context;
 public class PoolListHTMLGenerator extends VelocityHTMLGenerator {
     private Database database;
     private List<Pool> pools;
+
+    private static final Comparator<Player> PLAYERS_COMPARATOR = new Comparator<Player>() {
+        @Override
+        public int compare(Player p1, Player p2) {
+            String n1 = p1.getLastName() + p1.getFirstName();
+            String n2 = p2.getLastName() + p2.getFirstName();
+            return n1.compareTo(n2);
+        }
+    };
 
     public PoolListHTMLGenerator(Database database) {
         this(database, database.findAll(Pool.class, PoolDAO.ALL));
@@ -48,7 +59,8 @@ public class PoolListHTMLGenerator extends VelocityHTMLGenerator {
             if(pool.getLockedStatus()==LockedStatus.UNLOCKED){
                 poolPlayers.addAll(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), false));
             }
-            if(poolPlayers.size() == 0)
+            Collections.sort(poolPlayers, PLAYERS_COMPARATOR);
+            if(poolPlayers.isEmpty())
                 iter.remove();
             else
                 players.put(pool.getID(), poolPlayers);
