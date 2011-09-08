@@ -599,7 +599,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             if(getScore(i, Score.IPPON) == 1) {
                 if((getScore(i, Score.WAZARI) == 2) ||
                    (getScore(1-i, Score.IPPON) == 1) ||
-                   (getScore(1-i, Score.WAZARI) == 2)) {
+                   (getScore(1-i, Score.WAZARI) == 2) ||
+                   (!pendingScores[i].isEmpty()) ||
+                   (!pendingScores[1-i].isEmpty())) {
                     setMode(Mode.IDLE);
                     return;
                 }
@@ -611,7 +613,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             }
             if(getScore(i, Score.WAZARI) == 2) {
                 if((getScore(1-i, Score.IPPON) == 1) ||
-                   (getScore(1-i, Score.WAZARI) == 2)) {
+                   (getScore(1-i, Score.WAZARI) == 2) ||
+                   (!pendingScores[i].isEmpty()) ||
+                   (!pendingScores[1-i].isEmpty())) {
                     setMode(Mode.IDLE);
                     return;
                 }
