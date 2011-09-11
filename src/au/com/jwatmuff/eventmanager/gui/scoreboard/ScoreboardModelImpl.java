@@ -132,7 +132,8 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     holddownTimer.stop();
                     setHolddownMode(HolddownMode.INACTIVE);
                     notifyListeners(ScoreboardUpdate.SIREN);
-                    changeScore(holddownPlayer, Score.WAZARI, true);
+                    pendingScores[holddownPlayer].add(Score.WAZARI);
+                    notifyListeners(ScoreboardUpdate.PENDING_SCORE);
                 }
                 notifyListeners(ScoreboardUpdate.HOLDDOWN);
             }
@@ -336,7 +337,8 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         notifyListeners(ScoreboardUpdate.SIREN);
         if(holddownPlayer != UNKNOWN_PLAYER) {
             setHolddownMode(HolddownMode.INACTIVE);
-            changeScore(holddownPlayer, Score.IPPON, true);
+            pendingScores[holddownPlayer].add(Score.IPPON);
+            notifyListeners(ScoreboardUpdate.PENDING_SCORE);
         }
         else {
             pendingHolddownScore = Score.IPPON;
@@ -482,11 +484,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                 holddownPlayer = UNKNOWN_PLAYER;
                 setHolddownMode(HolddownMode.INACTIVE);
                 Score holddownScore = pendingHolddownScore;
-                if(holddownScore == Score.IPPON) {
-                    changeScore(player, Score.IPPON, true);
-                } else {
-                    pendingScores[player].add(holddownScore);
-                }
+                pendingScores[player].add(holddownScore);
                 notifyListeners(ScoreboardUpdate.PENDING_SCORE);
                 break;
             case ACTIVE:
