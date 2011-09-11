@@ -561,7 +561,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
 
         /* special case to handle licenses allowing limited number of mats */
         int numMats = database.findAll(Session.class, SessionDAO.ALL_MATS).size();
-        if(numMats >= 6 && !PermissionChecker.isAllowed(Action.ADD_MORE_THAN_SIX_MATS, database)) return;
+        if(numMats >= 10 && !PermissionChecker.isAllowed(Action.ADD_MORE_THAN_TEN_MATS, database)) return;
         else if(numMats >= 2 && !PermissionChecker.isAllowed(Action.ADD_MORE_THAN_TWO_MATS, database)) return;
 
         NewMatDialog nmd = new NewMatDialog(parentWindow, true);
