@@ -51,7 +51,7 @@ public class Main {
     //internal version - bump this up whenever making a database change
     public static final String VERSION = "6";
     public static final String WINDOW_TITLE = "Event Manager 2011";
-    public static final String VISIBLE_VERSION = "Event Manager 2011 Update 8";
+    public static final String VISIBLE_VERSION = "Event Manager 2011 Update 9";
 
     private static File workingDir = new File(".");
 
