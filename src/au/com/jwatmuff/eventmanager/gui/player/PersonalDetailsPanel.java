@@ -179,7 +179,8 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
         }
         
         genderComboBox.setSelectedItem(player.getGender());
-        gradeComboBox.setSelectedItem(player.getBelt());
+        gradeComboBox.setSelectedItem(player.getGrade());
+//        gradeComboBox.setSelectedItem(player.getBelt());
 
         weightTextField.setText("" + player.getWeight());
 
