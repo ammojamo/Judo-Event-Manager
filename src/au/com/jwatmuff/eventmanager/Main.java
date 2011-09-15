@@ -135,6 +135,15 @@ public class Main {
                 log.warn("Failed to copy license from " + license1 + " to " + license2, e);
             }
         }
+        if(license1.exists() && license2.exists()) {
+            if(license1.lastModified() > license2.lastModified()) {
+                try {
+                    FileUtils.copyFile(license1, license2);
+                } catch(IOException e) {
+                    log.warn("Failed to copy license from " + license1 + " to " + license2, e);
+                }
+            }
+        }
 
         /*
          * Check if run lock exists, if so ask user if it is ok to continue
