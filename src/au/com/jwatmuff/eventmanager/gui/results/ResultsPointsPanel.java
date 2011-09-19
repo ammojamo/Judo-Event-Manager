@@ -133,7 +133,6 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                 int[] scores2 = ri2.getResult().getSimpleScores(database);
                 int winnerIndex2 = scores2[1] > scores2[0] ? 1 : 0;
                 Player winner2 = ri2.getPlayer()[winnerIndex2].player;
-
                 return winner1.getVisibleID().compareTo(winner2.getVisibleID());
             }
         });

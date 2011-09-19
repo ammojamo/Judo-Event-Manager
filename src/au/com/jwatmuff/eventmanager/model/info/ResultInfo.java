@@ -24,7 +24,7 @@ public class ResultInfo {
     private Result result;
     private Fight fight;
     private String[] playerName = new String[2];
-    private FightPlayer[] player = new FightPlayer[2];
+    private FightPlayer[] fightPlayer = new FightPlayer[2];
     private String matName;
     private int matFightNumber;
 
@@ -36,8 +36,8 @@ public class ResultInfo {
         if(fight == null) throw new DatabaseStateException();
 
         for(int i=0; i<2; i++) {
-            player[i] = PlayerCodeParser.parseCode(database, fight.getPlayerCodes()[i], fight.getPoolID());
-            playerName[i] = player[i].toString();
+            fightPlayer[i] = PlayerCodeParser.parseCode(database, fight.getPlayerCodes()[i], fight.getPoolID());
+            playerName[i] = fightPlayer[i].player.getFirstName() + " " + fightPlayer[i].player.getLastName();
         }
         
         SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, fight.getID());
@@ -86,10 +86,10 @@ public class ResultInfo {
     }
 
     public FightPlayer[] getPlayer() {
-        return player;
+        return fightPlayer;
     }
 
     public void setPlayer(FightPlayer[] player) {
-        this.player = player;
+        this.fightPlayer = player;
     }
 }
