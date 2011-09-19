@@ -14,6 +14,10 @@
     </script>
   </head>
   <body onload="setTimeout('p()', 1500);">
+<!--
+#foreach($pool in $pools)
+<!-- -->
+
     <h1>Divisions List</h1>
     <h2>${competitionName}</h2>
 
@@ -34,10 +38,7 @@
       <tr>
         <td colspan="9" class ="borderFixWidth" ></td>
       </tr>
-<!--
-#foreach($pool in $pools)
-<!-- -->
-
+      
       <tr>
         <td>&nbsp;</td>
         <td class="borderTitle1" rowspan="2" colspan="8">$pool.description [$pool.lockedStatus]</td>
@@ -103,10 +104,12 @@
       <tr>
         <td colspan="10">&nbsp;</td>
       </tr>
+    </table>
+      
 
+      <p class="break"/>
 <!--
 #end
 -->
-    </table>
   </body>
 </html>
