@@ -155,7 +155,9 @@ public class PoolDraw {
         Iterator<PlayerPoolInfo> unorderedPlayersIterator = unorderedPLayers.iterator();
         while(seededPlayers.size() < numberOfPlayerPositions/2 && unorderedPlayersIterator.hasNext()) {
             PlayerPoolInfo unorderedPlayer = unorderedPlayersIterator.next();
-            seededPlayers.add(unorderedPlayer);
+            if(unorderedPlayer != null){
+                seededPlayers.add(unorderedPlayer);
+            }
         }
         unorderedPLayers.removeAll(seededPlayers);
 
