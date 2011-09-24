@@ -18,30 +18,29 @@
 #foreach($pool in $pools)
 <!-- -->
 
-    <h1>Divisions List</h1>
-    <h2>${competitionName}</h2>
+    <h1>${competitionName} - Divisions List</h1>
 
     <table>
       <tr>
         <th>&nbsp;</th>
-        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
         <th>&nbsp;</th>
       </tr>
 
       <tr>
-        <td colspan="9" class ="borderFixWidth" ></td>
+        <td colspan="11" class ="borderFixWidth" ></td>
       </tr>
       
       <tr>
         <td>&nbsp;</td>
-        <td class="borderTitle1" rowspan="2" colspan="8">$pool.description [$pool.lockedStatus]</td>
+        <td class="borderTitle1" rowspan="2" colspan="9">$pool.description</td>
         <td>&nbsp;</td>
       </tr>
 
@@ -51,43 +50,60 @@
       </tr>
 
       <tr>
-        <td colspan="10">&nbsp;</td>
+        <td colspan="11">&nbsp;</td>
       </tr>
 
       <tr>
         <th>&nbsp;</td>
         <th><b>ID</b></th>
-        <th><b>Last Name</b></th>
-        <th><b>First Name</b></th>
-        <th><b>Gender</b></th>
+        <th><b>Last</b></th>
+        <th><b>First</b></th>
+        <th><b>Sex</b></th>
         <th><b>DOB</b></th>
-        <th><b>Grade</b></th>
+        <th><b>GDE</b></th>
         <th><b>Team</b></th>
         <th><b>Weight</b></th>
+        <th><b>Signed</b></th>
         <th>&nbsp;</td>
       </tr>
 
 <!--
 #foreach($player in $players.get($pool.ID))
 <!-- -->
+
+      <tr>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+        <th>&nbsp;</td>
+      </tr>
+      
       <tr>
         <td>&nbsp;</td>
         <td>$!player.visibleID</td>
         <td>$!player.lastName</td>
         <td>$!player.firstName</td>
-        <td>$!player.gender</td>
+        <td>$!player.shortGender</td>
 #if($player.dob)
         <td>$date.format("dd/MM/yyyy", $!player.dob) &nbsp;</td>
 #else
         <td>---</td>
 #end
-        <td>$!player.shortGrade</td>
+        <td>$!player.veryShortGrade</td>
         <td>$!player.team</td>
 #if($!player.weight == 0.0)
             <td>_________ (kg)</td>
 #else
             <td>$!player.weight (kg)</td>
 #end
+            <td>______</td>
         <td>&nbsp;</td>
       </tr>
 <!--
@@ -95,14 +111,14 @@
 -->
 
       <tr>
-        <td colspan="10">&nbsp;</td>
+        <td colspan="11">&nbsp;</td>
       </tr>
       <tr>
-        <th colspan="10"><hr><b></b></th>
+        <th colspan="11"><hr><b></b></th>
       </tr>
 
       <tr>
-        <td colspan="10">&nbsp;</td>
+        <td colspan="11">&nbsp;</td>
       </tr>
     </table>
       

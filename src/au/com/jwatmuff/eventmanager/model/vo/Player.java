@@ -19,7 +19,14 @@ import java.sql.Date;
  */
 public class Player extends DistributableObject<Integer> implements Serializable {
     public static enum Gender {
-        MALE, FEMALE, UNSPECIFIED;
+        MALE ("M"),
+        FEMALE ("F"),
+        UNSPECIFIED ("U");
+
+        public final String shortGender;
+        Gender(String shortGender) {
+            this.shortGender = shortGender;
+        }
                 
         public static Gender fromString(String name) {
             return (name == null) ? UNSPECIFIED : valueOf(name);
@@ -44,9 +51,9 @@ public class Player extends DistributableObject<Integer> implements Serializable
         BLACK_9TH_DAN ("9 Dan", "9th Dan", "9D"),
         UNSPECIFIED ("None", "None", "N");
 
-        public final String shortGrade;   // in kilograms
-        public final String belt;   // in kilograms
-        public final String veryShortGrade;   // in kilograms
+        public final String shortGrade;
+        public final String belt;
+        public final String veryShortGrade;
         Grade(String shortGrade, String belt, String veryShortGrade) {
             this.shortGrade = shortGrade;
             this.belt = belt;
@@ -121,6 +128,10 @@ public class Player extends DistributableObject<Integer> implements Serializable
 
     public Gender getGender() {
         return gender;
+    }
+
+    public String getShortGender() {
+        return gender.shortGender;
     }
 
     public void setGender(Gender gender) {
