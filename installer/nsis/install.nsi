@@ -1,14 +1,14 @@
-Name "Event Manager 2011 Update 11"
+Name "Event Manager 2011 Update 12"
 Caption "Event Manager"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2011u11.exe"
+OutFile "EventManagerSetup-2011u12.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
 
 InstallDir $PROGRAMFILES\EventManager
 
-DirText "This will install EventManager 2011 Update 11 on your computer."
+DirText "This will install EventManager 2011 Update 12 on your computer."
 
 Section ""
   SetOutPath $INSTDIR
