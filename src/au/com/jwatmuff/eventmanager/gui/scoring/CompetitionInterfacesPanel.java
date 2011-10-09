@@ -22,6 +22,7 @@ import au.com.jwatmuff.genericp2p.PeerManager;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -311,9 +312,23 @@ private void displayScoreboardButtonActionPerformed(java.awt.event.ActionEvent e
 }//GEN-LAST:event_displayScoreboardButtonActionPerformed
 
 private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualScoreboardButtonActionPerformed
+    List<String> errors = new ArrayList<String>();
+    
     if(!PermissionChecker.isAllowed(Action.MANUAL_SCOREBOARD, database)) return;
+    
     String scoreboardName = JOptionPane.showInputDialog(this, "Enter a name for this scoreboard", "Manual Scoreboard", JOptionPane.QUESTION_MESSAGE);
+    
     if(scoreboardName == null) return;
+    else if(scoreboardName.isEmpty())
+        errors.add("Scoreboard name must not be empty");
+    else if(!scoreboardName.matches("[a-zA-Z0-9]*"))
+        errors.add("Scoreboard name must only consist of letters and numbers, with no spaces");
+
+    if(errors.size() > 0) {
+        GUIUtils.displayErrors(this, errors);
+        return;
+    }
+        
     scoreboardName = "Scoreboard/" + scoreboardName;
     openWindow(new ScoreboardWindow("Manual Scoreboard - " + scoreboardName,
                                     ScoringSystem.NEW, peerManager, scoreboardName));

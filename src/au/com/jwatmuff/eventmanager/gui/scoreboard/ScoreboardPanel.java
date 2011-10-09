@@ -806,9 +806,9 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
         }
         
         for(int i=0; i<2; i++) {
-            int p = swapPlayers?(1-i):i;
-            Color fg = colors.getColor((p==0)?Area.PLAYER1_FOREGROUND:Area.PLAYER2_FOREGROUND);
-            Color bg = colors.getColor((p==0)?Area.PLAYER1_BACKGROUND:Area.PLAYER2_BACKGROUND);
+            int playerPnt = swapPlayers?(1-i):i;
+            Color fg = colors.getColor((playerPnt==0)?Area.PLAYER1_FOREGROUND:Area.PLAYER2_FOREGROUND);
+            Color bg = colors.getColor((playerPnt==0)?Area.PLAYER1_BACKGROUND:Area.PLAYER2_BACKGROUND);
             
             player[i].setForeground(fg);
             player[i].setBackground(bg);
@@ -819,8 +819,8 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
             pendingPlayer[i].setForeground(fg);
             pendingPlayer[i].setBackground(bg);
             
-            vsPlayer[i].setForeground(fg);
-            vsPlayer[i].setBackground(bg);
+            vsPlayer[playerPnt].setForeground(fg);
+            vsPlayer[playerPnt].setBackground(bg);
 
             for(int j=0; j<4; j++) {
                 score[i][j].setForeground(fg);
@@ -1111,7 +1111,8 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
                 pendingFightLayer.setVisible(false);
                 if(!interactive) {
                     for(int i=0; i<2; i++)
-                        vsPlayer[i].setText(model.getPlayerName(swapPlayers?1-i:i));
+//                        vsPlayer[i].setText(model.getPlayerName(swapPlayers?1-i:i));
+                        vsPlayer[i].setText(model.getPlayerName(i));
                     vsLayer.setVisible(true);
                 }
                 if(interactive)
