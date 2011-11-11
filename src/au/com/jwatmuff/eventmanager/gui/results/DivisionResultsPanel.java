@@ -32,7 +32,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,48 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
             updateFromDatabase();
         }
     }, 2000);
+    
+    public static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
+        @Override
+        public int compare(Pool p1, Pool p2) {
+            if(p1.getMaximumAge() == p2.getMaximumAge()){
+                if(p2.getGender().equals(p1.getGender())){
+                    if(p1.getMaximumWeight() == p2.getMaximumWeight()){
+                        if(p1.getMinimumWeight() == p2.getMinimumWeight()){
+                            return  p1.getDescription().compareTo(p2.getDescription());
+                        } else {
+                            if(p1.getMinimumWeight() == 0) {
+                                return 1;
+                            } else if(p2.getMinimumWeight() == 0) {
+                                return -1;
+                            } else {
+                                return -Double.compare(p1.getMinimumWeight(), p2.getMinimumWeight());
+                            }
+                        }
+                    } else {
+                        if(p1.getMaximumWeight() == 0) {
+                            return 1;
+                        } else if(p2.getMaximumWeight() == 0) {
+                            return -1;
+                        } else {
+                            return Double.compare(p1.getMaximumWeight(), p2.getMaximumWeight());
+                        }
+                    }
+                } else {
+                    return  p2.getGender().compareTo(p1.getGender());
+                }
+            } else {
+                if(p1.getMaximumAge() == 0) {
+                    return 1;
+                } else if(p2.getMaximumAge() == 0) {
+                    return -1;
+                } else {
+                    return p1.getMaximumAge() - p2.getMaximumAge();
+                }
+            }
+        }
+    };
+
     
     /** Creates new form FightProgressionPanel */
     public DivisionResultsPanel() {
@@ -216,8 +260,10 @@ public class DivisionResultsPanel extends javax.swing.JPanel implements Transact
     }// </editor-fold>//GEN-END:initComponents
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-    List<Pool> divisions = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED);
+    List<Pool> divisions = new ArrayList<Pool>();
+    divisions.addAll(database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED));
     cache.filterDivisionsWithoutResults(divisions);
+    Collections.sort(divisions, POOL_COMPARATOR);
     CheckboxListDialog<Pool> dialog = new CheckboxListDialog<Pool>(null, true, divisions, "Select divisions to print", "Print Division Results");
     dialog.setRenderer(new StringRenderer<Pool>() {
             public String asString(Pool p) { return p.getDescription(); }

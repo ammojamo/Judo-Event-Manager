@@ -36,6 +36,8 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -65,6 +67,47 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     
     private Date censusDate;
     private ConfigurationFile configurationFile;
+    
+    public static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
+        @Override
+        public int compare(Pool p1, Pool p2) {
+            if(p1.getMaximumAge() == p2.getMaximumAge()){
+                if(p2.getGender().equals(p1.getGender())){
+                    if(p1.getMaximumWeight() == p2.getMaximumWeight()){
+                        if(p1.getMinimumWeight() == p2.getMinimumWeight()){
+                            return  p1.getDescription().compareTo(p2.getDescription());
+                        } else {
+                            if(p1.getMinimumWeight() == 0) {
+                                return 1;
+                            } else if(p2.getMinimumWeight() == 0) {
+                                return -1;
+                            } else {
+                                return -Double.compare(p1.getMinimumWeight(), p2.getMinimumWeight());
+                            }
+                        }
+                    } else {
+                        if(p1.getMaximumWeight() == 0) {
+                            return 1;
+                        } else if(p2.getMaximumWeight() == 0) {
+                            return -1;
+                        } else {
+                            return Double.compare(p1.getMaximumWeight(), p2.getMaximumWeight());
+                        }
+                    }
+                } else {
+                    return  p2.getGender().compareTo(p1.getGender());
+                }
+            } else {
+                if(p1.getMaximumAge() == 0) {
+                    return 1;
+                } else if(p2.getMaximumAge() == 0) {
+                    return -1;
+                } else {
+                    return p1.getMaximumAge() - p2.getMaximumAge();
+                }
+            }
+        }
+    };
 
     /** Creates new form ManagePoolsPanel */
     public ManagePoolsPanel() {
@@ -553,8 +596,9 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_requestedListMouseClicked
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-    /* get all pools */
-    List<Pool> pools = database.findAll(Pool.class, PoolDAO.ALL);
+    /* get all pools */ 
+    List<Pool> pools = new ArrayList<Pool>();
+    pools = database.findAll(Pool.class, PoolDAO.ALL);
     
     /* remove pools with no players */
     Iterator<Pool> iter = pools.iterator();
@@ -563,6 +607,7 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         if(database.findAll(Player.class, PlayerDAO.FOR_POOL, nextPool.getID(), false).isEmpty() && database.findAll(Player.class, PlayerDAO.FOR_POOL, nextPool.getID(), true).isEmpty())
             iter.remove();
     }
+    Collections.sort(pools, POOL_COMPARATOR);
 
     /* display pool selection dialog */
     CheckboxListDialog<Pool> cld = new CheckboxListDialog<Pool>(

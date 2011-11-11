@@ -21,6 +21,9 @@ import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
@@ -37,6 +40,49 @@ public class ResultsPanel extends javax.swing.JPanel {
     private Frame parentWindow;
     private ResultInfoCache resultInfoCache;
     private DivisionResultCache divisionResultCache;
+    
+    public static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
+        @Override
+        public int compare(Pool p1, Pool p2) {
+            if(p1.getMaximumAge() == p2.getMaximumAge()){
+                if(p2.getGender().equals(p1.getGender())){
+                    if(p1.getMaximumWeight() == p2.getMaximumWeight()){
+                        if(p1.getMinimumWeight() == p2.getMinimumWeight()){
+                            return  p1.getDescription().compareTo(p2.getDescription());
+                        } else {
+                            if(p1.getMinimumWeight() == 0) {
+                                return 1;
+                            } else if(p2.getMinimumWeight() == 0) {
+                                return -1;
+                            } else {
+                                return -Double.compare(p1.getMinimumWeight(), p2.getMinimumWeight());
+                            }
+                        }
+                    } else {
+                        if(p1.getMaximumWeight() == 0) {
+                            return 1;
+                        } else if(p2.getMaximumWeight() == 0) {
+                            return -1;
+                        } else {
+                            return Double.compare(p1.getMaximumWeight(), p2.getMaximumWeight());
+                        }
+                    }
+                } else {
+                    return  p2.getGender().compareTo(p1.getGender());
+                }
+            } else {
+                if(p1.getMaximumAge() == 0) {
+                    return 1;
+                } else if(p2.getMaximumAge() == 0) {
+                    return -1;
+                } else {
+                    return p1.getMaximumAge() - p2.getMaximumAge();
+                }
+            }
+        }
+    };
+
+    
 
     /** Creates new form FightProgressionPanel */
     public ResultsPanel() {
@@ -289,7 +335,9 @@ private void divisionResultsButtonActionPerformed(java.awt.event.ActionEvent evt
 }//GEN-LAST:event_divisionResultsButtonActionPerformed
 
 private void printDrawResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printDrawResultsButtonActionPerformed
-    List<Pool> pools = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED);
+    List<Pool> pools = new ArrayList<Pool>();
+    pools.addAll(database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED));
+    Collections.sort(pools, POOL_COMPARATOR);
     if(pools.size() == 0) {
         GUIUtils.displayMessage(null, "At least one division with locked fights must exist to print results", "Print Results");
         return;

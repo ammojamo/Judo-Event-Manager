@@ -34,7 +34,10 @@ import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +64,49 @@ public class FightOrderPanel extends javax.swing.JPanel {
     private FightTableModel fightTableModel;
 
     private JFrame parentWindow;
+    
+    public static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
+        @Override
+        public int compare(Pool p1, Pool p2) {
+            if(p1.getMaximumAge() == p2.getMaximumAge()){
+                if(p2.getGender().equals(p1.getGender())){
+                    if(p1.getMaximumWeight() == p2.getMaximumWeight()){
+                        if(p1.getMinimumWeight() == p2.getMinimumWeight()){
+                            return  p1.getDescription().compareTo(p2.getDescription());
+                        } else {
+                            if(p1.getMinimumWeight() == 0) {
+                                return 1;
+                            } else if(p2.getMinimumWeight() == 0) {
+                                return -1;
+                            } else {
+                                return -Double.compare(p1.getMinimumWeight(), p2.getMinimumWeight());
+                            }
+                        }
+                    } else {
+                        if(p1.getMaximumWeight() == 0) {
+                            return 1;
+                        } else if(p2.getMaximumWeight() == 0) {
+                            return -1;
+                        } else {
+                            return Double.compare(p1.getMaximumWeight(), p2.getMaximumWeight());
+                        }
+                    }
+                } else {
+                    return  p2.getGender().compareTo(p1.getGender());
+                }
+            } else {
+                if(p1.getMaximumAge() == 0) {
+                    return 1;
+                } else if(p2.getMaximumAge() == 0) {
+                    return -1;
+                } else {
+                    return p1.getMaximumAge() - p2.getMaximumAge();
+                }
+            }
+        }
+    };
+
+    
 
     /** Creates new form FightOrderPanel */
     public FightOrderPanel() {
@@ -458,12 +504,14 @@ public class FightOrderPanel extends javax.swing.JPanel {
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
     /* get list of pools */
-    List<Pool> pools = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.PLAYERS_LOCKED);
+    List<Pool> pools = new ArrayList<Pool>();
+    pools = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.PLAYERS_LOCKED);
     pools.addAll(database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED));
     if(pools.size() == 0) {
         GUIUtils.displayMessage(null, "At least one division with locked players must exist to print results", "Print Results");
         return;
     }
+    Collections.sort(pools, POOL_COMPARATOR);
 
     /* display selection dialog */
     CheckboxListDialog<Pool> dialog = new CheckboxListDialog<Pool>(parentWindow, true, pools, "Choose Division", "Print Draws");
