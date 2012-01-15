@@ -1,14 +1,14 @@
-Name "Event Manager 2011 Update 15"
-Caption "Event Manager"
+Name "Event Manager 2012"
+Caption "Event Manager 2012"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2011u15.exe"
+OutFile "EventManagerSetup-2012.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
 
-InstallDir $PROGRAMFILES\EventManager
+InstallDir $PROGRAMFILES\EventManager2012
 
-DirText "This will install EventManager 2011 Update 15 on your computer."
+DirText "This will install EventManager 2012 on your computer."
 
 Section ""
   SetOutPath $INSTDIR
@@ -22,13 +22,13 @@ Section ""
 
   writeUninstaller "$INSTDIR\uninstall.exe"
 
-  CreateDirectory "$SMPROGRAMS\EventManager"
-  createShortCut "$SMPROGRAMS\EventManager\EventManager.lnk" "$INSTDIR\EventManager.jar" "" "$INSTDIR\icon.ico"
-  createShortCut "$SMPROGRAMS\EventManager\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+  CreateDirectory "$SMPROGRAMS\EventManager2012"
+  createShortCut "$SMPROGRAMS\EventManager2012\EventManager.lnk" "$INSTDIR\EventManager.jar" "" "$INSTDIR\icon.ico"
+  createShortCut "$SMPROGRAMS\EventManager2012\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager" \
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager2012" \
                    "DisplayName" "EventManager"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager" \
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager2012" \
                    "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
 
 SectionEnd
@@ -37,17 +37,17 @@ Page license
 Page directory
 Page instfiles
 
-UninstallText "This will uninstall EventManager."
+UninstallText "This will uninstall EventManager 2012."
 
 Section "Uninstall"
 ; try user dir as well as all user dirs
-  RMDir /r "$SMPROGRAMS\EventManager"
+  RMDir /r "$SMPROGRAMS\EventManager2012"
   SetShellVarContext all
-  RMDir /r "$SMPROGRAMS\EventManager"
+  RMDir /r "$SMPROGRAMS\EventManager2012"
 
   RMDir /r "$INSTDIR"
 
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager2012"
 SectionEnd
 
 Section "Install Java"
