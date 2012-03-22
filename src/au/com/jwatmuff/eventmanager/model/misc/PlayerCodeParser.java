@@ -13,6 +13,7 @@ import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -989,15 +990,34 @@ public class PlayerCodeParser {
     }
 
     public ArrayList<Integer> getSameTeamFights() {
+        boolean returnSameTeamFights = false;
         ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
 
+        List<Place> places = pool.getPlaces();
+        for(Place place : places) {
+            CodeInfo codeInfo = getCodeInfo(place.code);
+            if(codeInfo.type == CodeType.ROUNDROBIN)
+                returnSameTeamFights = true;
+        }
+        
         for(FightInfo fightInfo : fightInfoList) {
             String[] codes = fightInfo.getAllPlayerCode();
+            for(String code:codes){
+                CodeInfo codeInfo = getCodeInfo(code);
+                if(codeInfo.type == CodeType.ROUNDROBIN)
+                    returnSameTeamFights = true;
+            }
+            
             if(isSameTeam(codes))
                 sameTeamFights.add(fightInfo.getFightPostion());
         }
 
-        return sameTeamFights;
+        if(returnSameTeamFights){
+            return sameTeamFights;
+        } else {
+            sameTeamFights.clear();
+            return sameTeamFights;
+        }
     }
 
     public boolean hasCommonPlayers(int[] fightPositions) {
@@ -1107,12 +1127,15 @@ public class PlayerCodeParser {
     
     /* Parser instance stuff */
 
+    private Pool pool;
     private List<PlayerPoolInfo> playerInfoList;
     private List<FightInfo> fightInfoList;
     private ConfigurationFile configurationFile;
     Map<String,FightPlayer> parseredCodes = new HashMap<String,FightPlayer>();
 
     private PlayerCodeParser(Database database, int poolID) {
+        pool = database.get(Pool.class, poolID);
+        
         playerInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
         List<Fight> fights = new ArrayList<Fight>(database.findAll(Fight.class, FightDAO.FOR_POOL, poolID));
 

@@ -67,124 +67,102 @@ public class PoolPlayerSequencer {
         return instances.get(database);
     }
 
-    public static boolean hasCommonPlayers(Database database, int poolID, int[] fightPositions) {
-        PoolPlayerSequencer pps = getInstance(database);
+//    public static boolean hasCommonPlayers(Database database, int poolID, int[] fightPositions) {
+//        PoolPlayerSequencer pps = getInstance(database);
+//
+//        if(!pps.poolFights.containsKey(poolID)) {
+//            Pool p = database.get(Pool.class, poolID);
+//            if(p.getLockedStatus() != Pool.LockedStatus.FIGHTS_LOCKED)
+//                return false;
+//
+//            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
+//            pps.poolFights.put(poolID, fights);
+//        }
+//
+//        List<Fight> fights = pps.poolFights.get(poolID);
+//
+//        int i = fightPositions[0];
+//        int j = fightPositions[1];
+//        if(i < j) { int k = i; i = j; j = k; } //swap
+//
+//        for(String code : fights.get(i-1).getPlayerCodes()) {
+//            if(PlayerCodeParser.getPrefix(code).equals("P")) {
+//                for(String code2 : fights.get(j-1).getPlayerCodes())
+//                    if(code.equals(code2)) return true;
+//            } else {
+//                int n = PlayerCodeParser.getNumber(code);
+//                if(n == j) return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 
-        if(!pps.poolFights.containsKey(poolID)) {
-            Pool p = database.get(Pool.class, poolID);
-            if(p.getLockedStatus() != Pool.LockedStatus.FIGHTS_LOCKED)
-                return false;
-
-            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
-            pps.poolFights.put(poolID, fights);
-        }
-
-        List<Fight> fights = pps.poolFights.get(poolID);
-
-        int i = fightPositions[0];
-        int j = fightPositions[1];
-        if(i < j) { int k = i; i = j; j = k; } //swap
-
-        for(String code : fights.get(i-1).getPlayerCodes()) {
-            if(PlayerCodeParser.getPrefix(code).equals("P")) {
-                for(String code2 : fights.get(j-1).getPlayerCodes())
-                    if(code.equals(code2)) return true;
-            } else {
-                int n = PlayerCodeParser.getNumber(code);
-                if(n == j) return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static ArrayList<Integer> getDependentFights(Database database, int poolID, int fightPosition) {
-        PoolPlayerSequencer pps = getInstance(database);
-        ArrayList<Integer> dependentFights = new ArrayList<Integer>();
-        dependentFights.add(fightPosition);
-
-        if(!pps.poolFights.containsKey(poolID)) {
-            Pool p = database.get(Pool.class, poolID);
-            if(p.getLockedStatus() != Pool.LockedStatus.FIGHTS_LOCKED){
-                System.out.println("***I don't think this should happen");
-                return null;
-            }
-
-            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
-            pps.poolFights.put(poolID, fights);
-        }
-
-        List<Fight> fights = pps.poolFights.get(poolID);
-
-        for(String code : fights.get(fightPosition-1).getPlayerCodes()) {
-            List<Integer> ascendantNumbers = PlayerCodeParser.getAscendant(code);
-            for(Integer ascendantNumber : ascendantNumbers) {
-                dependentFights.addAll(getDependentFights(database, poolID, ascendantNumber));
-            }
-        }
-
-        return dependentFights;
-    }
+//    public static ArrayList<Integer> getDependentFights(Database database, int poolID, int fightPosition) {
+//        PoolPlayerSequencer pps = getInstance(database);
+//        ArrayList<Integer> dependentFights = new ArrayList<Integer>();
+//        dependentFights.add(fightPosition);
+//
+//        if(!pps.poolFights.containsKey(poolID)) {
+//            Pool p = database.get(Pool.class, poolID);
+//            if(p.getLockedStatus() != Pool.LockedStatus.FIGHTS_LOCKED){
+//                System.out.println("***I don't think this should happen");
+//                return null;
+//            }
+//
+//            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
+//            pps.poolFights.put(poolID, fights);
+//        }
+//
+//        List<Fight> fights = pps.poolFights.get(poolID);
+//
+//        for(String code : fights.get(fightPosition-1).getPlayerCodes()) {
+//            List<Integer> ascendantNumbers = PlayerCodeParser.getAscendant(code);
+//            for(Integer ascendantNumber : ascendantNumbers) {
+//                dependentFights.addAll(getDependentFights(database, poolID, ascendantNumber));
+//            }
+//        }
+//
+//        return dependentFights;
+//    }
 
     public static ArrayList<Integer> getSameTeamFights(Database database, int poolID) {
         PoolPlayerSequencer pps = getInstance(database);
         PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
         ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
 
-        if(!pps.poolFights.containsKey(poolID)) {
-            Pool p = database.get(Pool.class, poolID);
-            if(p.getLockedStatus() != Pool.LockedStatus.FIGHTS_LOCKED){
-                System.out.println("***I don't think this should happen");
-                return null;
-            }
-
-            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
-            pps.poolFights.put(poolID, fights);
-        }
-
-        List<Fight> fights = pps.poolFights.get(poolID);
-
-        for(Fight fight : fights) {
-            String[] codes = fight.getPlayerCodes();
-            FightPlayer fightPlayer0 = parser.parseCode(codes[0]);
-            FightPlayer fightPlayer1 = parser.parseCode(codes[1]);
-            if(fightPlayer0.type == PlayerType.NORMAL && fightPlayer1.type == PlayerType.NORMAL){
-                if(fightPlayer0.player.getTeam().equals(fightPlayer1.player.getTeam()))
-                    sameTeamFights.add(fight.getPosition());
-            }
-        }
-
+        sameTeamFights = parser.getSameTeamFights();
         return sameTeamFights;
     }
 
-    public static ArrayList<Player> getPossiblePlayers(Database database, int poolID, int fightPosition) {
-        PoolPlayerSequencer pps = getInstance(database);
-        ArrayList<Player> possiblePlayers = new ArrayList<Player>();
-        PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
-
-        if(!pps.poolFights.containsKey(poolID)) {
-            Pool p = database.get(Pool.class, poolID);
-            if(p.getLockedStatus() != Pool.LockedStatus.FIGHTS_LOCKED)
-                return null;
-
-            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
-            pps.poolFights.put(poolID, fights);
-        }
-
-        List<Fight> fights = pps.poolFights.get(poolID);
-
-        for(String code : fights.get(fightPosition-1).getPlayerCodes()) {
-            if(PlayerCodeParser.getCodeInfo(code).type == PlayerCodeParser.CodeType.PLAYER) {
-                FightPlayer tempPlayer = parser.parseCode(code);
-                if(tempPlayer.type == PlayerCodeParser.PlayerType.NORMAL)
-                    possiblePlayers.add(tempPlayer.player);
-            } else {
-                for(int newNumber : PlayerCodeParser.getAscendant(code))
-                    possiblePlayers.addAll(getPossiblePlayers(database, poolID, newNumber ));
-            }
-        }
-        return possiblePlayers;
-    }
+//    public static ArrayList<Player> getPossiblePlayers(Database database, int poolID, int fightPosition) {
+//        PoolPlayerSequencer pps = getInstance(database);
+//        ArrayList<Player> possiblePlayers = new ArrayList<Player>();
+//        PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
+//
+//        if(!pps.poolFights.containsKey(poolID)) {
+//            Pool p = database.get(Pool.class, poolID);
+//            if(p.getLockedStatus() != Pool.LockedStatus.FIGHTS_LOCKED)
+//                return null;
+//
+//            List<Fight> fights = database.findAll(Fight.class, FightDAO.FOR_POOL, poolID);
+//            pps.poolFights.put(poolID, fights);
+//        }
+//
+//        List<Fight> fights = pps.poolFights.get(poolID);
+//
+//        for(String code : fights.get(fightPosition-1).getPlayerCodes()) {
+//            if(PlayerCodeParser.getCodeInfo(code).type == PlayerCodeParser.CodeType.PLAYER) {
+//                FightPlayer tempPlayer = parser.parseCode(code);
+//                if(tempPlayer.type == PlayerCodeParser.PlayerType.NORMAL)
+//                    possiblePlayers.add(tempPlayer.player);
+//            } else {
+//                for(int newNumber : PlayerCodeParser.getAscendant(code))
+//                    possiblePlayers.addAll(getPossiblePlayers(database, poolID, newNumber ));
+//            }
+//        }
+//        return possiblePlayers;
+//    }
 
     public static List<PlayerPoolInfo> getPlayerSequence(Database database, int poolID) {
         int numPlayerPositions = getNumberOfPlayerPositions(database, poolID);
