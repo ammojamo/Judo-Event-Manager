@@ -71,6 +71,7 @@ public class PoolNumber {
 
     public static int NumberToOrder(int number) {
         int order = 0;
+        number = number - 1;
         while (number > 0){
             number = number >>> 1;
             order++;
@@ -91,8 +92,9 @@ public class PoolNumber {
 
     public static int OrderToNumber(int order) {
         int number = 1;
-        for(int i = 0; i < order-1; i++)
-            number = number << 1;
+        number = (int) Math.pow(2,order);
+//        for(int i = 0; i < order-1; i++)
+//            number = number << 1;
         return number;
     }
 
@@ -158,22 +160,22 @@ public class PoolNumber {
         return newPoolNumbers;
     }
 
-    public static List<PoolNo> GetPoolOrder(PoolNo poolNo, int newOrder){
+    public static List<PoolNo> GetPoolOrder(PoolNo rootPoolNo, int newOrder){
         List<PoolNo> poolNos = new ArrayList<PoolNo>();
-        if(newOrder == GetPoolOrder(poolNo)){
-            poolNos.add(poolNo);
+        if(newOrder == GetPoolOrder(rootPoolNo)){
+            poolNos.add(rootPoolNo);
             return poolNos;
 
-        } else if(newOrder < GetPoolOrder(poolNo)) {
-            for(int i = GetPoolOrder(poolNo); i > newOrder; i--){
-                poolNo = ReduceOrder(poolNo);
+        } else if(newOrder < GetPoolOrder(rootPoolNo)) {
+            for(int i = GetPoolOrder(rootPoolNo); i > newOrder; i--){
+                rootPoolNo = ReduceOrder(rootPoolNo);
             }
-            poolNos.add(poolNo);
+            poolNos.add(rootPoolNo);
             return poolNos;
 
         } else {
-            poolNos.add(poolNo);
-            for(int i = GetPoolOrder(poolNo); i < newOrder-1; i++){
+            poolNos.add(rootPoolNo);
+            for(int i = GetPoolOrder(rootPoolNo); i < newOrder; i++){
                 poolNos = IncreasePoolOrder(poolNos);
             }
             return poolNos;
@@ -182,17 +184,21 @@ public class PoolNumber {
 
     public static List<Integer> GetFightList(int order){
 
-        int noPlayers = OrderToNumber(order+1);
+        int noPlayers = OrderToNumber(order);
         List<Integer> playerNumbers = new ArrayList<Integer>();
         List<Integer> fightNumbers = new ArrayList<Integer>();
         List<Integer> lastFightNumbers = new ArrayList<Integer>();
 
-        for(int i = 0; i<noPlayers/2; i++){
+        for(int i = 0; i<noPlayers; i++){
             fightNumbers.add(i, i);
         }
-        for(int i = fightNumbers.size(); i<noPlayers; i++){
-            lastFightNumbers.add(i);
-        }
+        
+//        for(int i = 0; i<noPlayers/2; i++){
+//            fightNumbers.add(i, i);
+//        }
+//        for(int i = fightNumbers.size(); i<noPlayers; i++){
+//            lastFightNumbers.add(i);
+//        }
 
         Random randomGenerator = new Random();
 
@@ -214,12 +220,12 @@ public class PoolNumber {
         newpoolNoPaths.put(0, GetPoolNumberPath(PoolNumber(playerNumbers.get(0), order)));
 
         for(int k = 1; k < noPlayers; k++){
-            int newOrder = NumberToOrder(k);
+            int newOrder = NumberToOrder(k+1);
             List<Integer> newPath = new ArrayList<Integer>();
             int nextCorner = 0;
 
-            if(fightNumbers.isEmpty())
-                fightNumbers.addAll(lastFightNumbers);
+//            if(fightNumbers.isEmpty())
+//                fightNumbers.addAll(lastFightNumbers);
 
             for(int i = 0; i < newOrder-1 ; i++){
                 nextCorner = poolNoPaths.get(k).Corners.get(i);
@@ -260,7 +266,7 @@ public class PoolNumber {
     }
 
     public static Map<Integer, Integer> SeedToPoolMap(int noPlayers){
-        int order = NumberToOrder(noPlayers-1);
+        int order = NumberToOrder(noPlayers);
         Map<Integer, Integer> seedToPoolMap = new HashMap<Integer, Integer>();
         List<Integer> seedToPool = GetFightList(order);
         int position = 0;
@@ -275,7 +281,7 @@ public class PoolNumber {
 
     public static Map<Integer, Integer> PlayerIDToScore(Map<Integer, Integer> playerIDToPoolNo, int noPlayers ){
 
-        int order = NumberToOrder(noPlayers-1);
+        int order = NumberToOrder(noPlayers);
         Map<Integer, Integer> playerIDToScore = new HashMap<Integer, Integer>();
         Map<Integer, PoolNoPath> playerIDToPoolNoPath = new HashMap<Integer, PoolNoPath>();
         
