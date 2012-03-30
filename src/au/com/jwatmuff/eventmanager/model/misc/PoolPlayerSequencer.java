@@ -131,7 +131,7 @@ public class PoolPlayerSequencer {
         PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
         ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
 
-        sameTeamFights = parser.getSameTeamFights();
+        sameTeamFights = parser.getSameTeamFightsFirst();
         return sameTeamFights;
     }
 

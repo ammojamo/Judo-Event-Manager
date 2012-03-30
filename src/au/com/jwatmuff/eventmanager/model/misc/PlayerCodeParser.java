@@ -989,34 +989,13 @@ public class PlayerCodeParser {
         return dependentFights;
     }
 
-    public ArrayList<Integer> getSameTeamFights() {
-        boolean returnSameTeamFights = false;
-        ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
-
-        List<Place> places = pool.getPlaces();
-        for(Place place : places) {
-            CodeInfo codeInfo = getCodeInfo(place.code);
-            if(codeInfo.type == CodeType.ROUNDROBIN)
-                returnSameTeamFights = true;
-        }
-        
-        for(FightInfo fightInfo : fightInfoList) {
-            String[] codes = fightInfo.getAllPlayerCode();
-            for(String code:codes){
-                CodeInfo codeInfo = getCodeInfo(code);
-                if(codeInfo.type == CodeType.ROUNDROBIN)
-                    returnSameTeamFights = true;
-            }
-            
-            if(isSameTeam(codes))
-                sameTeamFights.add(fightInfo.getFightPostion());
-        }
-
-        if(returnSameTeamFights){
+    public ArrayList<Integer> getSameTeamFightsFirst() {
+        if(isRoundRobinDraw)
             return sameTeamFights;
-        } else {
-            sameTeamFights.clear();
-            return sameTeamFights;
+        else {
+// Todo: Can this be done better?
+            ArrayList<Integer> emptyTeamFights = new ArrayList<Integer>();
+            return emptyTeamFights;
         }
     }
 
@@ -1131,6 +1110,8 @@ public class PlayerCodeParser {
     private List<PlayerPoolInfo> playerInfoList;
     private List<FightInfo> fightInfoList;
     private ConfigurationFile configurationFile;
+    private boolean isRoundRobinDraw = false;
+    private ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
     Map<String,FightPlayer> parseredCodes = new HashMap<String,FightPlayer>();
 
     private PlayerCodeParser(Database database, int poolID) {
@@ -1140,11 +1121,30 @@ public class PlayerCodeParser {
         List<Fight> fights = new ArrayList<Fight>(database.findAll(Fight.class, FightDAO.FOR_POOL, poolID));
 
         fightInfoList = new ArrayList<FightInfo>();
-        for(Fight fight : fights)
+        for(Fight fight : fights) 
             fightInfoList.add(FightInfo.getFightInfo(database, fight));
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
+        
+// initiate fights with same team and check for round robin.
         configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
+        List<Place> places = pool.getPlaces();
+        for(Place place : places) {
+            CodeInfo codeInfo = getCodeInfo(place.code);
+            if(codeInfo.type == CodeType.ROUNDROBIN)
+                isRoundRobinDraw = true;
+        }
+        for(FightInfo fightInfo : fightInfoList) {
+            String[] codes = fightInfo.getAllPlayerCode();
+            for(String code:codes){
+                CodeInfo codeInfo = getCodeInfo(code);
+                if(codeInfo.type == CodeType.ROUNDROBIN)
+                    isRoundRobinDraw = true;
+            }
+            
+            if(isSameTeam(codes))
+                sameTeamFights.add(fightInfo.getFightPostion());
+        }
     }
 
     public static PlayerCodeParser getInstance(Database database, int poolID) {
