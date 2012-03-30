@@ -88,13 +88,13 @@ public class ScalableAbsoluteLayout implements LayoutManager {
         int usableWidth = parentWidth;
         int usableHeight = parentHeight;
 
-        if(parentAspect > aspect) { // parent is broader than required
-            usableWidth = (int)(usableHeight * aspect);
-            xOffset = (parentWidth - usableWidth) / 2;                
-        } else {
-            usableHeight = (int)(usableWidth / aspect);
-            yOffset = (parentHeight - usableHeight) / 2;
-        }
+//        if(parentAspect > aspect) { // parent is broader than required
+//            usableWidth = (int)(usableHeight * aspect);
+//            xOffset = (parentWidth - usableWidth) / 2;                
+//        } else {
+//            usableHeight = (int)(usableWidth / aspect);
+//            yOffset = (parentHeight - usableHeight) / 2;
+//        }
         /*
         log.debug("parentWidth " + parentWidth);
         log.debug("parentHeight " + parentHeight);

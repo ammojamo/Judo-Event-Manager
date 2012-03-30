@@ -189,7 +189,7 @@ public class SessionFightSequencer {
 
     // If F1 is moved to i, will it be moved before a fight with two team mates
                     if(positionOk) {
-                        ArrayList<Integer> sameTeamFights = playerCodeParsers.get(f1.getPoolID()).getSameTeamFights();
+                        ArrayList<Integer> sameTeamFights = playerCodeParsers.get(f1.getPoolID()).getSameTeamFightsFirst();
                         if(!up) {
                             if(!sameTeamFights.contains(f1.getPosition())){
                                 for(int l = i; l < j; l++) {
