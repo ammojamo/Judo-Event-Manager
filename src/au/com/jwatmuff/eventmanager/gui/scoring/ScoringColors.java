@@ -15,11 +15,16 @@ import java.util.Map;
  */
 public class ScoringColors {
     public static enum Area {
-        IDLE_BACKGROUND(Color.YELLOW), IDLE_FOREGROUND(Color.BLACK),
-        FIGHTING_BACKGROUND(new Color(194, 191, 221)), FIGHTING_FOREGROUND(Color.BLACK),
-        HOLDDOWN_BACKGROUND(Color.GREEN), HOLDDOWN_FOREGROUND(Color.BLACK),
-        PLAYER1_BACKGROUND(Color.WHITE), PLAYER1_FOREGROUND(Color.BLACK),
-        PLAYER2_BACKGROUND(Color.BLUE), PLAYER2_FOREGROUND(Color.WHITE);
+        IDLE_BACKGROUND(Color.YELLOW), 
+        IDLE_FOREGROUND(Color.BLACK),
+        FIGHTING_BACKGROUND(new Color(194, 191, 221)), 
+        FIGHTING_FOREGROUND(Color.BLACK),
+        HOLDDOWN_BACKGROUND(Color.GREEN), 
+        HOLDDOWN_FOREGROUND(Color.BLACK),
+        PLAYER1_BACKGROUND(Color.WHITE), 
+        PLAYER1_FOREGROUND(Color.BLACK),
+        PLAYER2_BACKGROUND(Color.BLUE), 
+        PLAYER2_FOREGROUND(Color.WHITE);
         
         private Color defaultColor;
 

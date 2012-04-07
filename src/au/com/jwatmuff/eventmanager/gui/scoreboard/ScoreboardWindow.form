@@ -57,7 +57,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="swapPlayersMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Swap Players"/>
+                <Property name="text" type="java.lang.String" value="Swap Player Sides"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="swapPlayersMenuItemActionPerformed"/>

@@ -13,7 +13,7 @@ import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors.Area;
  * @author  James
  */
 public class ScoringColorsDialog extends javax.swing.JDialog {
-    private ScoringColors colors = new ScoringColors();;
+    private ScoringColors colors = new ScoringColors();
 
     /** Creates new form ScoringColorsDialog */
     public ScoringColorsDialog(java.awt.Frame parent, boolean modal) {
@@ -39,10 +39,17 @@ public class ScoringColorsDialog extends javax.swing.JDialog {
         fightingFg.setColor(colors.getColor(Area.FIGHTING_FOREGROUND));
         holddownBg.setColor(colors.getColor(Area.HOLDDOWN_BACKGROUND));
         holddownFg.setColor(colors.getColor(Area.HOLDDOWN_FOREGROUND));
-        player1Bg.setColor(colors.getColor(Area.PLAYER1_BACKGROUND));
-        player1Fg.setColor(colors.getColor(Area.PLAYER1_FOREGROUND));
-        player2Bg.setColor(colors.getColor(Area.PLAYER2_BACKGROUND));
-        player2Fg.setColor(colors.getColor(Area.PLAYER2_FOREGROUND));
+        if(jToggleButton1.isSelected()) {
+            player1Bg.setColor(colors.getColor(Area.PLAYER2_BACKGROUND));
+            player1Fg.setColor(colors.getColor(Area.PLAYER2_FOREGROUND));
+            player2Bg.setColor(colors.getColor(Area.PLAYER1_BACKGROUND));
+            player2Fg.setColor(colors.getColor(Area.PLAYER1_FOREGROUND));
+        }else {
+            player1Bg.setColor(colors.getColor(Area.PLAYER1_BACKGROUND));
+            player1Fg.setColor(colors.getColor(Area.PLAYER1_FOREGROUND));
+            player2Bg.setColor(colors.getColor(Area.PLAYER2_BACKGROUND));
+            player2Fg.setColor(colors.getColor(Area.PLAYER2_FOREGROUND));
+        }
     }
     
     private void updateScoringColors() {
@@ -87,6 +94,7 @@ public class ScoringColorsDialog extends javax.swing.JDialog {
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         defaultButton = new javax.swing.JButton();
+        jToggleButton1 = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Choose Colors");
@@ -236,6 +244,13 @@ public class ScoringColorsDialog extends javax.swing.JDialog {
             }
         });
 
+        jToggleButton1.setText("Swap Player Colors");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -258,7 +273,7 @@ public class ScoringColorsDialog extends javax.swing.JDialog {
                             .addComponent(holddownFg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(player1Fg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(player2Fg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(idleBg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -266,6 +281,7 @@ public class ScoringColorsDialog extends javax.swing.JDialog {
                             .addComponent(holddownBg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(player1Bg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(player2Bg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jToggleButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(defaultButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -277,7 +293,6 @@ public class ScoringColorsDialog extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -314,7 +329,9 @@ public class ScoringColorsDialog extends javax.swing.JDialog {
                             .addComponent(player1Fg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(player2Fg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jToggleButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(okButton)
                     .addComponent(cancelButton)
@@ -338,6 +355,11 @@ private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     setColors(new ScoringColors());
 }//GEN-LAST:event_defaultButtonActionPerformed
 
+private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    // TODO add your handling code here:
+    updateGUI();
+}//GEN-LAST:event_jToggleButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -355,6 +377,7 @@ private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JButton okButton;
     private net.java.dev.colorchooser.ColorChooser player1Bg;
     private net.java.dev.colorchooser.ColorChooser player1Fg;

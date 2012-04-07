@@ -42,6 +42,7 @@ import au.com.jwatmuff.genericp2p.NoSuchServiceException;
 import au.com.jwatmuff.genericp2p.Peer;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import au.com.jwatmuff.genericp2p.rmi.LookupService;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
@@ -527,7 +528,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         optionsMenu.add(fullScreenMenuItem);
         optionsMenu.remove(fullScreenMenuItem);
 
-        swapPlayersMenuItem.setText("Swap Players");
+        swapPlayersMenuItem.setText("Swap Player Sides");
         swapPlayersMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 swapPlayersMenuItemActionPerformed(evt);
