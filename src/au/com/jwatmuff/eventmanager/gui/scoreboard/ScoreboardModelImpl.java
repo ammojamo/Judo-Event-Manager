@@ -506,8 +506,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return Score.YUKO;
         } else if (time >= 10 && system != ScoringSystem.NEW) {
             return Score.KOKA;
-        } else
+        } else {
             return null;
+        }
     }
     
     @Override
@@ -551,7 +552,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     
     @Override
     public int getScore(int player, Score type) {
-        /* disable yuko for new scoring system */
+        /* disable koka for new scoring system */
         if(system == ScoringSystem.NEW && type == Score.KOKA)
             return 0;
 
