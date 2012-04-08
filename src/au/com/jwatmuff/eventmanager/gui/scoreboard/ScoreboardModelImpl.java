@@ -54,6 +54,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     private Score pendingHolddownScore;                         // stores score from holddown which has not yet been assigned to a player
     private int holddownPlayer = UNKNOWN_PLAYER;
     private List<Score>[] pendingScores;                        // stores scores from holddowns which have been assigned to a player but not yet awarded
+    private int holddownTimeIpon;
+    private int holddownTimeWazari;
+    private int holddownTimeYoko;
 
     /* cancel holddown undo stuff */
     private Stopwatch shadowTimer = new Stopwatch(10, true);    
@@ -121,11 +124,11 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
             @Override
             public void run() {
-                if(holddownTimer.getTime()/1000 >= 25) {
+                if(holddownTimer.getTime()/1000 >= holddownTimeIpon) {
                     stopTimer();
                     holddownTimer.stop();
                     handleHolddownTimerEnd();
-                } else if(holddownTimer.getTime()/1000 >= 20 &&
+                } else if(holddownTimer.getTime()/1000 >= holddownTimeWazari &&
                           holddownPlayer != UNKNOWN_PLAYER &&
                           getScore(holddownPlayer, Score.WAZARI) == 1) {
                     stopTimer();
@@ -143,6 +146,15 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public void reset(int fightTime, int goldenScoreTime, String[] playerNames) {
         this.fightTime = fightTime;
+        if (this.fightTime > 90) {
+            holddownTimeIpon = 25;
+            holddownTimeWazari = 20;
+            holddownTimeYoko = 15;
+        } else {
+            holddownTimeIpon = 20;
+            holddownTimeWazari = 15;
+            holddownTimeYoko = 10;
+        }
         this.goldenScoreTime = goldenScoreTime;
         this.playerNames = playerNames;
         stopTimer();
@@ -498,11 +510,11 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     }
     
     private Score holddownScore(int time) {
-        if(time == 25) {
+        if(time == holddownTimeIpon) {
             return Score.IPPON;
-        } else if (time >= 20) {
+        } else if (time >= holddownTimeWazari) {
             return Score.WAZARI;
-        } else if (time >= 15) {
+        } else if (time >= holddownTimeYoko) {
             return Score.YUKO;
         } else if (time >= 10 && system != ScoringSystem.NEW) {
             return Score.KOKA;
