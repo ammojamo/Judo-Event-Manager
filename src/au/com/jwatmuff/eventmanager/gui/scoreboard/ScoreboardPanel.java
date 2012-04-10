@@ -44,7 +44,6 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
     private static final Logger log = Logger.getLogger(ScoreboardPanel.class);
     
     private ScoreboardModel model;
-    private ScoringColors colors = new ScoringColors();
         
     private ScalableLabel timer;
     private ScalableLabel[] player;
@@ -710,11 +709,6 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
     public void setPlayerName(String playerName, int n) {
         player[swapPlayers?1-n:n].setText(playerName);
     }
-    
-    public void setColors(ScoringColors colors) {
-        this.colors = colors;
-        updateColors();
-    }
 
     public void setImagesEnabled(boolean enabled) {
         imageFiles = enabled ? findImageFiles() : new File[0];
@@ -723,6 +717,8 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
     }
     
     private void updateColors() {
+        ScoringColors colors = model.getColors();
+
         switch(model.getHolddownPlayer()) {
             case 0:
                 holddownTimer.setBackground(colors.getColor(Area.PLAYER1_BACKGROUND));
@@ -938,11 +934,11 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
 
         if(model.getMode() == Mode.WIN) {
             if(model.getWinningPlayer() == 0) {
-                result.setBackground(colors.getColor(Area.PLAYER1_BACKGROUND));
-                result.setForeground(colors.getColor(Area.PLAYER1_FOREGROUND));
+                result.setBackground(model.getColors().getColor(Area.PLAYER1_BACKGROUND));
+                result.setForeground(model.getColors().getColor(Area.PLAYER1_FOREGROUND));
             } else {
-                result.setBackground(colors.getColor(Area.PLAYER2_BACKGROUND));
-                result.setForeground(colors.getColor(Area.PLAYER2_FOREGROUND));
+                result.setBackground(model.getColors().getColor(Area.PLAYER2_BACKGROUND));
+                result.setForeground(model.getColors().getColor(Area.PLAYER2_FOREGROUND));
             }
             if(model.getWin() != null) {
                 Score winScore = model.getWin().score;

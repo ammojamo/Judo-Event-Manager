@@ -6,14 +6,15 @@
 package au.com.jwatmuff.eventmanager.gui.scoring;
 
 import java.awt.Color;
-import java.util.HashMap;
+import java.io.Serializable;
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
  *
  * @author James
  */
-public class ScoringColors {
+public class ScoringColors implements Serializable {
     public static enum Area {
         IDLE_BACKGROUND(Color.YELLOW), 
         IDLE_FOREGROUND(Color.BLACK),
@@ -37,7 +38,7 @@ public class ScoringColors {
         }
     }
     
-    private Map<Area, Color> colors = new HashMap<Area, Color>();
+    private Map<Area, Color> colors = new EnumMap<Area, Color>(Area.class);
     
     public Color getColor(Area a) {        
         Color c = colors.get(a);

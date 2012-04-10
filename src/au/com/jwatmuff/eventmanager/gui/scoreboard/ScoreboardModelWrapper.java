@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
+import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -171,6 +172,11 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
+    public ScoringColors getColors() {
+        return model.getColors();
+    }    
+
+    @Override
     public boolean undoCancelHolddownAvailable() {
         return model.undoCancelHolddownAvailable();
     }
@@ -283,5 +289,10 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     @Override
     public ScoringSystem getSystem() {
         return model.getSystem();
+    }
+    
+    @Override
+    public void setColors(ScoringColors colors) {
+        model.setColors(colors);
     }
 }

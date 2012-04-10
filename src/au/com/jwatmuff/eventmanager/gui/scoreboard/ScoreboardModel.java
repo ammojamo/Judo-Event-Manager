@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
+import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import java.util.Date;
 import java.util.List;
 
@@ -111,6 +112,8 @@ public interface ScoreboardModel {
 
     int getPendingFightTime(int player);
     
+    ScoringColors getColors();
+    
     void reset(int fightTime, int goldenScoreTime, String[] playerNames);
 
     void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date lastFights[], int minimumBreak);
@@ -150,4 +153,6 @@ public interface ScoreboardModel {
     void setHolddownTimer(int seconds);
 
     void decideWinner(int player);
+    
+    void setColors(ScoringColors colors);
 }

@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
+import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.util.Stopwatch;
 import au.com.jwatmuff.genericdb.distributed.Timestamp;
 import java.io.Serializable;
@@ -72,6 +73,8 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
     /* pending fight timers */
     private Stopwatch[] pendingFightTimers = new Stopwatch[2];
+    
+    private ScoringColors colors = new ScoringColors();
 
     private StringBuilder eventLog = new StringBuilder();
         
@@ -820,6 +823,17 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public ScoringSystem getSystem() {
         return system;
+    }
+
+    @Override
+    public ScoringColors getColors() {
+        return colors;
+    }
+    
+    @Override
+    public void setColors(ScoringColors colors) {
+        this.colors = colors;
+        notifyListeners(ScoreboardUpdate.ALL);
     }
 }
 
