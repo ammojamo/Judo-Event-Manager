@@ -95,6 +95,12 @@ public class Main {
         try {
             System.setProperty("java.rmi.server.hostname", InetAddress.getLocalHost().getHostName());
         } catch(Exception e) {}
+        
+        /*
+         * Set up menu bar for Mac
+         */
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Event Manager");
 
         /*
          * Set look and feel to 'system' style
