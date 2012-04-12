@@ -18,6 +18,7 @@ import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.SessionLink;
 import au.com.jwatmuff.eventmanager.model.vo.SessionPool;
 import au.com.jwatmuff.genericdb.Database;
+import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -117,15 +118,15 @@ public class SessionLinker {
      * the database is not a valid state to delete the session, for example if
      * the session has been locked.
      */
-    public static void deleteSession(Database database, Session session) throws DatabaseStateException {
-        if(session.getLockedStatus() != Session.LockedStatus.UNLOCKED)
-            throw new DatabaseStateException("Cannot delete a locked session");
-
+    public static void deleteSession(TransactionalDatabase database, Session session) throws DatabaseStateException {
         SessionInfo si = new SessionInfo(database, session);
         
         for(Session following : si.getFollowingSessions())
             deleteSession(database, following);
         
+        if(session.getLockedStatus() != Session.LockedStatus.UNLOCKED)
+            SessionFightSequencer.undeferAllFights(database, session);
+
         for(SessionLink sl : database.findAll(SessionLink.class, SessionLinkDAO.FOR_SESSION, session.getID()))
             database.delete(sl);
 

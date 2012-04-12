@@ -515,10 +515,10 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_removeMatButtonActionPerformed
 
     private void removeSessionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeSessionButtonActionPerformed
-        List<Session> sessions = getUnlockedSessions(true);
+        List<Session> sessions = database.findAll(Session.class, SessionDAO.ALL_NORMAL);
         
         if(sessions.size() == 0) {
-            GUIUtils.displayMessage(parentWindow, "No unlocked sessions to delete.", "Delete Session");
+            GUIUtils.displayMessage(parentWindow, "No sessions to delete.", "Delete Session");
             return;
         }
         if(!PermissionChecker.isAllowed(Action.REMOVE_SESSION, database)) return;

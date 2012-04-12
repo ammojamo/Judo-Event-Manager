@@ -125,7 +125,7 @@ public class SQLitePoolDAO implements PoolDAO {
 
     @Override
     public Collection<Pool> findWithoutSession() {
-        final String sql = "SELECT * FROM pool WHERE id NOT IN (SELECT pool_id FROM session_has_pool WHERE is_valid = 'true') AND locked_status = 'FIGHTS_LOCKED' AND is_valid = 'true' ORDER BY pool.description";
+        final String sql = "SELECT * FROM pool WHERE id NOT IN (SELECT pool_id FROM session_has_pool, session WHERE session.is_valid = 'true' AND session_has_pool.is_valid = 'true' AND session.id = session_id) AND locked_status = 'FIGHTS_LOCKED' AND is_valid = 'true' ORDER BY pool.description";
         return template.query(sql, mapper);
     }
     

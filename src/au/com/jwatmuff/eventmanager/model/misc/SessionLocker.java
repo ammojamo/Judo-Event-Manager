@@ -173,21 +173,47 @@ public class SessionLocker {
                     throw new DatabaseStateException("Failed to fight-lock all preceding sessions");
         }
         
-        final Session lockedSession = Session.getLockedCopy(session, LockedStatus.FIGHTS_LOCKED);
+        session.setLockedStatus(LockedStatus.FIGHTS_LOCKED);
+        database.update(session);
+    }
+
+    /**
+     * Unlocks the fights for the given session. Any following sessions will also
+     * have their fights unlocked.
+     *
+     * @param database  The database to be updated
+     * @param session   The session to unlock
+     * @throws au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException if
+     * the database is not in a valid state to unlock the fights for this session.
+     */
+    public static void unlockFights(final TransactionalDatabase database, final Session session) throws DatabaseStateException{
+        if(session.getLockedStatus() != LockedStatus.FIGHTS_LOCKED)
+            throw new DatabaseStateException("A session may only be fight-unlocked if it has been fight-locked");
         
-        database.perform(new Transaction() {
+        /** ensure that all following sessions are unlocked **/
 
-            @Override
-            public void perform() {
-                database.add(lockedSession);
+        SessionInfo si = new SessionInfo(database, session);
+        Collection<Session> allFollowing = si.getFollowingSessions();
+        if(allFollowing.size() > 0) {
+            for(Session following : allFollowing) {
+                // update 'following' from database, since the session may have
+                // been unlocked in an earlier iteration of this loop
+                following = database.get(Session.class, following.getID());
 
-                updateLinks(database, session, lockedSession);
-                updatePools(database, session, lockedSession);
-                updateFights(database, session, lockedSession);
-
-                database.delete(session);
+                // only unlock if 'following' is still valid
+                if(following.isValid() && following.getLockedStatus() == LockedStatus.FIGHTS_LOCKED)
+                    unlockFights(database, following);
             }
-        });   
+
+            si = new SessionInfo(database, session);
+            allFollowing = si.getFollowingSessions();
+            for(Session following : allFollowing)
+                if(following.getLockedStatus() == LockedStatus.FIGHTS_LOCKED)
+                    throw new DatabaseStateException("Failed to fight-unlock all following sessions");
+        }
+
+        session.setLockedStatus(LockedStatus.POSITION_LOCKED);
+        database.update(session);
     }
 
     private static void updateLinks(Database database, Session oldSession, Session newSession) {

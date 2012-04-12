@@ -40,13 +40,16 @@ public class ResultInfo {
             playerName[i] = fightPlayer[i].player.getFirstName() + " " + fightPlayer[i].player.getLastName();
         }
         
-        SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, fight.getID());
-        if(sf == null) throw new DatabaseStateException();
+        try {
+            SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, fight.getID());
 
-        FightMatInfo info = SessionFightSequencer.getFightMatInfo(database, sf);
-        matFightNumber = info.fightNumber;
-        matName = info.matName;
-        
+            FightMatInfo info = SessionFightSequencer.getFightMatInfo(database, sf);
+            matFightNumber = info.fightNumber;
+            matName = info.matName;
+        } catch(Exception e) {
+            matFightNumber = 0;
+            matName = "(changed)";
+        }
     }
 
     public Result getResult() {

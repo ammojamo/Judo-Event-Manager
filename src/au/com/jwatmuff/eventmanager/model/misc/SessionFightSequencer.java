@@ -396,6 +396,32 @@ public class SessionFightSequencer {
         SessionFightSequencer.saveFightSequence(database, followingFights, true, false);
     }
     
+    public static SessionFightInfo findDeferredFight(TransactionalDatabase database, Session session) {
+        SessionInfo si = new SessionInfo(database, session);
+
+        List<SessionFightInfo> fights = getFightSequence(database, session.getID());
+        Collections.reverse(fights);
+        for(SessionFightInfo fight : fights) {
+            boolean deferred = true;
+            for(Pool pool : si.getPools()) {
+                if(fight.getFight().getPoolID() == pool.getID()) {
+                    deferred = false;
+                    break;
+                }
+            }
+            if(deferred) return fight;
+        }
+        return null;
+    }
+
+    public static void undeferAllFights(TransactionalDatabase database, Session session) throws DatabaseStateException {
+        while(true) {
+            SessionFightInfo fight = findDeferredFight(database, session);
+            if(fight == null) return;
+            undeferFight(database, fight);
+        }
+    }
+
     /**
      * Un-defers the fight specified from it's current session to the last session
      * from which it was deferred. If this fight has not been deferred, or the
@@ -425,13 +451,14 @@ public class SessionFightSequencer {
             throw new DatabaseStateException("Could not find preceding session");
         
         if(deferredSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED)
-            throw new DatabaseStateException("The fights in the preceding session have been locked");
+            SessionLocker.unlockFights(database, deferredSession);
+            //throw new DatabaseStateException("The fights in the preceding session have been locked");
 
         final List<SessionFightInfo> fights = SessionFightSequencer.getFightSequence(database, si.getSession().getID());
         final List<SessionFightInfo> precedingFights = SessionFightSequencer.getFightSequence(database, deferredSession.getID());
 
         final Session ds = deferredSession;
-        
+
         database.perform(new Transaction() {
             @Override
             public void perform() {
