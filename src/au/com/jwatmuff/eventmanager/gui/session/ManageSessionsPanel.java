@@ -293,6 +293,14 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
     }
 
     private boolean confirmDelete(Session session) {
+        if(session.getLockedStatus() != Session.LockedStatus.UNLOCKED) {
+            String msg = "The session '" + session.getName() + "' is locked.\n"
+                    + "Are you sure you wish to delete it?";
+            if (JOptionPane.showConfirmDialog(parentWindow, msg, "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+                return false;
+            }
+        }
+
         Collection<Session> sessions = SessionInfo.findAllFollowingSessions(database, session);
         if (sessions.size() > 0) {
             String msg = "The following sessions will also be deleted: \n";
@@ -300,7 +308,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
                 msg = msg + "\n " + s.getMat() + " : " + s.getName();
             }
             msg = msg + "\n\nAre you sure you wish to continue?";
-            if (JOptionPane.showConfirmDialog(parentWindow, msg, "Confirm Delete", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            if (JOptionPane.showConfirmDialog(parentWindow, msg, "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
                 return false;
             }
         }
