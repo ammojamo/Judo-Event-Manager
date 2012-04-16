@@ -158,6 +158,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         upButton.setEnabled(enabled);
         downButton.setEnabled(enabled);
         lockSessionButton.setEnabled(enabled);
+        unlockSessionButton.setEnabled(getSelectedSession() != null && !enabled);
         autoOrderButton.setEnabled(true);
         resetButton.setEnabled(true);
         spacingSpinner.setEnabled(true);
@@ -307,10 +308,10 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         spacingLabel = new javax.swing.JLabel();
         resetButton = new javax.swing.JButton();
         dirtyIconLabel = new javax.swing.JLabel();
+        unlockSessionButton = new javax.swing.JButton();
 
         jScrollPane1.setDoubleBuffered(true);
 
-        sessionTable.setAutoCreateRowSorter(true);
         sessionTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null},
@@ -330,6 +331,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
                 return types [columnIndex];
             }
         });
+        sessionTable.setAutoCreateRowSorter(true);
         sessionTable.setGridColor(new java.awt.Color(204, 204, 204));
         sessionTable.setRowHeight(19);
         jScrollPane1.setViewportView(sessionTable);
@@ -448,6 +450,16 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         dirtyIconLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/pencil.png"))); // NOI18N
         dirtyIconLabel.setText(" ");
 
+        unlockSessionButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/lock_open.png"))); // NOI18N
+        unlockSessionButton.setText("Unlock Session");
+        unlockSessionButton.setFocusable(false);
+        unlockSessionButton.setIconTextGap(8);
+        unlockSessionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                unlockSessionButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -455,13 +467,15 @@ public class SessionFightsPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(lockSessionButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(unlockSessionButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -493,10 +507,12 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lockSessionButton)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(7, 7, 7)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(lockSessionButton)
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(unlockSessionButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -515,7 +531,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
                     .addComponent(autoOrderButton)
                     .addComponent(dirtyIconLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -690,7 +706,40 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         }
         this.setCursor(Cursor.getDefaultCursor());                                         
     }//GEN-LAST:event_resetButtonActionPerformed
-    
+
+    private void unlockSessionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unlockSessionButtonActionPerformed
+        if(!PermissionChecker.isAllowed(Action.UNLOCK_SESSION_FIGHT_ORDER, database)) return;
+        Session session = getSelectedSession();
+        if(session == null) return;
+
+        Collection<Session> sessions = SessionInfo.findAllFollowingFightLockedSessions(database, session);
+
+        /* remove mat sessions */
+        Iterator<Session> iter = sessions.iterator();
+        while(iter.hasNext()) if(iter.next().getType() == SessionType.MAT) iter.remove();
+
+        if(sessions.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("The fights in the following sessions will also be unlocked:\n");
+            for(Session s : sessions) sb.append("\n" + s.getMat() + " : " + s.getName());
+            sb.append("\n\nDo you wish to continue?");
+            int result = JOptionPane.showConfirmDialog(this, sb.toString(), "Unlock Session Fights", JOptionPane.YES_NO_OPTION);
+            if(result != JOptionPane.YES_OPTION) return;
+        } else {
+            if(!GUIUtils.confirmAction(parentWindow, "unlock", session.getMat() + " : " + session.getName())) return;
+        }
+
+        try {
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            SessionLocker.unlockFights(database, session);
+        } catch(Exception e) {
+            log.error("Error while unlocking fights in session " + session.getMat() + " : " + session.getName(), e);
+            GUIUtils.displayError(parentWindow, "Unable to unlock session");
+        } finally {
+            this.setCursor(Cursor.getDefaultCursor());
+        }
+    }//GEN-LAST:event_unlockSessionButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton autoOrderButton;
     private javax.swing.JButton deferFightButton;
@@ -708,6 +757,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel spacingLabel;
     private javax.swing.JSpinner spacingSpinner;
     private javax.swing.JButton undeferFightButton;
+    private javax.swing.JButton unlockSessionButton;
     private javax.swing.JButton upButton;
     // End of variables declaration//GEN-END:variables
     

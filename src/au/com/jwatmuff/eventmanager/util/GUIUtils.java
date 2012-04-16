@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -64,13 +65,17 @@ public class GUIUtils {
             lastSirenChooserDirectory = f;
     }
 
-    public static boolean confirmLock(Frame parent, String thingToLock) {
+    public static boolean confirmAction(Frame parent, String verb, String object) {
         int status = JOptionPane.showConfirmDialog(
                 parent,
-                "Are you sure you wish to lock " + thingToLock + "?",
-                "Confirm Lock",
+                "Are you sure you wish to " + verb + " " + object + "?",
+                "Confirm " + StringUtils.capitalize(verb),
                 JOptionPane.YES_NO_OPTION);
         return (status == JOptionPane.YES_OPTION);
+    }
+
+    public static boolean confirmLock(Frame parent, String thingToLock) {
+        return confirmAction(parent, "lock", thingToLock);
     }
 
     /** Make non-instantiable */
