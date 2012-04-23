@@ -1,14 +1,14 @@
-Name "Event Manager 2012 Update 1 Beta"
-Caption "Event Manager 2012 Update 1 Beta"
+Name "Event Manager 2012 Update 2"
+Caption "Event Manager 2012 Update 2"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2012-Update1beta.exe"
+OutFile "EventManagerSetup-2012-Update2.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
 
-InstallDir $PROGRAMFILES\EventManager2012Update1beta
+InstallDir $PROGRAMFILES\EventManager2012
 
-DirText "This will install EventManager 2012 Update1 beta on your computer."
+DirText "This will install EventManager 2012 Update 2 on your computer."
 
 Section ""
   SetOutPath $INSTDIR
