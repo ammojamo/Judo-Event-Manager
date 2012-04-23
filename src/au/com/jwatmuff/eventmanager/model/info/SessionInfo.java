@@ -17,6 +17,7 @@ import au.com.jwatmuff.eventmanager.model.vo.SessionLink;
 import au.com.jwatmuff.genericdb.Database;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import org.apache.log4j.Logger;
 
 /**
@@ -202,6 +203,13 @@ public class SessionInfo {
         return sessions;
     }
     
+    public static Collection<Session> findAllFollowingFightLockedSessions(Database database, Session session) {
+        Collection<Session> sessions = findAllFollowingSessions(database, session);
+        Iterator<Session> iter = sessions.iterator();
+        while(iter.hasNext()) if(iter.next().getLockedStatus() != Session.LockedStatus.FIGHTS_LOCKED) iter.remove();
+        return sessions;
+    }
+
     private static boolean containsSessionID(Collection<Session> sessions, int sessionID) {
         for(Session session : sessions)
             if(session.getID().equals(sessionID))
