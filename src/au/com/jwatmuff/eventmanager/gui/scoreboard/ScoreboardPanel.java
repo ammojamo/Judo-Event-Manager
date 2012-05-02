@@ -40,7 +40,7 @@ import org.jdesktop.swingx.JXImagePanel;
  *
  * @author  James
  */
-public class ScoreboardPanel extends JPanel implements ScoreboardModel.ScoreboardModelListener {    
+public class ScoreboardPanel extends ScoreboardDisplayPanel implements ScoreboardModel.ScoreboardModelListener {    
     private static final Logger log = Logger.getLogger(ScoreboardPanel.class);
     
     private ScoreboardModel model;
@@ -675,6 +675,7 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
         updateColors();
         
         model.addListener(this);
+        handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
     }
 
     private void wireEvents() {
@@ -704,10 +705,6 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
         swapPlayers = !swapPlayers;
 
         this.handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
-    }
-        
-    public void setPlayerName(String playerName, int n) {
-        player[swapPlayers?1-n:n].setText(playerName);
     }
 
     public void setImagesEnabled(boolean enabled) {
@@ -850,9 +847,11 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
     public void setModel(ScoreboardModel m) {
         if(model != null)
             model.removeListener(this);
-        model = m;
-        model.addListener(this);
-//        handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
+        if(m != null) {
+            model = m;
+            model.addListener(this);
+            handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
+        }
     }
     
     NumberFormat format = new DecimalFormat("00");
@@ -1005,7 +1004,7 @@ public class ScoreboardPanel extends JPanel implements ScoreboardModel.Scoreboar
         }
     }
     
-    public void updateTimer() {
+    private void updateTimer() {
         int sec = model.getTime();
         String str = sec/60 + ":" + format.format(sec%60);
         timer.setText(str);        
