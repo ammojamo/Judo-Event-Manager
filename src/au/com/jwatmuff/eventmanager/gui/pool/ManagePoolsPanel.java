@@ -3,7 +3,6 @@
  *
  * Created on 25 March 2008, 13:26
  */
-
 package au.com.jwatmuff.eventmanager.gui.pool;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
@@ -55,52 +54,50 @@ import org.apache.log4j.Logger;
  * @author  James
  */
 public class ManagePoolsPanel extends javax.swing.JPanel {
-    private static Logger log = Logger.getLogger(ManagePoolsPanel.class);
 
+    private static Logger log = Logger.getLogger(ManagePoolsPanel.class);
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
     private Frame parentWindow;
-    
     private PoolListTableModel tableModel;
     private PoolPlayerListModel requestedListModel;
     private PoolPlayerListModel approvedListModel;
-    
     private Date censusDate;
     private ConfigurationFile configurationFile;
-    
     public static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
+
         @Override
         public int compare(Pool p1, Pool p2) {
-            if(p1.getMaximumAge() == p2.getMaximumAge()){
-                if(p2.getGender().equals(p1.getGender())){
-                    if(p1.getMaximumWeight() == p2.getMaximumWeight()){
-                        if(p1.getMinimumWeight() == p2.getMinimumWeight()){
-                            return  p1.getDescription().compareTo(p2.getDescription());
+            if (p1.getMaximumAge() == p2.getMaximumAge()) {
+                if (p2.getGender().equals(p1.getGender())) {
+                    if (p1.getMaximumWeight() == p2.getMaximumWeight()) {
+                        if (p1.getMinimumWeight() == p2.getMinimumWeight()) {
+                            return p1.getDescription().compareTo(p2.getDescription());
                         } else {
-                            if(p1.getMinimumWeight() == 0) {
+                            if (p1.getMinimumWeight() == 0) {
                                 return 1;
-                            } else if(p2.getMinimumWeight() == 0) {
+                            } else if (p2.getMinimumWeight() == 0) {
                                 return -1;
                             } else {
                                 return -Double.compare(p1.getMinimumWeight(), p2.getMinimumWeight());
                             }
                         }
                     } else {
-                        if(p1.getMaximumWeight() == 0) {
+                        if (p1.getMaximumWeight() == 0) {
                             return 1;
-                        } else if(p2.getMaximumWeight() == 0) {
+                        } else if (p2.getMaximumWeight() == 0) {
                             return -1;
                         } else {
                             return Double.compare(p1.getMaximumWeight(), p2.getMaximumWeight());
                         }
                     }
                 } else {
-                    return  p2.getGender().compareTo(p1.getGender());
+                    return p2.getGender().compareTo(p1.getGender());
                 }
             } else {
-                if(p1.getMaximumAge() == 0) {
+                if (p1.getMaximumAge() == 0) {
                     return 1;
-                } else if(p2.getMaximumAge() == 0) {
+                } else if (p2.getMaximumAge() == 0) {
                     return -1;
                 } else {
                     return p1.getMaximumAge() - p2.getMaximumAge();
@@ -113,37 +110,38 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     public ManagePoolsPanel() {
         initComponents();
     }
-    
+
     public void setDatabase(TransactionalDatabase database) {
         this.database = database;
     }
-    
+
     public void setNotifier(TransactionNotifier notifier) {
         this.notifier = notifier;
     }
-    
+
     public void setParentWindow(Frame parentWindow) {
         this.parentWindow = parentWindow;
     }
-    
+
     public void afterPropertiesSet() {
         tableModel = new PoolListTableModel(database, notifier);
         poolListTable.setModel(tableModel);
-        
+
         censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
         configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
-              
+
         PlayerListCellRenderer playerListRenderer = new PlayerListCellRenderer(censusDate);
-        
+
         requestedListModel = new PoolPlayerListModel(database, notifier, false);
         requestedList.setCellRenderer(playerListRenderer);
         requestedList.setModel(requestedListModel);
         approvedListModel = new PoolPlayerListModel(database, notifier, true);
         approvedList.setModel(approvedListModel);
         approvedList.setCellRenderer(playerListRenderer);
-        
+
         poolListTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         poolListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
             @Override
             public void valueChanged(ListSelectionEvent evt) {
                 Pool pool = getSelectedPool();
@@ -151,14 +149,14 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 requestedListModel.setSelectedPool(pool);
                 approvedListModel.setSelectedPool(pool);
 
-                if(pool != null) {
+                if (pool != null) {
                     boolean unlocked = (pool.getLockedStatus() == Pool.LockedStatus.UNLOCKED);
                     boolean nopool = (pool.getID() == 0);
                     requestedList.setEnabled(unlocked && !nopool);
                     approvedList.setEnabled(unlocked || nopool);
                     autoApproveButton.setEnabled(unlocked && !nopool);
                 }
-                
+
                 approveButton.setEnabled(false);
                 removeButton.setEnabled(false);
             }
@@ -166,14 +164,14 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
         requestedList.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         requestedList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
             @Override
             public void valueChanged(ListSelectionEvent evt) {
-                if(evt.getFirstIndex() >= 0) {
+                if (evt.getFirstIndex() >= 0) {
                     approveButton.setEnabled(true);
                     removeButton.setEnabled(true);
                     approvedList.clearSelection();
-                }
-                else {
+                } else {
                     approveButton.setEnabled(false);
                     removeButton.setEnabled(requestedList.getSelectedIndex() >= 0);
                 }
@@ -182,32 +180,32 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
         approvedList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         approvedList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
             @Override
             public void valueChanged(ListSelectionEvent evt) {
-                if(evt.getFirstIndex() >= 0) {
+                if (evt.getFirstIndex() >= 0) {
                     approveButton.setEnabled(false);
                     removeButton.setEnabled(true);
                     requestedList.clearSelection();
-                }
-                else {
+                } else {
                     removeButton.setEnabled(approvedList.getSelectedIndex() >= 0);
                 }
             }
         });
-        
+
         notifier.addListener(new TransactionListener() {
+
             @Override
             public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
                 censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
             }
         }, CompetitionInfo.class);
     }
-    
-    
-    private Pool getSelectedPool()
-    {
-        if(poolListTable.getSelectedRows().length == 0)
+
+    private Pool getSelectedPool() {
+        if (poolListTable.getSelectedRows().length == 0) {
             return null;
+        }
         int row = poolListTable.getSelectedRows()[0];
         row = poolListTable.getRowSorter().convertRowIndexToModel(row);
         Pool p = tableModel.getAtRow(row);
@@ -251,7 +249,6 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         }
     }
 
-        
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -483,65 +480,82 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
     private void autoApproveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoApproveButtonActionPerformed
         Pool pool = getSelectedPool();
-        if(pool == null || pool.getID() == 0) return;
-        if(!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) return;
+        if (pool == null || pool.getID() == 0) {
+            return;
+        }
+        if (!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) {
+            return;
+        }
         try {
             AutoAssign.autoApprovePlayers(database, pool);
-        } catch(DatabaseStateException e) {
+        } catch (DatabaseStateException e) {
             GUIUtils.displayError(parentWindow, "Unabled to approve players: " + e.getMessage());
         }
     }//GEN-LAST:event_autoApproveButtonActionPerformed
 
     private void lockButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockButtonActionPerformed
         Pool pool = getSelectedPool();
-        if(pool != null && pool.getID() != 0){
-            if(!PermissionChecker.isAllowed(Action.LOCK_DIVISION, database)) return;
-            if(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true).isEmpty()){
+        if (pool != null && pool.getID() != 0) {
+            if (!PermissionChecker.isAllowed(Action.LOCK_DIVISION, database)) {
+                return;
+            }
+            if (database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true).isEmpty()) {
                 JOptionPane.showMessageDialog(this.parentWindow, "Pool can not be locked without any approved players");
                 return;
             }
-            if(!GUIUtils.confirmLock(this.parentWindow, pool.getDescription())) return;
-            
+            if (!GUIUtils.confirmLock(this.parentWindow, pool.getDescription())) {
+                return;
+            }
+
             try {
                 PoolLocker.lockPoolPlayers(database, pool);
-            } catch(DatabaseStateException e) {
+            } catch (DatabaseStateException e) {
                 GUIUtils.displayError(parentWindow, e.getMessage());
             }
         }
     }//GEN-LAST:event_lockButtonActionPerformed
 
     private void autoAssignButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoAssignButtonActionPerformed
-        if(JOptionPane.showConfirmDialog(
+        if (JOptionPane.showConfirmDialog(
                 parentWindow,
                 "CAUTION: All players will be automatically assigned to all divisions they are eligible for.\n\nAre you sure?",
                 "Confirm Auto Assign",
-                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
-        if(!PermissionChecker.isAllowed(Action.AUTO_ASSIGN_DIVISIONS, database)) return;
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            return;
+        }
+        if (!PermissionChecker.isAllowed(Action.AUTO_ASSIGN_DIVISIONS, database)) {
+            return;
+        }
         try {
             AutoAssign.assignPlayersToPools(database);
-        } catch(DatabaseStateException e) {
+        } catch (DatabaseStateException e) {
             log.error(e);
             GUIUtils.displayError(parentWindow, "Assigning players to divisions failed: " + e.getMessage());
         }
     }//GEN-LAST:event_autoAssignButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-        if(!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) return;
+        if (!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) {
+            return;
+        }
         Pool pool = getSelectedPool();
-        if(pool == null || pool.getID() == 0) return;
+        if (pool == null || pool.getID() == 0) {
+            return;
+        }
 
         Player player;
-        if(approvedList.getSelectedIndex() >= 0)
+        if (approvedList.getSelectedIndex() >= 0) {
             player = approvedListModel.getPlayerAt(approvedList.getSelectedIndex());
-        else if(requestedList.getSelectedIndex() >= 0)
+        } else if (requestedList.getSelectedIndex() >= 0) {
             player = requestedListModel.getPlayerAt(requestedList.getSelectedIndex());
-        else
+        } else {
             return;
+        }
 
         try {
             PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
             database.delete(pp);
-        } catch(Exception e) {
+        } catch (Exception e) {
             GUIUtils.displayError(this, "An error occured while removing the player from the selected division");
             log.error("Exception while removing player " + player.getID() + " from division " + pool.getID(), e);
         }
@@ -551,33 +565,39 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         int index = approvedList.getSelectedIndex();
         //removeButton.setEnabled((index == -1)?false:true);
         //approveButton.setEnabled(false);
-        if(evt.getClickCount() == 2 && index != -1) {
-            if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
+        if (evt.getClickCount() == 2 && index != -1) {
+            if (!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) {
+                return;
+            }
             Player player = approvedListModel.getPlayerAt(index);
             new PlayerDetailsDialog(parentWindow, true, database, notifier, player).setVisible(true);
         }
     }//GEN-LAST:event_approvedListMouseClicked
 
     private void approveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_approveButtonActionPerformed
-        if(!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) return;
-        Pool pool = getSelectedPool();
-        if(pool == null)
+        if (!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) {
             return;
-        
+        }
+        Pool pool = getSelectedPool();
+        if (pool == null) {
+            return;
+        }
+
         Collection<Player> players = new ArrayList<Player>();
         int[] indices = requestedList.getSelectedIndices();
-        for(int index : indices)
+        for (int index : indices) {
             players.add(requestedListModel.getPlayerAt(index));
+        }
 
 
-        for(Player player : players) {
+        for (Player player : players) {
             try {
-                if(PoolChecker.checkPlayer(player, pool, censusDate, configurationFile)) {
+                if (PoolChecker.checkPlayer(player, pool, censusDate, configurationFile)) {
                     PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
                     pp.setApproved(true);
                     database.update(pp);
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 GUIUtils.displayError(this, "An error occured while approving the player for the selected division");
                 log.error("Exception while updating requested/approved divisions for player " + player.getID(), e);
             }
@@ -587,108 +607,122 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
     private void requestedListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_requestedListMouseClicked
         int index = requestedList.getSelectedIndex();
-        approveButton.setEnabled((index == -1)?false:true);
-        if(evt.getClickCount() == 2 && index != -1) {
-            if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
+        approveButton.setEnabled((index == -1) ? false : true);
+        if (evt.getClickCount() == 2 && index != -1) {
+            if (!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) {
+                return;
+            }
             Player player = requestedListModel.getPlayerAt(index);
             new PlayerDetailsDialog(parentWindow, true, database, notifier, player).setVisible(true);
         }
     }//GEN-LAST:event_requestedListMouseClicked
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-    /* get all pools */ 
-    List<Pool> pools = new ArrayList<Pool>();
-    pools = database.findAll(Pool.class, PoolDAO.ALL);
-    
-    /* remove pools with no players */
-    Iterator<Pool> iter = pools.iterator();
-    while(iter.hasNext()){
-        Pool nextPool = iter.next();
-        if(database.findAll(Player.class, PlayerDAO.FOR_POOL, nextPool.getID(), false).isEmpty() && database.findAll(Player.class, PlayerDAO.FOR_POOL, nextPool.getID(), true).isEmpty())
-            iter.remove();
-    }
-    Collections.sort(pools, POOL_COMPARATOR);
+        /* get all pools */
+        List<Pool> pools = new ArrayList<Pool>();
+        pools = database.findAll(Pool.class, PoolDAO.ALL);
 
-    /* display pool selection dialog */
-    CheckboxListDialog<Pool> cld = new CheckboxListDialog<Pool>(
-            parentWindow, true, pools,
-            "Select divisions to print", "Print Divisions");
-    cld.setRenderer(new StringRenderer<Pool>() {
-            public String asString(Pool p) { return p.getDescription(); }
+        /* remove pools with no players */
+        Iterator<Pool> iter = pools.iterator();
+        while (iter.hasNext()) {
+            Pool nextPool = iter.next();
+            if (database.findAll(Player.class, PlayerDAO.FOR_POOL, nextPool.getID(), false).isEmpty() && database.findAll(Player.class, PlayerDAO.FOR_POOL, nextPool.getID(), true).isEmpty()) {
+                iter.remove();
+            }
+        }
+        Collections.sort(pools, POOL_COMPARATOR);
+
+        /* display pool selection dialog */
+        CheckboxListDialog<Pool> cld = new CheckboxListDialog<Pool>(
+                parentWindow, true, pools,
+                "Select divisions to print", "Print Divisions");
+        cld.setRenderer(new StringRenderer<Pool>() {
+
+            public String asString(Pool p) {
+                return p.getDescription();
+            }
         }, Icons.POOL);
-    cld.setVisible(true);
+        cld.setVisible(true);
 
-    /* print selected pools */
-    if(cld.getSuccess() && !cld.getSelectedItems().isEmpty()) {
-        new PoolListHTMLGenerator(database, cld.getSelectedItems()).openInBrowser();
-    }
+        /* print selected pools */
+        if (cld.getSuccess() && !cld.getSelectedItems().isEmpty()) {
+            new PoolListHTMLGenerator(database, cld.getSelectedItems()).openInBrowser();
+        }
 }//GEN-LAST:event_printButtonActionPerformed
 
 private void poolListTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_poolListTableMouseClicked
-    if(evt.getClickCount() == 2 && this.getSelectedPool() != null && this.getSelectedPool().getID() != 0) {
-        if(!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) return;
-        new PoolDetailsDialog(parentWindow, true, database, this.getSelectedPool()).setVisible(true);
-    }
+        if (evt.getClickCount() == 2 && this.getSelectedPool() != null && this.getSelectedPool().getID() != 0) {
+            if (!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) {
+                return;
+            }
+            new PoolDetailsDialog(parentWindow, true, database, this.getSelectedPool()).setVisible(true);
+        }
 }//GEN-LAST:event_poolListTableMouseClicked
 
 private void customPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customPoolButtonActionPerformed
-    if(!PermissionChecker.isAllowed(Action.ADD_DIVISION, database)) return;
-    new PoolDetailsDialog(parentWindow, true, database, null).setVisible(true);
+        if (!PermissionChecker.isAllowed(Action.ADD_DIVISION, database)) {
+            return;
+        }
+        new PoolDetailsDialog(parentWindow, true, database, null).setVisible(true);
 }//GEN-LAST:event_customPoolButtonActionPerformed
 
 private void drawWizardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    if(getSelectedPool() != null && getSelectedPool().getID() != 0) {
         Pool pool = getSelectedPool();
-        // TODO: disable the button instead of displaying this ugly message
-        // .. or maybe we can start the wizard on a locked pool??
-        if(pool.getLockedStatus() != Pool.LockedStatus.UNLOCKED) {
-            GUIUtils.displayMessage(null, "Please select an unlocked division", "Draw Wizard");
-        } else {
-            new DrawWizardWindow(database, notifier, getSelectedPool()).setVisible(true);
+        if (pool != null && pool.getID() != 0) {
+            if (!PermissionChecker.isAllowed(Action.LOCK_DIVISION, database)) {
+                return;
+            }
+            // TODO: disable the button instead of displaying this ugly message
+            // .. or maybe we can start the wizard on a locked pool??
+            if (pool.getLockedStatus() != Pool.LockedStatus.UNLOCKED) {
+                GUIUtils.displayMessage(null, "Please select an unlocked division", "Draw Wizard");
+            } else {
+                new DrawWizardWindow(database, notifier, getSelectedPool()).setVisible(true);
+            }
         }
-    }
 }//GEN-LAST:event_jButton1ActionPerformed
 
 private void customPoolButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customPoolButton1ActionPerformed
-    if(!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) return;
-    if(getSelectedPool() != null && getSelectedPool().getID() != 0) {
-        Pool pool = getSelectedPool();
+        if (!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) {
+            return;
+        }
+        if (getSelectedPool() != null && getSelectedPool().getID() != 0) {
+            Pool pool = getSelectedPool();
 
-        final Pool poolCopy = new Pool();
-        poolCopy.setDescription(pool.getDescription() + " Copy");
-        poolCopy.setGender(pool.getGender());
+            final Pool poolCopy = new Pool();
+            poolCopy.setDescription(pool.getDescription() + " Copy");
+            poolCopy.setGender(pool.getGender());
 
-        poolCopy.setMinimumAge(pool.getMinimumAge());
-        poolCopy.setMaximumAge(pool.getMaximumAge());
+            poolCopy.setMinimumAge(pool.getMinimumAge());
+            poolCopy.setMaximumAge(pool.getMaximumAge());
 
-        poolCopy.setMinimumWeight(pool.getMinimumWeight());
-        poolCopy.setMaximumWeight(pool.getMaximumWeight());
+            poolCopy.setMinimumWeight(pool.getMinimumWeight());
+            poolCopy.setMaximumWeight(pool.getMaximumWeight());
 
-        poolCopy.setMinimumGrade(pool.getMinimumGrade());
-        poolCopy.setMaximumGrade(pool.getMaximumGrade());
+            poolCopy.setMinimumGrade(pool.getMinimumGrade());
+            poolCopy.setMaximumGrade(pool.getMaximumGrade());
 
-        poolCopy.setMatchTime(pool.getMatchTime());
-        poolCopy.setMinimumBreakTime(pool.getMinimumBreakTime());
-        poolCopy.setGoldenScoreTime(pool.getGoldenScoreTime());
-        final List<Player> selectedPlayers = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), false);
-        selectedPlayers.addAll(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true));
-        database.perform(new Transaction() {
-            @Override
-            public void perform() {
-                database.add(poolCopy);
+            poolCopy.setMatchTime(pool.getMatchTime());
+            poolCopy.setMinimumBreakTime(pool.getMinimumBreakTime());
+            poolCopy.setGoldenScoreTime(pool.getGoldenScoreTime());
+            final List<Player> selectedPlayers = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), false);
+            selectedPlayers.addAll(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true));
+            database.perform(new Transaction() {
 
-                for(Player player : selectedPlayers) {
-                    PlayerPool pp = new PlayerPool();
-                    pp.setPlayerID(player.getID());
-                    pp.setPoolID(poolCopy.getID());
-                    database.add(pp);
+                @Override
+                public void perform() {
+                    database.add(poolCopy);
+
+                    for (Player player : selectedPlayers) {
+                        PlayerPool pp = new PlayerPool();
+                        pp.setPlayerID(player.getID());
+                        pp.setPoolID(poolCopy.getID());
+                        database.add(pp);
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
 }//GEN-LAST:event_customPoolButton1ActionPerformed
-
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton approveButton;
     private javax.swing.JList approvedList;
@@ -710,5 +744,4 @@ private void customPoolButton1ActionPerformed(java.awt.event.ActionEvent evt) {/
     private javax.swing.JButton removeButton;
     private javax.swing.JList requestedList;
     // End of variables declaration//GEN-END:variables
-    
 }
