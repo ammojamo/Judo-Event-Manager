@@ -78,7 +78,7 @@
           <Properties>
             <Property name="contentType" type="java.lang.String" value="text/html"/>
             <Property name="editable" type="boolean" value="false"/>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;   &lt;head&gt;&#xd; &#xd;   &lt;/head&gt;&#xd;   &lt;body&gt;&#xd;     &lt;h1&gt;Event Manager 2011&lt;/h1&gt;     &lt;p style=&quot;margin-top: 0&quot;&gt;&#xd;         &amp;copy; 2008 - 2011 James Watmuff and Leonard Hall     &lt;/p&gt;&#xd;      &lt;h3&gt;Acknowledgements&lt;/h3&gt;     &lt;p style=&quot;margin-top: 0&quot;&gt;         All icons from the &quot;Silk&quot; icon set by famfamfam.&lt;br&gt;         &lt;href=&quot;http://www.famfamfam.com&quot;&gt;http://famfamfam.com&lt;/a&gt;     &lt;/p&gt;    &lt;/body&gt;&#xd; &lt;/html&gt;&#xd; "/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;   &lt;head&gt;&#xd; &#xd;   &lt;/head&gt;&#xd;   &lt;body&gt;&#xd;     &lt;h1&gt;Event Manager 2012&lt;/h1&gt;     &lt;p style=&quot;margin-top: 0&quot;&gt;&#xd;         &amp;copy; 2008 - 2012 James Watmuff and Leonard Hall     &lt;/p&gt;&#xd;      &lt;h3&gt;Acknowledgements&lt;/h3&gt;     &lt;p style=&quot;margin-top: 0&quot;&gt;         All icons from the &quot;Silk&quot; icon set by famfamfam.&lt;br&gt;         &lt;href=&quot;http://www.famfamfam.com&quot;&gt;http://famfamfam.com&lt;/a&gt;     &lt;/p&gt;    &lt;/body&gt;&#xd; &lt;/html&gt;&#xd; "/>
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
         </Component>
