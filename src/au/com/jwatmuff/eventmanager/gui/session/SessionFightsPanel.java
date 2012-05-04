@@ -159,8 +159,8 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         downButton.setEnabled(enabled);
         lockSessionButton.setEnabled(enabled);
         unlockSessionButton.setEnabled(getSelectedSession() != null && !enabled);
-        autoOrderButton.setEnabled(true);
-        resetButton.setEnabled(true);
+        autoOrderButton.setEnabled(enabled);
+        resetButton.setEnabled(enabled);
         spacingSpinner.setEnabled(true);
         spacingLabel.setEnabled(true);
     }
@@ -565,6 +565,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
                 SessionFightSequencer.saveFightSequence(database, fights, true, false);
             }
             SessionLocker.lockFights(database, session);
+            enableButtons(false);
         } catch(Exception e) {
             log.error("Error while locking fights in session " + session.getMat() + " : " + session.getName(), e);
             GUIUtils.displayError(parentWindow, "Unable to lock session");
@@ -632,16 +633,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
 
     private void autoOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoOrderButtonActionPerformed
         if(selectedSession == null) return;
-        if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED){
-            if(!PermissionChecker.isAllowed(Action.LOCK_SESSION_FIGHT_ORDER, database)) return;
-            if(JOptionPane.showConfirmDialog(
-                parentWindow,
-                "CAUTION: Fights may have already been started on this session.\n\nAre you sure you want to re-order these fights?",
-                "Confirm Re-Order",
-                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION){
-                return;
-            }
-        }
+        if(selectedSession.getLockedStatus() == Session.LockedStatus.FIGHTS_LOCKED) return;
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         setFightsDirty(false);
         SessionFightSequencer.nPassAutoOrder(database, fights, (Integer)spacingSpinner.getValue());
@@ -732,6 +724,7 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         try {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             SessionLocker.unlockFights(database, session);
+            enableButtons(true);
         } catch(Exception e) {
             log.error("Error while unlocking fights in session " + session.getMat() + " : " + session.getName(), e);
             GUIUtils.displayError(parentWindow, "Unable to unlock session");
