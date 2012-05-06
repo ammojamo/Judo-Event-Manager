@@ -1,14 +1,14 @@
-Name "Event Manager 2012 Update 2"
-Caption "Event Manager 2012 Update 2"
+Name "Event Manager 2012 Update 2a"
+Caption "Event Manager 2012 Update 2a"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2012-Update2.exe"
+OutFile "EventManagerSetup-2012-Update2a.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
 
 InstallDir $PROGRAMFILES\EventManager2012
 
-DirText "This will install EventManager 2012 Update 2 on your computer."
+DirText "This will install EventManager 2012 Update 2a on your computer."
 
 Section ""
   SetOutPath $INSTDIR
