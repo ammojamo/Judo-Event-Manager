@@ -966,7 +966,7 @@ public class PlayerCodeParser {
         if(!isValidCode(codes[0]) || !isValidCode(codes[1])){
             return false;
         }
-        System.out.print(codes);
+//        System.out.print(codes);
         FightPlayer fightPlayer0 = parseCode(codes[0]);
         FightPlayer fightPlayer1 = parseCode(codes[1]);
         if(fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.player != null && fightPlayer1.player != null)
@@ -999,51 +999,49 @@ public class PlayerCodeParser {
         }
     }
 
-    public boolean hasCommonPlayers(int[] fightPositions) {
-        int i = fightPositions[0];
-        int j = fightPositions[1];
-        if(i < j) { int k = i; i = j; j = k; } //swap
+    public boolean hasCommonPlayers(int fightPosition1, int fightPosition2) {
+        if(fightPosition1 < fightPosition2) { int k = fightPosition1; fightPosition1 = fightPosition2; fightPosition2 = k; } //swap
         
-        List<String> codesi = new ArrayList<String>();
-        for(String code : fightInfoList.get(i-1).getAllPlayerCode()) {
-            codesi.addAll(Arrays.asList(getORCodes(code)));
+        List<String> codesFightPosition1 = new ArrayList<String>();
+        for(String code : fightInfoList.get(fightPosition1-1).getAllPlayerCode()) {
+            codesFightPosition1.addAll(Arrays.asList(getORCodes(code)));
         }
         
-        List<String> codesj = new ArrayList<String>();
-        for(String code : fightInfoList.get(j-1).getAllPlayerCode()) {
-            codesj.addAll(Arrays.asList(getORCodes(code)));
+        List<String> codesFightPosition2 = new ArrayList<String>();
+        for(String code : fightInfoList.get(fightPosition2-1).getAllPlayerCode()) {
+            codesFightPosition2.addAll(Arrays.asList(getORCodes(code)));
         }
         
-        for(String codei : codesi) {
-            CodeInfo codeInfo = getCodeInfo(codei);
+        for(String codeFightPosition1 : codesFightPosition1) {
+            CodeInfo codeInfo = getCodeInfo(codeFightPosition1);
             switch(codeInfo.type) {
                 case PLAYER:
-                    for(String codej : codesj)
-                        if(codei.equals(codej)) return true;
+                    for(String codeFightPosition2 : codesFightPosition2)
+                        if(codeFightPosition1.equals(codeFightPosition2)) return true;
                     break;
                 case WINNERLOOSER:{
-                    int n = getNumber(codei);
-                    if(n == j){
+                    int n = getNumber(codeFightPosition1);
+                    if(n == fightPosition2){
                         return true;
                     }
-                    for(String codej : codesj){
-                        if(codei.equals(codej)){
+                    for(String codeFightPosition2 : codesFightPosition2){
+                        if(codeFightPosition1.equals(codeFightPosition2)){
                             return true;
                         }
                     }
                     break;
                 }
                 case ROUNDROBIN:
-                    for(String codej : codesj){
-                        if(codei.equals(codej)){
+                    for(String codeFightPosition2 : codesFightPosition2){
+                        if(codeFightPosition1.equals(codeFightPosition2)){
                             return true;
                         }
                     }
                     break;
                 case BESTOFTHREE:
-                    int[] params = getParameters(codei);
-                    for(String codej : codesj){
-                        if(codei.equals(codej)){
+                    int[] params = getParameters(codeFightPosition1);
+                    for(String codeFightPosition2 : codesFightPosition2){
+                        if(codeFightPosition1.equals(codeFightPosition2)){
                             return true;
                         }
                     }
