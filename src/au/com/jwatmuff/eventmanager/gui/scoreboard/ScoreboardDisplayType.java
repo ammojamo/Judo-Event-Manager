@@ -10,7 +10,7 @@ package au.com.jwatmuff.eventmanager.gui.scoreboard;
  */
 public enum ScoreboardDisplayType {
     DEFAULT("Default Display"),
-    STYLE_2("Display Style 2");
+    VERTICAL("Vertical Display");
     
     public String description;  
     
@@ -18,10 +18,10 @@ public enum ScoreboardDisplayType {
         this.description = description;
     }
     
-    public static ScoreboardDisplayPanel getPanel(ScoreboardDisplayType type) {
+    public static ScoreboardPanel getPanel(ScoreboardDisplayType type) {
         switch(type) {
             case DEFAULT: return new DefaultScoreboardDisplayPanel();
-            case STYLE_2: return new DefaultScoreboardDisplayPanel();
+            case VERTICAL: return new VerticalScoreboardDisplayPanel();
             default: return new DefaultScoreboardDisplayPanel();
         }
     }

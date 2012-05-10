@@ -29,6 +29,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXImagePanel;
@@ -37,24 +38,41 @@ import org.jdesktop.swingx.JXImagePanel;
  *
  * @author  James
  */
-public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implements ScoreboardModel.ScoreboardModelListener {
-    private static final Logger log = Logger.getLogger(ScoreboardPanel.class);
+public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements ScoreboardModel.ScoreboardModelListener {
+    private static final Logger log = Logger.getLogger(ScoreboardEntryPanel.class);
     
     private ScoreboardModel model = new ScoreboardModelImpl(ScoringSystem.NEW);
     
-    private static final double[] SCORE_GROUP_X = new double[]{0.25, 8.25}; // Player 1, Player 2
-    private static final double[] SCORE_GROUP_Y = new double[]{4, 4}; // P1, P2
-    private static final double[] SCORE_X = new double[] {0, 1.5, 4}; // I, W, Y
-    private static final double[] SCORE_WIDTHS = new double[] {1, 2, 2}; // I,W,Y
-    private static final double[] SCORE_HEIGHTS = new double[] {2, 4, 4}; // I,W,Y
-    
-    private static final double SCORE_LABEL_HEIGHT = 1;
-    
-    private static final double[] SHIDO_GROUP_X = new double[]{1.5, 9.5}; // P1, P2
-    private static final double[] SHIDO_GROUP_Y = new double[]{9.5, 9.5}; // P1, P2
-    private static final double[] SHIDO_X = new double[]{4, 2, 0, 0}; // S,S,S,H
-    private static final double SHIDO_WIDTH = 1;
-    private static final double SHIDO_HEIGHT = 2;
+    protected static class LayoutValues {
+        double[] SCORE_GROUP_X = new double[]{0.25, 8.25}; // Player 1, Player 2
+        double[] SCORE_GROUP_Y = new double[]{4, 4}; // P1, P2
+        double[] SCORE_X = new double[] {0, 1.5, 4}; // I, W, Y
+        double[] SCORE_WIDTHS = new double[] {1, 2, 2}; // I,W,Y
+        double[] SCORE_HEIGHTS = new double[] {2, 4, 4}; // I,W,Y
+
+        double SCORE_LABEL_HEIGHT = 1;
+
+        double[] PLAYER_LABEL_Y = new double[] {2.5, 2.5}; // P1, P2
+        double[] PLAYER_LABEL_X = new double[] {0.25, 8.25}; // P1, P2
+        double PLAYER_LABEL_WIDTH = 7.5;
+        double PLAYER_LABEL_HEIGHT = 1.5;
+
+        double[] SHIDO_GROUP_X = new double[]{1.5, 9.5}; // P1, P2
+        double[] SHIDO_GROUP_Y = new double[]{9.5, 9.5}; // P1, P2
+        double[] SHIDO_X = new double[]{4, 2, 0, 0}; // S,S,S,H
+        double SHIDO_WIDTH = 1;
+        double SHIDO_HEIGHT = 2;
+
+        double TIMER_X = 5;
+        double TIMER_Y = 0;
+        double TIMER_WIDTH = 6;
+        double TIMER_HEIGHT = 2.5;
+
+        double HOLD_DOWN_X = 8;
+        double HOLD_DOWN_Y = 6;
+        double HOLD_DOWN_WIDTH = 4;
+        double HOLD_DOWN_HEIGHT = 4;
+    }
 
     private ScalableLabel timer;
     private ScalableLabel[] player;
@@ -90,6 +108,10 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
 
     /** Creates new form ScoreboardPanel */
     public DefaultScoreboardDisplayPanel() {
+        this(new LayoutValues());
+    }
+
+    public DefaultScoreboardDisplayPanel(LayoutValues lv) {
         ScalableAbsoluteLayout layout;
         
         setLayout(new GridLayout(1,1));
@@ -192,7 +214,6 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
             psLayer[i].setLayout(layout);
 
             for(int j=0; j<2; j++) {
-                final int ii=i, jj=j;
                 ScalableLabel label = new ScalableLabel("");
                 label.setVisible(false);
                 double x = 3.5 - i * 1.5;
@@ -213,7 +234,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
         
         holddownTimer = new ScalableLabel(" ");
         holddownTimer.setVisible(false);
-        layout.addComponent(holddownTimer, 6, 8, 4, 4);
+        layout.addComponent(holddownTimer, lv.HOLD_DOWN_X, lv.HOLD_DOWN_Y, lv.HOLD_DOWN_WIDTH, lv.HOLD_DOWN_HEIGHT);
 
         /*
          * Bottom layer - background and core elements such as timer, player
@@ -231,9 +252,10 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
             new ScalableLabel("Player 2")
         };
 
-        layout.addComponent(timer, 5, 0, 6, 2.5);
-        layout.addComponent(player[0], 0.25, 2.5, 7.5, 1.5);
-        layout.addComponent(player[1], 8.25, 2.5, 7.5, 1.5);
+        layout.addComponent(timer, lv.TIMER_X, lv.TIMER_Y, lv.TIMER_WIDTH, lv.TIMER_HEIGHT);
+        for(int i = 0; i < 2; i++) {
+            layout.addComponent(player[i], lv.PLAYER_LABEL_X[i], lv.PLAYER_LABEL_Y[i], lv.PLAYER_LABEL_WIDTH, lv.PLAYER_LABEL_HEIGHT);
+        }
         
         scoreLabels = new ScalableLabel[2][3];
         score = new ScalableLabel[2][3];
@@ -241,9 +263,9 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
         for(int i=0;i<2;i++) {
             for(int j=0;j<3;j++) {
                 scoreLabels[i][j] = new ScalableLabel(iwyk[j]);
-                layout.addComponent(scoreLabels[i][j], SCORE_GROUP_X[i] + SCORE_X[j], SCORE_GROUP_Y[i], SCORE_WIDTHS[j], SCORE_LABEL_HEIGHT);
+                layout.addComponent(scoreLabels[i][j], lv.SCORE_GROUP_X[i] + lv.SCORE_X[j], lv.SCORE_GROUP_Y[i], lv.SCORE_WIDTHS[j], lv.SCORE_LABEL_HEIGHT);
                 score[i][j] = new ScalableLabel("0");
-                layout.addComponent(score[i][j], SCORE_GROUP_X[i] + SCORE_X[j], SCORE_GROUP_Y[i] + SCORE_LABEL_HEIGHT, SCORE_WIDTHS[j], SCORE_HEIGHTS[j]);
+                layout.addComponent(score[i][j], lv.SCORE_GROUP_X[i] + lv.SCORE_X[j], lv.SCORE_GROUP_Y[i] + lv.SCORE_LABEL_HEIGHT, lv.SCORE_WIDTHS[j], lv.SCORE_HEIGHTS[j]);
             }
         }        
         
@@ -252,7 +274,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
             for(int j=0; j<4; j++) {
                 shido[i][j] = new ScalableLabel(j<3?"S":"H");
                 shido[i][j].setVisible(false);
-                layout.addComponent(shido[i][j], SHIDO_GROUP_X[i] + SHIDO_X[j], SHIDO_GROUP_Y[i], SHIDO_WIDTH, SHIDO_HEIGHT);
+                layout.addComponent(shido[i][j], lv.SHIDO_GROUP_X[i] + lv.SHIDO_X[j], lv.SHIDO_GROUP_Y[i], lv.SHIDO_WIDTH, lv.SHIDO_HEIGHT);
             }
         }
 
@@ -261,6 +283,9 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
         model.addListener(this);
     }
 
+    // for overriding in subclasses
+    protected void setLayoutValues() {
+    }
     
     @Override
     public void swapPlayers() {
@@ -395,7 +420,12 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
             model = m;
             model.addListener(this);
         }
-        handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
+            }
+        });
     }
     
     NumberFormat format = new DecimalFormat("00");
@@ -621,7 +651,6 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardDisplayPanel implem
                 pendingFightLayer.setVisible(false);
 
                 for(int i=0; i<2; i++)
-//                        vsPlayer[i].setText(model.getPlayerName(swapPlayers?1-i:i));
                     vsPlayer[i].setText(model.getPlayerName(i));
                 vsLayer.setVisible(true);
             }

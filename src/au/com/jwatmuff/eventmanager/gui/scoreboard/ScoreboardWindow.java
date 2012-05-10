@@ -39,10 +39,7 @@ import java.util.List;
 import java.util.*;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 
@@ -53,8 +50,8 @@ import org.apache.log4j.Logger;
 public class ScoreboardWindow extends javax.swing.JFrame {
     private static final Logger log = Logger.getLogger(ScoreboardWindow.class);
 
-    private ScoreboardDisplayPanel scoreboard;
-    private ScoreboardDisplayPanel fullscreen;
+    private ScoreboardPanel scoreboard;
+    private ScoreboardPanel fullscreen;
     
     private Database database;
     private TransactionNotifier notifier;
@@ -143,8 +140,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         setupMenu();
         this.title = title;
         setTitle(title);
-        scoreboard = new ScoreboardPanel(interactive);
-        fullscreen = new ScoreboardPanel(interactive);
+        scoreboard = new ScoreboardEntryPanel(interactive);
+        fullscreen = new ScoreboardEntryPanel(interactive);
         setModel(new ScoreboardModelWrapper(model), false);
 
         getContentPane().setLayout(new GridLayout(1,1));
@@ -165,8 +162,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         setTitle(title);
 
         /* create scoreboard panels */
-        scoreboard = new ScoreboardPanel(interactive);
-        fullscreen = new ScoreboardPanel(interactive);
+        scoreboard = new ScoreboardEntryPanel(interactive);
+        fullscreen = new ScoreboardEntryPanel(interactive);
         
         /* put scoreboard panel into window */
         getContentPane().setLayout(new GridLayout(1,1));
@@ -195,8 +192,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         optionsMenu.remove(showImagesMenuItem);
 
         /* create scoreboard panels (one for windowed, one for fullscreen) */
-        scoreboard = new ScoreboardPanel(true, system);
-        fullscreen = new ScoreboardPanel(true, system);
+        scoreboard = new ScoreboardEntryPanel(true, system);
+        fullscreen = new ScoreboardEntryPanel(true, system);
 
         /* add the scoreboard panel to the window */
         getContentPane().setLayout(new GridLayout(1,1));
@@ -387,16 +384,30 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         }
     }
     
+    // Builds the menu of scoreboard styles
     private void setupMenu() {
+        // Only show style menu for display scoreboard, not entry
         scoreboardStyleMenu.setVisible(!interactive);
+
+        // These menu items act like a radio button - create a button group for them
+        final ButtonGroup buttonGroup = new ButtonGroup();
+
+        boolean first = true;
         for(final ScoreboardDisplayType type : ScoreboardDisplayType.values()) {
-            JMenuItem menuItem = new JMenuItem();
+            // Create menu item for each display style
+            final JMenuItem menuItem = new JRadioButtonMenuItem();
+            buttonGroup.add(menuItem);
             menuItem.setText(type.description);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     updateStyle(type);
+                    buttonGroup.setSelected(menuItem.getModel(), true);
                 }
             });
+            if(first) {
+                buttonGroup.setSelected(menuItem.getModel(), true);
+                first = false;
+            }
             scoreboardStyleMenu.add(menuItem);
         }
     }
@@ -625,7 +636,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         
         if(gd.isFullScreenSupported()) {
-            final ScoreboardDisplayPanel sp = fullscreen;
+            final ScoreboardPanel sp = fullscreen;
             final Frame w = new PanelDisplayFrame(sp);
             w.addKeyListener(new KeyAdapter() {
                 @Override
