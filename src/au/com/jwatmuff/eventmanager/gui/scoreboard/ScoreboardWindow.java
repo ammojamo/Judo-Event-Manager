@@ -39,8 +39,7 @@ import java.util.List;
 import java.util.*;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 
@@ -121,8 +120,6 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         this.model = model;
         scoreboard.setModel(model);
         fullscreen.setModel(model);
-        scoreboard.handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
-        fullscreen.handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
 
         model.addListener(new ScoreboardModelListener() {
             @Override
@@ -137,13 +134,14 @@ public class ScoreboardWindow extends javax.swing.JFrame {
      * DISPLAY the scoreboard over the network for which a scoreboard model
      * is already obtained. Wraps the given scoreboard model
      */
-    public ScoreboardWindow(String title, ScoreboardModel model) {
+    private ScoreboardWindow(String title, ScoreboardModel model) {
         interactive = false;
         initComponents();
+        setupMenu();
         this.title = title;
         setTitle(title);
-        scoreboard = new ScoreboardPanel(interactive);
-        fullscreen = new ScoreboardPanel(interactive);
+        scoreboard = new ScoreboardEntryPanel(interactive);
+        fullscreen = new ScoreboardEntryPanel(interactive);
         setModel(new ScoreboardModelWrapper(model), false);
 
         getContentPane().setLayout(new GridLayout(1,1));
@@ -158,21 +156,15 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         interactive = false;
 
         initComponents();
+        setupMenu();
         
         title = "Event Manager - Scoreboard Display - [" + mat.getMat() + "]";
         setTitle(title);
 
         /* create scoreboard panels */
-        scoreboard = new ScoreboardPanel(interactive);
-        fullscreen = new ScoreboardPanel(interactive);
+        scoreboard = new ScoreboardEntryPanel(interactive);
+        fullscreen = new ScoreboardEntryPanel(interactive);
         
-        /* TODO: bit of a hack, the scoreboard should initialize with no fight anyway */
-        scoreboard.handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
-        fullscreen.handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
-/*
-        scoreboard.getModel().endFight();
-        fullscreen.getModel().endFight();
-*/
         /* put scoreboard panel into window */
         getContentPane().setLayout(new GridLayout(1,1));
         getContentPane().add(scoreboard);
@@ -191,16 +183,17 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         new Thread(findPeerScoreboard, "findPeerScoreboard").start();
     }
 
-    public ScoreboardWindow(ScoringSystem system) {
+    private ScoreboardWindow(ScoringSystem system) {
         interactive = true;
 
         initComponents();
+        setupMenu();
 
         optionsMenu.remove(showImagesMenuItem);
 
         /* create scoreboard panels (one for windowed, one for fullscreen) */
-        scoreboard = new ScoreboardPanel(true, system);
-        fullscreen = new ScoreboardPanel(true, system);
+        scoreboard = new ScoreboardEntryPanel(true, system);
+        fullscreen = new ScoreboardEntryPanel(true, system);
 
         /* add the scoreboard panel to the window */
         getContentPane().setLayout(new GridLayout(1,1));
@@ -210,10 +203,6 @@ public class ScoreboardWindow extends javax.swing.JFrame {
          * panel */
         model = scoreboard.getModel();
         fullscreen.setModel(model);
-
-        /* tell the scoreboard panels to update themselves from the model */
-        scoreboard.handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
-        fullscreen.handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
 
         /* open default siren file */
         openSirenFile(new File("resources/sound/siren.wav"));
@@ -281,9 +270,13 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             }
         });
 
-        ManualFightDialog mfd = new ManualFightDialog(ScoreboardWindow.this, true);
-        mfd.setVisible(true);
-        model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()});
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                ManualFightDialog mfd = new ManualFightDialog(ScoreboardWindow.this, true);
+                mfd.setVisible(true);
+                model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()});
+            }
+        });
     }
     
     /** Creates new ScoreboardWindow which gets fights from the given database
@@ -391,6 +384,59 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         }
     }
     
+    // Builds the menu of scoreboard styles
+    private void setupMenu() {
+        // Only show style menu for display scoreboard, not entry
+        scoreboardStyleMenu.setVisible(!interactive);
+
+        // These menu items act like a radio button - create a button group for them
+        final ButtonGroup buttonGroup = new ButtonGroup();
+
+        boolean first = true;
+        for(final ScoreboardDisplayType type : ScoreboardDisplayType.values()) {
+            // Create menu item for each display style
+            final JMenuItem menuItem = new JRadioButtonMenuItem();
+            buttonGroup.add(menuItem);
+            menuItem.setText(type.description);
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    updateStyle(type);
+                    buttonGroup.setSelected(menuItem.getModel(), true);
+                }
+            });
+            if(first) {
+                buttonGroup.setSelected(menuItem.getModel(), true);
+                first = false;
+            }
+            scoreboardStyleMenu.add(menuItem);
+        }
+    }
+    
+    private void updateStyle(ScoreboardDisplayType type) {
+        // set models to null to de-register model listeners
+        scoreboard.setModel(null);
+        fullscreen.setModel(null);
+        // remove from GUI
+        getContentPane().remove(scoreboard);
+        
+        // create new panels
+        scoreboard = ScoreboardDisplayType.getPanel(type);
+        fullscreen = ScoreboardDisplayType.getPanel(type);
+        scoreboard.setModel(model);
+        fullscreen.setModel(model);
+        
+        // add to GUI
+        getContentPane().add(scoreboard);
+        
+        // apply settings
+        if(swapPlayersMenuItem.isSelected()) {
+            scoreboard.swapPlayers();
+            fullscreen.swapPlayers();
+        }
+        scoreboard.setImagesEnabled(showImagesMenuItem.isSelected());
+        fullscreen.setImagesEnabled(showImagesMenuItem.isSelected());
+    }
+    
     private void updateFightFromDatabase() {
         if(mat == null) return;
 
@@ -459,6 +505,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         swapPlayersMenuItem = new javax.swing.JCheckBoxMenuItem();
         chooseColorsMenuItem = new javax.swing.JMenuItem();
         showImagesMenuItem = new javax.swing.JCheckBoxMenuItem();
+        scoreboardStyleMenu = new javax.swing.JMenu();
         jSeparator3 = new javax.swing.JSeparator();
         chooseSirenMenuItem = new javax.swing.JMenuItem();
         testSirenMenuItem = new javax.swing.JMenuItem();
@@ -529,6 +576,9 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             }
         });
         optionsMenu.add(showImagesMenuItem);
+
+        scoreboardStyleMenu.setText("Scoreboard Style");
+        optionsMenu.add(scoreboardStyleMenu);
 
         jSeparator3.setForeground(new java.awt.Color(204, 204, 204));
         optionsMenu.add(jSeparator3);
@@ -719,6 +769,7 @@ private void showImagesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JMenu optionsMenu;
+    private javax.swing.JMenu scoreboardStyleMenu;
     private javax.swing.JMenuItem setTimeMenuItem;
     private javax.swing.JCheckBoxMenuItem showImagesMenuItem;
     private javax.swing.JCheckBoxMenuItem swapPlayersMenuItem;
