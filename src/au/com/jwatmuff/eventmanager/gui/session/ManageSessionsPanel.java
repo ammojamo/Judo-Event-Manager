@@ -293,9 +293,15 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
     }
 
     private boolean confirmDelete(Session session) {
-        if(session.getLockedStatus() != Session.LockedStatus.UNLOCKED) {
-            String msg = "The session '" + session.getName() + "' is locked.\n"
-                    + "Are you sure you wish to delete it?";
+        if (session.getLockedStatus() != Session.LockedStatus.UNLOCKED) {
+            String msg = "";
+            if (session.getType() == Session.SessionType.NORMAL) {
+                msg = "The session '" + session.getMat() + ":" + session.getName() + "' is locked.\n"
+                        + "Are you sure you wish to delete it?";
+            } else {
+                msg = "The contest area '" + session.getMat() + "' is locked.\n"
+                        + "Are you sure you wish to delete it?";
+            }
             if (JOptionPane.showConfirmDialog(parentWindow, msg, "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
                 return false;
             }
@@ -485,7 +491,8 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_lockSessionButtonActionPerformed
 
     private void removeMatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeMatButtonActionPerformed
-        List<Session> unlockedMats = getUnlockedSessions(false);
+//        List<Session> unlockedMats = getUnlockedSessions(false);
+        List<Session> unlockedMats = database.findAll(Session.class, SessionDAO.ALL_MATS);
         
         if(unlockedMats.size() == 0) {
             GUIUtils.displayMessage(parentWindow, "No unlocked contest areas to delete.", "Delete Contest Area");
@@ -495,11 +502,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
 
         Collections.sort(unlockedMats, new Comparator<Session>() {
             public int compare(Session session1, Session session2) {
-                if(session1.getMat().equals(session2.getMat())){
-                    return session1.getName().compareTo(session2.getName());
-                } else {
-                    return session1.getMat().compareTo(session2.getMat());
-                }
+                return session1.getMat().compareTo(session2.getMat());
             }
         });
 
@@ -568,13 +571,20 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
         if(!PermissionChecker.isAllowed(Action.ADD_CONTEST_AREA, database)) return;
 
         /* special case to handle licenses allowing limited number of mats */
-        int numMats = database.findAll(Session.class, SessionDAO.ALL_MATS).size();
+        List<Session> mats = database.findAll(Session.class, SessionDAO.ALL_MATS);
+        int numMats = mats.size();
         if(numMats >= 10 && !PermissionChecker.isAllowed(Action.ADD_MORE_THAN_TEN_MATS, database)) return;
         else if(numMats >= 2 && !PermissionChecker.isAllowed(Action.ADD_MORE_THAN_TWO_MATS, database)) return;
 
         NewMatDialog nmd = new NewMatDialog(parentWindow, true);
         nmd.setVisible(true);
         if (nmd.getSuccess()) {
+            for (Session mat : mats) {
+                if (mat.getMat().equalsIgnoreCase(nmd.getMatName())) {
+                    GUIUtils.displayMessage(this, "A contest area of this name already exists", "Name Already Exists");
+                    return;
+                }
+            }
             Session session = new Session();
             session.setType(Session.SessionType.MAT);
             session.setMat(nmd.getMatName());
