@@ -46,20 +46,35 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
     protected static class LayoutValues {
         double[] SCORE_GROUP_X = new double[]{0.25, 8.25}; // Player 1, Player 2
         double[] SCORE_GROUP_Y = new double[]{4, 4}; // P1, P2
+        
         double[] SCORE_X = new double[] {0, 1.5, 4}; // I, W, Y
-        double[] SCORE_WIDTHS = new double[] {1, 2, 2}; // I,W,Y
-        double[] SCORE_HEIGHTS = new double[] {2, 4, 4}; // I,W,Y
+        double[] SCORE_Y = new double[] {1, 1, 1}; // I, W, Y
+        double[] SCORE_WIDTHS = new double[] {1, 2, 2}; // I, W, Y
+        double[] SCORE_HEIGHTS = new double[] {2, 4, 4}; // I, W, Y
 
-        double SCORE_LABEL_HEIGHT = 1;
+        double[] SCORE_LABEL_X = new double[] {0, 1.5, 4}; // I, W, Y
+        double[] SCORE_LABEL_Y = new double[] {0, 0, 0}; // I, W, Y
+        double[] SCORE_LABEL_WIDTHS = new double[] {1, 2, 2}; // I, W, Y
+        double[] SCORE_LABEL_HEIGHTS = new double[] {1, 1, 1}; // I, W, Y
+        
+        boolean SCORE_SHOW_IPON = false; 
 
         double[] PLAYER_LABEL_Y = new double[] {2.5, 2.5}; // P1, P2
         double[] PLAYER_LABEL_X = new double[] {0.25, 8.25}; // P1, P2
         double PLAYER_LABEL_WIDTH = 7.5;
         double PLAYER_LABEL_HEIGHT = 1.5;
 
+        double[] HD_SCORE_GROUP_X = new double[]{0.5, 10.5}; // P1, P2
+        double[] HD_SCORE_GROUP_Y = new double[]{8, 8}; // P1, P2
+        double[] HD_SCORE_X = new double[]{0, 1.5, 3}; // S,S,S,H
+        double[] HD_SCORE_Y = new double[]{0, 0, 0}; // S,S,S,H
+        double HD_SCORE_WIDTH = 2;
+        double HD_SCORE_HEIGHT = 2;
+
         double[] SHIDO_GROUP_X = new double[]{1.5, 9.5}; // P1, P2
         double[] SHIDO_GROUP_Y = new double[]{9.5, 9.5}; // P1, P2
         double[] SHIDO_X = new double[]{4, 2, 0, 0}; // S,S,S,H
+        double[] SHIDO_Y = new double[]{0, 0, 0, 0}; // S,S,S,H
         double SHIDO_WIDTH = 1;
         double SHIDO_HEIGHT = 2;
 
@@ -216,9 +231,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
             for(int j=0; j<2; j++) {
                 ScalableLabel label = new ScalableLabel("");
                 label.setVisible(false);
-                double x = 3.5 - i * 1.5;
-                if(j > 0) x = 14.0 - x;
-                layout.addComponent(label, x, 8, 2, 2);
+                layout.addComponent(label, lv.HD_SCORE_GROUP_X[j] + lv.HD_SCORE_X[i], lv.HD_SCORE_GROUP_Y[j] + lv.HD_SCORE_Y[i], lv.HD_SCORE_WIDTH, lv.HD_SCORE_HEIGHT);
                 pendingScores[j][i] = label;
             }
         }
@@ -263,19 +276,27 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         for(int i=0;i<2;i++) {
             for(int j=0;j<3;j++) {
                 scoreLabels[i][j] = new ScalableLabel(iwyk[j]);
-                layout.addComponent(scoreLabels[i][j], lv.SCORE_GROUP_X[i] + lv.SCORE_X[j], lv.SCORE_GROUP_Y[i], lv.SCORE_WIDTHS[j], lv.SCORE_LABEL_HEIGHT);
+                layout.addComponent(scoreLabels[i][j], lv.SCORE_GROUP_X[i] + lv.SCORE_LABEL_X[j], lv.SCORE_GROUP_Y[i] + lv.SCORE_LABEL_Y[j], lv.SCORE_LABEL_WIDTHS[j], lv.SCORE_LABEL_HEIGHTS[j]);
                 score[i][j] = new ScalableLabel("0");
-                layout.addComponent(score[i][j], lv.SCORE_GROUP_X[i] + lv.SCORE_X[j], lv.SCORE_GROUP_Y[i] + lv.SCORE_LABEL_HEIGHT, lv.SCORE_WIDTHS[j], lv.SCORE_HEIGHTS[j]);
+                layout.addComponent(score[i][j], lv.SCORE_GROUP_X[i] + lv.SCORE_X[j], lv.SCORE_GROUP_Y[i] + lv.SCORE_Y[j], lv.SCORE_WIDTHS[j], lv.SCORE_HEIGHTS[j]);
             }
-        }        
+        }
         
         shido = new ScalableLabel[2][4];
         for(int i=0; i<2; i++) {
             for(int j=0; j<4; j++) {
                 shido[i][j] = new ScalableLabel(j<3?"S":"H");
                 shido[i][j].setVisible(false);
-                layout.addComponent(shido[i][j], lv.SHIDO_GROUP_X[i] + lv.SHIDO_X[j], lv.SHIDO_GROUP_Y[i], lv.SHIDO_WIDTH, lv.SHIDO_HEIGHT);
+                layout.addComponent(shido[i][j], lv.SHIDO_GROUP_X[i] + lv.SHIDO_X[j], lv.SHIDO_GROUP_Y[i] + lv.SHIDO_Y[j], lv.SHIDO_WIDTH, lv.SHIDO_HEIGHT);
             }
+        }
+        
+        // remove ippon
+        if(!lv.SCORE_SHOW_IPON) {
+            scoreLabels[0][0].setVisible(false);
+            scoreLabels[1][0].setVisible(false);
+            score[0][0].setVisible(false);
+            score[1][0].setVisible(false);
         }
 
         updateColors();
