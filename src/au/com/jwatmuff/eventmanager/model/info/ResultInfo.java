@@ -7,11 +7,10 @@ package au.com.jwatmuff.eventmanager.model.info;
 
 import au.com.jwatmuff.eventmanager.db.SessionFightDAO;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer;
 import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer.FightMatInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
+import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -24,7 +23,7 @@ public class ResultInfo {
     private Result result;
     private Fight fight;
     private String[] playerName = new String[2];
-    private FightPlayer[] fightPlayer = new FightPlayer[2];
+    private Player[] players = new Player[2];
     private String matName;
     private int matFightNumber;
 
@@ -36,8 +35,8 @@ public class ResultInfo {
         if(fight == null) throw new DatabaseStateException();
 
         for(int i=0; i<2; i++) {
-            fightPlayer[i] = PlayerCodeParser.parseCode(database, fight.getPlayerCodes()[i], fight.getPoolID());
-            playerName[i] = fightPlayer[i].player.getFirstName() + " " + fightPlayer[i].player.getLastName();
+            players[i] = database.get(Player.class, result.getPlayerIDs()[i]);
+            playerName[i] = players[i].getFirstName() + " " + players[i].getLastName();
         }
         
         try {
@@ -88,11 +87,7 @@ public class ResultInfo {
         this.matFightNumber = matFightNumber;
     }
 
-    public FightPlayer[] getPlayer() {
-        return fightPlayer;
-    }
-
-    public void setPlayer(FightPlayer[] player) {
-        this.fightPlayer = player;
+    public Player[] getPlayer() {
+        return players;
     }
 }

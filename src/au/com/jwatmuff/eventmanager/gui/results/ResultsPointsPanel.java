@@ -128,11 +128,11 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
             public int compare(ResultInfo ri1, ResultInfo ri2) {
                 int[] scores1 = ri1.getResult().getSimpleScores(database);
                 int winnerIndex1 = scores1[1] > scores1[0] ? 1 : 0;
-                Player winner1 = ri1.getPlayer()[winnerIndex1].player;
+                Player winner1 = ri1.getPlayer()[winnerIndex1];
 
                 int[] scores2 = ri2.getResult().getSimpleScores(database);
                 int winnerIndex2 = scores2[1] > scores2[0] ? 1 : 0;
-                Player winner2 = ri2.getPlayer()[winnerIndex2].player;
+                Player winner2 = ri2.getPlayer()[winnerIndex2];
                 return winner1.getVisibleID().compareTo(winner2.getVisibleID());
             }
         });
@@ -170,8 +170,8 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                         int loserIndex = 1 - winnerIndex;
                         map.put("winner", bean.getPlayerName()[winnerIndex]);
                         map.put("loser", bean.getPlayerName()[loserIndex]);
-                        Player loser = bean.getPlayer()[loserIndex].player;
-                        Player winner = bean.getPlayer()[winnerIndex].player;
+                        Player loser = bean.getPlayer()[loserIndex];
+                        Player winner = bean.getPlayer()[winnerIndex];
                         winnerGrade = (winner == null) ? null : PoolChecker.getEffectiveGrade(winner, pool, censusDate, configurationFile);
                         map.put("winnerRank", (winnerGrade==null)?"N/A": winnerGrade.shortGrade);
                         loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate, configurationFile);
@@ -219,12 +219,12 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
             int w = (score[0] > score[1]) ? 0 : 1;
             int l = 1-w;
 
-            if(info.getPlayer()[w].player == null) {
+            if(info.getPlayer()[w] == null) {
                 log.warn("This shouldn't happen");
                 return 0;
             }
 
-            Grade winnerGrade = info.getPlayer()[w].player.getGrade();
+            Grade winnerGrade = info.getPlayer()[w].getGrade();
 
             int rankDifference = loserGrade.ordinal() - winnerGrade.ordinal();
             

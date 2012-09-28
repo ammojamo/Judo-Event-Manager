@@ -78,7 +78,7 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
             map.put("matfight", bean.getMatName() + " " + format.format(bean.getMatFightNumber()));
             map.put("division", database.get(Pool.class, bean.getFight().getPoolID()).getDescription());
             for(int i = 0; i < 2; i++) {
-                Player player = bean.getPlayer()[i].player;
+                Player player = bean.getPlayer()[i];
                 map.put("player" + (i + 1), bean.getPlayerName()[i]);
                 map.put("playerId" + (i + 1), (player != null) ? player.getVisibleID() : "N/A");
             }

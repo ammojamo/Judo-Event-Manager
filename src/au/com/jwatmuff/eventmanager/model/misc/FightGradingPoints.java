@@ -39,8 +39,8 @@ public class FightGradingPoints {
         int winner = scores[0] > scores[1] ? 0 : 1;
         int loser = 1 - winner;
         
-        winningPlayer = ri.getPlayer()[winner].player;
-        losingPlayer = ri.getPlayer()[loser].player;
+        winningPlayer = ri.getPlayer()[winner];
+        losingPlayer = ri.getPlayer()[loser];
         
         pool = database.get(Pool.class, ri.getFight().getPoolID());
         effectiveLoserGrade = PoolChecker.getEffectiveGrade(losingPlayer, pool, censusDate, configurationFile);
@@ -79,12 +79,12 @@ public class FightGradingPoints {
         int w = (score[0] > score[1]) ? 0 : 1;
         int l = 1-w;
 
-        if(info.getPlayer()[w].player == null) {
+        if(info.getPlayer()[w] == null) {
             log.warn("This shouldn't happen");
             return 0;
         }
 
-        Grade winnerGrade = info.getPlayer()[w].player.getGrade();
+        Grade winnerGrade = info.getPlayer()[w].getGrade();
 
         int rankDifference = loserGrade.ordinal() - winnerGrade.ordinal();
 
