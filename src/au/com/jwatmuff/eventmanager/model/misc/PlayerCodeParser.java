@@ -280,8 +280,10 @@ public class PlayerCodeParser {
         String[] codes = getORCodes(code);
         
         if(codes.length == 1){
-            if(parseredCodes.containsKey(codes[0]))
+            if(parseredCodes.containsKey(codes[0])){
+//                System.out.println(codes[0]);
                 return parseredCodes.get(codes[0]);
+            }
             // Use prefix to work out which parsing method to call
             String prefix = getPrefix(codes[0]);
             if(prefix.matches(matcherPlayer)){
@@ -294,6 +296,7 @@ public class PlayerCodeParser {
             }
             else if(prefix.matches(matcherRoundRobin)){
                 parseredCodes.put(codes[0], parseRRCode(codes[0]));
+                System.out.println(codes[0] + " " + parseredCodes.get(codes[0]).toString());
                 return parseredCodes.get(codes[0]);
             }
             else if(prefix.matches(matcherBestOfThree)){
@@ -324,8 +327,9 @@ public class PlayerCodeParser {
                 }
             }
             fightPlayer.code = codes[0];
-            parseredCodes.put(codes[0], fightPlayer);
-            return parseredCodes.get(codes[0]);
+//            parseredCodes.put(codes[0], fightPlayer);
+//            return parseredCodes.get(codes[0]);
+            return fightPlayer;
         } else {
             throw new IllegalArgumentException("Invalid player code: " + code);
         }
@@ -816,30 +820,8 @@ public class PlayerCodeParser {
                     parseCode(codes[1])
                 };
 
-// Both Bye: Check for dependent fights with results or Return bye
+// Both Bye: Return Empty Bye
                 if(fightPlayers[0].type == PlayerType.BYE && fightPlayers[1].type == PlayerType.BYE){
-                    for(FightInfo fightInfo:fightInfoList){
-                        if( fight.getFightPostion() < fightInfo.getFightPostion() && fightInfo.resultKnown()){
-                            int[] checkPlayerIDs = fightInfo.getAllPlayerID();
-                            String[] checkPlayerCodes = fightInfo.getAllPlayerCode();
-                            if(fightPlayers[0].player != null && (fightPlayers[0].player.getID() == checkPlayerIDs[0] || fightPlayers[0].player.getID() == checkPlayerIDs[1]) ){
-                                if(code.contentEquals(checkPlayerCodes[0]) || code.contentEquals(checkPlayerCodes[1])){
-                                    fightPlayer.playerPoolInfo = getPlayerPoolInfo(fightPlayers[0].player.getID());
-                                    fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
-                                    fightPlayer.type = PlayerType.NORMAL;
-                                    return fightPlayer;
-                                }
-                            }
-                            if(fightPlayers[1].player != null && (fightPlayers[1].player.getID() == checkPlayerIDs[0] || fightPlayers[1].player.getID() == checkPlayerIDs[1]) ){
-                                if(code.contentEquals(checkPlayerCodes[0]) || code.contentEquals(checkPlayerCodes[1])){
-                                    fightPlayer.playerPoolInfo = getPlayerPoolInfo(fightPlayers[1].player.getID());
-                                    fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
-                                    fightPlayer.type = PlayerType.NORMAL;
-                                    return fightPlayer;
-                                }
-                            }
-                        }
-                    }
                     fightPlayer.type = PlayerType.BYE;
                     return fightPlayer;
                 }
@@ -966,7 +948,7 @@ public class PlayerCodeParser {
         if(!isValidCode(codes[0]) || !isValidCode(codes[1])){
             return false;
         }
-//        System.out.print(codes);
+//        System.out.print(codes[0]);
         FightPlayer fightPlayer0 = parseCode(codes[0]);
         FightPlayer fightPlayer1 = parseCode(codes[1]);
         if(fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.player != null && fightPlayer1.player != null)
@@ -1119,8 +1101,29 @@ public class PlayerCodeParser {
         List<Fight> fights = new ArrayList<Fight>(database.findAll(Fight.class, FightDAO.FOR_POOL, poolID));
 
         fightInfoList = new ArrayList<FightInfo>();
-        for(Fight fight : fights) 
-            fightInfoList.add(FightInfo.getFightInfo(database, fight));
+        for (Fight fight : fights) {
+            FightInfo fightInfo = FightInfo.getFightInfo(database, fight);
+            fightInfoList.add(fightInfo);
+            String[] codes = fightInfo.getAllPlayerCode();
+            if (fightInfo.resultKnown()) {
+                int[] playerCodes = fightInfo.getAllPlayerID();
+                if (!parseredCodes.containsKey(codes[0])) {
+                    FightPlayer fightPlayer = new FightPlayer();
+                    fightPlayer.code = codes[0];
+                    fightPlayer.playerPoolInfo = getPlayerPoolInfo(playerCodes[0]);
+                    fightPlayer.player = fightPlayer.playerPoolInfo.getPlayer();
+                    fightPlayer.division = fightPlayer.playerPoolInfo.getPool();
+                    if (fightPlayer.playerPoolInfo.isWithdrawn()) {
+                        fightPlayer.type = PlayerType.BYE;
+                    } else {
+                        fightPlayer.type = PlayerType.NORMAL;
+                    }
+                    parseredCodes.put(codes[0], fightPlayer);
+                }
+            }
+        }
+
+                    
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         
