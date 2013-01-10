@@ -87,8 +87,12 @@ public class ScalableScoringPanel extends javax.swing.JPanel {
         iButton.setVisible(show);
         wButton.setVisible(show);
         yButton.setVisible(show);
-        if(system == ScoringSystem.OLD) kButton.setVisible(show);
-        if(system == ScoringSystem.NEW) dButton.setVisible(show);
+        if(system == ScoringSystem.OLD) {
+            kButton.setVisible(show);
+        }
+        if(system == ScoringSystem.NEW) {
+            dButton.setVisible(show);
+        }
     }
 
     public void showConfirmButtons(boolean show) {
