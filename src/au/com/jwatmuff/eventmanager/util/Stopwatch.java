@@ -60,6 +60,11 @@ public class Stopwatch {
         stop();
         this.time = (time / runperiod) * runperiod;
     }
+    
+    public void direction(boolean direction) {
+        stop();
+        this.direction = direction;
+    }
 
     public synchronized void start() {
         if(timer == null) {
@@ -73,6 +78,10 @@ public class Stopwatch {
             timer.cancel();
             timer = null;
         }
+    }
+
+    public boolean getDirection() {
+        return direction;
     }
 
     public long getTime() {

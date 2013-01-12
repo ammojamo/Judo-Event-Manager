@@ -100,7 +100,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         mainTimer = new Stopwatch(10, false, new Runnable() {
             @Override
             public void run() {
-                if(mainTimer.getTime() <= 0) {
+                if(mainTimer.getTime() < 0 || (!mainTimer.getDirection() && mainTimer.getTime() == 0)) {
                     mainTimer.stop();
                     switch(goldenScoreMode) {
                         case INACTIVE:
@@ -149,7 +149,11 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public void reset(int fightTime, int goldenScoreTime, String[] playerNames) {
         this.fightTime = fightTime;
-        if (this.fightTime > 90) {
+        if (this.fightTime > 90 && system == ScoringSystem.NEW) {
+            holddownTimeIpon = 20;
+            holddownTimeWazari = 15;
+            holddownTimeYoko = 10;
+        } else if (this.fightTime > 90 && system == ScoringSystem.OLD) {
             holddownTimeIpon = 25;
             holddownTimeWazari = 20;
             holddownTimeYoko = 15;
@@ -163,6 +167,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         stopTimer();
         cancelHolddownTimer();
         mainTimer.reset(fightTime * 1000);
+        mainTimer.direction(false);
         holddownTimer.reset(0);
         for(int i=0; i<2; i++) {
             shido[i] = 0;
@@ -274,7 +279,18 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         notifyListeners(ScoreboardUpdate.SCORE);
         notifyListeners(ScoreboardUpdate.SHIDO);
         
-        mainTimer.reset(goldenScoreTime * 1000);
+        if(system == ScoringSystem.NEW) {
+            if (goldenScoreTime == 0) {
+                mainTimer.direction(true);
+                mainTimer.reset(0);
+            } else {
+                mainTimer.direction(false);
+                mainTimer.reset(goldenScoreTime * 1000);
+            }
+        } else {
+            mainTimer.reset(goldenScoreTime * 1000);
+            mainTimer.direction(false);
+        }
         notifyListeners(ScoreboardUpdate.TIMER);
         setGoldenScoreMode(GoldenScoreMode.ACTIVE);
 
@@ -284,24 +300,35 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public void startTimer() {
         /* ignore if one player has already won */
-        if(mode == Mode.WIN) return;
+        if(mode == Mode.WIN) {
+            return;
+        }
 
         /* ignore if fight is not ready */
-        if(mode == Mode.FIGHT_PENDING) return;
+        if(mode == Mode.FIGHT_PENDING) {
+            return;
+        }
 
         /* ignore if no fight to start */
-        if(mode == Mode.NO_FIGHT) return;
+        if(mode == Mode.NO_FIGHT) {
+            return;
+        }
         
         /* ignore if the timer has run out and golden rule is active */
-        if(mainTimer.getTime() <= 0) return;
+        if(mainTimer.getTime() < 0 || (!mainTimer.getDirection() && mainTimer.getTime() == 0)) {
+            return;
+        }
         
         /* ignore if an ippon from a holddown is pending assignment to a player */
-        if(holddownMode == HolddownMode.PENDING && pendingHolddownScore == Score.IPPON) return;
+        if(holddownMode == HolddownMode.PENDING && pendingHolddownScore == Score.IPPON) {
+            return;
+        }
         
         disableCancelHolddownUndo();
         mainTimer.start();
-        if(holddownMode == HolddownMode.ACTIVE)
+        if(holddownMode == HolddownMode.ACTIVE) {
             holddownTimer.start();
+        }
         setMode(Mode.FIGHTING);
 
         logEvent("Start timer");
@@ -519,8 +546,8 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return Score.WAZARI;
         } else if (time >= holddownTimeYoko) {
             return Score.YUKO;
-        } else if (time >= 10 && system != ScoringSystem.NEW) {
-            return Score.KOKA;
+//        } else if (time >= 10 && system != ScoringSystem.NEW) {
+//            return Score.KOKA;
         } else {
             return null;
         }
@@ -568,17 +595,28 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public int getScore(int player, Score type) {
         /* disable koka for new scoring system */
-        if(system == ScoringSystem.NEW && type == Score.KOKA)
+//        if(system == ScoringSystem.NEW && type == Score.KOKA)
+//            return 0;
+        if(type == Score.SHIDO) {
             return 0;
+        }
 
         int s = score[player][type.ordinal()];
 
-        /* adjust for other players shido */
-        int otherPlayer = 1 - player;
-        if((shido[otherPlayer] == 2 && type == Score.YUKO) ||
-           (shido[otherPlayer] == 3 && type == Score.WAZARI) ||
-           (shido[otherPlayer] == 4 && type == Score.IPPON)) {
-            s++;
+        if(system == ScoringSystem.OLD){
+            /* adjust for other players shido */
+            int otherPlayer = 1 - player;
+            if((shido[otherPlayer] == 2 && type == Score.YUKO) ||
+               (shido[otherPlayer] == 3 && type == Score.WAZARI) ||
+               (shido[otherPlayer] == 4 && type == Score.IPPON)) {
+                s++;
+            }
+        } else {
+            /* adjust for other players shido */
+            int otherPlayer = 1 - player;
+            if(shido[otherPlayer] == 4 && type == Score.IPPON) {
+                s++;
+            }
         }
         return s;
     }
@@ -654,11 +692,11 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             } else if(getScore(0, Score.YUKO) < getScore(1, Score.YUKO)) {
                 win = Win.BY_YUKO;
                 winningPlayer = 1;
-            } else if(getScore(0, Score.KOKA) > getScore(1, Score.KOKA)) {
-                win = Win.BY_KOKA;
+            } else if(shido[0] < shido[1] && system == ScoringSystem.NEW) {
+                win = Win.BY_SHIDO;
                 winningPlayer = 0;
-            } else if(getScore(0, Score.KOKA) < getScore(1, Score.KOKA)) {
-                win = Win.BY_KOKA;
+            } else if(shido[0] > shido[1] && system == ScoringSystem.NEW) {
+                win = Win.BY_SHIDO;
                 winningPlayer = 1;
             }
             
@@ -763,7 +801,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public void setTimer(int seconds) {
         logEvent("Set time (" + seconds + "s)");
-        if(mainTimer.isRunning()) stopTimer();
+        if(mainTimer.isRunning()) {
+            stopTimer();
+        }
         mainTimer.reset(seconds * 1000);
         notifyListeners(ScoreboardUpdate.TIMER);
     }

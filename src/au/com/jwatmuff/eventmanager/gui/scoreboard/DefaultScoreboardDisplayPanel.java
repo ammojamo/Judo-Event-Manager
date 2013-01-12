@@ -41,6 +41,7 @@ import org.jdesktop.swingx.JXImagePanel;
 public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements ScoreboardModel.ScoreboardModelListener {
     private static final Logger log = Logger.getLogger(ScoreboardEntryPanel.class);
     
+//    private ScoreboardModel model = new ScoreboardModelImpl(ScoringSystem.OLD);
     private ScoreboardModel model = new ScoreboardModelImpl(ScoringSystem.NEW);
     
     protected static class LayoutValues {

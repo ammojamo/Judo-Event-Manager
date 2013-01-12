@@ -5,8 +5,6 @@ Fight,Player 1,Player 2
 4,P4,P8
 5,W1,W2
 6,W3,W4
-7,L1,L2
-8,L3,L4
-9,W7,L6
-10,W8,L5
-11,W5,W6
+7,LW5,L5
+8,LW6,L6
+9,W5,W6

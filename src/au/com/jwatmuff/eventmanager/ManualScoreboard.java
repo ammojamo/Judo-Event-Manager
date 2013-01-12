@@ -34,6 +34,7 @@ public class ManualScoreboard {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+//                ScoreboardWindow window = new ScoreboardWindow("Manual Scoreboard", ScoringSystem.OLD);
                 ScoreboardWindow window = new ScoreboardWindow("Manual Scoreboard", ScoringSystem.NEW);
 
                 window.addWindowListener(new WindowAdapter() {

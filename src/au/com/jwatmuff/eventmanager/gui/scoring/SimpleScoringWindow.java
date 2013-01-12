@@ -49,6 +49,7 @@ public class SimpleScoringWindow extends javax.swing.JFrame {
     }
     
     private SimpleScoringPanel getScoringPanel() {
+//        SimpleScoringPanel sp = new SimpleScoringPanel(matSession, ScoringSystem.OLD);
         SimpleScoringPanel sp = new SimpleScoringPanel(matSession, ScoringSystem.NEW);
         sp.setDatabase(database);
         sp.setNotifier(notifier);

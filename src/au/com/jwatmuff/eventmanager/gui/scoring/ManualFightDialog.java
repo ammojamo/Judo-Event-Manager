@@ -153,7 +153,7 @@ public class ManualFightDialog extends javax.swing.JDialog {
 
         try {
             if(Integer.parseInt(fightTimeTextField.getText()) <= 0) throw new Exception();
-            if(Integer.parseInt(goldenScoreTextField.getText()) <= 0) throw new Exception();
+            if(Integer.parseInt(goldenScoreTextField.getText()) < 0) throw new Exception();
         } catch(Exception e) {
             JOptionPane.showMessageDialog(rootPane, "Must enter a positive number of seconds for fight time and golden score time.", "Error", JOptionPane.ERROR_MESSAGE);
             return;

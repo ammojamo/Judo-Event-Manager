@@ -56,14 +56,12 @@ public class ScalableScoringPanel extends javax.swing.JPanel {
         yButton = new ScalableLabel(YUKO, true);
         layout.addComponent(yButton, new Rectangle.Double(5.0/10, 1.0/2, 1.0/5, 1.0/4));
 
-        if(system == ScoringSystem.OLD) {
-            kButton = new ScalableLabel(KOKA, true);
-            layout.addComponent(kButton, new Rectangle.Double(7.0/10, 1.0/2, 1.0/5, 1.0/4));
-        }
-        if(system == ScoringSystem.NEW) {
-            dButton = new ScalableLabel(DECISION, true);
-            layout.addComponent(dButton, new Rectangle.Double(7.0/10, 1.0/2, 1.0/5, 1.0/4));
-        }
+//        if(system == ScoringSystem.OLD) {
+//            kButton = new ScalableLabel(KOKA, true);
+//            layout.addComponent(kButton, new Rectangle.Double(7.0/10, 1.0/2, 1.0/5, 1.0/4));
+//        }
+        dButton = new ScalableLabel(DECISION, true);
+        layout.addComponent(dButton, new Rectangle.Double(7.0/10, 1.0/2, 1.0/5, 1.0/4));
         
         playerLabel = new ScalableLabel("Player");
         layout.addComponent(playerLabel, new Rectangle.Double(1.0/8, 1.0/6, 6.0/8, 1.0/6));
@@ -87,12 +85,10 @@ public class ScalableScoringPanel extends javax.swing.JPanel {
         iButton.setVisible(show);
         wButton.setVisible(show);
         yButton.setVisible(show);
-        if(system == ScoringSystem.OLD) {
-            kButton.setVisible(show);
-        }
-        if(system == ScoringSystem.NEW) {
+//        if(system == ScoringSystem.OLD) {
+//            kButton.setVisible(show);
+//        }
             dButton.setVisible(show);
-        }
     }
 
     public void showConfirmButtons(boolean show) {

@@ -765,6 +765,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         }
         
         scoreboardName = "Scoreboard/" + scoreboardName;
+//        new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.OLD, peerManager, scoreboardName).setVisible(true);
         new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.NEW, peerManager, scoreboardName).setVisible(true);
     }//GEN-LAST:event_manualScoreboardButtonActionPerformed
 

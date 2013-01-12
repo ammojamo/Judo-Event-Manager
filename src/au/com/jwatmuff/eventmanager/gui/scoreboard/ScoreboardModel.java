@@ -19,7 +19,7 @@ public interface ScoreboardModel {
     }
 
     enum Score {
-        IPPON(10), WAZARI(7), YUKO(5), KOKA(3), DECISION(1);
+        IPPON(10), WAZARI(7), YUKO(5), SHIDO(3), DECISION(1);
         
         int points;
 
@@ -50,7 +50,7 @@ public interface ScoreboardModel {
         WAZA_ARI_AWESETE_IPPON(Score.IPPON, "Waza-ari-awesete-ippon"),
         BY_WAZARI(Score.WAZARI, ""),
         BY_YUKO(Score.YUKO, ""),
-        BY_KOKA(Score.KOKA, ""),
+        BY_SHIDO(Score.SHIDO, ""),
         BY_DECISION(Score.DECISION, "");
         
         public final Score score;

@@ -123,10 +123,9 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
         ssp1.iButton.addMouseListener(ml1);
         ssp1.wButton.addMouseListener(ml1);
         ssp1.yButton.addMouseListener(ml1);
-        if(system == ScoringSystem.OLD)
-            ssp1.kButton.addMouseListener(ml1);
-        if(system == ScoringSystem.NEW)
-            ssp1.dButton.addMouseListener(ml1);
+//        if(system == ScoringSystem.OLD)
+//            ssp1.kButton.addMouseListener(ml1);
+        ssp1.dButton.addMouseListener(ml1);
         ssp1.cancelButton.addMouseListener(ml1);
         ssp1.confirmButton.addMouseListener(ml1);
         
@@ -189,10 +188,9 @@ public class SimpleScoringPanel extends javax.swing.JPanel implements Transactio
         ssp2.iButton.addMouseListener(ml2);
         ssp2.wButton.addMouseListener(ml2);
         ssp2.yButton.addMouseListener(ml2);
-        if(system == ScoringSystem.OLD)
-            ssp2.kButton.addMouseListener(ml2);
-        if(system == ScoringSystem.NEW)
-            ssp2.dButton.addMouseListener(ml2);
+//        if(system == ScoringSystem.OLD)
+//            ssp2.kButton.addMouseListener(ml2);
+        ssp2.dButton.addMouseListener(ml2);
         ssp2.cancelButton.addMouseListener(ml2);
         ssp2.confirmButton.addMouseListener(ml2);
     }

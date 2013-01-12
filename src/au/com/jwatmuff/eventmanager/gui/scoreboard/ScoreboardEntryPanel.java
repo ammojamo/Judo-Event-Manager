@@ -101,6 +101,7 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
     }
 
     public ScoreboardEntryPanel(boolean interactive) {
+//        this(interactive, ScoringSystem.OLD);
         this(interactive, ScoringSystem.NEW);
     }
 
@@ -110,7 +111,8 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
         this.interactive = interactive;
         imageFiles = interactive ? new File[0] : findImageFiles();
 
-        double offset = (system == ScoringSystem.NEW) ? 0.25 : 0;
+//        double offset = (system == ScoringSystem.NEW) ? 0.25 : 0;
+        double offset = 0.25;
 
         ScalableAbsoluteLayout layout;
         
@@ -658,17 +660,16 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
             score[1][0].setVisible(false);
         }
 
-        if(system == ScoringSystem.NEW) {
-            for(int i=0; i<2; i++) {
-                if(interactive) {
-                    scoreArrows[i][3][0].setVisible(false);
-                    scoreArrows[i][3][1].setVisible(false);
-                    scoreRegions[i][3][0].setVisible(false);
-                    scoreRegions[i][3][1].setVisible(false);
-                }
-                scoreLabels[i][3].setVisible(false);
-                score[i][3].setVisible(false);
+        // set old KOKA's to invisible
+        for(int i=0; i<2; i++) {
+            if(interactive) {
+                scoreArrows[i][3][0].setVisible(false);
+                scoreArrows[i][3][1].setVisible(false);
+                scoreRegions[i][3][0].setVisible(false);
+                scoreRegions[i][3][1].setVisible(false);
             }
+            scoreLabels[i][3].setVisible(false);
+            score[i][3].setVisible(false);
         }
         
         if(interactive) wireEvents();
