@@ -71,7 +71,7 @@ public class SQLitePlayerDetailsDAO implements PlayerDetailsDAO {
             p.setMedicalConditions(data.getString(MEDICAL_CONDITIONS_FIELD));
             p.setMedicalInfo(data.getString(MEDICAL_INFO_FIELD));
             p.setInjuryInfo(data.getString(INJURY_INFO_FIELD));
-            p.setValid(data.getString(VALID_FIELD).equals("true"));
+            p.setValid(data.getBoolean(VALID_FIELD));
             p.setTimestamp(new Timestamp(data.getDate(TIMESTAMP_FIELD).getTime()));
 
             return p;

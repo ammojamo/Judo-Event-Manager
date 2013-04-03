@@ -40,7 +40,7 @@ public class SQLiteSessionPoolDAO implements SessionPoolDAO {
             SessionPool sp = new SessionPool();
 
             sp.setID(new SessionPool.Key(rs.getInt("session_id"), rs.getInt("pool_id")));
-            sp.setValid(rs.getString("is_valid").equals("true"));
+            sp.setValid(rs.getBoolean("is_valid"));
             sp.setTimestamp(new Timestamp(rs.getDate("last_updated").getTime()));
             return sp;
         }
@@ -48,19 +48,19 @@ public class SQLiteSessionPoolDAO implements SessionPoolDAO {
     
     @Override
     public Collection<SessionPool> findAll() {
-        String sql = "SELECT * FROM session_has_pool WHERE is_valid = 'true'";
+        String sql = "SELECT * FROM session_has_pool WHERE is_valid";
         return template.query(sql, mapper);
     }
     
     @Override
     public Collection<SessionPool> findForSession(int sessionID) {
-        String sql = "SELECT * FROM session_has_pool WHERE is_valid = 'true' AND session_id = ?";
+        String sql = "SELECT * FROM session_has_pool WHERE is_valid AND session_id = ?";
         return template.query(sql, mapper, sessionID);
     }
 
     @Override
     public Collection<SessionPool> findForPool(int poolID) {
-        String sql = "SELECT * FROM session_has_pool WHERE is_valid = 'true' AND pool_id = ?";
+        String sql = "SELECT * FROM session_has_pool WHERE is_valid AND pool_id = ?";
         return template.query(sql, mapper, poolID);
     }
     

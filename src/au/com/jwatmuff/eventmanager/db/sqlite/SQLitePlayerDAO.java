@@ -63,7 +63,7 @@ public class SQLitePlayerDAO implements PlayerDAO {
             p.setGrade(Player.Grade.fromString(data.getString(GRADE_FIELD)));
             p.setWeight(data.getDouble(WEIGHT_FIELD));
             p.setTeam(data.getString(TEAM_FIELD));
-            p.setValid(data.getString(VALID_FIELD).equals("true"));
+            p.setValid(data.getBoolean(VALID_FIELD));
             p.setTimestamp(new Timestamp(data.getDate(TIMESTAMP_FIELD).getTime()));
 
             return p;
@@ -73,7 +73,7 @@ public class SQLitePlayerDAO implements PlayerDAO {
     @Override
     public Collection<Player> findAll()
     {
-        final String sql = "SELECT * FROM player WHERE is_valid = 'true'";
+        final String sql = "SELECT * FROM player WHERE is_valid";
         return template.query(sql, mapper);
     }
 
@@ -91,7 +91,7 @@ public class SQLitePlayerDAO implements PlayerDAO {
     @Override
     public Player findForVisibleID(String id) {
         try {
-            final String sql = "SELECT * FROM player WHERE visible_id = ? AND is_valid = 'true'";
+            final String sql = "SELECT * FROM player WHERE visible_id = ? AND is_valid";
             return template.queryForObject(sql, mapper, id);
         } catch(EmptyResultDataAccessException e) {
             return null;
@@ -100,13 +100,13 @@ public class SQLitePlayerDAO implements PlayerDAO {
     
     @Override
     public Collection<Player> findForPool(int poolID, boolean approved) {
-        final String sql = "SELECT player.* FROM player, player_has_pool WHERE player.is_valid = 'true' AND player.id = player_id AND pool_id = ? AND approved = ? AND player_has_pool.is_valid = 'true' AND player.is_valid = 'true'";
+        final String sql = "SELECT player.* FROM player, player_has_pool WHERE player.is_valid AND player.id = player_id AND pool_id = ? AND approved = ? AND player_has_pool.is_valid AND player.is_valid";
         return template.query(sql, mapper, poolID, approved);
     }
     
     @Override
     public Collection<Player> findWithoutPool() {
-        final String sql = "SELECT player.* FROM player WHERE player.id NOT IN (SELECT player_id FROM player_has_pool WHERE is_valid = 'true') AND player.is_valid = 'true'";
+        final String sql = "SELECT player.* FROM player WHERE player.id NOT IN (SELECT player_id FROM player_has_pool WHERE is_valid) AND player.is_valid";
         return template.query(sql, mapper);
     }
         

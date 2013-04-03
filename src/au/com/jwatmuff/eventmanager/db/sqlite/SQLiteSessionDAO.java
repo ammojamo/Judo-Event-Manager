@@ -45,7 +45,7 @@ public class SQLiteSessionDAO implements SessionDAO {
             s.setType(Session.SessionType.valueOf(rs.getString("session_type")));
             s.setMat(rs.getString("mat"));
             s.setLockedStatus(Session.LockedStatus.valueOf(rs.getString("locked_status")));
-            s.setValid(rs.getString("is_valid").equals("true"));
+            s.setValid(rs.getBoolean("is_valid"));
             s.setTimestamp(new Timestamp(rs.getDate("last_updated").getTime()));
             return s;
         }
@@ -53,37 +53,37 @@ public class SQLiteSessionDAO implements SessionDAO {
 
     @Override
     public Collection<Session> findAll() {
-        String sql = "SELECT * FROM session WHERE is_valid = 'true'";
+        String sql = "SELECT * FROM session WHERE is_valid";
         return template.query(sql, mapper);
     }
     
     @Override
     public Collection<Session> findFollowing(int sessionID, SessionLink.LinkType linkType) {
-        String sql = "SELECT session.* FROM session, session_link WHERE session_link.session_id = ? AND session_link.link_type = ? AND session.id = session_link.following_id AND session.is_valid = 'true' AND session_link.is_valid = 'true'";
+        String sql = "SELECT session.* FROM session, session_link WHERE session_link.session_id = ? AND session_link.link_type = ? AND session.id = session_link.following_id AND session.is_valid AND session_link.is_valid";
         return template.query(sql, mapper, sessionID, linkType);
     }
 
     @Override
     public Collection<Session> findPreceding(int sessionID, SessionLink.LinkType linkType) {
-        String sql = "SELECT session.* FROM session, session_link WHERE session_link.following_id = ? AND session_link.link_type = ? AND session.id = session_link.session_id AND session.is_valid = 'true' AND session_link.is_valid = 'true'";
+        String sql = "SELECT session.* FROM session, session_link WHERE session_link.following_id = ? AND session_link.link_type = ? AND session.id = session_link.session_id AND session.is_valid AND session_link.is_valid";
         return template.query(sql, mapper, sessionID, linkType);
     }
     
     @Override
     public Collection<Session> findAllMats() {
-        String sql = "SELECT * FROM session WHERE session_type='MAT' AND is_valid = 'true'";
+        String sql = "SELECT * FROM session WHERE session_type='MAT' AND is_valid";
         return template.query(sql, mapper);
     }
 
     @Override
     public Collection<Session> findAllNormal() {
-        String sql = "SELECT * FROM session WHERE session_type='NORMAL' AND is_valid = 'true'";
+        String sql = "SELECT * FROM session WHERE session_type='NORMAL' AND is_valid";
         return template.query(sql, mapper);
     }
     
     @Override
     public Collection<Session> findWithLockedStatus(Session.LockedStatus lockedStatus) {
-        String sql = "SELECT * FROM session WHERE locked_status = ? AND is_valid = 'true'";
+        String sql = "SELECT * FROM session WHERE locked_status = ? AND is_valid";
         return template.query(sql, mapper, lockedStatus);
     }
 
@@ -93,8 +93,8 @@ public class SQLiteSessionDAO implements SessionDAO {
                 "SELECT session.* FROM session, session_has_fight " +
                 "WHERE session.id = session_has_fight.session_id " +
                 "AND session_has_fight.fight_id = ? " +
-                "AND session.is_valid = 'true' " +
-                "AND session_has_fight.is_valid = 'true'";
+                "AND session.is_valid " +
+                "AND session_has_fight.is_valid";
         try {
             return template.queryForObject(sql, mapper, fightID);
         } catch (EmptyResultDataAccessException e) {
@@ -108,8 +108,8 @@ public class SQLiteSessionDAO implements SessionDAO {
                 "SELECT session.* FROM session, session_has_pool " +
                 "WHERE session.id = session_has_pool.session_id " +
                 "AND session_has_pool.pool_id = ? " +
-                "AND session.is_valid = 'true' " +
-                "AND session_has_pool.is_valid = 'true'";
+                "AND session.is_valid " +
+                "AND session_has_pool.is_valid";
         return template.query(sql, mapper, poolID);
     }
 

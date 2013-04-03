@@ -47,7 +47,7 @@ public class SQLiteResultDAO implements ResultDAO
             r.setPlayerIDs(new int[] { rs.getInt("player_id1"), rs.getInt("player_id2") });
             r.setDuration(rs.getInt("duration"));
             r.setEventLog(rs.getString("event_log"));
-            r.setValid(rs.getString("is_valid").equals("true"));
+            r.setValid(rs.getBoolean("is_valid"));
             r.setTimestamp(new Timestamp(rs.getDate("last_updated").getTime()));
             
             return r;
@@ -56,25 +56,25 @@ public class SQLiteResultDAO implements ResultDAO
     
     @Override
     public Collection<Result> findForSession(int sessionID) {
-        String sql = "SELECT fight_result.* FROM fight_result, session_has_fight WHERE fight_result.fight_id = session_has_fight.fight_id AND session_has_fight.session_id = ? AND fight_result.is_valid = 'true' AND session_has_fight.is_valid = 'true'";
+        String sql = "SELECT fight_result.* FROM fight_result, session_has_fight WHERE fight_result.fight_id = session_has_fight.fight_id AND session_has_fight.session_id = ? AND fight_result.is_valid AND session_has_fight.is_valid";
         return template.query(sql, mapper, sessionID);
     }
     
     @Override
     public Collection<Result> findForFight(int fightID) {
-        String sql = "SELECT fight_result.* FROM fight_result, fight WHERE fight_result.fight_id = fight.id AND fight.id = ? AND fight_result.is_valid = 'true' AND fight.is_valid = 'true' ORDER BY last_updated DESC";
+        String sql = "SELECT fight_result.* FROM fight_result, fight WHERE fight_result.fight_id = fight.id AND fight.id = ? AND fight_result.is_valid AND fight.is_valid ORDER BY last_updated DESC";
         return template.query(sql, mapper, fightID);
     }
 
     @Override
     public Collection<Result> findForPlayer(int playerID) {
-        String sql = "SELECT fight_result.* FROM fight_result WHERE player_id1 = ? OR player_id2 = ? AND fight_result.is_valid = 'true'";
+        String sql = "SELECT fight_result.* FROM fight_result WHERE player_id1 = ? OR player_id2 = ? AND fight_result.is_valid";
         return template.query(sql, mapper, playerID, playerID);
     }
 
     @Override
     public Collection<Result> findAll() {
-        String sql = "SELECT * FROM fight_result WHERE is_valid = 'true' ORDER BY last_updated";
+        String sql = "SELECT * FROM fight_result WHERE is_valid ORDER BY last_updated";
         return template.query(sql, mapper);
     }
 

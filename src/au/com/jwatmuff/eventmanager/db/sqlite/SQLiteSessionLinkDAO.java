@@ -43,7 +43,7 @@ public class SQLiteSessionLinkDAO implements SessionLinkDAO {
             sl.setSessionID(rs.getInt("session_id"));
             sl.setFollowingID(rs.getInt("following_id"));
             sl.setLinkType(SessionLink.LinkType.valueOf(rs.getString("link_type")));
-            sl.setValid("true".equals(rs.getString("is_valid")));
+            sl.setValid(rs.getBoolean("is_valid"));
             sl.setTimestamp(new Timestamp(rs.getDate("last_updated").getTime()));
             
             return sl;
@@ -53,7 +53,7 @@ public class SQLiteSessionLinkDAO implements SessionLinkDAO {
 
     @Override
     public Collection<SessionLink> findForSession(int sessionID) {
-        String sql = "SELECT * FROM session_link WHERE (session_id = ? OR following_id = ?) AND is_valid = 'true'";
+        String sql = "SELECT * FROM session_link WHERE (session_id = ? OR following_id = ?) AND is_valid";
         return template.query(sql, mapper, sessionID, sessionID);
     }
     

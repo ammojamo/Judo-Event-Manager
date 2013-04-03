@@ -47,14 +47,14 @@ public class SQLiteFightDAO implements FightDAO {
             new ParameterizedRowMapper<Fight>() {
         @Override
         public Fight mapRow(ResultSet rs, int rowNum) throws SQLException {
-            boolean locked = rs.getString("is_locked").equals("true");
+            boolean locked = rs.getBoolean("is_locked");
             Fight f = new Fight(locked);
 
             f.setID(rs.getInt(ID_FIELD));
             f.setPoolID(rs.getInt(POOL_ID_FIELD));
             f.setPlayerCodes(new String[] { rs.getString(PLAYER_CODE1_FIELD), rs.getString(PLAYER_CODE2_FIELD) });
             f.setPosition(rs.getInt(POSITION_FIELD));
-            f.setValid(rs.getString(VALID_FIELD).equals("true"));
+            f.setValid(rs.getBoolean(VALID_FIELD));
             f.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             return f;
         }
@@ -62,13 +62,13 @@ public class SQLiteFightDAO implements FightDAO {
     
     @Override
     public Collection<Fight> findForPool(int poolID) {
-        final String sql = "SELECT * FROM fight WHERE is_valid = 'true' AND pool_id = ? ORDER BY pos_in_pool";
+        final String sql = "SELECT * FROM fight WHERE is_valid AND pool_id = ? ORDER BY pos_in_pool";
         return template.query(sql, mapper, poolID);
     }
     
     @Override
     public Collection<Fight> findUnplayedInSession(int sessionID) {
-        final String sql = "SELECT fight.* FROM fight, session_has_fight WHERE session_has_fight.session_id = ? AND fight.id = session_has_fight.fight_id AND fight.is_valid = 'true' AND session_has_fight.is_valid = 'true' AND fight.id NOT IN (SELECT fight_id FROM fight_result WHERE is_valid = 'true') ORDER BY pos_in_session";
+        final String sql = "SELECT fight.* FROM fight, session_has_fight WHERE session_has_fight.session_id = ? AND fight.id = session_has_fight.fight_id AND fight.is_valid AND session_has_fight.is_valid AND fight.id NOT IN (SELECT fight_id FROM fight_result WHERE is_valid) ORDER BY pos_in_session";
         return template.query(sql, mapper, sessionID);
     }
 
@@ -77,7 +77,7 @@ public class SQLiteFightDAO implements FightDAO {
         final String sql =
                 "SELECT fight.* FROM fight " +
                 "WHERE fight.id IN (SELECT DISTINCT fight_id FROM fight_result) " +
-                "AND fight.is_valid = 'true'";
+                "AND fight.is_valid";
         return template.query(sql, mapper);
     }
 
@@ -88,9 +88,9 @@ public class SQLiteFightDAO implements FightDAO {
                 "WHERE fight.id = session_fight.fight_id " +
                 "AND session.id = session_fight.session_id " +
                 "AND session.locked_status = 'FIGHTS_LOCKED' " +
-                "AND fight.is_valid = 'true' " +
-                "AND session_fight.is_valid = 'true' " +
-                "AND session.is_valid = 'true'";
+                "AND fight.is_valid " +
+                "AND session_fight.is_valid " +
+                "AND session.is_valid";
         return template.query(sql, mapper);
     }
 

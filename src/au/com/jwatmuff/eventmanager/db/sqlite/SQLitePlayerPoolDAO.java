@@ -62,8 +62,8 @@ public class SQLitePlayerPoolDAO implements PlayerPoolDAO {
             pp.setPlayerPosition(rs.getInt(PLAYER_POSITION_FIELD));
             pp.setPlayerPosition2(rs.getInt(PLAYER_POSITION_FIELD_2));
             pp.setStatus(PlayerPool.Status.fromString(rs.getString(STATUS_FIELD)));
-            pp.setApproved(rs.getString(APPROVED_FIELD).equals("true"));
-            pp.setValid(rs.getString(VALID_FIELD).equals("true"));
+            pp.setApproved(rs.getBoolean(APPROVED_FIELD));
+            pp.setValid(rs.getBoolean(VALID_FIELD));
             pp.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             
             return pp;
@@ -108,7 +108,7 @@ public class SQLitePlayerPoolDAO implements PlayerPoolDAO {
     @Override
     public Collection<PlayerPool> findForPlayer(int playerID) {
         try {
-            final String sql = "SELECT player_has_pool.* FROM player_has_pool, pool WHERE player_has_pool.pool_id = pool.id AND pool.is_valid = 'true' AND player_id = ? AND player_has_pool.is_valid = 'true'";
+            final String sql = "SELECT player_has_pool.* FROM player_has_pool, pool WHERE player_has_pool.pool_id = pool.id AND pool.is_valid AND player_id = ? AND player_has_pool.is_valid";
             return template.query(sql, mapper, playerID);
         } catch(EmptyResultDataAccessException e) {
             return new ArrayList<PlayerPool>();
@@ -118,7 +118,7 @@ public class SQLitePlayerPoolDAO implements PlayerPoolDAO {
     @Override
     public Collection<PlayerPool> findForPool(int poolID) {
         try {
-            final String sql = "SELECT * FROM player_has_pool WHERE pool_id = ? AND is_valid = 'true'";
+            final String sql = "SELECT * FROM player_has_pool WHERE pool_id = ? AND is_valid";
             return template.query(sql, mapper, poolID);
         } catch(EmptyResultDataAccessException e) {
             return new ArrayList<PlayerPool>();

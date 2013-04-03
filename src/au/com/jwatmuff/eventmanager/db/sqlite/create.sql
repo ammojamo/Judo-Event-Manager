@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS competition (
   director_name VARCHAR(255),
   director_contact VARCHAR(255),
   draw_configuration VARCHAR(255),
-  closed BOOL NOT NULL DEFAULT 'false',
+  closed BOOL NOT NULL DEFAULT 0,
   last_updated TIME NOT NULL
 );
 
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS pool (
 CREATE TABLE IF NOT EXISTS player_has_pool (
   player_id INTEGER NOT NULL,
   pool_id INTEGER NOT NULL,
-  approved BOOL NOT NULL DEFAULT 'false',
+  approved BOOL NOT NULL DEFAULT 0,
   player_pos INTEGER,
   player_pos_2 INTEGER,
   status VARCHAR(32),

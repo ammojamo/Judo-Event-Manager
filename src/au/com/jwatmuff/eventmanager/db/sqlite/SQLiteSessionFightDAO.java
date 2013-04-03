@@ -41,7 +41,7 @@ public class SQLiteSessionFightDAO implements SessionFightDAO {
 
             sf.setID(new SessionFight.Key(rs.getInt("session_id"), rs.getInt("fight_id")));
             sf.setPosition(rs.getInt("pos_in_session"));
-            sf.setValid(rs.getString("is_valid").equals("true"));
+            sf.setValid(rs.getBoolean("is_valid"));
             sf.setTimestamp(new Timestamp(rs.getDate("last_updated").getTime()));
             return sf;
         }
@@ -49,13 +49,13 @@ public class SQLiteSessionFightDAO implements SessionFightDAO {
 
     @Override
     public Collection<SessionFight> findForSession(int sessionID) {
-        String  sql = "SELECT * FROM session_has_fight WHERE is_valid = 'true' AND session_id = ? ORDER BY pos_in_session";
+        String  sql = "SELECT * FROM session_has_fight WHERE is_valid AND session_id = ? ORDER BY pos_in_session";
         return template.query(sql, mapper, sessionID);
     }
     
     @Override
     public SessionFight findForFight(int fightID) {
-        String  sql = "SELECT session_has_fight.* FROM session_has_fight, session WHERE session_has_fight.is_valid = 'true' AND session.id = session_has_fight.session_id AND session.is_valid = 'true' AND fight_id = ?";
+        String  sql = "SELECT session_has_fight.* FROM session_has_fight, session WHERE session_has_fight.is_valid AND session.id = session_has_fight.session_id AND session.is_valid AND fight_id = ?";
         return template.queryForObject(sql, mapper, fightID);
     }
 

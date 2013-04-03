@@ -83,7 +83,7 @@ public class SQLitePoolDAO implements PoolDAO {
             p.setTemplateName(rs.getString(TEMPLATE_NAME_FIELD));
             p.setPlaces(placesFromString(rs.getString(PLACES_FIELD)));
             p.setDrawPools(drawPoolsFromString(rs.getString(DRAW_POOLS_FIELD)));
-            p.setValid(rs.getString(VALID_FIELD).equals("true"));
+            p.setValid(rs.getBoolean(VALID_FIELD));
             p.setTimestamp(new Timestamp(rs.getDate(TIMESTAMP_FIELD).getTime()));
             return p;
         }
@@ -91,19 +91,19 @@ public class SQLitePoolDAO implements PoolDAO {
     
     @Override
     public Collection<Pool> findAll() {
-        final String sql = "SELECT * FROM pool WHERE is_valid = 'true' ORDER BY description ASC";
+        final String sql = "SELECT * FROM pool WHERE is_valid ORDER BY description ASC";
         return template.query(sql, mapper);
     }
     
     @Override
     public Collection<Pool> findWithPlayers() {
-        final String sql = "SELECT pool.* FROM pool, player_has_pool WHERE pool.id = pool_id AND pool.is_valid = 'true' AND player_has_pool.is_valid = 'true' GROUP BY pool.id";
+        final String sql = "SELECT pool.* FROM pool, player_has_pool WHERE pool.id = pool_id AND pool.is_valid AND player_has_pool.is_valid GROUP BY pool.id";
         return template.query(sql, mapper);
     }
     
     @Override
     public Collection<Pool> findWithLockedStatus(Pool.LockedStatus lockedStatus) {
-        final String sql = "SELECT * FROM pool WHERE locked_status = ? AND is_valid = 'true' ORDER BY description ASC";
+        final String sql = "SELECT * FROM pool WHERE locked_status = ? AND is_valid ORDER BY description ASC";
         return template.query(sql, mapper, lockedStatus);
     }
     
@@ -119,13 +119,13 @@ public class SQLitePoolDAO implements PoolDAO {
     
     @Override
     public Collection<Pool> findForSession(int sessionID) {
-        final String sql = "SELECT pool.* FROM pool, session_has_pool WHERE session_has_pool.pool_id = pool.id AND pool.is_valid = 'true' AND session_has_pool.is_valid = 'true' AND session_has_pool.session_id = ? GROUP BY pool.id, pool.description ORDER BY pool.description";
+        final String sql = "SELECT pool.* FROM pool, session_has_pool WHERE session_has_pool.pool_id = pool.id AND pool.is_valid AND session_has_pool.is_valid AND session_has_pool.session_id = ? GROUP BY pool.id, pool.description ORDER BY pool.description";
         return template.query(sql, mapper, sessionID);
     }
 
     @Override
     public Collection<Pool> findWithoutSession() {
-        final String sql = "SELECT * FROM pool WHERE id NOT IN (SELECT pool_id FROM session_has_pool, session WHERE session.is_valid = 'true' AND session_has_pool.is_valid = 'true' AND session.id = session_id) AND locked_status = 'FIGHTS_LOCKED' AND is_valid = 'true' ORDER BY pool.description";
+        final String sql = "SELECT * FROM pool WHERE id NOT IN (SELECT pool_id FROM session_has_pool, session WHERE session.is_valid AND session_has_pool.is_valid AND session.id = session_id) AND locked_status = 'FIGHTS_LOCKED' AND is_valid ORDER BY pool.description";
         return template.query(sql, mapper);
     }
     
