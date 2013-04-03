@@ -1088,7 +1088,8 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
     private ImageUpdateThread imageUpdateThread;
 
     private static File[] findImageFiles() {
-        return new File("resources/advertising").listFiles(new FileExtensionFilter("jpeg", "jpg", "png", "gif"));
+        File[] files = new File("resources/advertising").listFiles(new FileExtensionFilter("jpeg", "jpg", "png", "gif"));
+        return files == null ? new File[0] : files;
     }
 
     private void updatePendingFight() {
