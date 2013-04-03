@@ -30,7 +30,6 @@ import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
@@ -267,7 +266,6 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
                             player2s[a].setText("");
                     }
                 }
-                return;
             } else {
                 for(int a = 0; a < numbers.length; a++){
                     if(!numbers[a].getText().equals(""))

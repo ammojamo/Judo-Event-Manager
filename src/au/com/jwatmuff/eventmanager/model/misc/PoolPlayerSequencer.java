@@ -6,13 +6,9 @@
 package au.com.jwatmuff.eventmanager.model.misc;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
-import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
-import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -127,11 +123,8 @@ public class PoolPlayerSequencer {
 //    }
 
     public static ArrayList<Integer> getSameTeamFights(Database database, int poolID) {
-        PoolPlayerSequencer pps = getInstance(database);
         PlayerCodeParser parser = PlayerCodeParser.getInstance(database, poolID);
-        ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
-
-        sameTeamFights = parser.getSameTeamFightsFirst();
+        ArrayList<Integer> sameTeamFights = parser.getSameTeamFightsFirst();
         return sameTeamFights;
     }
 

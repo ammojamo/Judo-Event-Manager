@@ -504,7 +504,7 @@ public class FightOrderPanel extends javax.swing.JPanel {
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
     /* get list of pools */
-    List<Pool> pools = new ArrayList<Pool>();
+    List<Pool> pools;
     pools = database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.PLAYERS_LOCKED);
     pools.addAll(database.findAll(Pool.class, PoolDAO.WITH_LOCKED_STATUS, Pool.LockedStatus.FIGHTS_LOCKED));
     if(pools.size() == 0) {

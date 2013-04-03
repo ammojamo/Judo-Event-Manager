@@ -138,7 +138,7 @@ public class SessionLockerTest extends TestCase {
         System.out.println("lockPosition");
         
         TransactionalDatabase database = getNewDatabase();
-        Session session = null;
+        Session session;
         try {
             session = setupUnlockedSession(database);
         } catch(IOException e) {
@@ -165,7 +165,7 @@ public class SessionLockerTest extends TestCase {
         System.out.println("lockFights");
         
         TransactionalDatabase database = getNewDatabase();
-        Session session = null;
+        Session session;
         try {
             session = setupUnlockedSession(database);
         } catch(IOException e) {

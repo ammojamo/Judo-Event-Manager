@@ -294,7 +294,7 @@ public class ManageSessionsPanel extends javax.swing.JPanel {
 
     private boolean confirmDelete(Session session) {
         if (session.getLockedStatus() != Session.LockedStatus.UNLOCKED) {
-            String msg = "";
+            String msg;
             if (session.getType() == Session.SessionType.NORMAL) {
                 msg = "The session '" + session.getMat() + ":" + session.getName() + "' is locked.\n"
                         + "Are you sure you wish to delete it?";

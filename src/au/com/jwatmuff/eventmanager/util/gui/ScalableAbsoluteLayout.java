@@ -52,12 +52,10 @@ public class ScalableAbsoluteLayout implements LayoutManager {
 
     @Override
     public void addLayoutComponent(String name, Component comp) {
-        return;
     }
 
     @Override
     public void removeLayoutComponent(Component comp) {
-        return;
     }
 
     @Override

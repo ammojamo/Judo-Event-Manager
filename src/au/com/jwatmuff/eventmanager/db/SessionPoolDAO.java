@@ -9,7 +9,6 @@
 
 package au.com.jwatmuff.eventmanager.db;
 
-import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.SessionPool;
 import au.com.jwatmuff.genericdb.GenericDAO;
 import java.util.Collection;

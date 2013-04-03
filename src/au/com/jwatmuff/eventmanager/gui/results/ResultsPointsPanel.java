@@ -162,7 +162,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 
                     int[] scores = bean.getResult().getSimpleScores(database);
 
-                    Grade winnerGrade = null;
+                    Grade winnerGrade;
                     Grade loserGrade = null;
 
                     if(scores[0] != scores[1]) {

@@ -20,7 +20,6 @@ import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.util.Collection;
-import java.util.Date;
 
 /**
  *

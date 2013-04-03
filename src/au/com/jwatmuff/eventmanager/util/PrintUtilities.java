@@ -50,7 +50,7 @@ public class PrintUtilities implements Printable {
 
     @Override
   public int print(Graphics g, PageFormat pf, int pageIndex) {
-    int response = NO_SUCH_PAGE;
+    int response;
 
     Graphics2D g2 = (Graphics2D) g;
 

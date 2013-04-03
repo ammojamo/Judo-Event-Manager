@@ -41,7 +41,6 @@ public abstract class VelocityHTMLGenerator extends HTMLGenerator {
                     writer);
         } catch(Exception e) {
             log.error("Error generating HTML", e);
-            return;
         }
     }
     

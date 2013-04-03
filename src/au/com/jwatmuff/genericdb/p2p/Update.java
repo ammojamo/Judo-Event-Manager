@@ -161,7 +161,7 @@ public class Update implements Serializable {
              * transaction */
             int eventPos = pos.get(earliestID);
             EventList eventList = updateMap.get(earliestID);
-            DataEvent event = null;
+            DataEvent event;
             do {
                 event = eventList.get(eventPos - eventList.base);
                 eventPos++;

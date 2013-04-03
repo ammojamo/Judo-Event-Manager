@@ -91,11 +91,7 @@ public class PoolNumber {
     }
 
     public static int OrderToNumber(int order) {
-        int number = 1;
-        number = (int) Math.pow(2,order);
-//        for(int i = 0; i < order-1; i++)
-//            number = number << 1;
-        return number;
+        return (int) Math.pow(2,order);
     }
 
     private static int GetLeading(PoolNo poolNo) {
@@ -142,7 +138,7 @@ public class PoolNumber {
     public static List<PoolNo> IncreasePoolOrder(List<PoolNo> poolNos){
 
         List<PoolNo> newPoolNumbers = new ArrayList<PoolNo>();
-            PoolNo poolNo0 = new PoolNo();
+            PoolNo poolNo0;
             for(int i = 0; i < poolNos.size(); i++){
                 poolNo0 = new PoolNo();
                 poolNo0.poolNumber = poolNos.get(i).poolNumber;

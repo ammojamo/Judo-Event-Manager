@@ -57,7 +57,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     private Collection<PeerConnectionListener> listeners = new ArrayList<PeerConnectionListener>();
     private Map<String, PeerService> peerServiceMap = new HashMap<String, PeerService>();
     private String name;
-    private Collection<ManagedPeer> peers = Collections.synchronizedCollection(new ArrayList<ManagedPeer>());
+    private final Collection<ManagedPeer> peers = Collections.synchronizedCollection(new ArrayList<ManagedPeer>());
 
     private Thread checkPeerThread = new Thread("checkPeerThread") {
         @Override

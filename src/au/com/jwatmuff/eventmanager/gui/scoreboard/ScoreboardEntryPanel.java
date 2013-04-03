@@ -763,8 +763,8 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
                 }
         }
         
-        Color mainBg = null;
-        Color mainFg = null;
+        Color mainBg;
+        Color mainFg;
         
         switch(model.getMode()) {
             case FIGHTING:
@@ -942,7 +942,7 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
             }
             if(model.getWin() != null) {
                 Score winScore = model.getWin().score;
-                String displayed = "";
+                String displayed;
                 if(winScore == Score.IPPON) {
                         if(model.getShido(1 - model.getWinningPlayer()) == 4)
                             displayed = "H";

@@ -183,7 +183,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         syncInfo.senderTime = new Timestamp();
         log.debug("our time: " + new Timestamp());
 
-        UpdateSyncInfo peerSyncInfo = null;
+        UpdateSyncInfo peerSyncInfo;
         try {
             peerSyncInfo = updateService.sync(syncInfo);
         } catch(RemoteAccessException e) {

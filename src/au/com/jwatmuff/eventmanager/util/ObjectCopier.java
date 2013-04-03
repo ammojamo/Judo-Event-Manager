@@ -27,8 +27,8 @@ public class ObjectCopier {
     
     @SuppressWarnings("unchecked")
     public static <T extends Serializable> T copy(T object) {
-      ObjectOutputStream oos = null;
-      ObjectInputStream ois = null;
+      ObjectOutputStream oos;
+      ObjectInputStream ois;
       try
       {
          ByteArrayOutputStream bos = new ByteArrayOutputStream();
