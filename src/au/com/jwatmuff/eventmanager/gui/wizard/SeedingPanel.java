@@ -100,7 +100,7 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         values[0] = "None";
         for(int i = 1; i <= numPlayers; i++) values[i] = "" + i;
 
-        return new DefaultCellEditor(new JComboBox(values));
+        return new DefaultCellEditor(new JComboBox<Object>(values));
     }
 
     private void updateFromDatabase() {

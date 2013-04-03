@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.3" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <Properties>
@@ -31,8 +31,8 @@
                               <Component id="jScrollPane2" min="-2" pref="250" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="removeButton" alignment="0" pref="119" max="32767" attributes="1"/>
-                                  <Component id="approveButton" alignment="0" pref="119" max="32767" attributes="1"/>
+                                  <Component id="removeButton" alignment="0" max="32767" attributes="1"/>
+                                  <Component id="approveButton" alignment="0" max="32767" attributes="1"/>
                                   <Component id="autoApproveButton" alignment="0" max="32767" attributes="1"/>
                               </Group>
                           </Group>
@@ -159,6 +159,9 @@
           <Events>
             <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="requestedListMouseClicked"/>
           </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Player&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
@@ -197,6 +200,9 @@
           <Events>
             <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="approvedListMouseClicked"/>
           </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Player&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

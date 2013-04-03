@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.3" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <NonVisualComponents>
@@ -92,7 +92,7 @@
                   <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
                       <Component id="addPoolButton" max="32767" attributes="1"/>
-                      <Component id="removePoolButton" alignment="1" pref="71" max="32767" attributes="1"/>
+                      <Component id="removePoolButton" alignment="1" pref="0" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -131,6 +131,9 @@
                   <StringArray count="0"/>
                 </Property>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Pool&gt;"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -140,6 +143,9 @@
               <StringArray count="0"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Pool&gt;"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JButton" name="removePoolButton">
           <Properties>
@@ -182,7 +188,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel3" min="-2" pref="100" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="matComboBox" pref="219" max="32767" attributes="0"/>
+                          <Component id="matComboBox" pref="221" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -225,6 +231,9 @@
               <StringArray count="0"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Session&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
@@ -267,7 +276,7 @@
                   <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
                       <Component id="addSessionButton" alignment="1" max="32767" attributes="1"/>
-                      <Component id="removeSessionButton" alignment="1" pref="71" max="32767" attributes="1"/>
+                      <Component id="removeSessionButton" alignment="1" pref="0" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -306,6 +315,9 @@
                   <StringArray count="0"/>
                 </Property>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Session&gt;"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -315,6 +327,9 @@
               <StringArray count="0"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Session&gt;"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JButton" name="removeSessionButton">
           <Properties>

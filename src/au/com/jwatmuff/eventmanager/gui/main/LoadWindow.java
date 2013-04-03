@@ -13,7 +13,7 @@ import javax.swing.DefaultListModel;
  * @author  James
  */
 public class LoadWindow extends javax.swing.JFrame {
-    DefaultListModel model = new DefaultListModel();
+    DefaultListModel<String> model = new DefaultListModel<String>();
     
     /** Creates new form LoadWindow */
     public LoadWindow() {
@@ -38,7 +38,7 @@ public class LoadWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        messageList = new javax.swing.JList();
+        messageList = new javax.swing.JList<String>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Loading EventManager");
@@ -68,7 +68,7 @@ public class LoadWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JList messageList;
+    private javax.swing.JList<String> messageList;
     // End of variables declaration//GEN-END:variables
 
 }

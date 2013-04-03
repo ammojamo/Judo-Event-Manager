@@ -9,8 +9,6 @@ package au.com.jwatmuff.eventmanager.gui.player;
 
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
-import au.com.jwatmuff.eventmanager.permissions.Action;
-import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -42,9 +40,9 @@ public class EnterWeightDialog extends javax.swing.JDialog {
     private double weight;
     private Player player;
 
-    private DefaultListModel poolListModel;
+    private DefaultListModel<PlayerPoolInfo> poolListModel;
     
-    private ListCellRenderer ppiRenderer = new DefaultListCellRenderer() {
+    private ListCellRenderer<Object> ppiRenderer = new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList list, Object obj, int arg2, boolean arg3, boolean arg4) {
             if(obj instanceof PlayerPoolInfo)
@@ -62,7 +60,7 @@ public class EnterWeightDialog extends javax.swing.JDialog {
         this.notifier = notifier;
         this.player = player;
         
-        poolListModel = new DefaultListModel();
+        poolListModel = new DefaultListModel<PlayerPoolInfo>();
         divisionsList.setModel(poolListModel);
         divisionsList.setCellRenderer(ppiRenderer);
 
@@ -135,7 +133,7 @@ public class EnterWeightDialog extends javax.swing.JDialog {
         teamTextField = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        divisionsList = new javax.swing.JList();
+        divisionsList = new javax.swing.JList<PlayerPoolInfo>();
         jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -192,11 +190,6 @@ public class EnterWeightDialog extends javax.swing.JDialog {
         jLabel8.setText("Team:");
 
         divisionsList.setBackground(new java.awt.Color(240, 240, 240));
-        divisionsList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "<none>" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
         divisionsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         divisionsList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         divisionsList.setSelectionBackground(new java.awt.Color(240, 240, 240));
@@ -238,7 +231,7 @@ public class EnterWeightDialog extends javax.swing.JDialog {
                                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(nameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                                    .addComponent(nameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
                                     .addComponent(gradeTextField)
                                     .addComponent(teamTextField, javax.swing.GroupLayout.Alignment.TRAILING)))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
@@ -249,7 +242,7 @@ public class EnterWeightDialog extends javax.swing.JDialog {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
-                            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
+                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 59, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -341,7 +334,7 @@ private void openPlayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
-    private javax.swing.JList divisionsList;
+    private javax.swing.JList<PlayerPoolInfo> divisionsList;
     private javax.swing.JTextField dobTextField;
     private javax.swing.JTextField genderTextField;
     private javax.swing.JTextField gradeTextField;

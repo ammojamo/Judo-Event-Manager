@@ -68,7 +68,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private boolean isNew = false;
     private boolean success = false;
     
-    private DefaultListModel dbListModel = new DefaultListModel();
+    private DefaultListModel<DatabaseInfo> dbListModel = new DefaultListModel<DatabaseInfo>();
 
     private static final int CHECK_DATABASES_PERIOD = 5000; //milliseconds
 
@@ -238,7 +238,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         existingCompRadioButton = new javax.swing.JRadioButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        competitionList = new javax.swing.JList();
+        competitionList = new javax.swing.JList<DatabaseInfo>();
         loadBackupButton = new javax.swing.JButton();
         saveBackupButton = new javax.swing.JButton();
         deleteCompButton = new javax.swing.JButton();
@@ -273,7 +273,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(existingCompRadioButton);
-        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
+        existingCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         existingCompRadioButton.setText("Open Existing Competition");
         existingCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         existingCompRadioButton.setEnabled(false);
@@ -360,7 +360,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(existingCompRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadBackupButton)
@@ -373,7 +373,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroup1.add(newCompRadioButton);
-        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11));
+        newCompRadioButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         newCompRadioButton.setSelected(true);
         newCompRadioButton.setText("Create New Competition");
         newCompRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -415,7 +415,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             }
         });
 
-        expiryWarningLabel.setFont(new java.awt.Font("Tahoma", 1, 11));
+        expiryWarningLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         expiryWarningLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/exclamation.png"))); // NOI18N
         expiryWarningLabel.setText("Your EventManager license will expire in X days.");
 
@@ -484,7 +484,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(manualScoreboardButton)
                     .addComponent(displayScoreboardButton))
-                .addContainerGap(397, Short.MAX_VALUE))
+                .addContainerGap(415, Short.MAX_VALUE))
         );
 
         jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {displayScoreboardButton, manualScoreboardButton});
@@ -515,7 +515,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
         licenseContactLabel.setText("N/A");
 
-        licenseTypeLabel.setFont(new java.awt.Font("Tahoma", 1, 11));
+        licenseTypeLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         licenseTypeLabel.setText("FREE");
 
         licenseExpiryLabel.setText("N/A");
@@ -543,7 +543,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
                         .addComponent(licenseExpiryLabel)))
-                .addContainerGap(445, Short.MAX_VALUE))
+                .addContainerGap(437, Short.MAX_VALUE))
         );
 
         jPanel6Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel2, jLabel3, jLabel4});
@@ -610,7 +610,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadLicenseButton)
                     .addComponent(enterLicenseKeyButton))
-                .addContainerGap(269, Short.MAX_VALUE))
+                .addContainerGap(288, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Licenses", jPanel5);
@@ -623,7 +623,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         );
         chatPanelContainerLayout.setVerticalGroup(
             chatPanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 471, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -642,7 +642,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chatPanelContainer, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -706,7 +706,6 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
             success = true;
             this.dispose();
-            return;
         }
     }//GEN-LAST:event_okButtonActionPerformed
     
@@ -898,7 +897,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton cancelButton;
     private javax.swing.JPanel chatPanelContainer;
-    private javax.swing.JList competitionList;
+    private javax.swing.JList<DatabaseInfo> competitionList;
     private javax.swing.JButton deleteCompButton;
     private javax.swing.JButton displayScoreboardButton;
     private javax.swing.JButton enterLicenseKeyButton;

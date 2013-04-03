@@ -49,6 +49,7 @@ public class ChatPanel extends javax.swing.JPanel {
         });
     }
     
+    @SuppressWarnings("UseOfObsoleteCollectionType")
     private void updateUserList() {
         userList.setListData(new Vector<Peer>(peerManager.getPeers()));
     }
@@ -99,7 +100,7 @@ public class ChatPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        userList = new javax.swing.JList();
+        userList = new javax.swing.JList<Peer>();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         chatTextPane = new javax.swing.JTextPane();
@@ -133,7 +134,7 @@ public class ChatPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel2.setText("Chat");
 
         jLabel3.setText("Messages");
@@ -145,8 +146,8 @@ public class ChatPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(chatEntryTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -195,7 +196,7 @@ public class ChatPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton sayButton;
-    private javax.swing.JList userList;
+    private javax.swing.JList<Peer> userList;
     // End of variables declaration//GEN-END:variables
     
 }

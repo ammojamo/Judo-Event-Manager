@@ -34,19 +34,8 @@ import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import com.jidesoft.swing.CheckBoxListSelectionModel;
 import java.awt.Color;
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.SwingUtilities;
+import java.util.*;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
@@ -84,6 +73,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     private ConfigurationFile configurationFile;
 
     /** Creates new form PlayerSelectionPanel */
+    @SuppressWarnings("unchecked")
     public PlayerSelectionPanel(final TransactionalDatabase database, TransactionNotifier notifier, Context context) {
         this.database = database;
         this.notifier = notifier;
@@ -92,12 +82,13 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
 
         initComponents();
 
-        teamList.setModel(new DefaultListModel());
-        eligiblePlayerList.setModel(new DefaultListModel());
+        teamList.setModel(new DefaultListModel<Team>());
+        eligiblePlayerList.setModel(new DefaultListModel<Player>());
         playerList.setModel(new DefaultListModel());
         playerSelectionModel = playerList.getCheckBoxListSelectionModel();
 
-        eligiblePlayerList.setCellRenderer(new PlayerListCellRenderer());
+        // Type cast remove compile warnings...
+        eligiblePlayerList.setCellRenderer((ListCellRenderer<Object>)new PlayerListCellRenderer());
         playerList.setCellRenderer(new PlayerListCellRenderer());
         teamList.setCellRenderer(new TeamListCellRenderer());
 
@@ -105,7 +96,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 // TODO: this seems to get called twice when a team is selected and i'm not sure why
-                final List<PlayerPool> playerPoolsToUpdate = new ArrayList<PlayerPool>();
+                final List<PlayerPool> playerPoolsToUpdate = new ArrayList<>();
                 if(e.getFirstIndex() < 0 || e.getLastIndex() < 0)
                     return;
 
@@ -170,7 +161,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         eligiblePlayers = PoolChecker.findEligiblePlayers(pool, database);
         unapprovedPlayersInPool = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), false);
         approvedPlayersInPool = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true);
-        playersInPool = new ArrayList<Player>();
+        playersInPool = new ArrayList<>();
         playersInPool.addAll(unapprovedPlayersInPool);
         playersInPool.addAll(approvedPlayersInPool);
 
@@ -195,7 +186,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
 
     private void updateTeamList() {
         Team selectedTeam = getSelectedTeam();
-        DefaultListModel model = (DefaultListModel)teamList.getModel();
+        DefaultListModel<Team> model = (DefaultListModel<Team>)teamList.getModel();
         model.clear();
         model.setSize(teams.size());
         int i = 0;
@@ -208,7 +199,8 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     }
 
     private void updateEligiblePlayerList() {
-        DefaultListModel model = (DefaultListModel)eligiblePlayerList.getModel();
+        @SuppressWarnings("unchecked")
+        DefaultListModel<Player> model = (DefaultListModel<Player>)eligiblePlayerList.getModel();
         model.clear();
 
         for(Player player : eligiblePlayers)
@@ -217,7 +209,8 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     }
 
     private void updatePlayerList() {
-        DefaultListModel model = (DefaultListModel)playerList.getModel();
+        @SuppressWarnings("unchecked")
+        DefaultListModel<Player> model = (DefaultListModel<Player>)playerList.getModel();
 
         // we don't want to process list selection events while we are building
         // the player list
@@ -251,7 +244,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     }
 
     private void calculateTeams() {
-        HashMap<String,Team> teamMap = new HashMap<String,Team>();
+        HashMap<String,Team> teamMap = new HashMap<>();
         /* Make sure we have teams of all eligible players */
         for(Player player : eligiblePlayers) {
             String name = player.getTeam();
@@ -274,7 +267,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         }
 
         /* Now sort the teams alphabetically and prepend 'All Teams' / 'Other' */
-        List<Team> result = new ArrayList<Team>();
+        List<Team> result = new ArrayList<>();
         result.addAll(teamMap.values());
         Collections.sort(result);
         if(playersWithoutTeam > 0)
@@ -284,7 +277,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     }
 
     private Team getSelectedTeam() {
-        return (Team)teamList.getSelectedValue();
+        return teamList.getSelectedValue();
     }
 
 
@@ -292,8 +285,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         database.perform(new Transaction() {
             @Override
             public void perform() {
-                for(Object value : eligiblePlayerList.getSelectedValues()) {
-                    Player player = (Player) value;
+                for(Player player : eligiblePlayerList.getSelectedValuesList()) {
                     if (player != null) {
                         PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
                         if (pp == null || !pp.isValid()) {
@@ -313,7 +305,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         database.perform(new Transaction() {
             @Override
             public void perform() {
-                for(Object value : playerList.getSelectedValues()) {
+                for(Object value : playerList.getSelectedValuesList()) {
                     Player player = (Player) value;
                     if(player != null) {
                         PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
@@ -397,10 +389,10 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        eligiblePlayerList = new javax.swing.JList();
+        eligiblePlayerList = new javax.swing.JList<Player>();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        teamList = new javax.swing.JList();
+        teamList = new javax.swing.JList<Team>();
         addPlayerButton = new javax.swing.JButton();
         divisionNameLabel = new javax.swing.JLabel();
 
@@ -446,16 +438,13 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(approveAllPlayersCheckBox)
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(removePlayerButton)
-                        .addContainerGap(181, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addContainerGap(206, Short.MAX_VALUE))))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(approveAllPlayersCheckBox)
+                            .addComponent(removePlayerButton)
+                            .addComponent(jLabel1))
+                        .addContainerGap(198, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -464,13 +453,13 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(approveAllPlayersCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(removePlayerButton)
                 .addContainerGap())
         );
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel2.setText("Filter by Team");
 
         eligiblePlayerList.setModel(new javax.swing.AbstractListModel() {
@@ -517,17 +506,16 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jLabel3)
-                .addContainerGap())
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(addPlayerButton))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jLabel2)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel2))
                 .addContainerGap())
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -544,7 +532,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                 .addContainerGap())
         );
 
-        divisionNameLabel.setFont(new java.awt.Font("Tahoma", 1, 24));
+        divisionNameLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         divisionNameLabel.setText("Division Name");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -586,7 +574,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
         
         if(evt.getClickCount() == 2 && index != -1) {
             if(!PermissionChecker.isAllowed(Action.OPEN_PLAYER, database)) return;
-            Player player = (Player) eligiblePlayerList.getSelectedValue();
+            Player player = eligiblePlayerList.getSelectedValue();
             new PlayerDetailsDialog(null, true, database, notifier, player).setVisible(true);
         }
     }//GEN-LAST:event_eligiblePlayerListMouseClicked
@@ -633,7 +621,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     private javax.swing.JButton addPlayerButton;
     private javax.swing.JCheckBox approveAllPlayersCheckBox;
     private javax.swing.JLabel divisionNameLabel;
-    private javax.swing.JList eligiblePlayerList;
+    private javax.swing.JList<Player> eligiblePlayerList;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -644,7 +632,7 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
     private javax.swing.JScrollPane jScrollPane3;
     private com.jidesoft.swing.CheckBoxList playerList;
     private javax.swing.JButton removePlayerButton;
-    private javax.swing.JList teamList;
+    private javax.swing.JList<Team> teamList;
     // End of variables declaration//GEN-END:variables
 
     private class PlayerListCellRenderer extends DefaultListCellRenderer {

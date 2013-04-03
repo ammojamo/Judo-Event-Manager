@@ -11,7 +11,7 @@ import javax.swing.table.TableCellRenderer;
  *
  * Copied from http://www.exampledepot.com/egs/javax.swing.table/ComboBox.html
  */
-public class ComboBoxCellRenderer extends JComboBox implements TableCellRenderer {
+public class ComboBoxCellRenderer extends JComboBox<Object> implements TableCellRenderer {
 
     public ComboBoxCellRenderer(Object[] items) {
         super(items);

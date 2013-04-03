@@ -12,6 +12,7 @@ import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Player.Grade;
+import au.com.jwatmuff.eventmanager.model.vo.Player.Gender;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
@@ -56,10 +57,11 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
     private int goldenScoreTime;
     private Grade minGrade, maxGrade;
     
-    private DefaultListModel playerListModel = new DefaultListModel();
+    private DefaultListModel<Object> playerListModel = new DefaultListModel<Object>();
     private Set<Integer> selectedPlayers = new HashSet<Integer>();
     
     /** Creates new form PoolDetailsDialog */
+    @SuppressWarnings("unchecked")
     public PoolDetailsDialog(java.awt.Frame parent, boolean modal, TransactionalDatabase database, Pool pool) {
         super(parent, modal);
         initComponents();
@@ -67,7 +69,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         
         this.database = database;
         
-        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        DefaultComboBoxModel<Grade> model = new DefaultComboBoxModel<Grade>();
         for(Player.Grade grade : Player.Grade.values())
             model.addElement(grade);
         minGradeComboBox.setModel(model);
@@ -82,7 +84,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         });
         minGradeComboBox.setSelectedItem(Player.Grade.UNSPECIFIED);
         
-        model = new DefaultComboBoxModel();
+        model = new DefaultComboBoxModel<Grade>();
         for(Player.Grade grade : Player.Grade.values())
             model.addElement(grade);
         maxGradeComboBox.setModel(model);
@@ -97,10 +99,10 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         });
         maxGradeComboBox.setSelectedItem(Player.Grade.UNSPECIFIED);
         
-        model = new DefaultComboBoxModel();
+        DefaultComboBoxModel<Gender> model2 = new DefaultComboBoxModel<>();
         for(Player.Gender gender : Player.Gender.values())
-            model.addElement(gender);
-        genderComboBox.setModel(model);
+            model2.addElement(gender);
+        genderComboBox.setModel(model2);
         genderComboBox.setSelectedItem(Player.Gender.UNSPECIFIED);
         
         playerList.addItemListener(new ItemListener() {
@@ -311,7 +313,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        genderComboBox = new javax.swing.JComboBox();
+        genderComboBox = new javax.swing.JComboBox<Gender>();
         poolNameTextField = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
@@ -321,7 +323,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         jLabel15 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        maxGradeComboBox = new javax.swing.JComboBox();
+        maxGradeComboBox = new javax.swing.JComboBox<Grade>();
         minWeightCheckBox = new javax.swing.JCheckBox();
         maxWeightCheckBox = new javax.swing.JCheckBox();
         maxAgeSpinner = new javax.swing.JSpinner();
@@ -330,7 +332,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         minGradeCheckBox = new javax.swing.JCheckBox();
         minWeightSpinner = new javax.swing.JSpinner();
         jLabel16 = new javax.swing.JLabel();
-        minGradeComboBox = new javax.swing.JComboBox();
+        minGradeComboBox = new javax.swing.JComboBox<Grade>();
         maxWeightSpinner = new javax.swing.JSpinner();
         minAgeCheckBox = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
@@ -618,7 +620,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel4)))
                         .addGap(62, 62, 62)))
-                .addContainerGap(135, Short.MAX_VALUE))
+                .addContainerGap(138, Short.MAX_VALUE))
         );
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {breakTimeMinSpinner, breakTimeSecSpinner, goldenScoreTimeMinSpinner, goldenScoreTimeSecSpinner, matchTimeMinSpinner, matchTimeSecSpinner});
@@ -664,7 +666,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -686,7 +688,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
@@ -771,7 +773,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
     private javax.swing.JSpinner breakTimeMinSpinner;
     private javax.swing.JSpinner breakTimeSecSpinner;
     private javax.swing.JButton cancelButton;
-    private javax.swing.JComboBox genderComboBox;
+    private javax.swing.JComboBox<Gender> genderComboBox;
     private javax.swing.JSpinner goldenScoreTimeMinSpinner;
     private javax.swing.JSpinner goldenScoreTimeSecSpinner;
     private javax.swing.JLabel jLabel1;
@@ -803,13 +805,13 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox maxAgeCheckBox;
     private javax.swing.JSpinner maxAgeSpinner;
     private javax.swing.JCheckBox maxGradeCheckBox;
-    private javax.swing.JComboBox maxGradeComboBox;
+    private javax.swing.JComboBox<Grade> maxGradeComboBox;
     private javax.swing.JCheckBox maxWeightCheckBox;
     private javax.swing.JSpinner maxWeightSpinner;
     private javax.swing.JCheckBox minAgeCheckBox;
     private javax.swing.JSpinner minAgeSpinner;
     private javax.swing.JCheckBox minGradeCheckBox;
-    private javax.swing.JComboBox minGradeComboBox;
+    private javax.swing.JComboBox<Grade> minGradeComboBox;
     private javax.swing.JCheckBox minWeightCheckBox;
     private javax.swing.JSpinner minWeightSpinner;
     private javax.swing.JButton okButton;

@@ -262,11 +262,11 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        requestedList = new javax.swing.JList();
+        requestedList = new javax.swing.JList<Player>();
         approveButton = new javax.swing.JButton();
         removeButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        approvedList = new javax.swing.JList();
+        approvedList = new javax.swing.JList<Player>();
         jLabel2 = new javax.swing.JLabel();
         autoAssignButton = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
@@ -418,8 +418,8 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(removeButton, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
-                                    .addComponent(approveButton, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                                    .addComponent(removeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(approveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(autoApproveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -619,8 +619,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
         /* get all pools */
-        List<Pool> pools = new ArrayList<Pool>();
-        pools = database.findAll(Pool.class, PoolDAO.ALL);
+        List<Pool> pools = database.findAll(Pool.class, PoolDAO.ALL);
 
         /* remove pools with no players */
         Iterator<Pool> iter = pools.iterator();
@@ -725,7 +724,7 @@ private void customPoolButton1ActionPerformed(java.awt.event.ActionEvent evt) {/
 }//GEN-LAST:event_customPoolButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton approveButton;
-    private javax.swing.JList approvedList;
+    private javax.swing.JList<Player> approvedList;
     private javax.swing.JButton autoApproveButton;
     private javax.swing.JButton autoAssignButton;
     private javax.swing.JButton customPoolButton;
@@ -742,6 +741,6 @@ private void customPoolButton1ActionPerformed(java.awt.event.ActionEvent evt) {/
     private javax.swing.JTable poolListTable;
     private javax.swing.JButton printButton;
     private javax.swing.JButton removeButton;
-    private javax.swing.JList requestedList;
+    private javax.swing.JList<Player> requestedList;
     // End of variables declaration//GEN-END:variables
 }

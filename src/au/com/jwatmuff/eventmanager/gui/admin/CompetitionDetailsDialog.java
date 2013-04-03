@@ -69,7 +69,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         this.licenseManager = licenseManager;
         initComponents();
 
-        drawConfigurationComboBox.setModel(new DefaultComboBoxModel(ConfigurationFile.getConfigurationNames()));
+        drawConfigurationComboBox.setModel(new DefaultComboBoxModel<String>(ConfigurationFile.getConfigurationNames()));
 
         this.setLocationRelativeTo(parent);
         
@@ -266,7 +266,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         jLabel10 = new javax.swing.JLabel();
         ageThresholdDatePicker = new com.michaelbaranov.microba.calendar.DatePicker();
         jLabel11 = new javax.swing.JLabel();
-        drawConfigurationComboBox = new javax.swing.JComboBox();
+        drawConfigurationComboBox = new javax.swing.JComboBox<String>();
         jPanel1 = new javax.swing.JPanel();
         addPoolButton = new javax.swing.JButton();
         deletePoolButton = new javax.swing.JButton();
@@ -409,7 +409,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(drawConfigurationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(171, Short.MAX_VALUE))
+                .addContainerGap(122, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("General", jPanel2);
@@ -490,7 +490,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(addPoolButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -511,7 +511,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                     .addComponent(deletePoolButton)
                     .addComponent(importButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -545,7 +545,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(licenseContactLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
+                        .addComponent(licenseContactLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -613,7 +613,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadLicenseButton)
                     .addComponent(enterLicenseKeyButton))
-                .addContainerGap(268, Short.MAX_VALUE))
+                .addContainerGap(271, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("License", jPanel3);
@@ -828,7 +828,7 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
     private javax.swing.JButton deletePoolButton;
     private javax.swing.JTextField directorContactTextField;
     private javax.swing.JTextField directorNameTextField;
-    private javax.swing.JComboBox drawConfigurationComboBox;
+    private javax.swing.JComboBox<String> drawConfigurationComboBox;
     private javax.swing.JButton editPoolButton;
     private javax.swing.JButton enterLicenseKeyButton;
     private com.michaelbaranov.microba.calendar.DatePicker finishDatePicker;

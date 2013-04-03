@@ -53,14 +53,14 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
     private TransactionalDatabase database;
     private int playerID;
     
-    private DefaultListModel poolListModel;
-    private DefaultComboBoxModel poolComboBoxModel;
+    private DefaultListModel<PlayerPoolInfo> poolListModel;
+    private DefaultComboBoxModel<Pool> poolComboBoxModel;
 
     private Frame parent;
 
     private FightTableModel fightTableModel;
 
-    private ListCellRenderer poolRenderer = new DefaultListCellRenderer() {
+    private ListCellRenderer<Object> poolRenderer = new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList list, Object obj, int arg2, boolean arg3, boolean arg4) {
             if(obj instanceof Pool)
@@ -69,7 +69,7 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
         }
     };
     
-    private ListCellRenderer ppiRenderer = new DefaultListCellRenderer() {
+    private ListCellRenderer<Object> ppiRenderer = new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList list, Object obj, int arg2, boolean arg3, boolean arg4) {
             if(obj instanceof PlayerPoolInfo)
@@ -86,11 +86,11 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
         
         notifier.addListener(this, PlayerPool.class);
         
-        poolComboBoxModel = new DefaultComboBoxModel();
+        poolComboBoxModel = new DefaultComboBoxModel<Pool>();
         divisionsComboBox.setModel(poolComboBoxModel);
         divisionsComboBox.setRenderer(poolRenderer);
         
-        poolListModel = new DefaultListModel();
+        poolListModel = new DefaultListModel<PlayerPoolInfo>();
         divisionsList.setModel(poolListModel);
         divisionsList.setCellRenderer(ppiRenderer);
 
@@ -223,8 +223,8 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
         jPanel2 = new javax.swing.JPanel();
         removeDivisionButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        divisionsList = new javax.swing.JList();
-        divisionsComboBox = new javax.swing.JComboBox();
+        divisionsList = new javax.swing.JList<PlayerPoolInfo>();
+        divisionsComboBox = new javax.swing.JComboBox<Pool>();
         addDivisionButton = new javax.swing.JButton();
         newDivisionButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -240,11 +240,6 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
             }
         });
 
-        divisionsList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "<none>" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
         divisionsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         divisionsList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -371,8 +366,8 @@ private void divisionsListValueChanged(javax.swing.event.ListSelectionEvent evt)
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addDivisionButton;
-    private javax.swing.JComboBox divisionsComboBox;
-    private javax.swing.JList divisionsList;
+    private javax.swing.JComboBox<Pool> divisionsComboBox;
+    private javax.swing.JList<PlayerPoolInfo> divisionsList;
     private javax.swing.JTable fightTable;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;

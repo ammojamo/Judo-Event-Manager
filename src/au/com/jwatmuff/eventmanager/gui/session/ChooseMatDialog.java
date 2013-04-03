@@ -30,7 +30,7 @@ public class ChooseMatDialog extends javax.swing.JDialog {
         this.setLocationRelativeTo(parent);
         this.getRootPane().setDefaultButton(okButton);
         
-        DefaultComboBoxModel sessionComboBoxModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<Session> sessionComboBoxModel = new DefaultComboBoxModel<Session>();
         for(Session session : database.findAll(Session.class, SessionDAO.ALL_MATS))
             sessionComboBoxModel.addElement(session);
         sessionComboBox.setModel(sessionComboBoxModel);
@@ -61,7 +61,7 @@ public class ChooseMatDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        sessionComboBox = new javax.swing.JComboBox();
+        sessionComboBox = new javax.swing.JComboBox<Session>();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
 
@@ -130,7 +130,7 @@ public class ChooseMatDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton okButton;
-    private javax.swing.JComboBox sessionComboBox;
+    private javax.swing.JComboBox<Session> sessionComboBox;
     // End of variables declaration//GEN-END:variables
     
 }

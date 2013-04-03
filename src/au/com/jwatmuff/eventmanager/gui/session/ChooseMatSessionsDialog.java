@@ -17,8 +17,6 @@ import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.genericdb.Database;
 import com.jidesoft.swing.DefaultSelectable;
 import java.awt.Component;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,21 +33,22 @@ import javax.swing.JList;
 public class ChooseMatSessionsDialog extends javax.swing.JDialog {
     private Database database;
     private boolean success;
-    private DefaultListModel sessionListModel;
+    private DefaultListModel<Object> sessionListModel;
     private Session lastSelectedMat;
 
     /** Creates new form ChooseMatSessionsDialog */
+    @SuppressWarnings("unchecked")
     public ChooseMatSessionsDialog(java.awt.Frame parent, boolean modal, Database database, String message, String title) {
         super(parent, modal);
         initComponents();
         this.database = database;
 
-        sessionListModel = new DefaultListModel();
+        sessionListModel = new DefaultListModel<Object>();
         sessionList.setModel(sessionListModel);
 
         Collection<Session> mats = database.findAll(Session.class, SessionDAO.ALL_MATS);
 
-        DefaultComboBoxModel matsModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<Session> matsModel = new DefaultComboBoxModel<Session>();
         matComboBox.setModel(matsModel);
         for (Session mat : mats) {
             matsModel.addElement(mat);
@@ -106,8 +105,7 @@ public class ChooseMatSessionsDialog extends javax.swing.JDialog {
 
         sessionListModel.clear();
 
-        if(mat == null) return;
-        else {
+        if(mat != null) {
             List<Session> sessions = SessionLinker.getMatSessions(database, mat);
             for(Session session : sessions)
                 sessionListModel.addElement(new DefaultSelectable(session));
@@ -145,7 +143,7 @@ public class ChooseMatSessionsDialog extends javax.swing.JDialog {
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         selectAllCheckBox = new javax.swing.JCheckBox();
-        matComboBox = new javax.swing.JComboBox();
+        matComboBox = new javax.swing.JComboBox<Session>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -249,7 +247,7 @@ public class ChooseMatSessionsDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox matComboBox;
+    private javax.swing.JComboBox<Session> matComboBox;
     private javax.swing.JLabel messageLabel;
     private javax.swing.JButton okButton;
     private javax.swing.JCheckBox selectAllCheckBox;

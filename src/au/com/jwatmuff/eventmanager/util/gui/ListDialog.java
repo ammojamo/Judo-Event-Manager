@@ -29,7 +29,7 @@ public class ListDialog<T> extends javax.swing.JDialog {
         
         initComponents();
         
-        DefaultListModel model = new DefaultListModel();
+        DefaultListModel<T> model = new DefaultListModel<T>();
         for(T item : items)
             if(item != null) model.addElement(item);
         list.setModel(model);
@@ -63,7 +63,7 @@ public class ListDialog<T> extends javax.swing.JDialog {
         });
     }
     
-    public void setRenderer(ListCellRenderer renderer) {
+    public void setRenderer(ListCellRenderer<Object> renderer) {
         list.setCellRenderer(renderer);
     }
             
@@ -89,7 +89,7 @@ public class ListDialog<T> extends javax.swing.JDialog {
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        list = new javax.swing.JList();
+        list = new javax.swing.JList<T>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Title");
@@ -177,7 +177,7 @@ private void listMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JList list;
+    private javax.swing.JList<T> list;
     private javax.swing.JLabel messageLabel;
     private javax.swing.JButton okButton;
     // End of variables declaration//GEN-END:variables

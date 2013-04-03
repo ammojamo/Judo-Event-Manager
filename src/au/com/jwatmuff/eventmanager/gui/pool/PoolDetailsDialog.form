@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.6" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
@@ -30,7 +30,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel2" max="32767" attributes="1"/>
                   <Component id="jPanel1" max="32767" attributes="1"/>
-                  <Component id="jPanel3" alignment="0" pref="464" max="32767" attributes="1"/>
+                  <Component id="jPanel3" alignment="0" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
@@ -153,6 +153,9 @@
               <StringArray count="0"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Gender&gt;"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JTextField" name="poolNameTextField">
         </Component>
@@ -304,6 +307,9 @@
           <BindingProperties>
             <BindingProperty name="enabled" source="maxGradeCheckBox" sourcePath="${selected &amp;&amp; enabled}" target="maxGradeComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Grade&gt;"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JCheckBox" name="minWeightCheckBox">
           <Properties>
@@ -359,6 +365,9 @@
           <BindingProperties>
             <BindingProperty name="enabled" source="minGradeCheckBox" sourcePath="${selected &amp;&amp; enabled}" target="minGradeComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Grade&gt;"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JSpinner" name="maxWeightSpinner">
           <Properties>
@@ -389,7 +398,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" max="-2" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel14" pref="93" max="32767" attributes="1"/>
@@ -575,7 +584,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="143" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -607,6 +616,9 @@
                   <StringArray count="0"/>
                 </Property>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value=""/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>

@@ -10,21 +10,13 @@
  */
 package au.com.jwatmuff.eventmanager.gui.admin;
 
-import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
-import au.com.jwatmuff.eventmanager.db.ResultDAO;
-import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
-import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
-import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
-import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool.Status;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
-import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
 import au.com.jwatmuff.eventmanager.util.DistributableBeanTableModel;
@@ -97,7 +89,7 @@ public class WithdrawPlayerDialog extends javax.swing.JDialog {
         playerTable.setSelectionModel(new NullSelectionModel()); // disable selection
         // set up cell editor for status column
         // see PlayerTableModel.setValueAt() for how edits to cells are handled
-        playerTable.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(new JComboBox(statuses)));
+        playerTable.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(new JComboBox<Status>(statuses)));
         playerTable.getColumnModel().getColumn(1).setCellRenderer(new ComboBoxCellRenderer(Status.values()));
         // sort by name
         playerTable.getRowSorter().setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));

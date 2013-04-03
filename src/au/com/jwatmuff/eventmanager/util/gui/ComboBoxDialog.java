@@ -29,7 +29,7 @@ public class ComboBoxDialog<T> extends javax.swing.JDialog {
         
         initComponents();
         
-        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        DefaultComboBoxModel<T> model = new DefaultComboBoxModel<T>();
         for(T item : items)
             if(item != null) model.addElement(item);
         comboBox.setModel(model);
@@ -62,7 +62,7 @@ public class ComboBoxDialog<T> extends javax.swing.JDialog {
         });
     }
     
-    public void setRenderer(ListCellRenderer renderer) {
+    public void setRenderer(ListCellRenderer<Object> renderer) {
         comboBox.setRenderer(renderer);
     }
             
@@ -85,7 +85,7 @@ public class ComboBoxDialog<T> extends javax.swing.JDialog {
     private void initComponents() {
 
         messageLabel = new javax.swing.JLabel();
-        comboBox = new javax.swing.JComboBox();
+        comboBox = new javax.swing.JComboBox<T>();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
 
@@ -160,7 +160,7 @@ private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
-    private javax.swing.JComboBox comboBox;
+    private javax.swing.JComboBox<T> comboBox;
     private javax.swing.JLabel messageLabel;
     private javax.swing.JButton okButton;
     // End of variables declaration//GEN-END:variables

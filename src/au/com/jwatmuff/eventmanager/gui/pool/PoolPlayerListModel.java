@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  *
  * @author James
  */
-public class PoolPlayerListModel extends DefaultListModel implements TransactionListener {
+public class PoolPlayerListModel extends DefaultListModel<Player> implements TransactionListener {
     private static final Logger log = Logger.getLogger(PoolPlayerListModel.class);
     private Database database;
     private boolean approved;

@@ -46,13 +46,13 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
         this.censusDate = censusDate;
 
         // Set up gender combo box
-        DefaultComboBoxModel model = (DefaultComboBoxModel)genderComboBox.getModel();
+        DefaultComboBoxModel<Gender> model = (DefaultComboBoxModel<Gender>)genderComboBox.getModel();
         for(Gender g : Player.Gender.values())
             model.addElement(g);
-        model.setSelectedItem(Player.Gender.UNSPECIFIED);
+        model.setSelectedItem(Gender.UNSPECIFIED);
         
         // Set up grade combo box
-        model = (DefaultComboBoxModel)gradeComboBox.getModel();
+        DefaultComboBoxModel<Grade> model2 = (DefaultComboBoxModel<Grade>)gradeComboBox.getModel();
         gradeComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b0) {
@@ -63,7 +63,7 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
             }
         });
         for(Grade b : Player.Grade.values())
-            model.addElement(b);
+            model2.addElement(b);
         model.setSelectedItem(Player.Grade.UNSPECIFIED);
         
         dobDatePicker.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
@@ -156,9 +156,9 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
     }
     
     public void updateFromPlayer(Player player) {
-        boolean editable = (player.getLockedStatus() != Player.LockedStatus.LOCKED);
+//        boolean editable = (player.getLockedStatus() != Player.LockedStatus.LOCKED);
 //        replace this with if in locked pool... maybe
-        editable = true;
+        boolean editable = true;
 
         playerIDTextField.setEditable(false);
         lastNameTextField.setEditable(editable);
@@ -202,7 +202,7 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
         dobLabel = new javax.swing.JLabel();
         dobDatePicker = new com.michaelbaranov.microba.calendar.DatePicker();
         genderLabel = new javax.swing.JLabel();
-        genderComboBox = new javax.swing.JComboBox();
+        genderComboBox = new javax.swing.JComboBox<Player.Gender>();
         playerIDTextField = new javax.swing.JTextField();
         lastNameTextField = new javax.swing.JTextField();
         firstNameTextField = new javax.swing.JTextField();
@@ -212,7 +212,7 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        gradeComboBox = new javax.swing.JComboBox();
+        gradeComboBox = new javax.swing.JComboBox<Player.Grade>();
         weightTextField = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
@@ -399,9 +399,9 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel dobLabel;
     private javax.swing.JLabel firstNameLabel;
     private javax.swing.JTextField firstNameTextField;
-    private javax.swing.JComboBox genderComboBox;
+    private javax.swing.JComboBox<Player.Gender> genderComboBox;
     private javax.swing.JLabel genderLabel;
-    private javax.swing.JComboBox gradeComboBox;
+    private javax.swing.JComboBox<Player.Grade> gradeComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

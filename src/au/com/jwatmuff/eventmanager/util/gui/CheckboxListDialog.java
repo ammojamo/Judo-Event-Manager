@@ -18,12 +18,7 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 
 /**
  *
@@ -39,17 +34,19 @@ public class CheckboxListDialog<T> extends javax.swing.JDialog {
     }
 
     /** Creates new form CheckboxListDialog */
+    @SuppressWarnings("unchecked")
     public CheckboxListDialog(java.awt.Frame parent, boolean modal, List<T> items,
                               String message, String title, boolean allowEmpty) {
         super(parent, modal);
         initComponents();
 
-        DefaultListModel model = new DefaultListModel();
+        DefaultListModel<Object> model = new DefaultListModel<>();
         for(T item : items)
             if(item != null) model.addElement(new DefaultSelectable(item));
         checkBoxList.setModel(model);
         if(!allowEmpty) {
             checkBoxList.addItemListener(new ItemListener() {
+                @Override
                 public void itemStateChanged(ItemEvent e) {
                     okButton.setEnabled(checkBoxList.getSelectedObjects().length > 0);
                 }
@@ -73,7 +70,7 @@ public class CheckboxListDialog<T> extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     public void setRenderer(StringRenderer<T> renderer, final Icon icon) {
         final StringRenderer<T> r = renderer;
-        setRenderer(new DefaultListCellRenderer() {
+        setRenderer((ListCellRenderer<Object>)new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList arg0, Object arg1, int arg2, boolean arg3, boolean arg4) {
                 try {
@@ -89,7 +86,8 @@ public class CheckboxListDialog<T> extends javax.swing.JDialog {
         });
     }
 
-    public void setRenderer(ListCellRenderer renderer) {
+    @SuppressWarnings("unchecked")
+    public void setRenderer(ListCellRenderer<Object> renderer) {
         checkBoxList.setCellRenderer(renderer);
     }
 
@@ -189,7 +187,7 @@ public class CheckboxListDialog<T> extends javax.swing.JDialog {
 
     @SuppressWarnings("unchecked")
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        selectedItems = new ArrayList<T>();
+        selectedItems = new ArrayList<>();
         for(Object o : checkBoxList.getSelectedObjects()) {
             try {
                 selectedItems.add((T)o);

@@ -38,12 +38,12 @@ public class NewSessionDialog extends javax.swing.JDialog {
     
     private Database database;
     
-    private DefaultComboBoxModel poolComboBoxModel;
-    private DefaultListModel poolListModel;
-    private DefaultComboBoxModel sessionComboBoxModel;
-    private DefaultListModel sessionListModel;
+    private DefaultComboBoxModel<Pool> poolComboBoxModel;
+    private DefaultListModel<Pool> poolListModel;
+    private DefaultComboBoxModel<Session> sessionComboBoxModel;
+    private DefaultListModel<Session> sessionListModel;
     
-    private DefaultComboBoxModel matComboBoxModel;
+    private DefaultComboBoxModel<Session> matComboBoxModel;
 
     /** Creates new form EditSessionDialog */
     public NewSessionDialog(java.awt.Frame parent, boolean modal, Database database) {
@@ -55,7 +55,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
         this.getRootPane().setDefaultButton(okButton);
 
         // populate mats
-        matComboBoxModel = new DefaultComboBoxModel();
+        matComboBoxModel = new DefaultComboBoxModel<Session>();
         ArrayList<Session> mats = new ArrayList<Session>(database.findAll(Session.class, SessionDAO.ALL_MATS));
         Collections.sort(mats, new Comparator<Session>() {
             public int compare(Session mat1, Session mat2) {
@@ -78,7 +78,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
             }
         });
         
-        ListCellRenderer sessionRenderer = new DefaultListCellRenderer() {
+        ListCellRenderer<Object> sessionRenderer = new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b0) {
                 if(object instanceof Session) {
@@ -92,7 +92,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
         sessionComboBox.setRenderer(sessionRenderer);
         sessionList.setCellRenderer(sessionRenderer);
         
-        sessionComboBoxModel = new DefaultComboBoxModel();
+        sessionComboBoxModel = new DefaultComboBoxModel<Session>();
         for(Session session : database.findAll(Session.class, SessionDAO.ALL_NORMAL)){
             SessionInfo si = new SessionInfo(database, session);
             if(si.getFollowingDependentSessions().size() == 0) {
@@ -100,19 +100,19 @@ public class NewSessionDialog extends javax.swing.JDialog {
             }
         }
         sessionComboBox.setModel(sessionComboBoxModel);
-        sessionListModel = new DefaultListModel();
+        sessionListModel = new DefaultListModel<Session>();
         sessionList.setModel(sessionListModel);
         
         // set up pool stuff
-        poolComboBoxModel = new DefaultComboBoxModel();
+        poolComboBoxModel = new DefaultComboBoxModel<Pool>();
         for(Pool pool : database.findAll(Pool.class, PoolDAO.WITHOUT_SESSION))
             poolComboBoxModel.addElement(pool);
         poolComboBox.setModel(poolComboBoxModel);
-        poolListModel = new DefaultListModel();
+        poolListModel = new DefaultListModel<Pool>();
         poolList.setModel(poolListModel);
         
         // set up pool name display
-        ListCellRenderer poolRenderer = new DefaultListCellRenderer() {
+        ListCellRenderer<Object> poolRenderer = new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b0) {
                 if(object instanceof Pool) {
@@ -139,21 +139,21 @@ public class NewSessionDialog extends javax.swing.JDialog {
         buttonGroup1 = new javax.swing.ButtonGroup();
         poolPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        poolList = new javax.swing.JList();
-        poolComboBox = new javax.swing.JComboBox();
+        poolList = new javax.swing.JList<Pool>();
+        poolComboBox = new javax.swing.JComboBox<Pool>();
         removePoolButton = new javax.swing.JButton();
         addPoolButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         sessionNameTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        matComboBox = new javax.swing.JComboBox();
+        matComboBox = new javax.swing.JComboBox<Session>();
         cancelButton = new javax.swing.JButton();
         okButton = new javax.swing.JButton();
         poolPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        sessionList = new javax.swing.JList();
-        sessionComboBox = new javax.swing.JComboBox();
+        sessionList = new javax.swing.JList<Session>();
+        sessionComboBox = new javax.swing.JComboBox<Session>();
         removeSessionButton = new javax.swing.JButton();
         addSessionButton = new javax.swing.JButton();
 
@@ -193,7 +193,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(poolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(addPoolButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(removePoolButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, Short.MAX_VALUE))
+                    .addComponent(removePoolButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         poolPanelLayout.setVerticalGroup(
@@ -230,7 +230,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(matComboBox, 0, 219, Short.MAX_VALUE)))
+                        .addComponent(matComboBox, 0, 221, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -290,7 +290,7 @@ public class NewSessionDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(poolPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(addSessionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(removeSessionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, Short.MAX_VALUE))
+                    .addComponent(removeSessionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         poolPanel1Layout.setVerticalGroup(
@@ -441,16 +441,16 @@ public class NewSessionDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JComboBox matComboBox;
+    private javax.swing.JComboBox<Session> matComboBox;
     private javax.swing.JButton okButton;
-    private javax.swing.JComboBox poolComboBox;
-    private javax.swing.JList poolList;
+    private javax.swing.JComboBox<Pool> poolComboBox;
+    private javax.swing.JList<Pool> poolList;
     private javax.swing.JPanel poolPanel;
     private javax.swing.JPanel poolPanel1;
     private javax.swing.JButton removePoolButton;
     private javax.swing.JButton removeSessionButton;
-    private javax.swing.JComboBox sessionComboBox;
-    private javax.swing.JList sessionList;
+    private javax.swing.JComboBox<Session> sessionComboBox;
+    private javax.swing.JList<Session> sessionList;
     private javax.swing.JTextField sessionNameTextField;
     // End of variables declaration//GEN-END:variables
     

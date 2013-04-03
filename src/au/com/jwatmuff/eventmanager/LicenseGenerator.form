@@ -123,6 +123,9 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="typeComboBoxActionPerformed"/>
       </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;LicenseType&gt;"/>
+      </AuxValues>
     </Component>
     <Component class="javax.swing.JLabel" name="nameValidLabel">
       <Properties>

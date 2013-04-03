@@ -37,7 +37,7 @@ public class LicenseGenerator extends javax.swing.JFrame {
         setLocationRelativeTo(null);
 
         /* set up license type combo box */
-        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        DefaultComboBoxModel<LicenseType> model = new DefaultComboBoxModel<LicenseType>();
         for(LicenseType type : LicenseType.values())
             if(type != LicenseType.DEFAULT_LICENSE)
                 model.addElement(type);
@@ -100,7 +100,7 @@ public class LicenseGenerator extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        typeComboBox = new javax.swing.JComboBox();
+        typeComboBox = new javax.swing.JComboBox<LicenseType>();
         nameValidLabel = new javax.swing.JLabel();
         contactTextField = new javax.swing.JTextField();
         expiryTextField = new javax.swing.JTextField();
@@ -185,7 +185,6 @@ public class LicenseGenerator extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 484, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,7 +228,6 @@ public class LicenseGenerator extends javax.swing.JFrame {
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 203, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -335,7 +333,7 @@ public class LicenseGenerator extends javax.swing.JFrame {
     private javax.swing.JTextField keyTextField;
     private javax.swing.JTextField nameTextField;
     private javax.swing.JLabel nameValidLabel;
-    private javax.swing.JComboBox typeComboBox;
+    private javax.swing.JComboBox<LicenseType> typeComboBox;
     // End of variables declaration//GEN-END:variables
 
 }
