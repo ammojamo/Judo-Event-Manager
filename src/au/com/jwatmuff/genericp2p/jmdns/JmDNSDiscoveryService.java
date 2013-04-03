@@ -12,12 +12,12 @@ package au.com.jwatmuff.genericp2p.jmdns;
 import au.com.jwatmuff.genericp2p.AbstractDiscoveryService;
 import au.com.jwatmuff.genericp2p.PeerInfo;
 import java.io.IOException;
-import org.apache.log4j.Logger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceListener;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -34,7 +34,9 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
     /** Creates a new instance of JmDNSDiscoveryService */
     public JmDNSDiscoveryService() {
         try {
-            jmdns = JmDNS.create();
+            InetAddress addr = InetAddress.getLocalHost();
+            String hostname = InetAddress.getByName(addr.getHostName()).toString();
+            jmdns = JmDNS.create(addr, hostname);
         } catch(IOException e) {
             log.error("IOException while initializing JmDNS", e);
         }
@@ -62,6 +64,7 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
         public void serviceAdded(ServiceEvent event) {
             String serviceName = event.getName();
             log.info("Found service (" + serviceName + "), resolving..");
+            jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
         }
 
         @Override
@@ -76,11 +79,12 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
         @Override
         public void serviceResolved(ServiceEvent event) {
             String serviceName = event.getName();
-            InetAddress addr  = event.getInfo().getInetAddress();
-            int port = event.getInfo().getPort();
-            PeerInfo peer = new PeerInfo(serviceName, new InetSocketAddress(addr, port));
-            log.info("Peer found (" + serviceName + ")");
-            addPeer(peer);
+            for(InetAddress addr : event.getInfo().getInetAddresses()) {
+                int port = event.getInfo().getPort();
+                PeerInfo peer = new PeerInfo(serviceName, new InetSocketAddress(addr, port));
+                log.info("Peer found (" + serviceName + ") at address: " + addr);
+                addPeer(peer);
+            }
         }
     }
 

@@ -8,8 +8,6 @@ package au.com.jwatmuff.genericp2p.jmdns;
 import au.com.jwatmuff.genericp2p.PeerRegistrationService;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 import org.apache.log4j.Logger;
@@ -33,16 +31,12 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
         this.port = port;
 
         try {
-            jmdns = JmDNS.create();
+            jmdns = JmDNS.create(InetAddress.getLocalHost());
         } catch(IOException e) {
             log.error("IOException while initializing JmDNS", e);
         }
 
-        try {
-            ourName = System.getProperty("user.name") + "@" + InetAddress.getLocalHost().getHostName();
-        } catch(UnknownHostException e) {
-            ourName = System.getProperty("user.name") + "@unknown";
-        }
+        ourName = System.getProperty("user.name");
 
         service = ServiceInfo.create(REG_TYPE, ourName, port, "Event Manager");
     }
@@ -52,8 +46,6 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
         if(jmdns == null) return;
 
         log.debug("Attempting to register as service (" + ourName + ")");
-
-        final AtomicBoolean failed = new AtomicBoolean(false);
 
         // perform registration in a seperate thread so that if it blocks for a
         // long time, we can give up waiting for it and continue
@@ -65,7 +57,6 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
 //TODO: is there a way to verify that we succesfully registered?
                     registered = true;
                 } catch (IOException e) {
-                    failed.set(true);
                     log.error("Unable to register with network", e);
                     //throw new RuntimeException("Bonjour registration failed", e);
                 }
@@ -75,7 +66,7 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
         registerThread.start();
         try {
             registerThread.join(10000);
-            if(!failed.get()) {
+            if(!registered) {
                 log.warn("Failed to register within 10 seconds, continuing..");
             }
         } catch(InterruptedException e) {
