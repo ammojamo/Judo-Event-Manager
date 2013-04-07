@@ -5,3 +5,4 @@ dist
 *.log
 nbproject/private
 *.run.lock
+.DS_Store
