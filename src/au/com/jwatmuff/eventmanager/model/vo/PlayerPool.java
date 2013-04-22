@@ -28,6 +28,7 @@ public class PlayerPool extends DistributableObject<PlayerPool.Key> implements S
 
     private int playerPosition;
     private int playerPosition2;
+    private int seed;
 
     private boolean approved = false;
     private boolean locked = false;
@@ -110,6 +111,14 @@ public class PlayerPool extends DistributableObject<PlayerPool.Key> implements S
 
     public void setPlayerPosition2(int playerPosition2) {
         this.playerPosition2 = playerPosition2;
+    }
+
+    public int getSeed() {
+        return seed;
+    }
+
+    public void setSeed(int seed) {
+        this.seed = seed;
     }
 
     public boolean isApproved() {
