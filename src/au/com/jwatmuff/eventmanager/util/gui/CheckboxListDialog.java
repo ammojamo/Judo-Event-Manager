@@ -74,7 +74,7 @@ public class CheckboxListDialog<T> extends javax.swing.JDialog {
             @Override
             public Component getListCellRendererComponent(JList arg0, Object arg1, int arg2, boolean arg3, boolean arg4) {
                 try {
-                    if(arg1 != null) arg1 = ((DefaultSelectable)arg1).getObject();
+                    if(arg1 instanceof DefaultSelectable) arg1 = ((DefaultSelectable)arg1).getObject();
                     if(arg1 != null) arg1 = r.asString((T)arg1);
                 } catch(ClassCastException e) {}
                 Component c = super.getListCellRendererComponent(arg0, arg1, arg2, arg3, arg4);

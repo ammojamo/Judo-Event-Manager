@@ -70,10 +70,8 @@ public class ChooseMatSessionsDialog extends javax.swing.JDialog {
         sessionList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList arg0, Object arg1, int arg2, boolean arg3, boolean arg4) {
-                if (arg1 != null) {
-                    DefaultSelectable s = (DefaultSelectable)arg1;
-                    arg1 = ((Session)s.getObject()).getName();
-                }
+                if(arg1 instanceof DefaultSelectable) arg1 = ((DefaultSelectable)arg1).getObject();
+                if(arg1 instanceof Session) arg1 = ((Session)arg1).getName();
                 Component c = super.getListCellRendererComponent(arg0, arg1, arg2, arg3, arg4);
                 if (c instanceof JLabel) {
                     ((JLabel) c).setIcon(Icons.SESSION);

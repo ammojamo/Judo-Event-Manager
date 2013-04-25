@@ -121,7 +121,8 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         playerList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean hasFocus) {
-                Player player = (Player)((DefaultSelectable)value).getObject();
+                if(value instanceof DefaultSelectable) value = ((DefaultSelectable)value).getObject();
+                Player player = (Player)value;
                 value = player.getFirstName() + " " + player.getLastName();
                 return super.getListCellRendererComponent(list, value, index, isSelected, hasFocus);
             }
