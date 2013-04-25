@@ -62,13 +62,17 @@ public class PlayerListTableModel extends JexlBeanTableModel<Player> implements 
         if(!StringUtils.isEmpty(nameStartingWith)) {
             Iterator<Player> iter = players.iterator();
             while(iter.hasNext()) {
-                if(!iter.next().getLastName().toLowerCase().startsWith(nameStartingWith.toLowerCase())) iter.remove();
+                Player player = iter.next();
+                if(!player.getLastName().toLowerCase().startsWith(nameStartingWith.toLowerCase()) &&
+                   !player.getFirstName().toLowerCase().startsWith(nameStartingWith.toLowerCase())) {
+                    iter.remove();
+                }
             }
         }
 
         setPlayers(players);
     }
-    
+
     private void setPlayers(Collection<Player> players) {
         tableModel.setBeans(players);
     }

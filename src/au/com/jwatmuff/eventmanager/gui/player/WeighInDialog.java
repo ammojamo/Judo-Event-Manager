@@ -84,7 +84,7 @@ public class WeighInDialog extends javax.swing.JDialog {
             }
         });
 
-        PromptSupport.setPrompt("Last Name", searchTextField);
+        PromptSupport.setPrompt("First/Last Name", searchTextField);
     }
     
     private Player getSelectedPlayer()
