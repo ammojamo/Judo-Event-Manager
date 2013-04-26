@@ -80,7 +80,7 @@
     <!--<property name="nsis.path" value="/usr/local/bin/makensis"/>-->
 
     <target name="build-installer" description="Create Installer" depends="clean,jar">
-      <exec executable="$nsis.path">
+      <exec executable="${nsis.path}">
         <arg value="installer/nsis/install.nsi"/>
       </exec>
     </target>
