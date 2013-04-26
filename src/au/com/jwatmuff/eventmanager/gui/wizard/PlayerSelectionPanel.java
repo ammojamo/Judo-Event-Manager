@@ -12,22 +12,19 @@
 package au.com.jwatmuff.eventmanager.gui.wizard;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
+import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
 import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
-import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
-import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
-import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
-import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -96,7 +93,6 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 // TODO: this seems to get called twice when a team is selected and i'm not sure why
-                final List<PlayerPool> playerPoolsToUpdate = new ArrayList<>();
                 if(e.getFirstIndex() < 0 || e.getLastIndex() < 0)
                     return;
 
@@ -111,34 +107,14 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                     }
 
                     if(selected && unapprovedPlayersInPool.contains(player) && ok) {
-                        // approve player
-                        PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
-                        pp.setApproved(true);
-                        playerPoolsToUpdate.add(pp);
-
+                        unapprovedPlayersInPool.remove(player);
+                        approvedPlayersInPool.add(player);
                     } else if(!selected && approvedPlayersInPool.contains(player)) {
-                        // unapprove player
-                        PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
-                        pp.setApproved(false);
-                        playerPoolsToUpdate.add(pp);
+                        approvedPlayersInPool.remove(player);
+                        unapprovedPlayersInPool.add(player);
                     }
                 }
                 updatePlayerList();
-
-                try {
-                    if(!playerPoolsToUpdate.isEmpty()) {
-                        database.perform(new Transaction() {
-                            @Override
-                            public void perform() {
-                                for(PlayerPool pp : playerPoolsToUpdate) {
-                                    database.update(pp);
-                                }
-                            }
-                        });
-                    }
-                } catch(Exception ex) {
-                    log.error("Exception updating player pool", ex);
-                }
             }
         };
 
@@ -148,12 +124,17 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        updateFromDatabase();
+                        //updateFromDatabase();
                     }
                 });
             }
         };
         
+        configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
+        pool = context.pool;
+        divisionNameLabel.setText(pool.getDescription() + ": Player Selection");
+        censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
+        updateFromDatabase();
     }
 
     private void updateFromDatabase() {
@@ -282,52 +263,58 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
 
 
     private void addSelectedEligiblePlayers() {
-        database.perform(new Transaction() {
-            @Override
-            public void perform() {
-                for(Player player : eligiblePlayerList.getSelectedValuesList()) {
-                    if (player != null) {
-                        PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
-                        if (pp == null || !pp.isValid()) {
-                            pp = new PlayerPool();
-                            pp.setPlayerID(player.getID());
-                            pp.setPoolID(pool.getID());
-                            pp.setApproved(false);
-                            database.add(pp);
-                        }
-                    }
-                }
-            }
-        });
+        for(Player player : eligiblePlayerList.getSelectedValuesList()) {
+            eligiblePlayers.remove(player);
+            unapprovedPlayersInPool.add(player);
+            playersInPool.add(player);
+        }
+        Collections.sort(playersInPool, PLAYERS_COMPARATOR);
+        Collections.sort(eligiblePlayers, PLAYERS_COMPARATOR);
+        updateEligiblePlayerList();
+        updatePlayerList();
+
     }
 
     private void removeSelectedPlayers() {
-        database.perform(new Transaction() {
-            @Override
-            public void perform() {
-                for(Object value : playerList.getSelectedValuesList()) {
-                    Player player = (Player) value;
-                    if(player != null) {
-                        PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
-                        if(pp != null || pp.isValid())
-                            database.delete(pp);
-                    }
-                }
-            }       
-        });
+        for(Object value : playerList.getSelectedValuesList()) {
+            Player player = (Player) value;
+            eligiblePlayers.add(player);
+            unapprovedPlayersInPool.remove(player);
+            approvedPlayersInPool.remove(player);
+            playersInPool.remove(player);
+        }
+        Collections.sort(playersInPool, PLAYERS_COMPARATOR);
+        Collections.sort(eligiblePlayers, PLAYERS_COMPARATOR);
+        updateEligiblePlayerList();
+        updatePlayerList();
     }
 
     @Override
     public boolean nextButtonPressed() {
-        if(GUIUtils.confirmLock(null, context.pool.getDescription())) {
-            try {
-                context.pool = PoolLocker.lockPoolPlayers(database, pool);
-                return true;
-            } catch(DatabaseStateException e) {
-                GUIUtils.displayError(null, e.getMessage());
-            }
+        if(approvedPlayersInPool.size() == 0) {
+            int status = JOptionPane.showConfirmDialog(
+                null,
+                "No players have been approved for this division. Are you sure you wish to continue?",
+                "Confirm",
+                JOptionPane.YES_NO_OPTION);
+            if (status != JOptionPane.YES_OPTION) return false;
         }
-        return false;
+        context.players = new ArrayList<>(approvedPlayersInPool);
+        context.unapprovedPlayers = new ArrayList<>(unapprovedPlayersInPool);
+        updateSeeds();
+        return true;
+    }
+
+    private void updateSeeds() {
+        for(PlayerPool pp : database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID())) {
+            if(!context.seeds.containsKey(pp.getPlayerID()))
+                context.seeds.put(pp.getPlayerID(), pp.getSeed());
+        }
+    }
+
+    @Override
+    public boolean backButtonPressed() {
+        return true;
     }
 
     @Override
@@ -337,12 +324,6 @@ public class PlayerSelectionPanel extends javax.swing.JPanel implements DrawWiza
 
     @Override
     public void beforeShow() {
-        
-        configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
-        pool = context.pool;
-        divisionNameLabel.setText(pool.getDescription() + ": Player Selection");
-        censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
-        updateFromDatabase();
         this.notifier.addListener(listener, Player.class, Pool.class, PlayerPool.class);
     }
 

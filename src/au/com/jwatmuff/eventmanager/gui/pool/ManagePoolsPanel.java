@@ -40,11 +40,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
@@ -676,6 +672,8 @@ private void drawWizardButtonActionPerformed(java.awt.event.ActionEvent evt) {//
             if (pool.getLockedStatus() != Pool.LockedStatus.UNLOCKED) {
                 GUIUtils.displayMessage(null, "Please select an unlocked division", "Draw Wizard");
             } else {
+                // TODO: it might be better if the draw wizard was modal, but I couldn't get
+                // GUIUtils.runModalJFrame to work in this case.
                 new DrawWizardWindow(database, notifier, getSelectedPool()).setVisible(true);
             }
         }

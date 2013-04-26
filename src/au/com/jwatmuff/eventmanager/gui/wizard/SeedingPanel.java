@@ -11,33 +11,27 @@
 
 package au.com.jwatmuff.eventmanager.gui.wizard;
 
+import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
 import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
-import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
-import au.com.jwatmuff.eventmanager.model.misc.PoolDraw;
-import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
+import au.com.jwatmuff.eventmanager.model.misc.*;
+import au.com.jwatmuff.eventmanager.model.misc.CSVImporter.TooFewPlayersException;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
+import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
-import au.com.jwatmuff.genericdb.distributed.DataEvent;
-import au.com.jwatmuff.genericdb.transaction.TransactionListener;
-import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
+import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.log4j.Logger;
 
 /**
@@ -49,26 +43,21 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
 
     private DefaultTableModel model;
     private TransactionalDatabase database;
-    private TransactionNotifier notifier;
-    private TransactionListener listener;
     private Pool pool;
-    private List<PlayerPoolInfo> playerPoolInfoList = new ArrayList<PlayerPoolInfo>();
-    private Map<Integer, Integer> seeds = new HashMap<Integer, Integer>();
     private Context context;
 
-    private static final Comparator<PlayerPoolInfo> PLAYERS_COMPARATOR_POSITION = new Comparator<PlayerPoolInfo>() {
+    private static final Comparator<Player> PLAYERS_COMPARATOR_POSITION = new Comparator<Player>() {
         @Override
-        public int compare(PlayerPoolInfo pp1, PlayerPoolInfo pp2) {
-            String n1 = pp1.getPlayer().getLastName() + pp1.getPlayer().getFirstName();
-            String n2 = pp2.getPlayer().getLastName() + pp2.getPlayer().getFirstName();
+        public int compare(Player p1, Player p2) {
+            String n1 = p1.getLastName() + p1.getFirstName();
+            String n2 = p2.getLastName() + p2.getFirstName();
             return n1.compareTo(n2);
         }
     };
 
     /** Creates new form SeedingPanel */
-    public SeedingPanel(TransactionalDatabase database, TransactionNotifier notifier, Context context) {
+    public SeedingPanel(TransactionalDatabase database, Context context) {
         this.database = database;
-        this.notifier = notifier;
         this.context = context;
 
         initComponents();
@@ -81,18 +70,6 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         model.setColumnIdentifiers(new Object[] { "Player", "Team", "Seed" });
 
         seedingTable.setModel(model);
-
-        listener = new TransactionListener() {
-            @Override
-            public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateFromDatabase();
-                    }
-                });
-            }
-        };
     }
 
     private TableCellEditor getSeedingCellEditor(int numPlayers) {
@@ -100,34 +77,16 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         values[0] = "None";
         for(int i = 1; i <= numPlayers; i++) values[i] = "" + i;
 
-        return new DefaultCellEditor(new JComboBox<Object>(values));
+        return new DefaultCellEditor(new JComboBox<>(values));
     }
 
-    private void updateFromDatabase() {
-        playerPoolInfoList = new ArrayList<PlayerPoolInfo>();
-        // filter out the null entries
-        for(PlayerPoolInfo player : PoolPlayerSequencer.getPlayerSequence(database, pool.getID()))
-            if(player != null)
-                playerPoolInfoList.add(player);
-
-        Collections.sort(playerPoolInfoList, PLAYERS_COMPARATOR_POSITION);
-
-        seedingTable.getColumn("Seed").setCellEditor(getSeedingCellEditor(playerPoolInfoList.size()));
-
-        // clear table
-        while(model.getRowCount() > 0) model.removeRow(0);
-
-        for(PlayerPoolInfo player : playerPoolInfoList) {
-            model.addRow(getRowData(player));
-        }
-    }
-
-    private Object[] getRowData(PlayerPoolInfo player) {
-        int playerID = player.getPlayer().getID();
+    private Object[] getRowData(Player player) {
+        int playerID = player.getID();
+        Integer seed = context.seeds.get(playerID);
         return new Object[] {
-            player.getPlayer().getLastName() + ", " + player.getPlayer().getFirstName(),
-            player.getPlayer().getTeam(),
-            seeds.get(playerID) == null ? "None" : "" + seeds.get(playerID)
+            player.getLastName() + ", " + player.getFirstName(),
+            player.getTeam(),
+            seed == null || seed <= 0 ? "None" : "" + seed
         };
     }
 
@@ -191,25 +150,48 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     private javax.swing.JTable seedingTable;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public boolean nextButtonPressed() {
-        // TODO: this shouldn't be done here, the seeds map should be updated
-        // every time the user changes a seed, otherwise all seeds will be lost
-        // if there is a database update.
-        // populate seeds map:
-        int index = 0;
-        for(PlayerPoolInfo player : playerPoolInfoList) {
-            if(player != null) {
-                String seed = (String)seedingTable.getModel().getValueAt(index, 2);
-                try {
-                    seeds.put(player.getPlayer().getID(), Integer.parseInt(seed));
-                } catch(NumberFormatException e) {
-                    // do nothing, just means no seed specified
-                }
-                index++;
-            }
+    private void lockDivisionPlayers() throws DatabaseStateException {
+        Map<Integer,PlayerPool> playerPoolMap = new HashMap<>();
+        for(PlayerPool pp : database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID())) {
+            playerPoolMap.put(pp.getPlayerID(), pp);
         }
-        // end TODO
+
+        for(Player p : context.unapprovedPlayers) {
+            PlayerPool pp = playerPoolMap.remove(p.getID());
+            if(pp == null) {
+                pp = new PlayerPool();
+                pp.setID(new PlayerPool.Key(p.getID(), pool.getID()));
+            }
+            pp.setApproved(false);
+            database.update(pp);
+        }
+
+        for(Player p : context.players) {
+            PlayerPool pp = playerPoolMap.remove(p.getID());
+            if(pp == null) {
+                pp = new PlayerPool();
+                pp.setID(new PlayerPool.Key(p.getID(), pool.getID()));
+            }
+            pp.setApproved(true);
+            database.update(pp);
+        }
+
+        for(PlayerPool pp : playerPoolMap.values()) {
+            database.delete(pp);
+        }
+
+        pool = PoolLocker.lockPoolPlayers(database, pool);
+    }
+
+    private boolean commitChanges() {
+        try {
+            lockDivisionPlayers();
+        } catch(DatabaseStateException e) {
+            GUIUtils.displayError(this, "Unable to lock players in pool " + pool.getDescription());
+            return false;
+        }
+
+        updateSeeds();
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
@@ -218,27 +200,44 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
             return false;
         }
 
-        String drawName = configurationFile.getDrawName(playerPoolInfoList.size());
+        String drawName = configurationFile.getDrawName(context.players.size());
         if(drawName == null) {
-            GUIUtils.displayError(this, "The current draw configuration does not support divisions with " + playerPoolInfoList.size() + " players");
+            GUIUtils.displayError(this, "The current draw configuration does not support divisions with " + context.players.size() + " players");
             return false;
         }
 
         File csvFile = new File("resources/draw/" + drawName + ".csv");
 
         try {
-            CSVImporter.importFightDraw(csvFile, database, pool, playerPoolInfoList.size());
-        } catch(Exception e) {
+            CSVImporter.importFightDraw(csvFile, database, pool, context.players.size());
+        } catch(IOException | DatabaseStateException | TooFewPlayersException e) {
             GUIUtils.displayError(this, "Failed to import fight draw (" + drawName + ")");
             log.error("Error importing fight draw", e);
+            return false;
         }
 
-
-        PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), seeds);
+        PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), context.seeds);
         List<PlayerPoolInfo> orderedPlayers = poolDraw.getOrderedPlayers();
 
         PoolPlayerSequencer.savePlayerSequence(database, pool.getID(), orderedPlayers);
 
+        context.pool = pool;
+
+        return true;
+    }
+
+    @Override
+    public boolean nextButtonPressed() {
+        if(!GUIUtils.confirmLock(null, "all players and fights in division " + pool.getDescription())) return false;
+
+        // TODO: I would like this to be wrapped in a transaction, so that it can't fail halfway (e.g. players
+        // locked, but fights not), but I couldn't get this working easily.
+        return commitChanges();
+    }
+
+    @Override
+    public boolean backButtonPressed() {
+        updateSeeds();
         return true;
     }
 
@@ -247,16 +246,38 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         return true;
     }
 
+    private void updateSeeds() {
+        int index = 0;
+        for(Player player : context.players) {
+            if(player != null) {
+                String seed = (String)seedingTable.getModel().getValueAt(index, 2);
+                try {
+                    context.seeds.put(player.getID(), Integer.parseInt(seed));
+                } catch(NumberFormatException e) {
+                    // do nothing, just means no seed specified
+                }
+                index++;
+            }
+        }
+    }
+
     @Override
     public void beforeShow() {
         pool = context.pool;
         divisionNameLabel.setText(pool.getDescription() + ": Seeding");
-        updateFromDatabase();
-        notifier.addListener(listener, Pool.class, PlayerPool.class);
+        Collections.sort(context.players, PLAYERS_COMPARATOR_POSITION);
+
+        seedingTable.getColumn("Seed").setCellEditor(getSeedingCellEditor(context.players.size()));
+
+        // clear table
+        while(model.getRowCount() > 0) model.removeRow(0);
+
+        for(Player player : context.players) {
+            model.addRow(getRowData(player));
+        }
     }
 
     @Override
     public void afterHide() {
-        notifier.removeListener(listener);
     }
 }

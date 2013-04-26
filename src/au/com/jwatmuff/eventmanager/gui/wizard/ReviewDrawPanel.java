@@ -152,7 +152,7 @@ public class ReviewDrawPanel extends javax.swing.JPanel implements DrawWizardWin
     }// </editor-fold>//GEN-END:initComponents
 
     private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-        ArrayList<Pool> pools = new ArrayList<Pool>();
+        ArrayList<Pool> pools = new ArrayList<>();
         pools.add(context.pool);
         new MultipleDrawHTMLGenerator(database, pools, false).openInBrowser();
 }//GEN-LAST:event_printButtonActionPerformed
@@ -179,6 +179,11 @@ public class ReviewDrawPanel extends javax.swing.JPanel implements DrawWizardWin
             GUIUtils.displayError(null, e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public boolean backButtonPressed() {
+        return true;
     }
 
     @Override

@@ -237,6 +237,7 @@ public class CSVImporter {
         columnMapping.put("Grade", "grade");
         columnMapping.put("DOB", "dob");
         columnMapping.put("Division", "division");
+        columnMapping.put("Seed", "seed");
         columnMapping.put("Club", "club");
         columnMapping.put("Team", "club");
 
@@ -387,6 +388,11 @@ public class CSVImporter {
                 if(pool != null) {
                     PlayerPool pp = new PlayerPool();
                     pp.setID(new PlayerPool.Key(p.getID(), pool.getID()));
+
+                    try {
+                        pp.setSeed(Integer.valueOf(row.get("seed")));
+                    } catch(Exception e) {}
+
                     pps.add(pp);
                 }
             }

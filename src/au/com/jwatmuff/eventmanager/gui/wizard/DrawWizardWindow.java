@@ -11,11 +11,23 @@
 
 package au.com.jwatmuff.eventmanager.gui.wizard;
 
+import au.com.jwatmuff.eventmanager.model.vo.Player;
+import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import au.com.jwatmuff.genericdb.distributed.DataEvent;
+import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 /**
@@ -27,6 +39,10 @@ public class DrawWizardWindow extends javax.swing.JFrame {
 
     public class Context {
         public Pool pool;
+        public List<Player> players;
+        public List<Player> unapprovedPlayers;
+        public Map<Integer, Integer> seeds;
+        public boolean detectExternalChanges = true;
     }
 
     public interface Panel {
@@ -38,6 +54,7 @@ public class DrawWizardWindow extends javax.swing.JFrame {
          * press
          */
         boolean nextButtonPressed();
+        boolean backButtonPressed();
         boolean closedButtonPressed();
         void beforeShow();
         void afterHide();
@@ -49,12 +66,13 @@ public class DrawWizardWindow extends javax.swing.JFrame {
     private Context context = new Context();
 
     /** Creates new form DrawWizardWindow */
-    public DrawWizardWindow(TransactionalDatabase database, TransactionNotifier notifier, Pool pool) {
+    public DrawWizardWindow(final TransactionalDatabase database, final TransactionNotifier notifier, final Pool pool) {
         context.pool = pool;
+        context.seeds = new HashMap<>();
 
         panels = new Panel[] {
             new PlayerSelectionPanel(database, notifier, context),
-            new SeedingPanel(database, notifier, context),
+            new SeedingPanel(database, context),
             new ReviewDrawPanel(database, notifier, context)
         };
 
@@ -73,6 +91,49 @@ public class DrawWizardWindow extends javax.swing.JFrame {
 
         setLocationRelativeTo(null);
         pack();
+
+        // Set up listener to close the wizard if the Pool or any related Players are modified externally
+        final TransactionListener listener = new TransactionListener() {
+            @Override
+            public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
+                if(!context.detectExternalChanges) return;
+                for(DataEvent event : events) {
+                    boolean changeDetected = false;
+                    if(event.getData() instanceof Pool) {
+                        if(((Pool)event.getData()).getID() == pool.getID()) changeDetected = true;
+                    } else if(event.getData() instanceof PlayerPool) {
+                        if(((PlayerPool)event.getData()).getPoolID() == pool.getID()) changeDetected = true;
+                    } else if(event.getData() instanceof Player) {
+                        Player p = (Player)event.getData();
+                        if(database.get(PlayerPool.class, new PlayerPool.Key(p.getID(), pool.getID())) != null) changeDetected = true;
+                    }
+                    if(changeDetected) {
+                        GUIUtils.displayMessage(DrawWizardWindow.this, "This division has been modified by another user on the network.\nThis wizard will now close to prevent any conflicts.", "Change detected");
+                        close();
+                        return;
+                    }
+                }
+            }
+        };
+        notifier.addListener(listener, Pool.class, Player.class, PlayerPool.class);
+
+        // clean up listeners
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                notifier.removeListener(listener);
+                DrawWizardWindow.this.removeWindowListener(this);
+            }
+        });
+    }
+
+    private void close() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                dispatchEvent(new WindowEvent(DrawWizardWindow.this, WindowEvent.WINDOW_CLOSING));
+            }
+        });
     }
 
     private Panel getCurrentPanel() {
@@ -87,13 +148,29 @@ public class DrawWizardWindow extends javax.swing.JFrame {
             panels[currentIndex - 1].afterHide();
         } else {
             log.warn("Next tried to go past end of available panels");
+            currentIndex--;
         }
         updateButtons();
     }
 
+    private void back() {
+        currentIndex--;
+        if(currentIndex >= 0) {
+            panels[currentIndex].beforeShow();
+            layout.previous(contentPanel);
+            panels[currentIndex + 1].afterHide();
+        } else {
+            log.warn("Back tried to go past beginning of available panels");
+            currentIndex++;
+        }
+    }
+
     private void updateButtons() {
         boolean last = currentIndex == panels.length - 1;
-        nextButton.setText(last ? "Finish" : "Next");
+        boolean first = currentIndex == 0;
+        //nextButton.setText(last ? "Finish" : "Next");
+        nextButton.setEnabled(!last);
+        backButton.setEnabled(!first && !last);
     }
 
     /** This method is called from within the constructor to
@@ -110,6 +187,7 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         closeButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
+        backButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Draw Wizard");
@@ -141,6 +219,14 @@ public class DrawWizardWindow extends javax.swing.JFrame {
             }
         });
 
+        backButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/resultset_previous.png"))); // NOI18N
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -149,7 +235,10 @@ public class DrawWizardWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(mainPanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(closeButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(backButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(nextButton))
                     .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE))
@@ -157,7 +246,7 @@ public class DrawWizardWindow extends javax.swing.JFrame {
             .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        mainPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {closeButton, nextButton});
+        mainPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {backButton, closeButton, nextButton});
 
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -168,7 +257,8 @@ public class DrawWizardWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(nextButton)
-                    .addComponent(closeButton))
+                    .addComponent(closeButton)
+                    .addComponent(backButton))
                 .addContainerGap())
         );
 
@@ -190,7 +280,7 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         if(getCurrentPanel().nextButtonPressed()) {
             // if this is the last panel, close wizard
             if(currentIndex == panels.length - 1) {
-                this.setVisible(false);
+                close();
                 getCurrentPanel().afterHide();
             } else {
                 next();
@@ -200,13 +290,20 @@ public class DrawWizardWindow extends javax.swing.JFrame {
 
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
         if(getCurrentPanel().closedButtonPressed()) {
-            this.setVisible(false);
+            close();
             getCurrentPanel().afterHide();
         }
     }//GEN-LAST:event_closeButtonActionPerformed
 
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        if(getCurrentPanel().backButtonPressed()) {
+            back();
+        }
+    }//GEN-LAST:event_backButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backButton;
     private javax.swing.JButton closeButton;
     private javax.swing.JPanel contentPanel;
     private javax.swing.JSeparator jSeparator1;

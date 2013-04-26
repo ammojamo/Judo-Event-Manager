@@ -35,6 +35,7 @@ public class SQLitePlayerPoolDAO implements PlayerPoolDAO {
             POOL_ID_FIELD = "pool_id",
             PLAYER_POSITION_FIELD = "player_pos",
             PLAYER_POSITION_FIELD_2 = "player_pos_2",
+            SEED_FIELD = "seed",
             STATUS_FIELD = "status",
             APPROVED_FIELD = "approved",
             VALID_FIELD = "is_valid",
@@ -61,6 +62,7 @@ public class SQLitePlayerPoolDAO implements PlayerPoolDAO {
             pp.setPoolID(rs.getInt(POOL_ID_FIELD));
             pp.setPlayerPosition(rs.getInt(PLAYER_POSITION_FIELD));
             pp.setPlayerPosition2(rs.getInt(PLAYER_POSITION_FIELD_2));
+            pp.setSeed(rs.getInt(SEED_FIELD));
             pp.setStatus(PlayerPool.Status.fromString(rs.getString(STATUS_FIELD)));
             pp.setApproved(rs.getBoolean(APPROVED_FIELD));
             pp.setValid(rs.getBoolean(VALID_FIELD));
@@ -84,7 +86,7 @@ public class SQLitePlayerPoolDAO implements PlayerPoolDAO {
     
     @Override
     public void add(PlayerPool pp) {
-        final String sql = "INSERT INTO player_has_pool (player_id, pool_id, approved, player_pos, player_pos_2, status, is_locked, is_valid, last_updated) VALUES (:playerID, :poolID, :approved, :playerPosition, :playerPosition2, :status, :locked, :valid, :timestamp);";
+        final String sql = "INSERT INTO player_has_pool (player_id, pool_id, approved, player_pos, player_pos_2, seed, status, is_locked, is_valid, last_updated) VALUES (:playerID, :poolID, :approved, :playerPosition, :playerPosition2, :seed, :status, :locked, :valid, :timestamp);";
         SqlParameterSource params = new BeanPropertySqlParameterSource(pp);
         template.update(sql, params);        
     }
@@ -95,7 +97,7 @@ public class SQLitePlayerPoolDAO implements PlayerPoolDAO {
         // TODO: revisit and think about what will happen if computers get out of sync
         //if(pp.isLocked() || get(pp.getID()).isLocked())
         //    throw new RuntimeException("Cannot update locked PlayerPool");
-        final String sql = "UPDATE player_has_pool SET approved=:approved, player_pos=:playerPosition, player_pos_2=:playerPosition2, status=:status, is_locked=:locked, is_valid=:valid, last_updated=:timestamp WHERE player_id=:playerID AND pool_id=:poolID";
+        final String sql = "UPDATE player_has_pool SET approved=:approved, player_pos=:playerPosition, player_pos_2=:playerPosition2, seed=:seed, status=:status, is_locked=:locked, is_valid=:valid, last_updated=:timestamp WHERE player_id=:playerID AND pool_id=:poolID";
         SqlParameterSource params = new BeanPropertySqlParameterSource(pp);
         template.update(sql, params);        
     }
