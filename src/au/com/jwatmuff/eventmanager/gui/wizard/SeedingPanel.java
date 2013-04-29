@@ -230,9 +230,14 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     public boolean nextButtonPressed() {
         if(!GUIUtils.confirmLock(null, "all players and fights in division " + pool.getDescription())) return false;
 
+        context.detectExternalChanges = false;
+
         // TODO: I would like this to be wrapped in a transaction, so that it can't fail halfway (e.g. players
         // locked, but fights not), but I couldn't get this working easily.
-        return commitChanges();
+        boolean result = commitChanges();
+        if(!result) context.detectExternalChanges = true;
+
+        return result;
     }
 
     @Override
