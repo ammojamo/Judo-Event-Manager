@@ -24,6 +24,7 @@ import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
+import java.awt.Cursor;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -216,10 +217,18 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
             return false;
         }
 
-        PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), context.seeds);
-        List<PlayerPoolInfo> orderedPlayers = poolDraw.getOrderedPlayers();
+        try {
+            PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), context.seeds);
+            List<PlayerPoolInfo> orderedPlayers = poolDraw.getOrderedPlayers();
 
-        PoolPlayerSequencer.savePlayerSequence(database, pool.getID(), orderedPlayers);
+            PoolPlayerSequencer.savePlayerSequence(database, pool.getID(), orderedPlayers);
+        
+            pool = PoolLocker.lockPoolFights(database, pool);
+        } catch(Exception e) {
+            GUIUtils.displayError(this, "Failed to generate and lock fights");
+            log.error("Error generating and locking fights", e);
+            return false;
+        }
 
         context.pool = pool;
 
@@ -230,12 +239,22 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     public boolean nextButtonPressed() {
         if(!GUIUtils.confirmLock(null, "all players and fights in division " + pool.getDescription())) return false;
 
-        context.detectExternalChanges = false;
-
         // TODO: I would like this to be wrapped in a transaction, so that it can't fail halfway (e.g. players
         // locked, but fights not), but I couldn't get this working easily.
-        boolean result = commitChanges();
-        if(!result) context.detectExternalChanges = true;
+        boolean result = false;
+        try {
+            context.detectExternalChanges = false;
+            context.wizardWindow.disableNavigation();
+            seedingTable.setEnabled(false);
+            context.wizardWindow.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+            result = commitChanges();
+        } finally {
+            context.wizardWindow.enableNavigation();
+            seedingTable.setEnabled(true);
+            context.wizardWindow.setCursor(Cursor.getDefaultCursor());
+            if(!result) context.detectExternalChanges = true;
+        }
 
         return result;
     }

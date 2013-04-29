@@ -43,6 +43,7 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         public List<Player> unapprovedPlayers;
         public Map<Integer, Integer> seeds;
         public boolean detectExternalChanges = true;
+        public DrawWizardWindow wizardWindow = DrawWizardWindow.this;
     }
 
     public interface Panel {
@@ -64,6 +65,7 @@ public class DrawWizardWindow extends javax.swing.JFrame {
     final private Panel[] panels;
     private int currentIndex;
     private Context context = new Context();
+    private boolean navigationEnabled = true;
 
     /** Creates new form DrawWizardWindow */
     public DrawWizardWindow(final TransactionalDatabase database, final TransactionNotifier notifier, final Pool pool) {
@@ -169,8 +171,26 @@ public class DrawWizardWindow extends javax.swing.JFrame {
         boolean last = currentIndex == panels.length - 1;
         boolean first = currentIndex == 0;
         //nextButton.setText(last ? "Finish" : "Next");
-        nextButton.setEnabled(!last);
-        backButton.setEnabled(!first && !last);
+        nextButton.setEnabled(!last && navigationEnabled);
+        backButton.setEnabled(!first && navigationEnabled);
+        closeButton.setEnabled(navigationEnabled);
+        
+        if(last) {
+            if(nextButton.getParent() != null) nextButton.getParent().remove(nextButton);
+            if(backButton.getParent() != null) backButton.getParent().remove(backButton);
+            closeButton.setText("Finish");
+            pack();
+        }
+    }
+    
+    public void disableNavigation() {
+        navigationEnabled = false;
+        updateButtons();
+    }
+    
+    public void enableNavigation() {
+        navigationEnabled = true;
+        updateButtons();
     }
 
     /** This method is called from within the constructor to
