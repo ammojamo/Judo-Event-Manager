@@ -28,9 +28,7 @@ import au.com.jwatmuff.eventmanager.util.IDGenerator;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Collection;
+import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -52,9 +50,16 @@ public class SessionLocker {
      * @param session   The session to be locked
      */
     public static void lockPosition(final TransactionalDatabase database, final Session session) throws DatabaseStateException {
+        lockPosition(database, session, new HashSet<Integer>());
+    }
+
+    private static void lockPosition(final TransactionalDatabase database, final Session session, Set<Integer> alreadyLocked) throws DatabaseStateException {
         assert session != null;
         assert database != null;
         
+        if(alreadyLocked.contains(session.getID())) return;
+        alreadyLocked.add(session.getID());
+
         if(session.getLockedStatus() != LockedStatus.UNLOCKED)
             throw new DatabaseStateException("Session has already been locked");
         
@@ -65,7 +70,7 @@ public class SessionLocker {
         if(allPreceding.size() > 0) {
             for(Session preceding : allPreceding) {
                 if(preceding.getLockedStatus().compareTo(LockedStatus.POSITION_LOCKED) < 0)
-                    lockPosition(database, preceding);
+                    lockPosition(database, preceding, alreadyLocked);
             }
 
             si = new SessionInfo(database, session);
@@ -148,11 +153,17 @@ public class SessionLocker {
      * the database is not in a valid state to lock the fights for this session.
      */
     public static void lockFights(final TransactionalDatabase database, final Session session) throws DatabaseStateException{
+        lockFights(database, session, new HashSet<Integer>());
+    }
+
+    private static void lockFights(final TransactionalDatabase database, final Session session, Set<Integer> alreadyLocked) throws DatabaseStateException{
         if(session.getLockedStatus() != LockedStatus.POSITION_LOCKED)
             throw new DatabaseStateException("A session may only be fight-locked if it has been position-locked");
+
+        if(alreadyLocked.contains(session.getID())) return;
+        alreadyLocked.add(session.getID());
         
         /** ensure that all preceding sessions are locked **/
-
         SessionInfo si = new SessionInfo(database, session);
         Collection<Session> allPreceding = si.getPrecedingSessions();
         if(allPreceding.size() > 0) {
@@ -163,7 +174,7 @@ public class SessionLocker {
 
                 // only lock if 'preceding' is still valid
                 if(preceding.isValid() && preceding.getLockedStatus() != LockedStatus.FIGHTS_LOCKED)
-                    lockFights(database, preceding);
+                    lockFights(database, preceding, alreadyLocked);
             }
 
             si = new SessionInfo(database, session);
