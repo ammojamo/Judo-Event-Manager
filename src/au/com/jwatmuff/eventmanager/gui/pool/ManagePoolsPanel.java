@@ -24,6 +24,7 @@ import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.print.PoolListHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.CheckboxListDialog;
+import au.com.jwatmuff.eventmanager.util.gui.ComboBoxDialog;
 import au.com.jwatmuff.eventmanager.util.gui.StringRenderer;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
@@ -155,6 +156,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
                 approveButton.setEnabled(false);
                 removeButton.setEnabled(false);
+                seedButton.setEnabled(false);
             }
         });
 
@@ -166,10 +168,12 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 if (evt.getFirstIndex() >= 0) {
                     approveButton.setEnabled(true);
                     removeButton.setEnabled(true);
+                    seedButton.setEnabled(true);
                     approvedList.clearSelection();
                 } else {
                     approveButton.setEnabled(false);
                     removeButton.setEnabled(requestedList.getSelectedIndex() >= 0);
+                    seedButton.setEnabled(requestedList.getSelectedIndex() >= 0);
                 }
             }
         });
@@ -182,9 +186,11 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 if (evt.getFirstIndex() >= 0) {
                     approveButton.setEnabled(false);
                     removeButton.setEnabled(true);
+                    seedButton.setEnabled(true);
                     requestedList.clearSelection();
                 } else {
                     removeButton.setEnabled(approvedList.getSelectedIndex() >= 0);
+                    seedButton.setEnabled(approvedList.getSelectedIndex() >= 0);
                 }
             }
         });
@@ -208,6 +214,24 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
         return p;
     }
+    
+    private PlayerPool getSelectedPlayerPool() {
+        Pool pool = getSelectedPool();
+        if (pool == null || pool.getID() == 0) {
+            return null;
+        }
+
+        Player player;
+        if (approvedList.getSelectedIndex() >= 0) {
+            player = approvedListModel.getPlayerAt(approvedList.getSelectedIndex());
+        } else if (requestedList.getSelectedIndex() >= 0) {
+            player = requestedListModel.getPlayerAt(requestedList.getSelectedIndex());
+        } else {
+            return null;
+        }
+        
+        return database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
+    }
 
     private class PlayerListCellRenderer extends DefaultListCellRenderer {
 
@@ -228,7 +252,14 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 if (pool != null && pool.getID() != 0) {
                     ok = PoolChecker.checkPlayer(player, pool, censusDate, configurationFile);
                 }
-                String str = (ok ? "" : "(!) ") + player.getFirstName() + " " + player.getLastName() + "   (" + player.getTeam() + ")";
+
+                String str = (ok ? "" : "(!) ");
+                try {
+                    PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
+                    if(pp.getSeed() > 0) str += "[" + pp.getSeed() + "] ";
+                } catch(Exception e) {}
+                str += player.getFirstName() + " " + player.getLastName() + " (" + player.getTeam() + ")";
+
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, str, index, isSelected, hasFocus);
                 if (player.getLockedStatus() != Player.LockedStatus.LOCKED) {
                     label.setIcon(Icons.UNLOCKED_PLAYER);
@@ -271,11 +302,11 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         customPoolButton = new javax.swing.JButton();
         drawWizardButton = new javax.swing.JButton();
         printButton = new javax.swing.JButton();
-        customPoolButton1 = new javax.swing.JButton();
+        copyPoolButton = new javax.swing.JButton();
+        seedButton = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(300, 0));
 
-        poolListTable.setAutoCreateRowSorter(true);
         poolListTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -295,6 +326,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 return types [columnIndex];
             }
         });
+        poolListTable.setAutoCreateRowSorter(true);
         poolListTable.setGridColor(new java.awt.Color(237, 237, 237));
         poolListTable.setRowHeight(19);
         poolListTable.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -392,11 +424,19 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
             }
         });
 
-        customPoolButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/wrench.png"))); // NOI18N
-        customPoolButton1.setText("Copy Division");
-        customPoolButton1.addActionListener(new java.awt.event.ActionListener() {
+        copyPoolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/wrench.png"))); // NOI18N
+        copyPoolButton.setText("Copy Division");
+        copyPoolButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                customPoolButton1ActionPerformed(evt);
+                copyPoolButtonActionPerformed(evt);
+            }
+        });
+
+        seedButton.setText("Seed");
+        seedButton.setEnabled(false);
+        seedButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                seedButtonActionPerformed(evt);
             }
         });
 
@@ -409,14 +449,15 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 761, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(removeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(approveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(autoApproveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(autoApproveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(seedButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -428,7 +469,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                         .addGap(6, 6, 6)
                         .addComponent(customPoolButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(customPoolButton1)
+                        .addComponent(copyPoolButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lockButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -447,7 +488,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(autoAssignButton)
                         .addComponent(customPoolButton)
-                        .addComponent(customPoolButton1)
+                        .addComponent(copyPoolButton)
                         .addComponent(lockButton))
                     .addComponent(drawWizardButton)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -469,7 +510,10 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(approveButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(removeButton)))
+                        .addComponent(removeButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(seedButton)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -534,26 +578,15 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
         if (!PermissionChecker.isAllowed(Action.APPROVE_DIVISION, database)) {
             return;
         }
-        Pool pool = getSelectedPool();
-        if (pool == null || pool.getID() == 0) {
-            return;
-        }
-
-        Player player;
-        if (approvedList.getSelectedIndex() >= 0) {
-            player = approvedListModel.getPlayerAt(approvedList.getSelectedIndex());
-        } else if (requestedList.getSelectedIndex() >= 0) {
-            player = requestedListModel.getPlayerAt(requestedList.getSelectedIndex());
-        } else {
-            return;
-        }
-
+        
+        PlayerPool pp = getSelectedPlayerPool();
+        if(pp == null) return;
+        
         try {
-            PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
             database.delete(pp);
         } catch (Exception e) {
             GUIUtils.displayError(this, "An error occured while removing the player from the selected division");
-            log.error("Exception while removing player " + player.getID() + " from division " + pool.getID(), e);
+            log.error("Exception while removing player " + pp.getPlayerID() + " from division " + pp.getPoolID(), e);
         }
     }//GEN-LAST:event_removeButtonActionPerformed
 
@@ -679,7 +712,7 @@ private void drawWizardButtonActionPerformed(java.awt.event.ActionEvent evt) {//
         }
 }//GEN-LAST:event_jButton1ActionPerformed
 
-private void customPoolButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customPoolButton1ActionPerformed
+private void copyPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyPoolButtonActionPerformed
         if (!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) {
             return;
         }
@@ -719,14 +752,35 @@ private void customPoolButton1ActionPerformed(java.awt.event.ActionEvent evt) {/
                 }
             });
         }
-}//GEN-LAST:event_customPoolButton1ActionPerformed
+}//GEN-LAST:event_copyPoolButtonActionPerformed
+
+    private void seedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seedButtonActionPerformed
+        PlayerPool pp = getSelectedPlayerPool();
+        if(pp == null) return;
+        
+        if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
+        
+        List<Integer> seeds = new ArrayList<>();
+        for(int i = 0; i < 64; i++) {
+            seeds.add(i+1);
+        }
+        ComboBoxDialog<Integer> seedDialog = new ComboBoxDialog<>(null, true, seeds, "Please select a seed", "Player Seed");
+        if(pp.getSeed() > 0) seedDialog.setSelectedItem(pp.getSeed());
+        seedDialog.setVisible(true);
+        
+        if(seedDialog.getSuccess()) {
+            pp.setSeed(seedDialog.getSelectedItem());
+            database.update(pp);
+        }
+    }//GEN-LAST:event_seedButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton approveButton;
     private javax.swing.JList<Player> approvedList;
     private javax.swing.JButton autoApproveButton;
     private javax.swing.JButton autoAssignButton;
+    private javax.swing.JButton copyPoolButton;
     private javax.swing.JButton customPoolButton;
-    private javax.swing.JButton customPoolButton1;
     private javax.swing.JButton drawWizardButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -740,5 +794,6 @@ private void customPoolButton1ActionPerformed(java.awt.event.ActionEvent evt) {/
     private javax.swing.JButton printButton;
     private javax.swing.JButton removeButton;
     private javax.swing.JList<Player> requestedList;
+    private javax.swing.JButton seedButton;
     // End of variables declaration//GEN-END:variables
 }

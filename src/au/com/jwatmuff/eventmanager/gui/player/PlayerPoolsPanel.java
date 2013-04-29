@@ -72,8 +72,13 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
     private ListCellRenderer<Object> ppiRenderer = new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList list, Object obj, int arg2, boolean arg3, boolean arg4) {
-            if(obj instanceof PlayerPoolInfo)
-                obj = ((PlayerPoolInfo)obj).getPool().getDescription();
+            if(obj instanceof PlayerPoolInfo) {
+                PlayerPoolInfo ppi = (PlayerPoolInfo)obj;
+                obj = ppi.getPool().getDescription();
+                if(ppi.getPlayerPool().getSeed() > 0) {
+                    obj = "[" + ppi.getPlayerPool().getSeed() + "] " + obj;
+                }
+            }
             return super.getListCellRendererComponent(list, obj, arg2, arg3, arg4);
         }
     };

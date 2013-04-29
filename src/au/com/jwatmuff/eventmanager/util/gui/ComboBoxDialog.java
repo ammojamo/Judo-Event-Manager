@@ -64,8 +64,7 @@ public class ComboBoxDialog<T> extends javax.swing.JDialog {
     
     public void setRenderer(ListCellRenderer<Object> renderer) {
         comboBox.setRenderer(renderer);
-    }
-            
+    }       
     
     public boolean getSuccess() {
         return success;
@@ -73,6 +72,10 @@ public class ComboBoxDialog<T> extends javax.swing.JDialog {
     
     public T getSelectedItem() {
         return selectedItem;
+    }
+    
+    public void setSelectedItem(T item) {
+        comboBox.setSelectedItem(item);
     }
     
     /** This method is called from within the constructor to
