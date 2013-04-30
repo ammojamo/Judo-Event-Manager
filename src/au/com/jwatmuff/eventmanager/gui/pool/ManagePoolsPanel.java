@@ -6,6 +6,7 @@
 package au.com.jwatmuff.eventmanager.gui.pool;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
+import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
@@ -735,18 +736,18 @@ private void copyPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
             poolCopy.setMatchTime(pool.getMatchTime());
             poolCopy.setMinimumBreakTime(pool.getMinimumBreakTime());
             poolCopy.setGoldenScoreTime(pool.getGoldenScoreTime());
-            final List<Player> selectedPlayers = database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), false);
-            selectedPlayers.addAll(database.findAll(Player.class, PlayerDAO.FOR_POOL, pool.getID(), true));
+            final List<PlayerPool> selectedPlayers = database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID());
             database.perform(new Transaction() {
 
                 @Override
                 public void perform() {
                     database.add(poolCopy);
 
-                    for (Player player : selectedPlayers) {
+                    for (PlayerPool playerPool : selectedPlayers) {
                         PlayerPool pp = new PlayerPool();
-                        pp.setPlayerID(player.getID());
+                        pp.setPlayerID(playerPool.getPlayerID());
                         pp.setPoolID(poolCopy.getID());
+                        pp.setSeed(playerPool.getSeed());
                         database.add(pp);
                     }
                 }
