@@ -294,6 +294,18 @@ public class PoolDraw {
         playerPoolInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
         fights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID());
         this.seeds = seeds;
+        
+        List<Integer> playerIDs = new ArrayList<>();
+        playerIDs.addAll(this.seeds.keySet());
+        for (PlayerPoolInfo playerPoolInfo : playerPoolInfoList) {
+            if (playerPoolInfo != null) {
+                int playerID = playerPoolInfo.getPlayer().getID();
+                playerIDs.remove(playerIDs.indexOf(playerID));
+            }
+        }
+        for (int playerID : playerIDs) {
+            this.seeds.remove(playerID);
+        }
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
