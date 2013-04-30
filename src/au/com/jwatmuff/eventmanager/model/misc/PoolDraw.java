@@ -293,24 +293,17 @@ public class PoolDraw {
         pool = database.get(Pool.class, poolID);
         playerPoolInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
         fights = database.findAll(Fight.class, FightDAO.FOR_POOL, pool.getID());
-        this.seeds = seeds;
         
-        List<Integer> playerIDs = new ArrayList<>();
-        playerIDs.addAll(this.seeds.keySet());
+        this.seeds = new HashMap<>();
+        // For each player in division, copy seed into new seeds map
         for (PlayerPoolInfo playerPoolInfo : playerPoolInfoList) {
-            if (playerPoolInfo != null) {
-                int playerID = playerPoolInfo.getPlayer().getID();
-                playerIDs.remove(playerIDs.indexOf(playerID));
-            }
-        }
-        for (int playerID : playerIDs) {
-            this.seeds.remove(playerID);
+            int playerID = playerPoolInfo.getPlayer().getID();
+            this.seeds.put(playerID, seeds.get(playerID));
         }
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
         if (configurationFile == null) {
-//            System.out.println("Unable to load draw configuration.");
             log.error("Unable to load draw configuration.");
         }
     }
