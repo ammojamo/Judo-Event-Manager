@@ -236,11 +236,11 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
         if(poolName.equals(""))
             errors.add("Pool name required");
         
-        if(matchTime == 0)
+        if(matchTime <= 0)
             errors.add("Match time must be greater than 0");
 
-        if(goldenScoreTime == 0)
-            errors.add("Golden score time must be greater than 0");
+        if(goldenScoreTime < 0)
+            errors.add("Golden score time must be greater than or equal to 0");
         
         if(errors.size() > 0) {
             GUIUtils.displayErrors(this,errors);
