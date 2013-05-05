@@ -51,7 +51,9 @@ public class ZipUtils {
             ZipEntry entry;
             while ((entry = zipStream.getNextEntry()) != null) {
                 // get output file
-                File file = new File(destFolder, entry.getName());
+                String name = entry.getName();
+                if(name.startsWith("/") || name.startsWith("\\")) name = name.substring(1);
+                File file = new File(destFolder, name);
                 // ensure directory exists
                 File dir = file.getParentFile();
                 if(!dir.exists()) dir.mkdirs();
