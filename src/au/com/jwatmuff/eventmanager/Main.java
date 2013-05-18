@@ -50,8 +50,8 @@ public class Main {
 
     //internal version - bump this up whenever making a database change
     public static final String VERSION = "7";
-    public static final String WINDOW_TITLE = "Event Manager 2013 Beta";
-    public static final String VISIBLE_VERSION = "Event Manager 2013 Beta";
+    public static final String WINDOW_TITLE = "Event Manager 2013";
+    public static final String VISIBLE_VERSION = "Event Manager 2013";
 
     private static File workingDir = new File(".");
 

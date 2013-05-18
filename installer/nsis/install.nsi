@@ -1,5 +1,5 @@
 Name "Event Manager 2013"
-Caption "Event Manager 2013 Beta"
+Caption "Event Manager 2013"
 ;Icon "YourProgram.ico"
 OutFile "EventManagerSetup-2013.exe"
 
@@ -8,7 +8,7 @@ LicenseForceSelection checkbox
 
 InstallDir $PROGRAMFILES\EventManager2013
 
-DirText "This will install EventManager 2013 Beta on your computer."
+DirText "This will install EventManager 2013 on your computer."
 
 Section ""
   SetOutPath $INSTDIR
@@ -37,7 +37,7 @@ Page license
 Page directory
 Page instfiles
 
-UninstallText "This will uninstall EventManager 2013 Beta."
+UninstallText "This will uninstall EventManager 2013."
 
 Section "Uninstall"
 ; try user dir as well as all user dirs
@@ -60,10 +60,10 @@ Section "Install Java"
 
   installjava:
 
-  File ..\thirdparty\jre-6u23-windows-i586-s.exe
-  ExecWait "$INSTDIR\jre-6u23-windows-i586-s.exe"
+  File ..\thirdparty\jre-7u21-windows-i586.exe
+  ExecWait "$INSTDIR\jre-7u21-windows-i586.exe"
 
   installjavadone:
 
-  Delete "$INSTDIR\jre-6u23-windows-i586-s.exe"
+  Delete "$INSTDIR\jre-7u21-windows-i586.exe"
 SectionEnd
