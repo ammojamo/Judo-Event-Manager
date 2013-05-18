@@ -31,14 +31,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.log4j.Logger;
+import org.jdesktop.xswingx.PromptSupport;
 
 /**
  *
@@ -155,6 +152,8 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
                 return label;
             }
         });
+        
+        PromptSupport.setPrompt("First/Last Name", searchTextField);
     }
 
     // called when any mouse or key event occurs on the table
@@ -206,6 +205,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
         importButton = new javax.swing.JButton();
         editButton = new javax.swing.JButton();
         deleteButton = new javax.swing.JButton();
+        searchTextField = new javax.swing.JTextField();
 
         newButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/user_add.png"))); // NOI18N
         newButton.setText("Add Player..");
@@ -218,7 +218,6 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
 
         playerListScrollPane.setMaximumSize(new java.awt.Dimension(452, 4000));
 
-        playerListTable.setAutoCreateRowSorter(true);
         playerListTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -230,6 +229,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
                 "Player ID", "Last Name", "First Name"
             }
         ));
+        playerListTable.setAutoCreateRowSorter(true);
         playerListTable.setGridColor(new java.awt.Color(237, 237, 237));
         playerListTable.setRowHeight(19);
         playerListTable.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -295,6 +295,12 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
             }
         });
 
+        searchTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                searchTextFieldKeyTyped(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -302,7 +308,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(playerListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                    .addComponent(playerListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(newButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -311,7 +317,9 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
                         .addComponent(deleteButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(importButton)))
                 .addContainerGap())
         );
@@ -322,8 +330,10 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(newButton)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(importButton))
+                        .addComponent(importButton)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(editButton)
                     .addComponent(deleteButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -429,6 +439,15 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
         //    (new AddPlayerDialog(parentWindow, true, database)).setVisible(true);
             (new PlayerDetailsDialog(parentWindow, true, database, notifier, null)).setVisible(true);
     }//GEN-LAST:event_newButtonActionPerformed
+
+    private void searchTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchTextFieldKeyTyped
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                tableModel.setNameFilter(searchTextField.getText());
+            }
+        });
+    }//GEN-LAST:event_searchTextFieldKeyTyped
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -441,6 +460,7 @@ public class ManagePlayersPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane playerListScrollPane;
     private javax.swing.JTable playerListTable;
     private javax.swing.JButton printButton;
+    private javax.swing.JTextField searchTextField;
     // End of variables declaration//GEN-END:variables
     
 }
