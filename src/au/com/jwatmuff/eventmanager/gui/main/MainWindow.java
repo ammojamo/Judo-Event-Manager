@@ -24,14 +24,19 @@ import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
+import au.com.jwatmuff.genericp2p.ManualDiscoveryService;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import au.com.jwatmuff.genericp2p.windows.WindowsNetUtil;
 import java.awt.Cursor;
 import java.awt.event.WindowEvent;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import java.util.Collection;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.border.EmptyBorder;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -54,6 +59,7 @@ public class MainWindow extends javax.swing.JFrame {
     private SessionFightsPanel sessionFightsPanel;
     private CompetitionInterfacesPanel competitionInterfacesPanel;
     private ResultsPanel resultsPanel;
+    private ManualDiscoveryService manualDiscoveryService;
     
     private PeerManager peerManager;
     
@@ -97,6 +103,10 @@ public class MainWindow extends javax.swing.JFrame {
     @Required
     public void setPeerManager(PeerManager peerManager) {
         this.peerManager = peerManager;
+    }
+    
+    public void setManualDiscoveryService(ManualDiscoveryService manualDiscoveryService) {
+        this.manualDiscoveryService = manualDiscoveryService;
     }
     
     private void createPanels() {
@@ -220,6 +230,14 @@ public class MainWindow extends javax.swing.JFrame {
         return deleteOnExit;
     }
     
+    private void manuallyAddHost(final String hostname) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                manualDiscoveryService.manuallyAddHost(hostname);
+            }
+        }, "Manual peer discovery").start();
+    }
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -249,6 +267,7 @@ public class MainWindow extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JSeparator();
         fileExitMenuItem = new javax.swing.JMenuItem();
         networkMenu = new javax.swing.JMenu();
+        manualAddPeerMenuItem = new javax.swing.JMenuItem();
         firewallMenuItem = new javax.swing.JMenuItem();
         networkLogMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
@@ -415,7 +434,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(competitionInterfacesButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultsButton)
-                .addContainerGap(150, Short.MAX_VALUE))
+                .addContainerGap(126, Short.MAX_VALUE))
             .addComponent(chatParentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -445,6 +464,14 @@ public class MainWindow extends javax.swing.JFrame {
         menuBar.add(fileMenu);
 
         networkMenu.setText("Network");
+
+        manualAddPeerMenuItem.setText("Manually Enter IP/Host..");
+        manualAddPeerMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualAddPeerMenuItemActionPerformed(evt);
+            }
+        });
+        networkMenu.add(manualAddPeerMenuItem);
 
         firewallMenuItem.setText("Update Windows Firewall..");
         firewallMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -584,6 +611,23 @@ private void masterUnlockMenuItemActionPerformed(java.awt.event.ActionEvent evt)
         GUIUtils.displayMessage(null, "Network diagnostic information has been logged.\nThis will assist the developers to resolve network related issues with EventManager.", "Log Network Info");
     }//GEN-LAST:event_networkLogMenuItemActionPerformed
 
+    private void manualAddPeerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualAddPeerMenuItemActionPerformed
+        String hostname = JOptionPane.showInputDialog("Enter an IP Address, Host or Computer Name on which EventManager is running.");
+        
+        if(!StringUtils.isBlank(hostname)) {
+            try {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                InetAddress.getByName(hostname);
+                GUIUtils.displayMessage(null, "The computer '" + hostname + "' was successfully added.\nIf EventManager is able to connect to this computer, it will appear under the chat user list shortly", "Computer added");
+                manuallyAddHost(hostname);
+            } catch(UnknownHostException e) {
+                GUIUtils.displayError(null, "EventManager was unable to identify any computer named '" + hostname + "' (Unknown host)");
+            } finally {
+                setCursor(Cursor.getDefaultCursor()); 
+            }
+        }
+    }//GEN-LAST:event_manualAddPeerMenuItemActionPerformed
+
             
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton adminButton;
@@ -603,6 +647,7 @@ private void masterUnlockMenuItemActionPerformed(java.awt.event.ActionEvent evt)
     private javax.swing.JTabbedPane mainTabbedPane;
     private javax.swing.JButton managePoolsButton;
     private javax.swing.JButton manageSessionsButton;
+    private javax.swing.JMenuItem manualAddPeerMenuItem;
     private javax.swing.JMenuItem masterUnlockMenuItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem networkLogMenuItem;

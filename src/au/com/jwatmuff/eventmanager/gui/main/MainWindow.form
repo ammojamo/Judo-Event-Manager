@@ -55,6 +55,14 @@
             <Property name="text" type="java.lang.String" value="Network"/>
           </Properties>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="manualAddPeerMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Manually Enter IP/Host.."/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="manualAddPeerMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="firewallMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Update Windows Firewall.."/>
@@ -99,7 +107,6 @@
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="menuBar"/>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
-    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
   <Events>
     <EventHandler event="windowClosing" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosing"/>
@@ -200,7 +207,7 @@
                       <Component id="competitionInterfacesButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="resultsButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="150" max="32767" attributes="0"/>
+                      <EmptySpace pref="126" max="32767" attributes="0"/>
                   </Group>
                   <Component id="chatParentPanel" alignment="0" max="32767" attributes="0"/>
               </Group>

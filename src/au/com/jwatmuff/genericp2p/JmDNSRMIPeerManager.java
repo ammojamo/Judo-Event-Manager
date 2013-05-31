@@ -106,4 +106,8 @@ public class JmDNSRMIPeerManager implements PeerManager {
     public boolean isRegistered(String serviceName) {
         return manager.isRegistered(serviceName);
     }
+    
+    public void addDiscoveryService(PeerDiscoveryService discoverer) {
+        discoverer.setListener(manager);
+    }
 }

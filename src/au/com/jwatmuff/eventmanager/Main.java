@@ -26,6 +26,7 @@ import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import au.com.jwatmuff.genericdb.p2p.DistributedDatabase;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericp2p.JmDNSRMIPeerManager;
+import au.com.jwatmuff.genericp2p.ManualDiscoveryService;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import java.io.File;
 import java.io.IOException;
@@ -192,7 +193,9 @@ public class Main {
             loadWindow.addMessage("Loading Peer Manager..");
             log.info("Loading Peer Manager");
 
-            PeerManager peerManager = new JmDNSRMIPeerManager(rmiPort, new File(workingDir, "peerid.dat"));
+            ManualDiscoveryService manualDiscoveryService = new ManualDiscoveryService();
+            JmDNSRMIPeerManager peerManager = new JmDNSRMIPeerManager(rmiPort, new File(workingDir, "peerid.dat"));
+            peerManager.addDiscoveryService(manualDiscoveryService);
             if(!peerManager.initialisedOk()) {
                 GUIUtils.displayMessage(loadWindow, "Event Manager could not find a network connection.\nTo connect to other computers you will need to establish a network connection and restart the Event Manager.", "No Network Connection");
             }
@@ -261,6 +264,7 @@ public class Main {
                     mainWindow.setNotifier(notifier);
                     mainWindow.setPeerManager(peerManager);
                     mainWindow.setLicenseManager(licenseManager);
+                    mainWindow.setManualDiscoveryService(manualDiscoveryService);
                     mainWindow.setTitle(WINDOW_TITLE);
                     mainWindow.afterPropertiesSet();
 
