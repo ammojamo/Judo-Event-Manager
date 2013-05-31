@@ -8,6 +8,7 @@ package au.com.jwatmuff.genericp2p;
 import au.com.jwatmuff.genericp2p.jmdns.JmDNSDiscoveryService;
 import au.com.jwatmuff.genericp2p.jmdns.JmDNSRegistrationService;
 import au.com.jwatmuff.genericp2p.rmi.RMIPeerManager;
+import au.com.jwatmuff.genericp2p.windows.WindowsNetDiscoveryService;
 import java.io.File;
 import java.util.Collection;
 import java.util.UUID;
@@ -26,12 +27,15 @@ public class JmDNSRMIPeerManager implements PeerManager {
 
     private JmDNSRegistrationService registrar;
     private JmDNSDiscoveryService discoverer;
+    
+    private WindowsNetDiscoveryService winDiscoverer;
 
     private RMIPeerManager manager;
     
     public JmDNSRMIPeerManager(int port, File idFile) {
         registrar = new JmDNSRegistrationService(port);
         discoverer = new JmDNSDiscoveryService();
+        winDiscoverer = new WindowsNetDiscoveryService();
 
         log.info("Starting RMI Peer Manager");
 
@@ -43,10 +47,12 @@ public class JmDNSRMIPeerManager implements PeerManager {
         manager.setName(registrar.getOurName());
 
         discoverer.setListener(manager);
+        winDiscoverer.setListener(manager);
 
         log.info("Starting Peer Discovery Service");
 
         discoverer.start();
+        winDiscoverer.start();
     }
 
     @Override

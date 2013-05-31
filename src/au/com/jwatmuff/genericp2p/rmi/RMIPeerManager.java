@@ -278,7 +278,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     @Override
     public void handleDiscoveryEvent(PeerDiscoveryEvent event) {
         if (event.getType() == PeerDiscoveryEvent.Type.FOUND) {
-            log.debug("Got name/IP address from Bonjour/JmDNS: " + event.getPeerInfo().getName() + " : " + event.getPeerInfo().getAddress());
+            log.debug("Got name/IP address from Bonjour/JmDNS/Windows: " + event.getPeerInfo().getName() + " : " + event.getPeerInfo().getAddress());
             this.handlePeerInfo(event.getPeerInfo());
         }
     }

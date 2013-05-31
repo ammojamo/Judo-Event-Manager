@@ -25,6 +25,8 @@ import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import au.com.jwatmuff.genericp2p.PeerManager;
+import au.com.jwatmuff.genericp2p.windows.WindowsNetUtil;
+import java.awt.Cursor;
 import java.awt.event.WindowEvent;
 
 import java.util.Collection;
@@ -246,6 +248,9 @@ public class MainWindow extends javax.swing.JFrame {
         masterUnlockMenuItem = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JSeparator();
         fileExitMenuItem = new javax.swing.JMenuItem();
+        networkMenu = new javax.swing.JMenu();
+        firewallMenuItem = new javax.swing.JMenuItem();
+        networkLogMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         helpAboutMenuItem = new javax.swing.JMenuItem();
 
@@ -309,7 +314,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel3.setText("Select a task");
 
         weighInButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/anchor.png"))); // NOI18N
@@ -383,7 +388,7 @@ public class MainWindow extends javax.swing.JFrame {
                         .addComponent(fightOrderButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(manageSessionsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(competitionInterfacesButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(chatParentPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -410,7 +415,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(competitionInterfacesButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultsButton)
-                .addContainerGap(163, Short.MAX_VALUE))
+                .addContainerGap(150, Short.MAX_VALUE))
             .addComponent(chatParentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -439,6 +444,26 @@ public class MainWindow extends javax.swing.JFrame {
 
         menuBar.add(fileMenu);
 
+        networkMenu.setText("Network");
+
+        firewallMenuItem.setText("Update Windows Firewall..");
+        firewallMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                firewallMenuItemActionPerformed(evt);
+            }
+        });
+        networkMenu.add(firewallMenuItem);
+
+        networkLogMenuItem.setText("Log Network Diagnostics..");
+        networkLogMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                networkLogMenuItemActionPerformed(evt);
+            }
+        });
+        networkMenu.add(networkLogMenuItem);
+
+        menuBar.add(networkMenu);
+
         helpMenu.setText("Help");
 
         helpAboutMenuItem.setText("About..");
@@ -459,7 +484,7 @@ public class MainWindow extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
+                .addComponent(mainTabbedPane)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -527,6 +552,38 @@ private void masterUnlockMenuItemActionPerformed(java.awt.event.ActionEvent evt)
     toggleMasterUnlock();
 }//GEN-LAST:event_masterUnlockMenuItemActionPerformed
 
+    private void firewallMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firewallMenuItemActionPerformed
+        String rule = "EventManager Port 1199";
+        String title = "Update Firewall";
+        
+        try {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            if(WindowsNetUtil.firewallRuleExists(rule)) {
+                GUIUtils.displayMessage(null, "Firewall already configured", title);
+                return;
+            }
+            WindowsNetUtil.openInboundFirewallPort(rule, 1199);
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+        }
+        if(WindowsNetUtil.firewallRuleExists(rule)) {
+            GUIUtils.displayMessage(null, "Firewall Successfully Updated", title);
+        } else {
+            GUIUtils.displayError(null, "Failed to update firewall");
+        }
+    }//GEN-LAST:event_firewallMenuItemActionPerformed
+
+    private void networkLogMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_networkLogMenuItemActionPerformed
+        try {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            WindowsNetUtil.logNetworkInfo();
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+        }
+   
+        GUIUtils.displayMessage(null, "Network diagnostic information has been logged.\nThis will assist the developers to resolve network related issues with EventManager.", "Log Network Info");
+    }//GEN-LAST:event_networkLogMenuItemActionPerformed
+
             
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton adminButton;
@@ -535,6 +592,7 @@ private void masterUnlockMenuItemActionPerformed(java.awt.event.ActionEvent evt)
     private javax.swing.JButton fightOrderButton;
     private javax.swing.JMenuItem fileExitMenuItem;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenuItem firewallMenuItem;
     private javax.swing.JMenuItem helpAboutMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JLabel jLabel3;
@@ -547,6 +605,8 @@ private void masterUnlockMenuItemActionPerformed(java.awt.event.ActionEvent evt)
     private javax.swing.JButton manageSessionsButton;
     private javax.swing.JMenuItem masterUnlockMenuItem;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenuItem networkLogMenuItem;
+    private javax.swing.JMenu networkMenu;
     private javax.swing.JButton registerButton;
     private javax.swing.JButton resultsButton;
     private javax.swing.JButton weighInButton;
