@@ -14,6 +14,7 @@ import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer;
 import au.com.jwatmuff.eventmanager.model.misc.SessionLocker;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.Session.SessionType;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
@@ -201,7 +202,8 @@ public class SessionFightsPanel extends javax.swing.JPanel {
         public FightTableModel(TransactionNotifier notifier) {
             super();
             
-            notifier.addListener(this, SessionFight.class);
+            notifier.addListener(this, SessionFight.class, Result.class);
+
             setBeanMapper(new BeanMapper<SessionFightInfo> () {
                 @Override
                 public Map<String, Object> mapBean(SessionFightInfo bean) {
