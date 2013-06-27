@@ -14,11 +14,8 @@ import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
-import au.com.jwatmuff.eventmanager.model.vo.Player;
-import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.print.ResultListHTMLGenerator;
-import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.LimitedFrequencyRunner;
@@ -30,14 +27,9 @@ import java.awt.Frame;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JFileChooser;
@@ -61,45 +53,15 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
 
     private boolean changeMode = false;
 
-    private NumberFormat format = new DecimalFormat();
-    private DateFormat dformat = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
-
     private LimitedFrequencyRunner updater = new LimitedFrequencyRunner(new Runnable() {
         public void run() {
             updateFromDatabase();
         }
     }, 2000);
 
-    private BeanMapper<ResultInfo> mapper = new BeanMapper<ResultInfo>() {
-        @Override
-        public Map<String, Object> mapBean(ResultInfo bean) {
+    private ResultInfoMapper mapper;
 
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("matfight", bean.getMatName() + " " + format.format(bean.getMatFightNumber()));
-            map.put("division", database.get(Pool.class, bean.getFight().getPoolID()).getDescription());
-            for(int i = 0; i < 2; i++) {
-                Player player = bean.getPlayer()[i];
-                map.put("player" + (i + 1), bean.getPlayerName()[i]);
-                map.put("playerId" + (i + 1), (player != null) ? player.getVisibleID() : "N/A");
-            }
-
-            int[] scores = bean.getResult().getSimpleScores(database);
-            map.put("score", scores[0] + " : " + scores[1]);
-            if(scores[0] > scores[1])
-                map.put("winner", bean.getPlayerName()[0]);
-            else if(scores[0] < scores[1])
-                map.put("winner", bean.getPlayerName()[1]);
-            else
-                map.put("winner", "Draw");
-
-            map.put("time", dformat.format(bean.getResult().getTimestamp()));
-            map.put("timerec", bean.getResult().getTimestamp()); // for printing
-
-            return map;
-        }
-    };
-
-    private ResultTableModel resultTableModel = new ResultTableModel();
+    private ResultTableModel resultTableModel;
     
     /** Creates new form FightProgressionPanel */
     public ResultsSummaryPanel() {
@@ -109,7 +71,6 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
     public ResultsSummaryPanel(boolean changeMode) {
         this.changeMode = changeMode;
         initComponents();
-        resultTable.setModel(resultTableModel);
         printButton.setVisible(!changeMode);
         exportButton.setVisible(!changeMode);
         actionButton.setText(changeMode ? "Update Result" : "View Fight Log");
@@ -135,6 +96,9 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
     }
     
     public void afterPropertiesSet() {
+        mapper = new ResultInfoMapper(database);
+        resultTableModel =  new ResultTableModel();
+        resultTable.setModel(resultTableModel);
         notifier.addListener(this, Result.class);
         updater.run(true);
     }
@@ -158,14 +122,13 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
         /* order by fight and time recorded */
         resultTable.getRowSorter().setSortKeys(Arrays.asList(
                 new SortKey(0, SortOrder.ASCENDING),
-                new SortKey(6, SortOrder.ASCENDING)));
+                new SortKey(8, SortOrder.ASCENDING)));
     }
 
     private class ResultTableModel extends BeanMapperTableModel<ResultInfo> {
         
         public ResultTableModel() {
             super();
-            format.setMinimumIntegerDigits(3);
             this.setBeanMapper(mapper);
 
             addColumn("Fight", "matfight");

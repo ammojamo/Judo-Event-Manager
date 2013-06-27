@@ -11,6 +11,7 @@ import au.com.jwatmuff.eventmanager.gui.fightorder.FightOrderPanel;
 import au.com.jwatmuff.eventmanager.gui.player.ManagePlayersPanel;
 import au.com.jwatmuff.eventmanager.gui.player.WeighInDialog;
 import au.com.jwatmuff.eventmanager.gui.pool.ManagePoolsPanel;
+import au.com.jwatmuff.eventmanager.gui.results.PrintPanel;
 import au.com.jwatmuff.eventmanager.gui.scoring.CompetitionInterfacesPanel;
 import au.com.jwatmuff.eventmanager.gui.results.ResultsPanel;
 import au.com.jwatmuff.eventmanager.gui.session.ManageSessionsPanel;
@@ -59,6 +60,7 @@ public class MainWindow extends javax.swing.JFrame {
     private SessionFightsPanel sessionFightsPanel;
     private CompetitionInterfacesPanel competitionInterfacesPanel;
     private ResultsPanel resultsPanel;
+    private PrintPanel printPanel;
     private ManualDiscoveryService manualDiscoveryService;
     
     private PeerManager peerManager;
@@ -110,6 +112,14 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void createPanels() {
+        printPanel = new PrintPanel();
+        printPanel.setParentWindow(this);
+        printPanel.setDatabase(database);
+        printPanel.setNotifier(notifier);
+        printPanel.afterPropertiesSet();
+        
+        mainTabbedPane.insertTab("Print", null, printPanel, null, 1);
+        
         resultsPanel = new ResultsPanel();
         resultsPanel.setParentWindow(this);
         resultsPanel.setDatabase(database);
