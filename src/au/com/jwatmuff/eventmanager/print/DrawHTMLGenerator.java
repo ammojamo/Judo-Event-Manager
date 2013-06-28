@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.context.Context;
 
 /**
@@ -80,7 +81,7 @@ public class DrawHTMLGenerator extends VelocityHTMLGenerator {
         CompetitionInfo compInfo = database.get(CompetitionInfo.class, null);
         ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(compInfo.getDrawConfiguration());
         c.put("competitionName", compInfo.getName());
-        if(compInfo.getLocation().isEmpty())
+        if(StringUtils.isEmpty(compInfo.getLocation()))
             c.put("competitionInfo",
                     DATE_FORMAT.format(compInfo.getStartDate()) + " to " +
                     DATE_FORMAT.format(compInfo.getEndDate()));
