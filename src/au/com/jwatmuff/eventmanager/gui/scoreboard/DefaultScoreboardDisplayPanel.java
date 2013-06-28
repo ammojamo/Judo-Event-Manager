@@ -90,10 +90,10 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         double HOLD_DOWN_WIDTH = 4;
         double HOLD_DOWN_HEIGHT = 4;
         
-        double DIVISION_X = 13;
+        double DIVISION_X = 12;
         double DIVISION_Y = 0;
-        double DIVISION_WIDTH = 3;
-        double DIVISION_HEIGHT = 1;
+        double DIVISION_WIDTH = 4;
+        double DIVISION_HEIGHT = 1.5;
     }
 
     private ScalableLabel timer;
