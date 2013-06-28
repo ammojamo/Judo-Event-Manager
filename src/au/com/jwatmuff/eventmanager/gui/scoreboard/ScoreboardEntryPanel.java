@@ -33,6 +33,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
 import javax.swing.border.EmptyBorder;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXImagePanel;
 
@@ -49,9 +50,11 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
     private ScalableLabel[] player;
     private ScalableLabel[][] scoreLabels;
     private ScalableLabel[][] score;
+    private ScalableLabel division;
 
     private ScalableLabel[] pendingPlayer;
     private ScalableLabel[] pendingFightTimer;
+    private ScalableLabel pendingDivision;
     
     private ScalableLabel[][][] scoreRegions;
     private ScalableLabel[][][] scoreArrows;
@@ -85,6 +88,7 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
 
     private ScalableLabel vsPlayer[];
     private ScalableLabel vs;
+    private ScalableLabel vsDivision;
     private JPanel vsLayer;
     
     private boolean swapPlayers;
@@ -157,9 +161,11 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
             new ScalableLabel("Player 2")
         };
         vs = new ScalableLabel("vs");
+        vsDivision = new ScalableLabel(" ");
         layout.addComponent(vsPlayer[0], 1, 1, 11, 3);
         layout.addComponent(vsPlayer[1], 4, 8, 11, 3);
         layout.addComponent(vs, 7, 5, 2, 2);
+        layout.addComponent(vsDivision, 13, 0, 3, 1);
 
         /*
          * Pending fight layer
@@ -178,10 +184,12 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
             new ScalableLabel("0:00"),
             new ScalableLabel("0:00")
         };
+        pendingDivision = new ScalableLabel(" ");
         layout.addComponent(pendingPlayer[0], 1, 2.5, 6, 1.5);
         layout.addComponent(pendingPlayer[1], 9, 2.5, 6, 1.5);
         layout.addComponent(pendingFightTimer[0], 2, 5, 4, 2);
         layout.addComponent(pendingFightTimer[1], 10, 5, 4, 2);
+        layout.addComponent(pendingDivision, 13, 0, 3, 1);
         
         for(int i = 0; i < 2; i++) {
             final int ii = i;
@@ -659,6 +667,9 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
             score[0][0].setVisible(false);
             score[1][0].setVisible(false);
         }
+        
+        division = new ScalableLabel(" ");
+        layout.addComponent(division, 13, 0, 3, 1);
 
         // set old KOKA's to invisible
         for(int i=0; i<2; i++) {
@@ -733,7 +744,8 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
 
         for(ScalableLabel label : new ScalableLabel[] {
                 timer,
-                goldenScore, goldenScoreApprove, vs} ) {
+                goldenScore, goldenScoreApprove, vs,
+                division, vsDivision, pendingDivision} ) {
             label.setForeground(Color.BLACK);
             label.setBackground(Color.WHITE);
         }
@@ -971,6 +983,15 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
             player[i].setText(model.getPlayerName(swapPlayers?1-i:i));
     }
     
+    private void updateDivision() {
+        String divisionName = model.getDivisionName();
+        boolean showDivision = !StringUtils.isEmpty(divisionName);
+        for(ScalableLabel label : new ScalableLabel[] { division, vsDivision, pendingDivision} ) {
+            label.setVisible(showDivision);
+            label.setText(showDivision ? divisionName : " ");
+        }
+    }
+    
     private void updateGoldenScore() {
         switch(model.getGoldenScoreMode()) {
             case ACTIVE:
@@ -1139,6 +1160,7 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
                 updateNoFight();
                 updateImages(false);
                 updatePendingFight();
+                updateDivision();
                 break;
             case SCORE:
                 updateScore();
@@ -1164,6 +1186,7 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
                 break;
             case FIGHT_PENDING:
                 updatePendingFight();
+                updateDivision();
                 break;
             case ALL:
                 updateTimer();
@@ -1177,6 +1200,7 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
                 updateImages(false);
                 updateGoldenScore();
                 updatePendingFight();
+                updateDivision();
                 break;
             default:
                 log.info("Unknown update event: " + update);
