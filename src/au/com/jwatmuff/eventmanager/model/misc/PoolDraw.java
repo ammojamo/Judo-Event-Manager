@@ -297,8 +297,12 @@ public class PoolDraw {
         this.seeds = new HashMap<>();
         // For each player in division, copy seed into new seeds map
         for (PlayerPoolInfo playerPoolInfo : playerPoolInfoList) {
-            int playerID = playerPoolInfo.getPlayer().getID();
-            this.seeds.put(playerID, seeds.get(playerID));
+            if(playerPoolInfo != null) {
+                int playerID = playerPoolInfo.getPlayer().getID();
+                if(seeds.containsKey(playerID)) {
+                    this.seeds.put(playerID, seeds.get(playerID));
+                }
+            }
         }
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
