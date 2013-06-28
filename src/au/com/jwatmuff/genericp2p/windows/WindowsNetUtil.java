@@ -16,6 +16,10 @@ import org.apache.log4j.Logger;
 public class WindowsNetUtil {
     private static final Logger log = Logger.getLogger(WindowsNetUtil.class);
     
+    public static boolean runningOnWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+    
     public static void logNetworkInfo() {
         log.info("Beginning network log");
         log.info(ExecUtil.getStdoutForCommand("NET VIEW"));

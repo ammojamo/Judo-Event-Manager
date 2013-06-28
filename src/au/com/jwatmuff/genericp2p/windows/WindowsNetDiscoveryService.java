@@ -41,6 +41,10 @@ public class WindowsNetDiscoveryService  extends AbstractDiscoveryService {
     
     @Override
     public void start() {
+        if(!WindowsNetUtil.runningOnWindows()) {
+            log.info("Not running on windows - skipping windows network discovery");
+            return;
+        }
         if(checkTimer != null) stop();
         checkTimer = new Timer(WindowsNetDiscoveryService.class.getSimpleName());
         checkTimer.schedule(checkTask, 0, 30000);
