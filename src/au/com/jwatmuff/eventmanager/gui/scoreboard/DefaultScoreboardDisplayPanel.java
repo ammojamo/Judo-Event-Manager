@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXImagePanel;
 
@@ -88,15 +89,22 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         double HOLD_DOWN_Y = 6;
         double HOLD_DOWN_WIDTH = 4;
         double HOLD_DOWN_HEIGHT = 4;
+        
+        double DIVISION_X = 13;
+        double DIVISION_Y = 0;
+        double DIVISION_WIDTH = 3;
+        double DIVISION_HEIGHT = 1;
     }
 
     private ScalableLabel timer;
     private ScalableLabel[] player;
     private ScalableLabel[][] scoreLabels;
     private ScalableLabel[][] score;
+    private ScalableLabel division;
 
     private ScalableLabel[] pendingPlayer;
     private ScalableLabel[] pendingFightTimer;
+    private ScalableLabel pendingDivision;
         
     private ScalableLabel[][] shido;
     
@@ -113,6 +121,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
 
     private ScalableLabel vsPlayer[];
     private ScalableLabel vs;
+    private ScalableLabel vsDivision;
     private JPanel vsLayer;
     
     private boolean swapPlayers;
@@ -170,9 +179,11 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
             new ScalableLabel("Player 2")
         };
         vs = new ScalableLabel("vs");
+        vsDivision = new ScalableLabel(" ");
         layout.addComponent(vsPlayer[0], 1, 1, 11, 3);
         layout.addComponent(vsPlayer[1], 4, 8, 11, 3);
         layout.addComponent(vs, 7, 5, 2, 2);
+        layout.addComponent(vsDivision, lv.DIVISION_X, lv.DIVISION_Y, lv.DIVISION_WIDTH, lv.DIVISION_HEIGHT);
 
         /*
          * Pending fight layer
@@ -191,10 +202,12 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
             new ScalableLabel("0:00"),
             new ScalableLabel("0:00")
         };
+        pendingDivision = new ScalableLabel(" ");
         layout.addComponent(pendingPlayer[0], 1, 2.5, 6, 1.5);
         layout.addComponent(pendingPlayer[1], 9, 2.5, 6, 1.5);
         layout.addComponent(pendingFightTimer[0], 2, 5, 4, 2);
         layout.addComponent(pendingFightTimer[1], 10, 5, 4, 2);
+        layout.addComponent(pendingDivision, lv.DIVISION_X, lv.DIVISION_Y, lv.DIVISION_WIDTH, lv.DIVISION_HEIGHT);
         
         /*
          * Winning result layer
@@ -291,6 +304,8 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
                 layout.addComponent(shido[i][j], lv.SHIDO_GROUP_X[i] + lv.SHIDO_X[j], lv.SHIDO_GROUP_Y[i] + lv.SHIDO_Y[j], lv.SHIDO_WIDTH, lv.SHIDO_HEIGHT);
             }
         }
+        division = new ScalableLabel(" ");
+        layout.addComponent(division, lv.DIVISION_X, lv.DIVISION_Y, lv.DIVISION_WIDTH, lv.DIVISION_HEIGHT);
         
         // remove ippon
         if(!lv.SCORE_SHOW_IPON) {
@@ -346,7 +361,8 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
 
         for(ScalableLabel label : new ScalableLabel[] {
                 timer,
-                goldenScore, goldenScoreApprove, vs} ) {
+                goldenScore, goldenScoreApprove, vs,
+                division, vsDivision, pendingDivision}) {
             label.setForeground(Color.BLACK);
             label.setBackground(Color.WHITE);
         }
@@ -544,6 +560,15 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
             player[i].setText(model.getPlayerName(swapPlayers?1-i:i));
     }
     
+    private void updateDivision() {
+        String divisionName = model.getDivisionName();
+        boolean showDivision = !StringUtils.isEmpty(divisionName);
+        for(ScalableLabel label : new ScalableLabel[] { division, vsDivision, pendingDivision} ) {
+            label.setVisible(showDivision);
+            label.setText(showDivision ? divisionName : " ");
+        }
+    }
+    
     private void updateGoldenScore() {
         switch(model.getGoldenScoreMode()) {
             case ACTIVE:
@@ -701,6 +726,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
                 updateNoFight();
                 updateImages(false);
                 updatePendingFight();
+                updateDivision();
                 break;
             case SCORE:
                 updateScore();
@@ -723,11 +749,13 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
                 break;
             case FIGHT_PENDING:
                 updatePendingFight();
+                updateDivision();
                 break;
             case ALL:
                 updateTimer();
                 updateHolddownTimer();
                 updatePlayers();
+                updateDivision();
                 updateScore();
                 updateShido();
                 updatePendingScores();

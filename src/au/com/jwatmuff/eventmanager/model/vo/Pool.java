@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -25,6 +26,7 @@ import java.util.Map;
  */
 public class Pool extends DistributableObject<Integer> implements Serializable {
     private String description;
+    private String shortName;
     private int minimumAge;
     private int maximumAge;
     private double minimumWeight;
@@ -68,8 +70,20 @@ public class Pool extends DistributableObject<Integer> implements Serializable {
         return description;
     }
 
+    public String getShortName() {
+        if(StringUtils.isEmpty(shortName) && !StringUtils.isEmpty(description)) {
+            return description.replaceAll("[a-z\\s]", "").replaceAll("[^0-9][0-9]+$", " $0");
+        } else {
+            return shortName;
+        }
+    }
+
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     public int getMinimumAge() {

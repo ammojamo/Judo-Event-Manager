@@ -48,6 +48,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     private int fightTime;
     private int goldenScoreTime;
     private String[] playerNames = new String[2];
+    private String divisionName;
 
     /* hold down related stuff */
     private Stopwatch holddownTimer;
@@ -147,7 +148,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     }
     
     @Override
-    public void reset(int fightTime, int goldenScoreTime, String[] playerNames) {
+    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String divisionName) {
         this.fightTime = fightTime;
         if (this.fightTime > 90 && system == ScoringSystem.NEW) {
             holddownTimeIpon = 20;
@@ -164,6 +165,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         }
         this.goldenScoreTime = goldenScoreTime;
         this.playerNames = playerNames;
+        this.divisionName = divisionName;
         stopTimer();
         cancelHolddownTimer();
         mainTimer.reset(fightTime * 1000);
@@ -183,8 +185,8 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     }
 
     @Override
-    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date lastFights[], int minimumBreak) {
-        reset(fightTime, goldenScoreTime, playerNames);
+    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date lastFights[], int minimumBreak, String divisionName) {
+        reset(fightTime, goldenScoreTime, playerNames, divisionName);
         for(int i=0; i<2; i++) {
             final int j = i;
             if(lastFights[i] == null) continue;
@@ -751,7 +753,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     public String getPlayerName(int player) {
         return playerNames[player];
     }
-    
+
+    @Override
+    public String getDivisionName() {
+        return divisionName;
+    }
+
     @Override
     public void endFight() {
         //reset(0, new String[] {"",""});

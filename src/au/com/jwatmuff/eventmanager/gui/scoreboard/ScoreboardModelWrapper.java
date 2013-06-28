@@ -132,6 +132,11 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
+    public String getDivisionName() {
+        return model.getDivisionName();
+    }
+
+    @Override
     public int getScore(int player, Score type) {
         return model.getScore(player, type);
     }
@@ -182,13 +187,13 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
-    public void reset(int fightTime, int goldenScoreTime, String[] playerNames) {
-        model.reset(fightTime, goldenScoreTime, playerNames);
+    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String divisionName) {
+        model.reset(fightTime, goldenScoreTime, playerNames, divisionName);
     }
 
     @Override
-    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date[] lastFights, int minimumBreak) {
-        model.reset(fightTime, goldenScoreTime, playerNames, lastFights, minimumBreak);
+    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date[] lastFights, int minimumBreak, String divisionName) {
+        model.reset(fightTime, goldenScoreTime, playerNames, lastFights, minimumBreak, divisionName);
     }
 
     @Override

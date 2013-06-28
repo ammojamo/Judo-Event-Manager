@@ -91,6 +91,8 @@ public interface ScoreboardModel {
     List<Score> getPendingScores(int player);
 
     String getPlayerName(int player);
+    
+    String getDivisionName();
 
     int getScore(int player, Score type);
 
@@ -114,9 +116,9 @@ public interface ScoreboardModel {
     
     ScoringColors getColors();
     
-    void reset(int fightTime, int goldenScoreTime, String[] playerNames);
+    void reset(int fightTime, int goldenScoreTime, String[] playerNames, String divisionName);
 
-    void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date lastFights[], int minimumBreak);
+    void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date lastFights[], int minimumBreak, String divisionName);
 
     void declarePlayerReady(int player);
 

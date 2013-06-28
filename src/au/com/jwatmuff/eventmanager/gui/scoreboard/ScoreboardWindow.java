@@ -140,8 +140,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         setupMenu();
         this.title = title;
         setTitle(title);
-        scoreboard = new ScoreboardEntryPanel(interactive);
-        fullscreen = new ScoreboardEntryPanel(interactive);
+        scoreboard = new DefaultScoreboardDisplayPanel();
+        fullscreen = new DefaultScoreboardDisplayPanel();
         setModel(new ScoreboardModelWrapper(model), false);
 
         getContentPane().setLayout(new GridLayout(1,1));
@@ -162,8 +162,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         setTitle(title);
 
         /* create scoreboard panels */
-        scoreboard = new ScoreboardEntryPanel(interactive);
-        fullscreen = new ScoreboardEntryPanel(interactive);
+        scoreboard = new DefaultScoreboardDisplayPanel();
+        fullscreen = new DefaultScoreboardDisplayPanel();
         
         /* put scoreboard panel into window */
         getContentPane().setLayout(new GridLayout(1,1));
@@ -265,7 +265,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                    (model.getMode() == Mode.NO_FIGHT)) {
                     ManualFightDialog mfd = new ManualFightDialog(ScoreboardWindow.this, true);
                     mfd.setVisible(true);
-                    model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()});
+                    model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()}, null);
                 }
             }
         });
@@ -274,7 +274,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             public void run() {
                 ManualFightDialog mfd = new ManualFightDialog(ScoreboardWindow.this, true);
                 mfd.setVisible(true);
-                model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()});
+                model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()}, null);
             }
         });
     }
@@ -478,7 +478,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
 
             Pool pool = database.get(Pool.class, currentFight.getPoolID());
 
-            model.reset(pool.getMatchTime(), pool.getGoldenScoreTime(), playerNames, lastFightTimes, pool.getMinimumBreakTime());
+            model.reset(pool.getMatchTime(), pool.getGoldenScoreTime(), playerNames, lastFightTimes, pool.getMinimumBreakTime(), pool.getShortName());
 
             SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, currentFight.getID());
             int fightNumber = SessionFightSequencer.getFightMatInfo(database, sf).fightNumber;

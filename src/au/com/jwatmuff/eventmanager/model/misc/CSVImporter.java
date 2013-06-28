@@ -192,6 +192,7 @@ public class CSVImporter {
         
         Map<String, String> columnMapping = new HashMap<String, String>();
         columnMapping.put("Division", "description");
+        columnMapping.put("Short Name", "shortName");
         columnMapping.put("Max Weight", "maximumWeight");
         columnMapping.put("Min Weight", "minimumWeight");
         columnMapping.put("Max Grade", "maximumGrade");

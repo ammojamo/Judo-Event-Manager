@@ -40,6 +40,7 @@ public class SQLitePoolDAO implements PoolDAO {
             ID_FIELD = "id",
             LOCKED_STATUS_FIELD = "locked_status",
             DESCRIPTION_FIELD = "description",
+            SHORT_NAME_FIELD = "short_name",
             MAXIMUM_AGE_FIELD = "max_age",
             MINIMUM_AGE_FIELD = "min_age",
             MAXIMUM_WEIGHT_FIELD = "max_weight",
@@ -70,6 +71,7 @@ public class SQLitePoolDAO implements PoolDAO {
 
             p.setID(rs.getInt(ID_FIELD));
             p.setDescription(rs.getString(DESCRIPTION_FIELD));
+            p.setShortName(rs.getString(SHORT_NAME_FIELD));
             p.setMaximumAge(rs.getInt(MAXIMUM_AGE_FIELD));
             p.setMinimumAge(rs.getInt(MINIMUM_AGE_FIELD));
             p.setMaximumWeight(rs.getDouble(MAXIMUM_WEIGHT_FIELD));
@@ -141,14 +143,14 @@ public class SQLitePoolDAO implements PoolDAO {
     
     @Override
     public void add(Pool p) {
-        final String sql = "INSERT INTO pool (id, description, max_age, min_age, max_weight, min_weight, max_grade, min_grade, gender, match_time, min_break_time, golden_score_time, template_name, places, draw_pools, locked_status, is_valid, last_updated) VALUES (:ID, :description, :maximumAge, :minimumAge, :maximumWeight, :minimumWeight, :maximumGrade, :minimumGrade, :gender, :matchTime, :minimumBreakTime, :goldenScoreTime, :templateName, :places, :drawPools, :lockedStatus, :valid, :timestamp);";
+        final String sql = "INSERT INTO pool (id, description, short_name, max_age, min_age, max_weight, min_weight, max_grade, min_grade, gender, match_time, min_break_time, golden_score_time, template_name, places, draw_pools, locked_status, is_valid, last_updated) VALUES (:ID, :description, :shortName, :maximumAge, :minimumAge, :maximumWeight, :minimumWeight, :maximumGrade, :minimumGrade, :gender, :matchTime, :minimumBreakTime, :goldenScoreTime, :templateName, :places, :drawPools, :lockedStatus, :valid, :timestamp);";
         SqlParameterSource params = getSqlParams(p);
         template.update(sql, params);
     }
     
     @Override
     public void update(Pool p) {
-        final String sql = "UPDATE pool SET description=:description, max_age=:maximumAge, min_age=:minimumAge, max_weight=:maximumWeight, min_weight=:minimumWeight, max_grade=:maximumGrade, min_grade=:minimumGrade, gender=:gender, match_time=:matchTime, min_break_time=:minimumBreakTime, golden_score_time=:goldenScoreTime, template_name=:templateName, places=:places, draw_pools=:drawPools, locked_status=:lockedStatus, is_valid=:valid, last_updated=:timestamp WHERE id=:ID";
+        final String sql = "UPDATE pool SET description=:description, short_name=:shortName, max_age=:maximumAge, min_age=:minimumAge, max_weight=:maximumWeight, min_weight=:minimumWeight, max_grade=:maximumGrade, min_grade=:minimumGrade, gender=:gender, match_time=:matchTime, min_break_time=:minimumBreakTime, golden_score_time=:goldenScoreTime, template_name=:templateName, places=:places, draw_pools=:drawPools, locked_status=:lockedStatus, is_valid=:valid, last_updated=:timestamp WHERE id=:ID";
         SqlParameterSource params = getSqlParams(p);
         template.update(sql, params);
     }

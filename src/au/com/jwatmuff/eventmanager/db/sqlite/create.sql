@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS player (
 CREATE TABLE IF NOT EXISTS pool (
   id INTEGER NOT NULL ,
   description VARCHAR(512) NOT NULL,
+  short_name VARCHAR(256),
   max_age INTEGER NOT NULL,
   min_age INTEGER NOT NULL,
   max_weight REAL,

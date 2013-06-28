@@ -13,6 +13,7 @@ import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer;
 import au.com.jwatmuff.eventmanager.model.misc.UpcomingFightFinder;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
+import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
@@ -54,6 +55,7 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
     ScalableLabel[] numbers;
     ScalableLabel[] player1s;
     ScalableLabel[] player2s;
+    ScalableLabel[] divisions;
 
     /** Creates new form FightProgressionPanel */
     public FightProgressionPanel(Session matSession, boolean displayMatName, int layoutType, int noVertCells, int noHorizCells, double screenHight, double screenWidth) {
@@ -71,10 +73,12 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
         numbers = new ScalableLabel[noVertCells*noHorizCells];
         player1s = new ScalableLabel[noVertCells*noHorizCells];
         player2s = new ScalableLabel[noVertCells*noHorizCells];
+        divisions = new ScalableLabel[noVertCells*noHorizCells];
         for(int i = 0; i < noVertCells*noHorizCells; i++){
             numbers[i] = new ScalableLabel(" ");
             player1s[i] = new ScalableLabel(" ");
             player2s[i] = new ScalableLabel(" ");
+            divisions[i] = new ScalableLabel(" ");
         }
 
         double borderRatio = 0.1;
@@ -89,6 +93,7 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
         double borderWidth;
         double numberWidth;
         double textWidth;
+        double divisionWidth;
 
         if (layoutType == 0) {
             if (displayMatName) {
@@ -112,19 +117,22 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
 
             now = new ScalableLabel("Now", impact);
 
-            layout.addComponent(now, new Rectangle.Double(borderWidth, cellStart+borderWidth, numberWidth, textHight));
+            layout.addComponent(now, new Rectangle.Double(borderWidth, cellStart+borderWidth, numberWidth, textHight * 0.75));
             now.setBorder(new EmptyBorder(0,0,0,0));
             numbers[0].setBorder(new EmptyBorder(0,0,0,0));
+            divisions[0].setBorder(new EmptyBorder(0,0,0,0));
             layout.addComponent(player1s[0], new Rectangle.Double(borderWidth+numberWidth, cellStart+borderWidth, textWidth, textHight));
             layout.addComponent(player2s[0], new Rectangle.Double(borderWidth+numberWidth, cellStart+borderWidth+textHight, textWidth, textHight));
-            layout.addComponent(numbers[0], new Rectangle.Double(borderWidth, cellStart+borderWidth+textHight, numberWidth, textHight));
+            layout.addComponent(numbers[0], new Rectangle.Double(borderWidth, cellStart+borderWidth+textHight * 0.75, numberWidth, textHight * 0.75));
+            layout.addComponent(divisions[0], new Rectangle.Double(borderWidth, cellStart+borderWidth+textHight * 1.5, numberWidth, textHight * 0.5));
 
             for(int a = 0; a < noVertCells; a++){
                 for(int b = 0; b < noHorizCells; b++){
                     if( a > 0 || b > 0){
                         layout.addComponent(player1s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHight+borderWidth, textWidth, textHight));
                         layout.addComponent(player2s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHight+borderWidth+textHight, textWidth, textHight));
-                        layout.addComponent(numbers[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth, cellStart+a*cellHight+borderWidth, numberWidth, 2.0*textHight));
+                        layout.addComponent(numbers[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth, cellStart+a*cellHight+borderWidth, numberWidth, 1.5*textHight));
+                        layout.addComponent(divisions[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth, cellStart+a*cellHight+borderWidth + 1.5*textHight, numberWidth, 0.5*textHight));
                     }
                 }
             }
@@ -142,7 +150,8 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
             textHight = cellHight/(1+2.0*borderRatio);
             borderWidth = borderRatio*textHight;
             numberWidth = textHight*numberRatio;
-            textWidth = (cellWidth-(2.0*borderWidth+numberWidth))/2.0;
+            divisionWidth = numberWidth;
+            textWidth = (cellWidth-(2.0*borderWidth+numberWidth+divisionWidth))/2.0;
 
             if (displayMatName) {
                 layout.addComponent(matTitle, new Rectangle.Double(borderWidth, borderWidth, screenWidth-2.0*borderWidth, 2.0*textHight));
@@ -154,15 +163,17 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
             layout.addComponent(now, new Rectangle.Double(borderWidth, cellStart+borderWidth, numberWidth, textHight));
             now.setBorder(new EmptyBorder(0,0,0,0));
             numbers[0].setBorder(new EmptyBorder(0,0,0,0));
-            layout.addComponent(player1s[0], new Rectangle.Double(borderWidth+numberWidth, cellStart+borderWidth, textWidth, textHight));
-            layout.addComponent(player2s[0], new Rectangle.Double(borderWidth+numberWidth+textWidth, cellStart+borderWidth, textWidth, textHight));
+            layout.addComponent(player1s[0], new Rectangle.Double(borderWidth+numberWidth+divisionWidth, cellStart+borderWidth, textWidth, textHight));
+            layout.addComponent(player2s[0], new Rectangle.Double(borderWidth+numberWidth+divisionWidth+textWidth, cellStart+borderWidth, textWidth, textHight));
+            layout.addComponent(divisions[0], new Rectangle.Double(borderWidth+numberWidth, cellStart+borderWidth, divisionWidth, textHight));
 
             for(int a = 0; a < noVertCells; a++){
                 for(int b = 0; b < noHorizCells; b++){
                     if( a > 0 || b > 0){
-                        layout.addComponent(player1s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHight+borderWidth, textWidth, textHight));
-                        layout.addComponent(player2s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth+textWidth, cellStart+a*cellHight+borderWidth, textWidth, textHight));
+                        layout.addComponent(player1s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth+divisionWidth, cellStart+a*cellHight+borderWidth, textWidth, textHight));
+                        layout.addComponent(player2s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth+divisionWidth+textWidth, cellStart+a*cellHight+borderWidth, textWidth, textHight));
                         layout.addComponent(numbers[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth, cellStart+a*cellHight+borderWidth, numberWidth, textHight));
+                        layout.addComponent(divisions[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHight+borderWidth, numberWidth, textHight));
                     }
                 }
             }
@@ -202,9 +213,11 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
             if(a == 0) {
                 numbers[a].setForeground(colors.getColor(Area.IDLE_FOREGROUND));
                 numbers[a].setBackground(colors.getColor(Area.IDLE_BACKGROUND));
+                divisions[a].setBackground(colors.getColor(Area.IDLE_BACKGROUND));
             } else {
                 numbers[a].setForeground(colors.getColor(Area.FIGHTING_FOREGROUND));
                 numbers[a].setBackground(colors.getColor(Area.FIGHTING_BACKGROUND));
+                divisions[a].setBackground(colors.getColor(Area.FIGHTING_BACKGROUND));
             }
             player1s[a].setForeground(colors.getColor(Area.PLAYER1_FOREGROUND));
             player2s[a].setForeground(colors.getColor(Area.PLAYER2_FOREGROUND));
@@ -257,6 +270,10 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
                             player1s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[0], f.getPoolID()).toString());
                         if(!player2s[a].getText().equals(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString()))
                             player2s[a].setText(PlayerCodeParser.parseCode(database, f.getPlayerCodes()[1], f.getPoolID()).toString());
+                        
+                        Pool p = database.get(Pool.class, f.getPoolID());
+                        if(!divisions[a].getText().equals(p.getShortName()));
+                            divisions[a].setText(p.getShortName());
                     } else {
                         if(!numbers[a].getText().equals(""))
                             numbers[a].setText("");
@@ -264,6 +281,8 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
                             player1s[a].setText("");
                         if(!player2s[a].getText().equals(""))
                             player2s[a].setText("");
+                        if(!divisions[a].getText().equals(""))
+                            divisions[a].setText("");
                     }
                 }
             } else {
