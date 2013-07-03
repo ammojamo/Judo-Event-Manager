@@ -958,9 +958,9 @@ public class ScoreboardEntryPanel extends ScoreboardPanel implements ScoreboardM
                 if(winScore == Score.IPPON) {
                         if(model.getShido(1 - model.getWinningPlayer()) == 4)
                             displayed = "H";
-                        else if(model.getShido(1 - model.getWinningPlayer()) == 3 &&
-                                model.getScore(model.getWinningPlayer(), Score.WAZARI) == 2)
-                            displayed = "S";
+//                        else if(model.getShido(1 - model.getWinningPlayer()) == 3 &&
+//                                model.getScore(model.getWinningPlayer(), Score.WAZARI) == 2)
+//                            displayed = "S";
                         else
                             displayed = "I";
                 } else {
