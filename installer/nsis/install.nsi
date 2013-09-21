@@ -1,7 +1,7 @@
 Name "Event Manager 2013"
 Caption "Event Manager 2013"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2013.exe"
+OutFile "EventManagerSetup-2013-Update1.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
@@ -60,8 +60,8 @@ Section "Install Java"
 
   installjava:
 
-  File ..\thirdparty\jre-7u21-windows-i586.exe
-  ExecWait "$INSTDIR\jre-7u21-windows-i586.exe"
+  File ..\thirdparty\jre-7u25-windows-i586.exe
+  ExecWait "$INSTDIR\jre-7u25-windows-i586.exe"
 
   installjavadone:
 
