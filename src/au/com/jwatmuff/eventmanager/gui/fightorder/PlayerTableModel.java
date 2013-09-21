@@ -38,9 +38,9 @@ public abstract class PlayerTableModel extends BeanMapperTableModel<PlayerPoolIn
                 Map<String,Object> map = new HashMap<String, Object>();
                 if(bean != null) {
                     if(bean.getPlayer().getTeam().isEmpty()){
-                        map.put("name", "P" + bean.getPlayerPool().getPlayerPosition() + ": "+ bean.getPlayer().getFirstName() + " " + bean.getPlayer().getLastName());
+                        map.put("name", "P" + bean.getPlayerPool().getPlayerPosition() + ": "+ bean.getPlayer().getFirstName() + " " + bean.getPlayer().getLastName() + "   (" + bean.getPlayer().getWeight() + " kg )");
                     } else {
-                        map.put("name", "P" + bean.getPlayerPool().getPlayerPosition() + ": "+ bean.getPlayer().getFirstName() + " " + bean.getPlayer().getLastName() + "   (" + bean.getPlayer().getTeam() + ")");
+                        map.put("name", "P" + bean.getPlayerPool().getPlayerPosition() + ": "+ bean.getPlayer().getFirstName() + " " + bean.getPlayer().getLastName() + "   (" + bean.getPlayer().getWeight() + " kg - " + bean.getPlayer().getTeam() + ")");
                     }
                 } else {
                     map.put("name", "BYE");

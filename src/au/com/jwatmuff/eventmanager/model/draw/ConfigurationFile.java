@@ -58,6 +58,14 @@ public class ConfigurationFile {
         }
     }
 
+    public double getDoubleProperty(String propertyName, double defaultValue) {
+        try {
+            return Double.parseDouble(properties.getProperty(propertyName));
+        } catch(Exception e) {
+            return defaultValue;
+        }
+    }
+
     public boolean getBooleanProperty(String propertyName, boolean defaultValue) {
         try {
             return properties.getProperty(propertyName).equalsIgnoreCase("true");

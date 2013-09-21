@@ -83,8 +83,8 @@ public class FightInfo {
             return null;
     }
 
-    public int getWinningPlayerSimpleScore(ConfigurationFile configurationFile) {
-        int[] simpleScores = r.getSimpleScores(configurationFile);
+    public double getWinningPlayerSimpleScore(ConfigurationFile configurationFile) {
+        double[] simpleScores = r.getSimpleScores(configurationFile);
         if(resultKnown())
             return simpleScores[getWinningPlayerIndex()];
         else
@@ -105,5 +105,9 @@ public class FightInfo {
 
     public int getLosingPlayerID() {
             return r.getPlayerIDs()[getLosingPlayerIndex()];
+    }
+
+    public int getFightTime() {
+            return r.getDuration();
     }
 }

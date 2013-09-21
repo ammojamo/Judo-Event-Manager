@@ -259,7 +259,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                     PlayerPool pp = database.get(PlayerPool.class, new PlayerPool.Key(player.getID(), pool.getID()));
                     if(pp.getSeed() > 0) str += "[" + pp.getSeed() + "] ";
                 } catch(Exception e) {}
-                str += player.getFirstName() + " " + player.getLastName() + " (" + player.getTeam() + ")";
+                str += player.getFirstName() + " " + player.getLastName() + "   (" + player.getWeight() + " kg - "+ player.getTeam() + ")";
 
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, str, index, isSelected, hasFocus);
                 if (player.getLockedStatus() != Player.LockedStatus.LOCKED) {

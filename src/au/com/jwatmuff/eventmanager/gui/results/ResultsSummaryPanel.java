@@ -190,6 +190,7 @@ public class ResultsSummaryPanel extends javax.swing.JPanel implements Transacti
                 r.setFightID(f1.getID());
                 r.setPlayerIDs(ri.getResult().getPlayerIDs());
                 r.setScores(crd.getScores());
+                r.setDuration(ri.getResult().getDuration());
                 database.add(r);
             }
         } else {

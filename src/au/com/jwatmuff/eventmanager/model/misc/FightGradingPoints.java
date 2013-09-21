@@ -35,7 +35,7 @@ public class FightGradingPoints {
         result = ri;
         ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
         Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
-        int[] scores = ri.getResult().getSimpleScores(database);
+        double[] scores = ri.getResult().getSimpleScores(database);
         int winner = scores[0] > scores[1] ? 0 : 1;
         int loser = 1 - winner;
         
@@ -74,7 +74,7 @@ public class FightGradingPoints {
     public int calculatePoints(ResultInfo info, Grade loserGrade, Database database) {
         if(loserGrade == null) return 0;
 
-        int[] score = info.getResult().getSimpleScores(database);
+        double[] score = info.getResult().getSimpleScores(database);
         if(score[0] == score[1]) return 0;
         int w = (score[0] > score[1]) ? 0 : 1;
         int l = 1-w;

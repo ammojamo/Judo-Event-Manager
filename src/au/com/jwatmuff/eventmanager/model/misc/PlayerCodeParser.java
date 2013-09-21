@@ -104,16 +104,53 @@ public class PlayerCodeParser {
         int playerID;
         int playerPos1;
         int playerPos2;
-        Map<Integer,Integer>  fightPoints = new HashMap<Integer,Integer>();
+        Map<Integer,Double>  fightPoints = new HashMap<Integer,Double>();
         int wins;
-        int points;
+        double points;
+        int time;
+        double weight;
         int place;
         }
 
-    private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_RR = new Comparator<PlayerRRScore>(){
+    private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_RR_WPTW = new Comparator<PlayerRRScore>(){
             @Override
             public int compare(PlayerRRScore p0, PlayerRRScore p1) {
-                return (p1.wins - p0.wins != 0) ? p1.wins - p0.wins : p1.points - p0.points;
+                if(p1.wins - p0.wins != 0){
+                    return (p1.wins - p0.wins);
+                }else if(p1.points - p0.points != 0){
+                    if(p1.points - p0.points > 0){
+                        return 1;
+                    }else{
+                        return -1;
+                    }
+                }else if(p1.time - p0.time != 0){
+                    return -(p1.time - p0.time);
+                }else if(p1.weight - p0.weight != 0){
+                    if(p1.weight - p0.weight > 0){
+                        return -1;
+                    }else{
+                        return 1;
+                    }                        
+                }else{
+                    return 0;
+                }
+            }
+        };
+
+    private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_RR_WP = new Comparator<PlayerRRScore>(){
+            @Override
+            public int compare(PlayerRRScore p0, PlayerRRScore p1) {
+                if(p1.wins - p0.wins != 0){
+                    return (p1.wins - p0.wins);
+                }else if(p1.points - p0.points != 0){
+                    if(p1.points - p0.points > 0){
+                        return 1;
+                    }else{
+                        return -1;
+                    }          
+                }else{
+                    return 0;
+                }
             }
         };
 
@@ -281,7 +318,7 @@ public class PlayerCodeParser {
         
         if(codes.length == 1){
             if(parseredCodes.containsKey(codes[0])){
-//                System.out.println(codes[0]);
+// System.out.println(codes[0]);
                 return parseredCodes.get(codes[0]);
             }
             // Use prefix to work out which parsing method to call
@@ -296,7 +333,7 @@ public class PlayerCodeParser {
             }
             else if(prefix.matches(matcherRoundRobin)){
                 parseredCodes.put(codes[0], parseRRCode(codes[0]));
-                System.out.println(codes[0] + " " + parseredCodes.get(codes[0]).toString());
+// System.out.println(codes[0] + " " + parseredCodes.get(codes[0]).toString());
                 return parseredCodes.get(codes[0]);
             }
             else if(prefix.matches(matcherBestOfThree)){
@@ -584,6 +621,7 @@ public class PlayerCodeParser {
                     playerRRScore.wins = 0;
                     playerRRScore.points = 0;
                     playerRRScore.place = 0;
+                    playerRRScore.weight = fightPlayer.player.getWeight();
                     playerRRScoresMap.put(playerRRScore.playerID,playerRRScore);
                 }
             }
@@ -592,16 +630,16 @@ public class PlayerCodeParser {
 //Calculate accumulated wins and points
         for(FightInfo fightInfo : roundRobinFightInfoList) {
             if(fightInfo.resultKnown()){
-                int winningPlayerSimpleScore = fightInfo.getWinningPlayerSimpleScore(configurationFile);
+                double winningPlayerSimpleScore = fightInfo.getWinningPlayerSimpleScore(configurationFile);
                 PlayerRRScore winPlayerRRScore = playerRRScoresMap.get(fightInfo.getWinningPlayerID());
                 winPlayerRRScore.wins = winPlayerRRScore.wins+1;
                 winPlayerRRScore.points = winPlayerRRScore.points + winningPlayerSimpleScore;
-                playerRRScoresMap.put(fightInfo.getWinningPlayerID(), winPlayerRRScore);
                 winPlayerRRScore.fightPoints.put(fightInfo.getLosingPlayerID(),winningPlayerSimpleScore);
+                winPlayerRRScore.time = winPlayerRRScore.time + fightInfo.getFightTime();
                 playerRRScoresMap.put(fightInfo.getWinningPlayerID(), winPlayerRRScore);
 
                 PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightInfo.getLosingPlayerID());
-                losePlayerRRScore.fightPoints.put(fightInfo.getWinningPlayerID(),0);
+                losePlayerRRScore.fightPoints.put(fightInfo.getWinningPlayerID(),0.0);
                 playerRRScoresMap.put(fightInfo.getLosingPlayerID(), losePlayerRRScore);
             } else {
                 String[] codes = fightInfo.getAllPlayerCode();
@@ -613,23 +651,23 @@ public class PlayerCodeParser {
                     if(fightPlayers[0].playerPoolInfo.isWithdrawn()){
                         PlayerRRScore winPlayerRRScore = playerRRScoresMap.get(fightPlayers[1].player.getID());
                         winPlayerRRScore.wins = winPlayerRRScore.wins+1;
-                        winPlayerRRScore.points = winPlayerRRScore.points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
-                        winPlayerRRScore.fightPoints.put(fightPlayers[0].player.getID(),configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10));
+                        winPlayerRRScore.points = winPlayerRRScore.points + configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 10);
+                        winPlayerRRScore.fightPoints.put(fightPlayers[0].player.getID(),configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 10));
                         playerRRScoresMap.put(fightPlayers[1].player.getID(), winPlayerRRScore);
 
                         PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightPlayers[0].player.getID());
-                        losePlayerRRScore.fightPoints.put(fightPlayers[1].player.getID(),0);
+                        losePlayerRRScore.fightPoints.put(fightPlayers[1].player.getID(),0.0);
                         playerRRScoresMap.put(fightPlayers[0].player.getID(), losePlayerRRScore);
 
                     }else if(fightPlayers[1].playerPoolInfo.isWithdrawn()){
                         PlayerRRScore winPlayerRRScore = playerRRScoresMap.get(fightPlayers[0].player.getID());
                         winPlayerRRScore.wins = winPlayerRRScore.wins+1;
-                        winPlayerRRScore.points = winPlayerRRScore.points + configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
-                        winPlayerRRScore.fightPoints.put(fightPlayers[1].player.getID(),configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10));
+                        winPlayerRRScore.points = winPlayerRRScore.points + configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 10);
+                        winPlayerRRScore.fightPoints.put(fightPlayers[1].player.getID(),configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 10));
                         playerRRScoresMap.put(fightPlayers[0].player.getID(), winPlayerRRScore);
 
                         PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightPlayers[1].player.getID());
-                        losePlayerRRScore.fightPoints.put(fightPlayers[0].player.getID(),0);
+                        losePlayerRRScore.fightPoints.put(fightPlayers[0].player.getID(),0.0);
                         playerRRScoresMap.put(fightPlayers[1].player.getID(), losePlayerRRScore);
                     }
                 }
@@ -682,8 +720,12 @@ public class PlayerCodeParser {
     private List<PlayerRRScore> roundRobinResults(CodeType codeType, List<FightInfo> roundRobinFightInfoList) {
 
         List<PlayerRRScore> playerRRScoresList = roundRobinScores(roundRobinFightInfoList);
-
-        Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_RR;
+        Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR;
+        if (roundRobinSeperation.contentEquals("WinsPointsTimeWeight")) {
+            PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_RR_WPTW;
+        }else{
+            PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_RR_WP;
+        }
         Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR = PLAYERS_POS2_COMPARATOR_RR;
         if(codeType == CodeType.BESTOFTHREE){
             PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_BT;
@@ -948,7 +990,7 @@ public class PlayerCodeParser {
         if(!isValidCode(codes[0]) || !isValidCode(codes[1])){
             return false;
         }
-//        System.out.print(codes[0]);
+// System.out.print(codes[0]);
         FightPlayer fightPlayer0 = parseCode(codes[0]);
         FightPlayer fightPlayer1 = parseCode(codes[1]);
         if(fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.player != null && fightPlayer1.player != null)
@@ -969,6 +1011,25 @@ public class PlayerCodeParser {
         }
 
         return dependentFights;
+    }
+
+    public ArrayList<Integer> getContingentFights(int fightPosition) {
+        ArrayList<Integer> contingentFights = new ArrayList<Integer>();
+        contingentFights.add(fightPosition);
+        
+        for (int i = fightPosition; i < fightInfoList.size(); i++) {
+            for(String code : fightInfoList.get(i-1).getAllPlayerCode()) {
+                List<Integer> ascendantNumbers = PlayerCodeParser.getAscendant(code);
+                if (ascendantNumbers.contains(fightPosition)) {
+                    contingentFights.addAll(getContingentFights(i));
+                }
+            }
+        }
+        return contingentFights;
+    }
+
+    public ArrayList<Integer> getFinalsFights() {
+        return finalsFights;
     }
 
     public ArrayList<Integer> getSameTeamFightsFirst() {
@@ -1089,9 +1150,11 @@ public class PlayerCodeParser {
     private Pool pool;
     private List<PlayerPoolInfo> playerInfoList;
     private List<FightInfo> fightInfoList;
-    private ConfigurationFile configurationFile;
+    private ConfigurationFile configurationFile;    
+    private String roundRobinSeperation;
     private boolean isRoundRobinDraw = false;
     private ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
+    private ArrayList<Integer> finalsFights = new ArrayList<Integer>();
     Map<String,FightPlayer> parseredCodes = new HashMap<String,FightPlayer>();
 
     private PlayerCodeParser(Database database, int poolID) {
@@ -1129,11 +1192,23 @@ public class PlayerCodeParser {
         
 // initiate fights with same team and check for round robin.
         configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
+        roundRobinSeperation = configurationFile.getProperty("defaultRoundRobinSeperation");
         List<Place> places = pool.getPlaces();
         for(Place place : places) {
             CodeInfo codeInfo = getCodeInfo(place.code);
             if(codeInfo.type == CodeType.ROUNDROBIN)
                 isRoundRobinDraw = true;
+        }
+        for(Place place : places) {
+            CodeInfo codeInfo = getCodeInfo(place.code);
+            if(codeInfo.type == CodeType.WINNERLOOSER){
+                ArrayList<Integer> contingentFights = getContingentFights(codeInfo.number);
+                if (contingentFights.size()==1 && !finalsFights.contains(codeInfo.number)){
+                    finalsFights.add(codeInfo.number);
+                }
+            } else {
+                break;
+            }
         }
         for(FightInfo fightInfo : fightInfoList) {
             String[] codes = fightInfo.getAllPlayerCode();

@@ -73,35 +73,35 @@ public class Result extends DistributableObject<Integer> {
     }
 
 
-    public int[] getSimpleScores(Database database) {
+    public double[] getSimpleScores(Database database) {
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
         return getSimpleScores(configurationFile);
     }
 
-    public int[] getSimpleScores(ConfigurationFile configurationFile) {
-        int[] simple = {0,0};
-        int simpleScore = 0;
+    public double[] getSimpleScores(ConfigurationFile configurationFile) {
+        double[] simple = {0,0};
+        double simpleScore = 0;
 
         if (scores[0].getDecision() != scores[1].getDecision()) {
-            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsDecision", 1);
+            simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsDecision", 0.5);
         }
         else if (scores[0].getIppon() != scores[1].getIppon()) {
-            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+            simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 100);
         }
         else if(scores[0].getWazari() != scores[1].getWazari()) {
             if(Math.max(scores[0].getWazari(),scores[1].getWazari()) == 2) {
-                simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsIppon", 10);
+                simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 100);
             }
             else {
-                simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsWazari", 7);
+                simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsWazari", 10);
             }
         }
         else if (scores[0].getYuko() != scores[1].getYuko()) {
-            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsYuko", 5);
+            simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsYuko", 1);
         }
         else if (scores[0].getShido() != scores[1].getShido()) {
-            simpleScore  = configurationFile.getIntegerProperty("defaultVictoryPointsDecision", 1);
+            simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsShido", 0.5);
         }
         if (scores[0].compareTo(scores[1])>0) {
             simple[0] = simpleScore;
