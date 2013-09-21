@@ -269,15 +269,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         if(holddownMode == HolddownMode.ACTIVE)
             return;
 
-        /* No longer want to set score to zero when golden score is activated */
-        /*
-        for(int i=0; i<2; i++) {
-            shido[i] = 0;
-            for(int j=0; j<Score.values().length; j++)
-                score[i][j] = 0;
-        }
-        */
-
         notifyListeners(ScoreboardUpdate.SCORE);
         notifyListeners(ScoreboardUpdate.SHIDO);
         
@@ -725,21 +716,23 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     public Win getWin() {
         return win;
     }
-
-    @Override
-    public int getWinPoints() {
-        if(win == null) return 0;
-        /* once golden score has started, any win is awarded as a decision (1 point) */
-        if(goldenScoreMode == GoldenScoreMode.ACTIVE ||
-           goldenScoreMode == GoldenScoreMode.FINISHED ) {
-            return 1;
-        }
-        else return win.score.points;
-    }
     
     public void setGoldenScoreMode(GoldenScoreMode goldenScoreMode) {
         if(this.goldenScoreMode != goldenScoreMode) {
             this.goldenScoreMode = goldenScoreMode;
+            if(this.goldenScoreMode == GoldenScoreMode.INACTIVE) {
+                mainTimer.direction(false);
+            }else{
+                if(system == ScoringSystem.NEW) {
+                    if (goldenScoreTime == 0) {
+                        mainTimer.direction(true);
+                    } else {
+                        mainTimer.direction(false);
+                    }
+                } else {
+                    mainTimer.direction(false);
+                }
+            }
             notifyListeners(ScoreboardUpdate.GOLDEN_SCORE);
         }
     }

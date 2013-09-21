@@ -325,14 +325,20 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                             score.setWazari(model.getScore(i, ScoreboardModel.Score.WAZARI));
                             score.setYuko(model.getScore(i, ScoreboardModel.Score.YUKO));
                             score.setShido(model.getShido(i));
-                            if(goldenScore && model.getWinningPlayer() == i) score.setDecision(1);
+                            if(model.getWin() == ScoreboardModel.Win.BY_DECISION && model.getWinningPlayer() == i) score.setDecision(1);
                             scores[i] = score;
                         }
                         
                         // Work out fight duration
                         Pool pool = ScoreboardWindow.this.database.get(Pool.class, currentFight.getPoolID());
                         int fightDuration = pool.getMatchTime() - model.getTime();
-                        if(goldenScore) fightDuration += pool.getGoldenScoreTime();
+                        if(goldenScore) {
+                            if(pool.getGoldenScoreTime() == 0) {
+                                fightDuration = pool.getMatchTime() + model.getTime();
+                            } else {
+                                fightDuration = pool.getMatchTime() + pool.getGoldenScoreTime() - model.getTime();
+                            }
+                        }
                         r.setDuration(fightDuration);
 
                         //model.getTime()
@@ -736,11 +742,11 @@ private void setTimeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
     if(dialog.isMainTimeSet()) {
         model.setTimer(dialog.getMainTime());
     }
-    if(dialog.isHolddownTimeSet()) {
-        model.setHolddownTimer(dialog.getHolddownTime());
-    }
     if(scoresEqual) {
         model.setGoldenScoreMode(dialog.getGoldenScore() ? GoldenScoreMode.ACTIVE : GoldenScoreMode.INACTIVE);
+    }
+    if(dialog.isHolddownTimeSet()) {
+        model.setHolddownTimer(dialog.getHolddownTime());
     }
 }//GEN-LAST:event_setTimeMenuItemActionPerformed
 

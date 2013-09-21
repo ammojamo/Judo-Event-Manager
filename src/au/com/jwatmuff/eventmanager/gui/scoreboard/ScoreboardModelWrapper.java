@@ -157,11 +157,6 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
-    public int getWinPoints() {
-        return model.getWinPoints();
-    }
-
-    @Override
     public int getWinningPlayer() {
         return model.getWinningPlayer();
     }

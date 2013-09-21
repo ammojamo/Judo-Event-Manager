@@ -102,8 +102,6 @@ public interface ScoreboardModel {
 
     Win getWin();
 
-    int getWinPoints();
-
     int getWinningPlayer();
 
     boolean isHolddownActivated();
