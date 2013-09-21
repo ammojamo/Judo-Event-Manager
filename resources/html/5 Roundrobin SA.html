@@ -1,0 +1,561 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <title></title>
+</head>
+
+<body>
+#if($fullDocument) #parse("resources/html/draw-header.html") #else #if($first)
+#set($first=false) #else 
+
+<p class="break">#end #end </p>
+
+<table class="repechage" style="font-size: 70%">
+  <tbody>
+    <tr>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px">                           </th>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+    </tr>
+    <tr>
+      <td> </td>
+      <td class="borderTitle1" rowspan="2" colspan="10">$!competitionName</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td class="borderTitle2" colspan="10">$!competitionInfo</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td colspan="12" class="borderFixWidth"> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td class="borderTitle1" rowspan="2" colspan="10">$!division</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <th rowspan="8"> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th rowspan="8"> </th>
+    </tr>
+    <tr>
+      <th> </th>
+      <td colspan="2"> </td>
+      <td class="borderSquarePlayerNo">1</td>
+      <td class="borderSquarePlayerNo">2</td>
+      <td class="borderSquarePlayerNo">3</td>
+      <td class="borderSquarePlayerNo">4</td>
+      <td class="borderSquarePlayerNo">5</td>
+      <td class="borderSquareTitle">Wins</td>
+      <td class="borderSquareTitle">Pts</td>
+    </tr>
+    <tr>
+      <td class="borderSquarePlayerNo">1 </td>
+      <td class="borderPlayer">$!RAP1</td>
+      <td class="borderPlayerInfo">$!RAPRegion1</td>
+      <td class="borderSquareNoFight">X</td>
+      <td class="borderSquare">$!RAP1P2  </td>
+      <td class="borderSquare">$!RAP1P3  </td>
+      <td class="borderSquare">$!RAP1P4  </td>
+      <td class="borderSquare">$!RAP1P5  </td>
+      <td class="borderSquare">$!RAWins1  </td>
+      <td class="borderSquare">$!RAPoints1  </td>
+    </tr>
+    <tr>
+      <td class="borderSquarePlayerNo">2 </td>
+      <td class="borderPlayer">$!RAP2</td>
+      <td class="borderPlayerInfo">$!RAPRegion2</td>
+      <td class="borderSquare">$!RAP2P1  </td>
+      <td class="borderSquareNoFight">X</td>
+      <td class="borderSquare">$!RAP2P3  </td>
+      <td class="borderSquare">$!RAP2P4  </td>
+      <td class="borderSquare">$!RAP2P5  </td>
+      <td class="borderSquare">$!RAWins2  </td>
+      <td class="borderSquare">$!RAPoints2  </td>
+    </tr>
+    <tr>
+      <td class="borderSquarePlayerNo">3 </td>
+      <td class="borderPlayer">$!RAP3</td>
+      <td class="borderPlayerInfo">$!RAPRegion3</td>
+      <td class="borderSquare">$!RAP3P1  </td>
+      <td class="borderSquare">$!RAP3P2  </td>
+      <td class="borderSquareNoFight">X</td>
+      <td class="borderSquare">$!RAP3P4  </td>
+      <td class="borderSquare">$!RAP3P5  </td>
+      <td class="borderSquare">$!RAWins3  </td>
+      <td class="borderSquare">$!RAPoints3  </td>
+    </tr>
+    <tr>
+      <td class="borderSquarePlayerNo">4 </td>
+      <td class="borderPlayer">$!RAP4</td>
+      <td class="borderPlayerInfo">$!RAPRegion4</td>
+      <td class="borderSquare">$!RAP4P1  </td>
+      <td class="borderSquare">$!RAP4P2  </td>
+      <td class="borderSquare">$!RAP4P3  </td>
+      <td class="borderSquareNoFight">X</td>
+      <td class="borderSquare">$!RAP4P5  </td>
+      <td class="borderSquare">$!RAWins4  </td>
+      <td class="borderSquare">$!RAPoints4  </td>
+    </tr>
+    <tr>
+      <td class="borderSquarePlayerNo">5 </td>
+      <td class="borderPlayer">$!RAP5</td>
+      <td class="borderPlayerInfo">$!RAPRegion5</td>
+      <td class="borderSquare">$!RAP5P1  </td>
+      <td class="borderSquare">$!RAP5P2  </td>
+      <td class="borderSquare">$!RAP5P3  </td>
+      <td class="borderSquare">$!RAP5P4  </td>
+      <td class="borderSquareNoFight">X</td>
+      <td class="borderSquare">$!RAWins5  </td>
+      <td class="borderSquare">$!RAPoints5  </td>
+    </tr>
+    <tr>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </tbody>
+</table>
+
+<table class="repechage" style="font-size: 70%">
+  <tbody>
+    <tr>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th width="1px">                           </th>
+      <th width="1px">  </th>
+      <th width="1px">  </th>
+      <th width="1px">                           </th>
+      <th> </th>
+      <th width="1px">                           </th>
+      <th> </th>
+      <th width="1px"> </th>
+    </tr>
+    <tr>
+      <td colspan="10" class="borderFixWidth"></td>
+    </tr>
+    <tr>
+      <th rowspan="31"> </th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <th rowspan="31"> </th>
+    </tr>
+    <tr>
+      <td>(1)</td>
+      <td class="borderBluePlayer">$!player1</td>
+      <td class="borderBluePlayerInfo">$!player1Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber1 </td>
+      <td class="borderMedal">$!W1  </td>
+      <td> </td>
+      <td class="borderTitle3" rowspan="2" colspan="2">Results</td>
+    </tr>
+    <tr>
+      <td>(4)</td>
+      <td class="borderWhitePlayer">$!player4</td>
+      <td class="borderWhitePlayerInfo">$!player4Details</td>
+      <td class="borderResultbottom">$!result_1 </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td class="borderPlace" colspan="2">$!place1 </td>
+    </tr>
+    <tr>
+      <td>(2)</td>
+      <td class="borderBluePlayer">$!player2</td>
+      <td class="borderBluePlayerInfo">$!player2Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber2 </td>
+      <td class="borderMedal">$!W2  </td>
+      <td> </td>
+      <td class="borderPlace" colspan="2">$!place2 </td>
+    </tr>
+    <tr>
+      <td>(5)</td>
+      <td class="borderWhitePlayer">$!player5</td>
+      <td class="borderWhitePlayerInfo">$!player5Details</td>
+      <td class="borderResultbottom">$!result_2 </td>
+      <td> </td>
+      <td class="borderPlace" colspan="2">$!place3 </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td class="borderPlace" colspan="2">$!place4 </td>
+    </tr>
+    <tr>
+      <td>(1)</td>
+      <td class="borderBluePlayer">$!player1</td>
+      <td class="borderBluePlayerInfo">$!player1Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber3 </td>
+      <td class="borderMedal">$!W3  </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(3)</td>
+      <td class="borderWhitePlayer">$!player3</td>
+      <td class="borderWhitePlayerInfo">$!player3Details</td>
+      <td class="borderResultbottom">$!result_3 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(2)</td>
+      <td class="borderBluePlayer">$!player2</td>
+      <td class="borderBluePlayerInfo">$!player2Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber4 </td>
+      <td class="borderMedal">$!W4  </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(4)</td>
+      <td class="borderWhitePlayer">$!player4</td>
+      <td class="borderWhitePlayerInfo">$!player4Details</td>
+      <td class="borderResultbottom">$!result_4 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(3)</td>
+      <td class="borderBluePlayer">$!player3</td>
+      <td class="borderBluePlayerInfo">$!player3Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber5 </td>
+      <td class="borderMedal">$!W5  </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(4)</td>
+      <td class="borderWhitePlayer">$!player4</td>
+      <td class="borderWhitePlayerInfo">$!player4Details</td>
+      <td class="borderResultbottom">$!result_5 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(1)</td>
+      <td class="borderBluePlayer">$!player1</td>
+      <td class="borderBluePlayerInfo">$!player1Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber6 </td>
+      <td class="borderMedal">$!W6  </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(5)</td>
+      <td class="borderWhitePlayer">$!player5</td>
+      <td class="borderWhitePlayerInfo">$!player5Details</td>
+      <td class="borderResultbottom">$!result_6 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(2)</td>
+      <td class="borderBluePlayer">$!player2</td>
+      <td class="borderBluePlayerInfo">$!player2Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber7 </td>
+      <td class="borderMedal">$!W7  </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(3)</td>
+      <td class="borderWhitePlayer">$!player3</td>
+      <td class="borderWhitePlayerInfo">$!player3Details</td>
+      <td class="borderResultbottom">$!result_7 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(4)</td>
+      <td class="borderBluePlayer">$!player4</td>
+      <td class="borderBluePlayerInfo">$!player4Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber8 </td>
+      <td class="borderMedal">$!W8  </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(5)</td>
+      <td class="borderWhitePlayer">$!player5</td>
+      <td class="borderWhitePlayerInfo">$!player5Details</td>
+      <td class="borderResultbottom">$!result_8 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(3)</td>
+      <td class="borderBluePlayer">$!player3</td>
+      <td class="borderBluePlayerInfo">$!player3Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber9 </td>
+      <td class="borderMedal">$!W9  </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(5)</td>
+      <td class="borderWhitePlayer">$!player5</td>
+      <td class="borderWhitePlayerInfo">$!player5Details</td>
+      <td class="borderResultbottom">$!result_9 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(1)</td>
+      <td class="borderBluePlayer">$!player1</td>
+      <td class="borderBluePlayerInfo">$!player1Details</td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber10 </td>
+      <td class="borderMedal">$!W10  </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>(2)</td>
+      <td class="borderWhitePlayer">$!player2</td>
+      <td class="borderWhitePlayerInfo">$!player2Details</td>
+      <td class="borderResultbottom">$!result_10 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="repechage" style="font-size: 60%">
+  <tbody>
+    <tr>
+      <th width="1px"> </th>
+      <th width="1px"> </th>
+      <th>                           </th>
+      <th width="1px">  </th>
+      <th>                           </th>
+      <th width="1px">  </th>
+      <th>                           </th>
+      <th width="1px">  </th>
+      <th>                           </th>
+      <th width="1px"> </th>
+    </tr>
+    <tr>
+      <td class="borderTop" colspan="10"> </td>
+    </tr>
+    <tr>
+      <td colspan="10" class="borderFixWidth"></td>
+    </tr>
+    <tr>
+      <th rowspan="7"> </th>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <th rowspan="7"> </th>
+    </tr>
+    <tr>
+      <td> </td>
+      <td class="borderBlue">$!RAT1-1-2-3-4-5-6-7-8-9-10  </td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber11 </td>
+      <td class="borderResultTop">$!result_11 </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td class="borderWhite">$!RAT5-1-2-3-4-5-6-7-8-9-10  </td>
+      <td class="borderBlue">$!W11  </td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber13 </td>
+      <td class="borderResultTop">$!result_13 </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td class="borderWhite">$!RAT3-1-2-3-4-5-6-7-8-9-10  </td>
+      <td class="borderBlue">$!W13  </td>
+      <td rowspan="2" class="borderFightFinal">$!fightNumber14 </td>
+      <td class="borderMedal">$!W14  </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td class="borderBlue">$!RAT2-1-2-3-4-5-6-7-8-9-10  </td>
+      <td rowspan="2" class="borderFightNumber">$!fightNumber12 </td>
+      <td class="borderWhite">$!W12  </td>
+      <td class="borderResultBottom">$!result_14 </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td class="borderWhite">$!RAT4-1-2-3-4-5-6-7-8-9-10  </td>
+      <td class="borderResultBottom">$!result_12 </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+#if($fullDocument) #parse("resources/html/draw-footer.html") #end </body>
+</html>
