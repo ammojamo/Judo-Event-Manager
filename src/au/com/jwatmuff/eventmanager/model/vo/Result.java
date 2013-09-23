@@ -105,8 +105,7 @@ public class Result extends DistributableObject<Integer> {
         }
         if (scores[0].compareTo(scores[1])>0) {
             simple[0] = simpleScore;
-        }
-        else {
+        } else {
             simple[1] = simpleScore;
         }
 

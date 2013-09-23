@@ -270,7 +270,7 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         return true;
     }
 
-    private void updateSeeds() {
+     private void updateSeeds() {
         int index = 0;
         for(Player player : context.players) {
             if(player != null) {

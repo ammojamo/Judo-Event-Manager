@@ -106,6 +106,8 @@ public class FullScore implements Comparable<FullScore>, Serializable {
             return getWazari() - o.getWazari();
         if (getYuko() != o.getYuko())
             return getYuko() - o.getYuko();
+        if (getShido() != o.getShido())
+            return o.getShido() - getShido();
         return getDecision() - o.getDecision();
     }
 }
