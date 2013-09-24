@@ -293,6 +293,8 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
                         player1s[a].setText("");
                     if(!player2s[a].getText().equals(""))
                         player2s[a].setText("");
+                    if(!divisions[a].getText().equals(""))
+                        divisions[a].setText("");
                 }
             }
         } catch(DatabaseStateException e) {
