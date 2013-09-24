@@ -85,8 +85,8 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         double TIMER_WIDTH = 6;
         double TIMER_HEIGHT = 2.5;
 
-        double HOLD_DOWN_X = 8;
-        double HOLD_DOWN_Y = 6;
+        double HOLD_DOWN_X = 6;
+        double HOLD_DOWN_Y = 8;
         double HOLD_DOWN_WIDTH = 4;
         double HOLD_DOWN_HEIGHT = 4;
         
