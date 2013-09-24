@@ -8,6 +8,7 @@ package au.com.jwatmuff.eventmanager.print;
 import au.com.jwatmuff.eventmanager.model.info.SessionFightInfo;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer;
 import au.com.jwatmuff.eventmanager.model.misc.SessionLinker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
@@ -62,8 +63,18 @@ public class FightOrderHTMLGenerator extends VelocityHTMLGenerator {
             for(SessionFightInfo sfi : SessionFightSequencer.getFightSequence(database, session.getID())) {
                 try {
                     Map<String, String> fight = new HashMap<String, String>();
-                    fight.put("player1", PlayerCodeParser.parseCode(database, sfi.getFight().getPlayerCodes()[0], sfi.getFight().getPoolID()).toString());
-                    fight.put("player2", PlayerCodeParser.parseCode(database, sfi.getFight().getPlayerCodes()[1], sfi.getFight().getPoolID()).toString());
+                    FightPlayer fightPlayer1 = PlayerCodeParser.parseCode(database, sfi.getFight().getPlayerCodes()[0], sfi.getFight().getPoolID());
+                    if(fightPlayer1.type == PlayerCodeParser.PlayerType.NORMAL){
+                        fight.put("player1", fightPlayer1.toString() + " (" + fightPlayer1.player.getTeam().toString() +")");
+                    }else{
+                        fight.put("player1", fightPlayer1.toString());
+                    }
+                    FightPlayer fightPlayer2 = PlayerCodeParser.parseCode(database, sfi.getFight().getPlayerCodes()[1], sfi.getFight().getPoolID());
+                    if(fightPlayer2.type == PlayerCodeParser.PlayerType.NORMAL){
+                        fight.put("player2", fightPlayer2.toString() + " (" + fightPlayer2.player.getTeam().toString() +")");
+                    }else{
+                        fight.put("player2", fightPlayer2.toString());
+                    }
                     fight.put("pool", database.get(Pool.class, sfi.getFight().getPoolID()).getDescription());
                     fight.put("poolNumber", "Fight " + sfi.getFight().getPosition());
                     sessionFights.add(fight);
