@@ -65,13 +65,13 @@ public class FightOrderHTMLGenerator extends VelocityHTMLGenerator {
                     Map<String, String> fight = new HashMap<String, String>();
                     FightPlayer fightPlayer1 = PlayerCodeParser.parseCode(database, sfi.getFight().getPlayerCodes()[0], sfi.getFight().getPoolID());
                     if(fightPlayer1.type == PlayerCodeParser.PlayerType.NORMAL){
-                        fight.put("player1", fightPlayer1.toString() + " (" + fightPlayer1.player.getTeam().toString() +")");
+                        fight.put("player1", fightPlayer1.toString() + " - " + fightPlayer1.player.getTeam().toString());
                     }else{
                         fight.put("player1", fightPlayer1.toString());
                     }
                     FightPlayer fightPlayer2 = PlayerCodeParser.parseCode(database, sfi.getFight().getPlayerCodes()[1], sfi.getFight().getPoolID());
                     if(fightPlayer2.type == PlayerCodeParser.PlayerType.NORMAL){
-                        fight.put("player2", fightPlayer2.toString() + " (" + fightPlayer2.player.getTeam().toString() +")");
+                        fight.put("player2", fightPlayer2.toString() + " - " + fightPlayer2.player.getTeam().toString());
                     }else{
                         fight.put("player2", fightPlayer2.toString());
                     }
