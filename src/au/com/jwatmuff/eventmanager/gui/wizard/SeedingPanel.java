@@ -154,6 +154,10 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     private void lockDivisionPlayers() throws DatabaseStateException {
         Map<Integer,PlayerPool> playerPoolMap = new HashMap<>();
         for(PlayerPool pp : database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID())) {
+            // Save player seeds as chosen by user - requires updateSeeds() to be called first.
+            if(context.seeds.containsKey(pp.getPlayerID())) {
+                pp.setSeed(context.seeds.get(pp.getPlayerID()));
+            }
             playerPoolMap.put(pp.getPlayerID(), pp);
         }
 
@@ -185,14 +189,14 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
     }
 
     private boolean commitChanges() {
+        updateSeeds();
+
         try {
             lockDivisionPlayers();
         } catch(DatabaseStateException e) {
             GUIUtils.displayError(this, "Unable to lock players in pool " + pool.getDescription());
             return false;
         }
-
-        updateSeeds();
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
@@ -270,7 +274,8 @@ public class SeedingPanel extends javax.swing.JPanel implements DrawWizardWindow
         return true;
     }
 
-     private void updateSeeds() {
+    // Updates context.seeds from selection made by the user in the seedingTable
+    private void updateSeeds() {
         int index = 0;
         for(Player player : context.players) {
             if(player != null) {
