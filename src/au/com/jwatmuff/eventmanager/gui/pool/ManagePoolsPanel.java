@@ -760,17 +760,14 @@ private void copyPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         if(pp == null) return;
         
         if(!PermissionChecker.isAllowed(Action.EDIT_PLAYER, database)) return;
-        
-        List<Integer> seeds = new ArrayList<>();
-        for(int i = 0; i < 64; i++) {
-            seeds.add(i+1);
-        }
-        ComboBoxDialog<Integer> seedDialog = new ComboBoxDialog<>(null, true, seeds, "Please select a seed", "Player Seed");
+
+        SeedSelectionDialog seedDialog = new SeedSelectionDialog(null, true);
         if(pp.getSeed() > 0) seedDialog.setSelectedItem(pp.getSeed());
         seedDialog.setVisible(true);
         
         if(seedDialog.getSuccess()) {
-            pp.setSeed(seedDialog.getSelectedItem());
+            Integer seed = seedDialog.getSelectedItem();
+            pp.setSeed(seed);
             database.update(pp);
         }
     }//GEN-LAST:event_seedButtonActionPerformed

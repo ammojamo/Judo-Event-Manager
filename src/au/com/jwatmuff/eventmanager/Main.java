@@ -31,6 +31,7 @@ import au.com.jwatmuff.genericp2p.PeerManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -56,26 +57,30 @@ public class Main {
 
     private static File workingDir = new File(".");
 
+    private static final int LOCK_PORT = 58536;
 
     /**
-     * Creates a run lock file if it does not already exist. Returns false
-     * if a run lock is already present and the force argument is false.
+     * Binds to a TCP port to ensure we are the only instance of Event Manager
+     * running on the computer. Returns false if the TCP port is already bound
+     * and the force parameter is set to false.
      */
     private static boolean obtainRunLock(boolean force) {
-        File f = new File(workingDir, "eventmanager.run.lock");
-        if(f.exists() && !force) {
+        if(force) return true;
+        try {
+            final ServerSocket lockSocket = new ServerSocket(LOCK_PORT);
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        lockSocket.close();
+                    } catch(IOException e) {
+                        log.warn("Failed to close lock socket", e);
+                    }
+                }
+            });
+        } catch(IOException e) {
             log.info("Run lock is present");
             return false;
-        } else {
-            try {
-                if(f.exists() && force)
-                    f.delete();
-                f.createNewFile();
-                f.deleteOnExit();
-            } catch(IOException e) {
-                log.warn("Unable to create lock file", e);
-                return false;
-            }
         }
         
         return true;
