@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 /**
  *
  * @author James
+ * java -cp dist/EventManager.jar au.com.jwatmuff.eventmanager.DumpUpdates  "[update file]" "[output file]"
  */
 public class DumpUpdates {
     private static final Logger log = Logger.getLogger(DumpUpdates.class);
