@@ -1,7 +1,7 @@
 Name "Event Manager 2013"
 Caption "Event Manager 2013"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2013-Update1.exe"
+OutFile "EventManagerSetup-2013-Update2.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
