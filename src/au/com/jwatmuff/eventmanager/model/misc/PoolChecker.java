@@ -60,41 +60,6 @@ public class PoolChecker {
         return calculateAge(p.getDob(), censusDate);
     }
 
-    private static Grade reduceGrade(Grade g, int amount) {
-        assert (g != null);
-        return Grade.values()[Math.max(g.ordinal() - amount, 0)];
-    }
-
-    public static Grade getEffectiveGrade(Player p, Pool pool, Date censusDate, ConfigurationFile configurationFile) {
-        Grade g = p.getGrade();
-
-        if(g == Grade.UNSPECIFIED || g == null)
-            return Grade.UNSPECIFIED;
-
-        int age = getAge(p, censusDate);
-
-        int maxAge = pool.getMaximumAge();
-
-        if(configurationFile.getBooleanProperty("defaultAdjustGrade", false)){
-            int age1 = configurationFile.getIntegerProperty("defaultAgeThreshold1", 11);
-            int age2 = configurationFile.getIntegerProperty("defaultAgeThreshold2", 14);
-            int age3 = configurationFile.getIntegerProperty("defaultAgeThreshold3", 16);
-            int gradeDrop = configurationFile.getIntegerProperty("defaultBeltDrop", 2);
-            if (maxAge > age3 || maxAge == 0) {
-                if(age <= age3) g = reduceGrade(g, gradeDrop);
-                if(age <= age2) g = reduceGrade(g, gradeDrop);
-                if(age <= age1) g = reduceGrade(g, gradeDrop);
-            } else if(maxAge > age2) {
-                if(age <= age2) g = reduceGrade(g, gradeDrop);
-                if(age <= age1) g = reduceGrade(g, gradeDrop);
-            } else if(maxAge > age1) {
-                if(age <= age1) g = reduceGrade(g, gradeDrop);
-            }
-        }
-
-        return g;
-    }
-
     /**
      * Checks whether the given player is eligible to be entered into the given
      * pool.
@@ -148,7 +113,7 @@ public class PoolChecker {
         }
 
         // adjust belt if necessary
-        Grade grade = getEffectiveGrade(p, pool, censusDate, configurationFile);
+        Grade grade = p.getGrade();
 
         // check grade/belt
         Grade maxGrade = pool.getMaximumGrade();

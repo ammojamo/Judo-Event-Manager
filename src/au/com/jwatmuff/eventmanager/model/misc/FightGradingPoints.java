@@ -27,6 +27,7 @@ public class FightGradingPoints {
     public Player losingPlayer;
     public Player winningPlayer;
     public Grade effectiveLoserGrade;
+    public Grade effectiveWinningGrade;
     public Pool pool;
 
     private static final int[] POINTS = new int[] { 1, 3, 5, 7, 10, 15, 20 };
@@ -43,8 +44,10 @@ public class FightGradingPoints {
         losingPlayer = ri.getPlayer()[loser];
         
         pool = database.get(Pool.class, ri.getFight().getPoolID());
-        effectiveLoserGrade = PoolChecker.getEffectiveGrade(losingPlayer, pool, censusDate, configurationFile);
-        points = calculatePoints(ri, effectiveLoserGrade, database);
+        effectiveLoserGrade = losingPlayer.getGrade();
+        effectiveWinningGrade = winningPlayer.getGrade();
+        
+        points = calculatePoints(ri, effectiveLoserGrade, effectiveWinningGrade, configurationFile);
     }
 
     public int getPoints() {
@@ -71,29 +74,18 @@ public class FightGradingPoints {
         return pool;
     }
 
-    public int calculatePoints(ResultInfo info, Grade loserGrade, Database database) {
-        if(loserGrade == null) return 0;
+    public static int calculatePoints(ResultInfo info, Grade loserGrade, Grade winningGrade, ConfigurationFile configurationFile) {
 
-        double[] score = info.getResult().getSimpleScores(database);
-        if(score[0] == score[1]) return 0;
-        int w = (score[0] > score[1]) ? 0 : 1;
-        int l = 1-w;
-
-        if(info.getPlayer()[w] == null) {
-            log.warn("This shouldn't happen");
-            return 0;
-        }
-
-        Grade winnerGrade = info.getPlayer()[w].getGrade();
-
-        int rankDifference = loserGrade.ordinal() - winnerGrade.ordinal();
-
+        double[] scores = info.getResult().getSimpleScores(configurationFile);
+        int winner = scores[0] > scores[1] ? 0 : 1;
+        int rankDifference = loserGrade.ordinal() - winningGrade.ordinal();
+        
         if(rankDifference < -2) return 0;
         rankDifference = Math.min(rankDifference, 2);
 
-        if(score[w] == 10)
+        if(scores[winner] == configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 100))
             return POINTS[4 + rankDifference];
-        else if(score[w] == 7)
+        else if(scores[winner] == configurationFile.getDoubleProperty("defaultVictoryPointsWazari", 10))
             return POINTS[3 + rankDifference];
         else
             return POINTS[2 + rankDifference];
