@@ -6,3 +6,4 @@ dist
 nbproject/private
 *.run.lock
 .DS_Store
+/JavaApplication1/nbproject/private/
