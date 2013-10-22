@@ -36,9 +36,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -90,6 +93,30 @@ public class Main {
         return workingDir;
     }
     
+    private static boolean updateRmiHostName() {
+        try {
+            String existingHostName = System.getProperty("java.rmi.server.hostname");
+            String newHostName = InetAddress.getLocalHost().getHostAddress();
+            if(!ObjectUtils.equals(existingHostName, newHostName)) {
+                log.info("Updating RMI hostname to: " + newHostName);
+                System.setProperty("java.rmi.server.hostname", newHostName);
+                return true;
+            }
+        } catch(Exception e) {}
+        return false;
+    }
+
+    private static void monitorNetworkInterfaceChanges(final PeerManager peerManager) {
+        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                if(updateRmiHostName()) {
+                    peerManager.refreshServices();
+                }
+            }
+        }, 15, 15, TimeUnit.SECONDS);
+    }
+
     /**
      * Main method.
      */
@@ -98,11 +125,8 @@ public class Main {
 
         /* Set timeout for RMI connections - TODO: move to external file */
         System.setProperty("sun.rmi.transport.tcp.handshakeTimeout", "2000");
-        try {
-            //System.setProperty("java.rmi.server.hostname", InetAddress.getLocalHost().getHostName());
-            System.setProperty("java.rmi.server.hostname", InetAddress.getLocalHost().getHostAddress());
-        } catch(Exception e) {}
-        
+        updateRmiHostName();
+
         /*
          * Set up menu bar for Mac
          */
@@ -201,9 +225,8 @@ public class Main {
             ManualDiscoveryService manualDiscoveryService = new ManualDiscoveryService();
             JmDNSRMIPeerManager peerManager = new JmDNSRMIPeerManager(rmiPort, new File(workingDir, "peerid.dat"));
             peerManager.addDiscoveryService(manualDiscoveryService);
-            if(!peerManager.initialisedOk()) {
-                GUIUtils.displayMessage(loadWindow, "Event Manager could not find a network connection.\nTo connect to other computers you will need to establish a network connection and restart the Event Manager.", "No Network Connection");
-            }
+
+            monitorNetworkInterfaceChanges(peerManager);
 
             loadWindow.addMessage("Loading Database Manager..");
             log.info("Loading Database Manager");

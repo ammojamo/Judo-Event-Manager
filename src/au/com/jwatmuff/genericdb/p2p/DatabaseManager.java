@@ -252,11 +252,22 @@ public abstract class DatabaseManager {
         }
     }
 
+    private boolean updating = false;
+
     //Bit of a hack making this public - to help refresh load competition screen
-    public synchronized void updateAllDatabaseInfo() {
-        databases.clear();
-        updateLocalDatabaseInfo();
-        updatePeerDatabaseInfo();
+    public void updateAllDatabaseInfo() {
+        synchronized(this) {
+            if(updating) return;
+            updating = true;
+        }
+
+        try {
+            databases.clear();
+            updateLocalDatabaseInfo();
+            updatePeerDatabaseInfo();
+        } finally {
+            updating = false;
+        }
     }
     
     private void updatePeerDatabaseInfo() {

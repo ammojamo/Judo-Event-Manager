@@ -20,6 +20,7 @@ public interface PeerManager {
     public <T> void registerService(String serviceName, Class<T> serviceClass, T implementation);
     public <T> void registerService(Class<T> serviceClass, T implementation);
     public void unregisterService(String serviceName);
+    public void refreshServices();
     public Collection<Peer> getPeers();
     public boolean isRegistered(String serviceName);
     public boolean initialisedOk();

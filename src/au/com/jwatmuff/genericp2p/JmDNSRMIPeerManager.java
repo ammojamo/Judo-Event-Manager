@@ -37,8 +37,6 @@ public class JmDNSRMIPeerManager implements PeerManager {
         discoverer = new JmDNSDiscoveryService();
         winDiscoverer = new WindowsNetDiscoveryService();
 
-        log.info("Starting RMI Peer Manager");
-
         manager = new RMIPeerManager(port, idFile);
         
         log.info("Starting Peer Registration Service");
@@ -48,6 +46,9 @@ public class JmDNSRMIPeerManager implements PeerManager {
 
         discoverer.setListener(manager);
         winDiscoverer.setListener(manager);
+
+        log.info("Starting RMI Peer Manager");
+        manager.start();
 
         log.info("Starting Peer Discovery Service");
 
@@ -96,6 +97,13 @@ public class JmDNSRMIPeerManager implements PeerManager {
     @Override
     public <T> void registerService(Class<T> serviceClass, T implementation) {
         manager.registerService(serviceClass, implementation);
+    }
+
+    @Override
+    public void refreshServices() {
+        manager.refreshServices();
+        discoverer.stop();
+        discoverer.start();
     }
     
     @Override

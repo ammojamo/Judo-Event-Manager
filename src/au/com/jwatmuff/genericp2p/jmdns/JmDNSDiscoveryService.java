@@ -33,22 +33,21 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
 
     /** Creates a new instance of JmDNSDiscoveryService */
     public JmDNSDiscoveryService() {
-        try {
-            InetAddress addr = InetAddress.getLocalHost();
-            String hostname = InetAddress.getByName(addr.getHostName()).toString();
-            jmdns = JmDNS.create(addr, hostname);
-        } catch(IOException e) {
-            log.error("IOException while initializing JmDNS", e);
-        }
     }
 
     @Override
     public void start() {
-        if(jmdns == null) return;
+        try {
+            InetAddress addr = InetAddress.getLocalHost();
+            String hostname = InetAddress.getByName(addr.getHostName()).toString();
+            jmdns = JmDNS.create(addr, hostname);
 
-        log.debug("Browsing for services");
-        jmdns.addServiceListener(REG_TYPE, listener);
-        setRunning(true);
+            log.debug("Browsing for services");
+            jmdns.addServiceListener(REG_TYPE, listener);
+            setRunning(true);
+        } catch(IOException e) {
+            log.error("IOException while initializing JmDNS", e);
+        }
     }
 
     @Override
@@ -56,6 +55,7 @@ public class JmDNSDiscoveryService extends AbstractDiscoveryService {
         if(jmdns == null) return;
 
         jmdns.removeServiceListener(REG_TYPE, listener);
+        jmdns = null;
         setRunning(false);
     }
 

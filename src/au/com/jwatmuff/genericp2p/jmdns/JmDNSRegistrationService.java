@@ -24,11 +24,16 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
     private final int port;
 
     private JmDNS jmdns;
-    private final ServiceInfo service;
+    private ServiceInfo service;
     private boolean registered = false;
 
     public JmDNSRegistrationService(int port) {
         this.port = port;
+    }
+
+    @Override
+    public void register() {
+        if(jmdns != null) unregister();
 
         try {
             jmdns = JmDNS.create(InetAddress.getLocalHost());
@@ -39,11 +44,6 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
         ourName = System.getProperty("user.name");
 
         service = ServiceInfo.create(REG_TYPE, ourName, port, "Event Manager");
-    }
-
-    @Override
-    public void register() {
-        if(jmdns == null) return;
 
         log.debug("Attempting to register as service (" + ourName + ")");
 
@@ -79,6 +79,7 @@ public class JmDNSRegistrationService implements PeerRegistrationService {
         if(jmdns == null) return;
 
         jmdns.unregisterService(service);
+        jmdns = null;
         registered = false;
     }
 

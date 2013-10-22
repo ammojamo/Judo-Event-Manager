@@ -20,14 +20,28 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.proxy.Interceptor;
 import org.apache.commons.proxy.Invocation;
 import org.apache.commons.proxy.ProxyFactory;
@@ -42,7 +56,6 @@ import org.springframework.remoting.rmi.RmiServiceExporter;
  */
 public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, AnnounceService, IdentifyService, LookupService {
     private static final Logger log = Logger.getLogger(RMIPeerManager.class);
-    private static final int RETRY_PERIOD = 30000; //milliseconds
 
     private class PeerService<T> {
         String name;
@@ -54,58 +67,70 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     private int registryPort;
     private File idFile;
     private UUID uuid;
-    private Collection<PeerConnectionListener> listeners = new ArrayList<PeerConnectionListener>();
-    private Map<String, PeerService> peerServiceMap = new HashMap<String, PeerService>();
+    private Collection<PeerConnectionListener> listeners = new ArrayList<>();
+    private Map<String, PeerService> peerServiceMap = new HashMap<>();
     private String name;
     private final Collection<ManagedPeer> peers = Collections.synchronizedCollection(new ArrayList<ManagedPeer>());
-
-    private Thread checkPeerThread = new Thread("checkPeerThread") {
-        @Override
-        public void run() {
-            while (true) {
-                checkDisconnectedPeers();
-                log.debug(getPeerTables());
-                try {
-                    Thread.sleep(RETRY_PERIOD);
-                } catch (InterruptedException e) {
-                }
-            }
-        }
-    };
+    private final Set<InetSocketAddress> addresses = Collections.synchronizedSet(new HashSet<InetSocketAddress>());
+    private Registry registry;
+    
+    private ScheduledExecutorService slowPeerCheckExecutor;
+    private ScheduledExecutorService fastPeerCheckExecutor;
+    private ExecutorService timeoutExecutor = Executors.newCachedThreadPool();
 
     public RMIPeerManager(int registryPort, File idFile) {
+        try {
+            registry = LocateRegistry.createRegistry(registryPort);
+        } catch(RemoteException e) {
+            log.error("Failed to create RMI registry", e);
+        }
+        
         this.registryPort = registryPort;
         this.idFile = idFile;
-
-        log.debug("Obtained local ID: " + this.getUUID());
-
-        registerService(AnnounceService.class, this);
-        registerService(IdentifyService.class, this);
-        registerService(LookupService.class, this);
-
-        log.debug("Starting retry thread");
-        checkPeerThread.start();
-
-        log.debug("Completed RMIPeerManager startup");
     }
 
     public void setName(String name) {
-        /* if this is the first time we have been given a name, add ourselves
-         * to the list of peers using localhost address */
-        if(this.name == null) {
-            try {
-                InetSocketAddress local = new InetSocketAddress(InetAddress.getLocalHost(), registryPort);
-                handlePeerInfo(new PeerInfo(name, local, uuid));
-            } catch(UnknownHostException e) {
-                log.error("Could not find local host", e);
-            }
-        }
-
         this.name = name;
     }
 
     public String getName() {
         return name;
+    }
+    
+    public void start() {
+        log.debug("Obtained local ID: " + this.getUUID());
+
+        registerService(AnnounceService.class, this);
+        registerService(IdentifyService.class, this);
+        registerService(LookupService.class, this);
+        
+        fastPeerCheckExecutor = Executors.newScheduledThreadPool(2);
+        slowPeerCheckExecutor = Executors.newScheduledThreadPool(4);
+        
+        fastPeerCheckExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                for(ManagedPeer peer : getManagedPeers()) {
+                    log.debug("FAST CHECK CHECKING: " + peer);
+                    checkPeer(peer);
+                }
+            }
+        }, 30, 30, TimeUnit.SECONDS);
+        
+        slowPeerCheckExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                addSelf();
+                for(InetSocketAddress address : getAddresses()) {
+                    log.debug("SLOW CHECK CHECKING: " + address);
+                    checkAddress(address);
+                }
+            }
+        }, 30, 30, TimeUnit.SECONDS);
+        
+        addSelf();
+
+        log.debug("Completed RMIPeerManager startup");
     }
 
     /**
@@ -152,17 +177,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
      */
     @Override
     public void announce(String name, InetSocketAddress address, UUID id) {
-        log.debug("Got name/IP address/id from peer: " + name + " : " + address + " : " + id);
-        boolean known = false;
-        for(Peer peer : peers) {
-            if(peer.getName().equalsIgnoreCase(name)) {
-                known = true;
-                break;
-            }
-        }
-        if(!known) log.debug("*****PEER FOUND NOT VIA BONJOUR/JmDNS*****");
-        final PeerInfo info = new PeerInfo(name, address, id);
-        handlePeerInfo(info);
+        handlePeerInfo(new PeerInfo(name, address, id));
     }
 
     /**
@@ -175,96 +190,90 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
      */
     @Override
     public void announceDisconnected(String name, UUID id) {
-        log.debug("Attempting to disconnect peer: " + name + " : " + id);
-        boolean disconnectedPeer = false;
-        for (ManagedPeer peer : peers) {
-            if(peer.getUUID().equals(id)) {
-                log.debug("Disconnect peer: " + name + " : " + id);
-                peer.setDisconnected();
-                disconnectedPeer = true;
-                break;
-            }
-        }
-        if(!disconnectedPeer) log.debug("*****Could not disconect peer because uuid was not found*****");
-
+        ManagedPeer peer = getPeerWithUUID(id);
+        if(peer != null) peer.setDisconnected();
     }
 
-    public void handlePeerInfo(PeerInfo info) {
-        /* update ID if necessary (i.e. if from Bonjour/JmDNS) */
-        if (info.getID() == null) {
+    public void handlePeerInfo(final PeerInfo info) {
+        addresses.add(info.getAddress());
+        fastPeerCheckExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                checkAddress(info.getAddress());
+            } 
+        });
+    }
+    
+    private void checkAddress(InetSocketAddress address) {
+        if(getPeerWithAddress(address) != null) return;
+
+        ManagedPeer peer = new ManagedPeer(address);
+        peer.checkConnectivity();
+        if(peer.isConnected()) {
+            peer.populatePeerInfo();
+            boolean notify = false;
+            synchronized(peers) {
+                if(getPeerWithUUID(peer.getUUID()) == null) {
+                    peers.add(peer);
+                    notify = true;
+                }
+            }
+            if(notify) {
+                notifyPeerConnectionListeners(new PeerConnectionEvent(PeerConnectionEvent.Type.CONNECTED, peer));
+                announcePeer(peer);
+            }
+        }
+    }
+    
+    private void checkPeer(ManagedPeer peer) {
+        peer.checkConnectivity();
+        if(peer.isConnected()) {
+            announcePeer(peer);
+        }
+    }
+    
+    private void announcePeer(ManagedPeer p) {
+        try {
+            AnnounceService service = p.getService(AnnounceService.class);
+            for(InetSocketAddress address : getAddresses()) {
+                service.announce(null, address, null);
+            }
+        } catch(NoSuchServiceException e) {
+            log.error("Exception announcing peers", e);
+        }
+    }
+    
+    private ManagedPeer getPeerWithAddress(InetSocketAddress address) {
+        synchronized(peers) {
+            for(ManagedPeer peer : peers) {
+                if(peer.getAddress().equals(address)) return peer;
+            }
+        }
+        return null;
+    }
+    
+    private ManagedPeer getPeerWithUUID(UUID uuid) {
+        synchronized(peers) {
+            for(ManagedPeer peer : peers) {
+                if(peer.getUUID().equals(uuid)) return peer;
+            }
+        }
+        return null;
+    }
+    
+    private void notifyPeerConnectionListeners(PeerConnectionEvent event) {
+        int n = listeners.size();
+        int i = 0;
+        for(PeerConnectionListener listener : new ArrayList<PeerConnectionListener>(listeners)) {
+            log.debug("NOTIFYING LISTENER " + (++i) + "/" + n + " - " + listener);
             try {
-                UUID peerUUID = getService(
-                        info.getAddress(),
-                        IdentifyService.class.getCanonicalName(),
-                        IdentifyService.class).getUUID();
-                info.setID(peerUUID);
+                listener.handleConnectionEvent(event);
             } catch(Exception e) {
-                log.error("Couldn't get UUID from new peer", e);
-                return;
-            }
-        }
-
-        for (ManagedPeer peer : new ArrayList<ManagedPeer>(peers)) {
-            if (peer.getUUID().equals(info.getID())) {
-                if (peer.isConnected() &&
-                        !peer.currentAddress.getAddress().isLoopbackAddress()) {
-                    log.debug("Peer already connected on network address, adding (possibly) new address to history");
-                    peer.addAddressToHistory(info.getAddress());
-                } else {
-                    log.debug("Reconnecting peer on address " + info.getAddress());
-                    peer.setAddress(info.getAddress());
-                    if (peer.isConnected() && !peer.currentAddress.getAddress().isLoopbackAddress()) {
-                        announcePeers(peer);
-                    }
-                }
-                return;
-            }
-        }
-
-        /* if the peer was not already in our list, add it */
-        log.debug("New peer found, adding as connected");
-        ManagedPeer peer = new ManagedPeer(info);
-        synchronized (peers){
-            for (ManagedPeer peerCheck : new ArrayList<ManagedPeer>(peers)) {
-                if (peerCheck.getUUID().equals(info.getID())) {
-                    /* if we get here another thread got to it first */
-                    return;
-                }
-            }
-            peers.add(peer);
-            for(PeerConnectionListener listener : new ArrayList<PeerConnectionListener>(listeners)) {
-                listener.handleConnectionEvent(
-                    new PeerConnectionEvent(PeerConnectionEvent.Type.CONNECTED, peer));
-            }
-        }
-        announcePeers(peer);
-    }
-
-    private void announcePeers(ManagedPeer peer) {
-        for(ManagedPeer peer2 : new ArrayList<ManagedPeer>(peers)) {
-            /* This code announces ouselves and each of our known peers to the new peer, including all their address history */
-            for(InetSocketAddress address : peer2.addressHistory) {
-                try {
-                    if(peer.isConnected() && !address.getAddress().isLoopbackAddress()) {
-                        peer.getService(AnnounceService.class).announce(peer2.getName(), address, peer2.getUUID());
-                    }
-                } catch(Exception e) {
-                    log.error(e);
-                }
-            }
-
-            /* This code announces the new peer to all our known peers, including all their address history */
-            for(InetSocketAddress address : peer.addressHistory) {
-                try {
-                    if(peer2.isConnected() && !peer2.getUUID().equals(uuid) && !address.getAddress().isLoopbackAddress()) {
-                        peer2.getService(AnnounceService.class).announce(peer.getName(), address, peer.getUUID());
-                    }
-                } catch(Exception e) {
-                    log.error(e);
-                }
+                log.error("Error notifying listener of peer connection event", e);
             }
         }
     }
+
 
     /**
      * Handles a peer FOUND or LOST event generated by a PeerDiscoveryService.
@@ -278,28 +287,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     @Override
     public void handleDiscoveryEvent(PeerDiscoveryEvent event) {
         if (event.getType() == PeerDiscoveryEvent.Type.FOUND) {
-            log.debug("Got name/IP address from Bonjour/JmDNS/Windows/Manual: " + event.getPeerInfo().getName() + " : " + event.getPeerInfo().getAddress());
             this.handlePeerInfo(event.getPeerInfo());
-        }
-    }
-
-    /**
-     * Goes through the list of previously seen (but disconnected) peers, tries
-     * to reconnect to them if enough time has elapsed since the last check.
-     */
-    public void checkDisconnectedPeers() {
-        for (ManagedPeer peer : new ArrayList<ManagedPeer>(peers)) {
-            if (peer.isDisconnected()) {
-                for (InetSocketAddress address : peer.addressHistory) {
-                    peer.setAddress(address);
-                    if(peer.isConnected()) {
-                        announcePeers(peer);
-                        break;
-                    }
-                }
-            } else {
-                peer.checkConnectivity();
-            }
         }
     }
 
@@ -308,15 +296,13 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
      */
     @Override
     public void stop() {
-        for(ManagedPeer peer2 : new ArrayList<ManagedPeer>(peers)) {
-            try {
-                if(peer2.isConnected() && !peer2.getUUID().equals(uuid)) {
-                    log.debug("Informing peer " + peer2.getName() + " : " + peer2.getUUID() + " that we are disconnecting." );
-                    peer2.getService(AnnounceService.class).announceDisconnected(name, uuid);
-                }
-            } catch(Exception e) {
-                log.error(e);
-            }
+        slowPeerCheckExecutor.shutdown();
+        fastPeerCheckExecutor.shutdown();
+        try {
+            for(Peer peer : getPeers())
+                peer.getService(AnnounceService.class).announceDisconnected(name, uuid);
+        } catch(NoSuchServiceException e) {
+            log.error("Exception announcing disconnection to peers", e);
         }
     }
 
@@ -371,7 +357,8 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
 
         if (implementation != null) {
             RmiServiceExporter exporter = new RmiServiceExporter();
-            exporter.setRegistryPort(registryPort);
+            //exporter.setRegistryPort(registryPort);
+            exporter.setRegistry(registry);
             exporter.setServiceName(serviceName);
             exporter.setServiceInterface(serviceClass);
             exporter.setService(implementation);
@@ -404,17 +391,51 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
             log.error(e.getMessage(), e);
         }
     }
-
-    /**
-     * To do : find a way of checking local RMI registry or detecting when it
-     * stops working. Then try reregistering everything.
-     */
-    @SuppressWarnings("unchecked")
-    private void reregisterServices() {
-        for (PeerService service : peerServiceMap.values()) {
-            registerService(service.name, service.serviceClass, service.implementation);
+    
+    private void addSelf() {
+            // Add ourselves as a peer on our new IP address
+            try {
+                InetSocketAddress local = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), registryPort);
+                handlePeerInfo(new PeerInfo(name, local, uuid));
+            } catch(UnknownHostException e) {
+                log.error("Could not find local host", e);
+            }
+    }
+    
+    @Override
+    public void refreshServices() {
+        try {
+            // Restart RMI Registry
+            UnicastRemoteObject.unexportObject(registry,true);
+            registry = LocateRegistry.createRegistry(registryPort);
+            
+            // Re-export services to new RMI Registry
+            for(PeerService service : peerServiceMap.values()) {
+                refreshService(service);
+            }
+            
+            addSelf();
+        } catch(Exception e) {
+            log.error("Failed to refresh services", e);
         }
     }
+    
+    private void refreshService(PeerService service) {
+        RmiServiceExporter exporter = new RmiServiceExporter();
+        exporter.setRegistryPort(registryPort);
+        exporter.setServiceName(service.name);
+        exporter.setServiceInterface(service.serviceClass);
+        exporter.setService(service.implementation);
+        try {
+            service.exporter.destroy();
+            exporter.afterPropertiesSet();
+            exporter.prepare();
+            service.exporter = exporter;
+        } catch (RemoteException e) {
+            log.error("Refreshing service " + service.name + " (" + service + ") failed", e);
+        }
+    }
+
 
     @SuppressWarnings("unchecked")
     private static <T> T getService(InetSocketAddress address, String serviceName, Class<T> serviceClass) throws NoSuchServiceException {
@@ -461,13 +482,27 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     @Override
     public Collection<Peer> getPeers() {
         Collection<Peer> connectedPeers = new ArrayList<Peer>();
-        for (ManagedPeer peer : peers) {
-            if (peer.isConnected()) {
-                connectedPeers.add(peer);
+        synchronized(peers) {
+            for (ManagedPeer peer : peers) {
+                if (peer.isConnected()) {
+                    connectedPeers.add(peer);
+                }
             }
         }
 
         return connectedPeers;
+    }
+
+    private Collection<ManagedPeer> getManagedPeers() {
+        synchronized(peers) {
+            return new ArrayList<>(peers);
+        }
+    }
+    
+    private Collection<InetSocketAddress> getAddresses() {
+        synchronized(addresses) {
+            return new ArrayList<>(addresses);
+        }
     }
 
     @Override
@@ -486,16 +521,19 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
     private static final ProxyFactory pf = new ProxyFactory();
 
     private class ManagedPeer implements Peer {
-        private PeerStatus status = PeerStatus.CONNECTED;
+        boolean connected = true;
         PeerInfo info;
-        UUID uuid;
-        InetSocketAddress currentAddress;
-        List<InetSocketAddress> addressHistory = new ArrayList<InetSocketAddress>();
-        private Interceptor RMIInterceptor = new Interceptor() {
+        InetSocketAddress address;
 
+        public ManagedPeer(InetSocketAddress address) {
+            this.address = address;
+            populatePeerInfo();
+        }
+
+        private Interceptor interceptor = new Interceptor() {
             @Override
             public Object intercept(Invocation inv) throws Throwable {
-                if (isDisconnected()) {
+                if (!connected) {
                     throw new RuntimeException("Peer is disconnected");
                 }
                 try {
@@ -508,78 +546,88 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
             }
         };
 
-        public void checkConnectivity() {
+        private void populatePeerInfo() {
             try {
-                // check that we can get a UUID at current address (failure will jump to catch block)
-                IdentifyService idService = getServiceWithoutProxy(IdentifyService.class);
-                UUID id = idService.getUUID();
-                String name = idService.getName();
-                if(id.equals(this.uuid)) {
-                    // if the obtained UUID matches the UUID of this peer, set this peer as connected
-                    setConnected();
-                } else {
-                    // else, set peer as disconnected
-                    setDisconnected();
-                    // update any existing peer with the obtained UUID
-                    for(ManagedPeer peer : peers) {
-                        if(id.equals(peer.getUUID())) {
-                            peer.addAddressToHistory(currentAddress);
-                            return;
-                        }
-                    }
-                    // if no existing peer with the obtained UUID is found, add a new peer
-                    handlePeerInfo(new PeerInfo(name, currentAddress, id));
-                }
-            } catch (Exception e) {
-                log.error(this + " Connectivity failure", e);
-                setDisconnected();
+                IdentifyService service = getService(IdentifyService.class);
+                info = new PeerInfo(service.getName(), address, service.getUUID());
+            } catch(NoSuchServiceException e) {
+                log.error(e.getMessage(), e);
             }
         }
+        
+        public void checkConnectivity() {
+            if(!connected) return;
 
-        private void setConnected() {
-            if(status != PeerStatus.CONNECTED) {
-                log.debug("Setting peer " + this + " Connected");
-                status = PeerStatus.CONNECTED;
-                for(PeerConnectionListener listener : new ArrayList<PeerConnectionListener>(listeners))
-                    listener.handleConnectionEvent(new PeerConnectionEvent(PeerConnectionEvent.Type.CONNECTED, this));
+            log.debug("Checking connectivity of: " + this);
+            final AtomicBoolean connected = new AtomicBoolean(false);
+            Future<?> f = timeoutExecutor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        UUID uuid = getServiceWithoutProxy(IdentifyService.class).getUUID();
+                        if(info == null || uuid.equals(info.getID())) connected.set(true);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+
+            try {
+                f.get(5, TimeUnit.SECONDS);
+            } catch(TimeoutException e) {
+            } catch(Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            
+            if(!connected.get()) {
+                setDisconnected();
+            } else {
+                log.debug("Connectivity check: OK");
             }
         }
 
         public void setDisconnected() {
-            if(status != PeerStatus.DISCONNECTED) {
+            if(!connected) return;
+            
+            if(peers.remove(this)) {
                 log.debug("Setting peer " + this + " Disconnected");
-                status = PeerStatus.DISCONNECTED;
-                for(PeerConnectionListener listener : new ArrayList<PeerConnectionListener>(listeners))
-                    listener.handleConnectionEvent(new PeerConnectionEvent(PeerConnectionEvent.Type.DISCONNECTED, this));
+                connected = false;
+                
+                timeoutExecutor.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyPeerConnectionListeners(new PeerConnectionEvent(PeerConnectionEvent.Type.DISCONNECTED, ManagedPeer.this));
+                    }
+                });
             }
         }
 
         public boolean isConnected() {
-            return status == PeerStatus.CONNECTED;
-        }
-
-        public boolean isDisconnected() {
-            return status == PeerStatus.DISCONNECTED;
-        }
-
-        public ManagedPeer(PeerInfo info) {
-            this.info = info;
-            this.uuid = info.getID();
-            setAddress(info.getAddress());
-        }
-
-        public void setAddress(InetSocketAddress address) {
-            currentAddress = address;
-            addAddressToHistory(address);
-            checkConnectivity();
+            return connected;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> T getService(String name, Class<T> serviceClass) throws NoSuchServiceException {
-            T service = RMIPeerManager.getService(currentAddress, name, serviceClass);
-            T proxy = (T) pf.createInterceptorProxy(service, RMIInterceptor, new Class[]{serviceClass});
-            return proxy;
+        public <T> T getService(final String name, final Class<T> serviceClass) throws NoSuchServiceException {
+            Future<T> future = timeoutExecutor.submit(new Callable<T>() {
+                @Override
+                public T call() throws Exception {
+                    return RMIPeerManager.getService(address, name, serviceClass);
+                }
+            });
+            
+            try {
+                T service = future.get(5, TimeUnit.SECONDS);
+                T proxy = (T) pf.createInterceptorProxy(service, interceptor, new Class[]{serviceClass});
+                return proxy;
+            } catch(TimeoutException e) {
+                setDisconnected();
+                throw new NoSuchServiceException("No such service: " + name + " - due to timeout");
+            } catch(ExecutionException e) {
+                if(e.getCause() instanceof NoSuchServiceException) throw (NoSuchServiceException)e.getCause();
+                else throw new RuntimeException(e);
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
@@ -588,7 +636,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
         }
 
         private <T> T getServiceWithoutProxy(String name, Class<T> serviceClass) throws NoSuchServiceException {
-            return RMIPeerManager.getService(currentAddress, name, serviceClass);
+            return RMIPeerManager.getService(address, name, serviceClass);
         }
 
         private <T> T getServiceWithoutProxy(Class<T> serviceClass) throws NoSuchServiceException {
@@ -602,36 +650,16 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
 
         @Override
         public UUID getUUID() {
-            if (uuid == null) {
-                try {
-                    uuid = getService(IdentifyService.class).getUUID();
-                } catch (NoSuchServiceException e) {
-                    throw new RuntimeException("Unable to access identify service for peer.", e);
-                }
-            }
-            return uuid;
+            return info.getID();
+        }
+
+        public InetSocketAddress getAddress() {
+            return address;
         }
 
         @Override
         public String toString() {
-            return getName() + " @ " + currentAddress + " : " + uuid;
+            return getName() + " @ " + address + " : " + uuid;
         }
-
-        public void addAddressToHistory(InetSocketAddress address) {
-            addressHistory.remove(address);
-            addressHistory.add(0, address);
-        }
-    }
-
-    private String getPeerTables() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Peer list:");
-        for (ManagedPeer peer : peers) {
-            sb.append("\n  " + peer + " : " + ((peer.status == PeerStatus.CONNECTED) ? "Connected" : "Disconnected"));
-            for(InetSocketAddress address : peer.addressHistory) {
-                sb.append("\n    " + address);
-            }
-        }
-        return sb.toString();
     }
 }
