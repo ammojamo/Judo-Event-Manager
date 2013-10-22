@@ -12,6 +12,7 @@ import au.com.jwatmuff.eventmanager.export.CSVExporter;
 import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
+import au.com.jwatmuff.eventmanager.model.misc.FightGradingPoints;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
@@ -153,28 +154,26 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                     map.put("date", dateFormat.format(bean.getResult().getTimestamp()));
                     map.put("compname", competitionName);
                     
-                    Pool pool = database.get(Pool.class, bean.getFight().getPoolID());
+                    FightGradingPoints points = new FightGradingPoints(bean, database);
 
-                    map.put("pool", pool.getDescription());
+                    map.put("pool", points.pool.getDescription());
 
                     Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
                     ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
 
                     double[] scores = bean.getResult().getSimpleScores(database);
 
-                    Grade winnerGrade;
+                    Grade winnerGrade = null;
                     Grade loserGrade = null;
 
                     if(scores[0] != scores[1]) {
-                        int winnerIndex = scores[1] > scores[0] ? 1 : 0;
-                        int loserIndex = 1 - winnerIndex;
-                        map.put("winner", bean.getPlayerName()[winnerIndex]);
-                        map.put("loser", bean.getPlayerName()[loserIndex]);
-                        Player loser = bean.getPlayer()[loserIndex];
-                        Player winner = bean.getPlayer()[winnerIndex];
-                        winnerGrade = (winner == null) ? null : PoolChecker.getEffectiveGrade(winner, pool, censusDate, configurationFile);
+                        Player winner = points.losingPlayer;
+                        Player loser = points.winningPlayer;
+                        map.put("winner", winner.toString());
+                        map.put("loser", loser.toString());
+                        winnerGrade = (winner == null) ? null : winner.getGrade();
                         map.put("winnerRank", (winnerGrade==null)?"N/A": winnerGrade.shortGrade);
-                        loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate, configurationFile);
+                        loserGrade = (loser == null) ? null : loser.getGrade();
                         map.put("loserRank", (loserGrade==null)?"N/A": loserGrade.shortGrade);
                         map.put("loserId", (loser == null) ? "N/A" : loser.getVisibleID());
                         map.put("winnerId", (winner == null) ? "N/A" : winner.getVisibleID());
@@ -189,12 +188,65 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                     }
 
                     
-                    map.put("points", calculatePoints(bean, loserGrade));
+                    map.put("points", FightGradingPoints.calculatePoints(bean, loserGrade, winnerGrade, configurationFile));
                     map.put("signature", " ");
 
                     return map;
                 } 
             });
+        
+//        public ResultTableModel() {
+//            super();
+//            format.setMinimumIntegerDigits(2);
+//            this.setBeanMapper(new BeanMapper<ResultInfo>() {
+//                @Override
+//                public Map<String, Object> mapBean(ResultInfo bean) {
+//                    Map<String, Object> map = new HashMap<String, Object>();
+//                    map.put("date", dateFormat.format(bean.getResult().getTimestamp()));
+//                    map.put("compname", competitionName);
+//                    
+//                    Pool pool = database.get(Pool.class, bean.getFight().getPoolID());
+//
+//                    map.put("pool", pool.getDescription());
+//
+//                    Date censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
+//                    ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(database.get(CompetitionInfo.class, null).getDrawConfiguration());
+//
+//                    double[] scores = bean.getResult().getSimpleScores(database);
+//
+//                    Grade winnerGrade;
+//                    Grade loserGrade = null;
+//
+//                    if(scores[0] != scores[1]) {
+//                        int winnerIndex = scores[1] > scores[0] ? 1 : 0;
+//                        int loserIndex = 1 - winnerIndex;
+//                        map.put("winner", bean.getPlayerName()[winnerIndex]);
+//                        map.put("loser", bean.getPlayerName()[loserIndex]);
+//                        Player loser = bean.getPlayer()[loserIndex];
+//                        Player winner = bean.getPlayer()[winnerIndex];
+//                        winnerGrade = (winner == null) ? null : PoolChecker.getEffectiveGrade(winner, pool, censusDate, configurationFile);
+//                        map.put("winnerRank", (winnerGrade==null)?"N/A": winnerGrade.shortGrade);
+//                        loserGrade = (loser == null) ? null : PoolChecker.getEffectiveGrade(loser, pool, censusDate, configurationFile);
+//                        map.put("loserRank", (loserGrade==null)?"N/A": loserGrade.shortGrade);
+//                        map.put("loserId", (loser == null) ? "N/A" : loser.getVisibleID());
+//                        map.put("winnerId", (winner == null) ? "N/A" : winner.getVisibleID());
+//                    }
+//                    else {
+//                        map.put("winner", "Draw");
+//                        map.put("loser", "Draw");
+//                        map.put("winnerRank", "N/A");
+//                        map.put("loserRank", "N/A");
+//                        map.put("winnerId", "N/A");
+//                        map.put("loserId", "N/A");
+//                    }
+//
+//                    
+//                    map.put("points", calculatePoints(bean, loserGrade));
+//                    map.put("signature", " ");
+//
+//                    return map;
+//                } 
+//            });
 
             addColumn("Date", "date");
             addColumn("Player", "winner");
@@ -209,35 +261,35 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
             addColumn("Signature", "signature");
         }
 
-        private final int[] POINTS = new int[] { 1, 3, 5, 7, 10, 15, 20 };
+//        private final int[] POINTS = new int[] { 1, 3, 5, 7, 10, 15, 20 };
 
-        private int calculatePoints(ResultInfo info, Grade loserGrade) {
-            if(loserGrade == null) return 0;
-
-            double[] score = info.getResult().getSimpleScores(database);
-            if(score[0] == score[1]) return 0;
-            int w = (score[0] > score[1]) ? 0 : 1;
-            int l = 1-w;
-
-            if(info.getPlayer()[w] == null) {
-                log.warn("This shouldn't happen");
-                return 0;
-            }
-
-            Grade winnerGrade = info.getPlayer()[w].getGrade();
-
-            int rankDifference = loserGrade.ordinal() - winnerGrade.ordinal();
-            
-            if(rankDifference < -2) return 0;
-            rankDifference = Math.min(rankDifference, 2);
-
-            if(score[w] == 10)
-                return POINTS[4 + rankDifference];
-            else if(score[w] == 7)
-                return POINTS[3 + rankDifference];
-            else
-                return POINTS[2 + rankDifference];
-        }
+//        private int calculatePoints(ResultInfo info, Grade loserGrade) {
+//            if(loserGrade == null) return 0;
+//
+//            double[] score = info.getResult().getSimpleScores(database);
+//            if(score[0] == score[1]) return 0;
+//            int w = (score[0] > score[1]) ? 0 : 1;
+//            int l = 1-w;
+//
+//            if(info.getPlayer()[w] == null) {
+//                log.warn("This shouldn't happen");
+//                return 0;
+//            }
+//
+//            Grade winnerGrade = info.getPlayer()[w].getGrade();
+//
+//            int rankDifference = loserGrade.ordinal() - winnerGrade.ordinal();
+//            
+//            if(rankDifference < -2) return 0;
+//            rankDifference = Math.min(rankDifference, 2);
+//
+//            if(score[w] == 10)
+//                return POINTS[4 + rankDifference];
+//            else if(score[w] == 7)
+//                return POINTS[3 + rankDifference];
+//            else
+//                return POINTS[2 + rankDifference];
+//        }
     }
 
     @Override

@@ -54,9 +54,9 @@ public class Main {
     private static Logger log = Logger.getLogger(Main.class);
 
     //internal version - bump this up whenever making a database change
-    public static final String VERSION = "8";
-    public static final String WINDOW_TITLE = "Event Manager 2013 Update 1";
-    public static final String VISIBLE_VERSION = "Event Manager 2013 Update 1";
+    public static final String VERSION = "9";
+    public static final String WINDOW_TITLE = "Event Manager 2013 Update 3";
+    public static final String VISIBLE_VERSION = "Event Manager 2013 Update 3";
 
     private static File workingDir = new File(".");
 

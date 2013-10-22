@@ -117,7 +117,7 @@ public class PoolDraw {
 // Creat a list of seed values
         List<Integer> seedSet = new ArrayList<Integer>();
         for (Integer seed : seeds.values()) {
-            if (seed != null && !seedSet.contains(seed)) {
+            if (seed != null && seed != 0 && !seedSet.contains(seed)) {
                 seedSet.add(seed);
             }
         }
