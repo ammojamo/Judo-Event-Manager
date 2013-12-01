@@ -64,7 +64,7 @@ table td.borderTitle3 {
     background: whitesmoke;
 }
 
-table td.borderBlue {
+table td.borderPlayer1 {
     background: white;
     border-top: 2px solid black;
     border-left: 2px solid black;
@@ -73,7 +73,7 @@ table td.borderBlue {
     padding-top: 0.3em;
 }
 
-table td.borderBluePlayer {
+table td.borderFirstPlayer {
     background: white;
     border-top: 2px solid black;
     border-left: 2px solid black;
@@ -82,7 +82,7 @@ table td.borderBluePlayer {
     padding-top: 0.3em;
 }
 
-table td.borderBluePlayerInfo {
+table td.borderFirstPlayerInfo {
     background: white;
     border-top: 2px solid black;
     border-left: none;
@@ -92,7 +92,7 @@ table td.borderBluePlayerInfo {
     text-align: right;
 }
 
-table td.borderWhite {
+table td.borderPlayer2 {
     background: aliceblue;
     border-top: 1px solid black;
     border-left: 2px solid black;
@@ -101,7 +101,7 @@ table td.borderWhite {
     padding-bottom: 0.3em;
 }
 
-table td.borderWhitePlayer {
+table td.borderSecondPlayer {
     background: aliceblue;
     border-top: 1px solid black;
     border-left: 2px solid black;
@@ -110,7 +110,7 @@ table td.borderWhitePlayer {
     padding-bottom: 0.3em;
 }
 
-table td.borderWhitePlayerInfo {
+table td.borderSecondPlayerInfo {
     background: aliceblue;
     border-top: 1px solid black;
     border-left: none;
