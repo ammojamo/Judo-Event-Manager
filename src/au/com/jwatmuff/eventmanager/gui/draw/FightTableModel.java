@@ -1,4 +1,4 @@
-package au.com.jwatmuff.eventmanager.gui.fightorder;
+package au.com.jwatmuff.eventmanager.gui.draw;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;

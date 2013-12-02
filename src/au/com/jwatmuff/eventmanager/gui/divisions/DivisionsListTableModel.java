@@ -6,7 +6,7 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package au.com.jwatmuff.eventmanager.gui.pool;
+package au.com.jwatmuff.eventmanager.gui.divisions;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
  *
  * @author James
  */
-public class PoolListTableModel extends BeanMapperTableModel<Pool> implements TransactionListener {
-    private static final Logger log = Logger.getLogger(PoolListTableModel.class);
+public class DivisionsListTableModel extends BeanMapperTableModel<Pool> implements TransactionListener {
+    private static final Logger log = Logger.getLogger(DivisionsListTableModel.class);
 
     private Database database;
     private BeanMapper<Pool> beanMapper = new BeanMapper<Pool>() {
@@ -55,7 +55,7 @@ public class PoolListTableModel extends BeanMapperTableModel<Pool> implements Tr
     };
 
     /** Creates a new instance of PoolListTableModel */
-    public PoolListTableModel(Database database, TransactionNotifier notifier) {
+    public DivisionsListTableModel(Database database, TransactionNotifier notifier) {
         super();
         this.database = database;
         setBeanMapper(beanMapper);

@@ -11,8 +11,8 @@
 
 package au.com.jwatmuff.eventmanager.gui.wizard;
 
-import au.com.jwatmuff.eventmanager.gui.fightorder.FightTableModel;
-import au.com.jwatmuff.eventmanager.gui.fightorder.PlayerTableModel;
+import au.com.jwatmuff.eventmanager.gui.draw.FightTableModel;
+import au.com.jwatmuff.eventmanager.gui.draw.PlayerTableModel;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;

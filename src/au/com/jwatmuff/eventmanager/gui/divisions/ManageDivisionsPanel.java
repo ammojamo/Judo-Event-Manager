@@ -3,7 +3,7 @@
  *
  * Created on 25 March 2008, 13:26
  */
-package au.com.jwatmuff.eventmanager.gui.pool;
+package au.com.jwatmuff.eventmanager.gui.divisions;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
@@ -51,15 +51,15 @@ import org.apache.log4j.Logger;
  *
  * @author  James
  */
-public class ManagePoolsPanel extends javax.swing.JPanel {
+public class ManageDivisionsPanel extends javax.swing.JPanel {
 
-    private static Logger log = Logger.getLogger(ManagePoolsPanel.class);
+    private static Logger log = Logger.getLogger(ManageDivisionsPanel.class);
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
     private Frame parentWindow;
-    private PoolListTableModel tableModel;
-    private PoolPlayerListModel requestedListModel;
-    private PoolPlayerListModel approvedListModel;
+    private DivisionsListTableModel tableModel;
+    private DivisionsPlayerListModel requestedListModel;
+    private DivisionsPlayerListModel approvedListModel;
     private Date censusDate;
     private ConfigurationFile configurationFile;
     public static final Comparator<Pool> POOL_COMPARATOR = new Comparator<Pool>() {
@@ -105,7 +105,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     };
 
     /** Creates new form ManagePoolsPanel */
-    public ManagePoolsPanel() {
+    public ManageDivisionsPanel() {
         initComponents();
     }
 
@@ -122,7 +122,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
     }
 
     public void afterPropertiesSet() {
-        tableModel = new PoolListTableModel(database, notifier);
+        tableModel = new DivisionsListTableModel(database, notifier);
         poolListTable.setModel(tableModel);
 
         censusDate = database.get(CompetitionInfo.class, null).getAgeThresholdDate();
@@ -130,10 +130,10 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
         PlayerListCellRenderer playerListRenderer = new PlayerListCellRenderer(censusDate);
 
-        requestedListModel = new PoolPlayerListModel(database, notifier, false);
+        requestedListModel = new DivisionsPlayerListModel(database, notifier, false);
         requestedList.setCellRenderer(playerListRenderer);
         requestedList.setModel(requestedListModel);
-        approvedListModel = new PoolPlayerListModel(database, notifier, true);
+        approvedListModel = new DivisionsPlayerListModel(database, notifier, true);
         approvedList.setModel(approvedListModel);
         approvedList.setCellRenderer(playerListRenderer);
 
@@ -308,6 +308,7 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
 
         setMinimumSize(new java.awt.Dimension(300, 0));
 
+        poolListTable.setAutoCreateRowSorter(true);
         poolListTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -327,7 +328,6 @@ public class ManagePoolsPanel extends javax.swing.JPanel {
                 return types [columnIndex];
             }
         });
-        poolListTable.setAutoCreateRowSorter(true);
         poolListTable.setGridColor(new java.awt.Color(237, 237, 237));
         poolListTable.setRowHeight(19);
         poolListTable.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -684,7 +684,7 @@ private void poolListTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIR
             if (!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) {
                 return;
             }
-            new PoolDetailsDialog(parentWindow, true, database, this.getSelectedPool()).setVisible(true);
+            new DivisionsDetailsDialog(parentWindow, true, database, this.getSelectedPool()).setVisible(true);
         }
 }//GEN-LAST:event_poolListTableMouseClicked
 
@@ -692,7 +692,7 @@ private void customPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//
         if (!PermissionChecker.isAllowed(Action.ADD_DIVISION, database)) {
             return;
         }
-        new PoolDetailsDialog(parentWindow, true, database, null).setVisible(true);
+        new DivisionsDetailsDialog(parentWindow, true, database, null).setVisible(true);
 }//GEN-LAST:event_customPoolButtonActionPerformed
 
 private void drawWizardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

@@ -8,7 +8,7 @@ package au.com.jwatmuff.eventmanager.gui.admin;
 
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
-import au.com.jwatmuff.eventmanager.gui.pool.PoolDetailsDialog;
+import au.com.jwatmuff.eventmanager.gui.divisions.DivisionsDetailsDialog;
 import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
@@ -693,13 +693,13 @@ public class CompetitionDetailsDialog extends javax.swing.JDialog {
         Pool selected = getSelectedPool();
         if(selected != null) {
             if(!PermissionChecker.isAllowed(Action.EDIT_DIVISION, database)) return;
-            new PoolDetailsDialog(parentWindow, true, database, selected).setVisible(true);
+            new DivisionsDetailsDialog(parentWindow, true, database, selected).setVisible(true);
         }
     }//GEN-LAST:event_editPoolButtonActionPerformed
 
     private void addPoolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPoolButtonActionPerformed
         if(!PermissionChecker.isAllowed(Action.ADD_DIVISION, database)) return;
-        new PoolDetailsDialog(parentWindow, true, database, null).setVisible(true);
+        new DivisionsDetailsDialog(parentWindow, true, database, null).setVisible(true);
         tableSelectionChanged();
     }//GEN-LAST:event_addPoolButtonActionPerformed
 

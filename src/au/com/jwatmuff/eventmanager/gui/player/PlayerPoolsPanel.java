@@ -10,7 +10,7 @@ import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
 import au.com.jwatmuff.eventmanager.db.SessionDAO;
-import au.com.jwatmuff.eventmanager.gui.pool.PoolDetailsDialog;
+import au.com.jwatmuff.eventmanager.gui.divisions.DivisionsDetailsDialog;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
@@ -360,7 +360,7 @@ public class PlayerPoolsPanel extends javax.swing.JPanel implements TransactionL
     }//GEN-LAST:event_removeDivisionButtonActionPerformed
 
 private void newDivisionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newDivisionButtonActionPerformed
-        PoolDetailsDialog pdd = new PoolDetailsDialog(parent, true, database, null);
+        DivisionsDetailsDialog pdd = new DivisionsDetailsDialog(parent, true, database, null);
         pdd.setVisible(true);
         updatePoolComboBox();
 }//GEN-LAST:event_newDivisionButtonActionPerformed

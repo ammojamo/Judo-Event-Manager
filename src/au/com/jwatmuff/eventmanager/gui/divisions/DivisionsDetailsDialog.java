@@ -4,7 +4,7 @@
  * Created on 25 April 2008, 17:19
  */
 
-package au.com.jwatmuff.eventmanager.gui.pool;
+package au.com.jwatmuff.eventmanager.gui.divisions;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
@@ -43,7 +43,7 @@ import javax.swing.JOptionPane;
  *
  * @author  James
  */
-public class PoolDetailsDialog extends javax.swing.JDialog {
+public class DivisionsDetailsDialog extends javax.swing.JDialog {
     private TransactionalDatabase database;
     
     private boolean newPool = true;
@@ -63,7 +63,7 @@ public class PoolDetailsDialog extends javax.swing.JDialog {
     
     /** Creates new form PoolDetailsDialog */
     @SuppressWarnings("unchecked")
-    public PoolDetailsDialog(java.awt.Frame parent, boolean modal, TransactionalDatabase database, Pool pool) {
+    public DivisionsDetailsDialog(java.awt.Frame parent, boolean modal, TransactionalDatabase database, Pool pool) {
         super(parent, modal);
         initComponents();
         setLocationRelativeTo(parent);

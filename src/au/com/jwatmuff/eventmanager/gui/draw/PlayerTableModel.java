@@ -1,4 +1,4 @@
-package au.com.jwatmuff.eventmanager.gui.fightorder;
+package au.com.jwatmuff.eventmanager.gui.draw;
 
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;

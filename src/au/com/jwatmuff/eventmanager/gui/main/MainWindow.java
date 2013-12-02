@@ -7,10 +7,10 @@
 package au.com.jwatmuff.eventmanager.gui.main;
 
 import au.com.jwatmuff.eventmanager.gui.admin.AdministrationPanel;
-import au.com.jwatmuff.eventmanager.gui.fightorder.FightOrderPanel;
+import au.com.jwatmuff.eventmanager.gui.draw.FightOrderPanel;
 import au.com.jwatmuff.eventmanager.gui.player.ManagePlayersPanel;
 import au.com.jwatmuff.eventmanager.gui.player.WeighInDialog;
-import au.com.jwatmuff.eventmanager.gui.pool.ManagePoolsPanel;
+import au.com.jwatmuff.eventmanager.gui.divisions.ManageDivisionsPanel;
 import au.com.jwatmuff.eventmanager.gui.results.PrintPanel;
 import au.com.jwatmuff.eventmanager.gui.scoring.CompetitionInterfacesPanel;
 import au.com.jwatmuff.eventmanager.gui.results.ResultsPanel;
@@ -53,7 +53,7 @@ public class MainWindow extends javax.swing.JFrame {
     private LicenseManager licenseManager;
     
     private ManagePlayersPanel managePlayersPanel;
-    private ManagePoolsPanel managePoolsPanel;
+    private ManageDivisionsPanel managePoolsPanel;
     private AdministrationPanel administrationPanel;
     private FightOrderPanel fightOrderPanel;
     private ManageSessionsPanel manageSessionsPanel;
@@ -161,7 +161,7 @@ public class MainWindow extends javax.swing.JFrame {
         
         mainTabbedPane.insertTab("Draw", null, fightOrderPanel, null, 1);
 
-        managePoolsPanel = new ManagePoolsPanel();
+        managePoolsPanel = new ManageDivisionsPanel();
         managePoolsPanel.setParentWindow(this);
         managePoolsPanel.setDatabase(database);
         managePoolsPanel.setNotifier(notifier);
