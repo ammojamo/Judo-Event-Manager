@@ -1,12 +1,12 @@
-Name "Event Manager 2013 B"
-Caption "Event Manager 2013 B"
+Name "Event Manager 2013 Update 4"
+Caption "Event Manager 2013 Update 4"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2013-Update3.exe"
+OutFile "EventManagerSetup-2013-Update4.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
 
-InstallDir $PROGRAMFILES\EventManager2013_B
+InstallDir $PROGRAMFILES\EventManager2013
 
 DirText "This will install EventManager 2013 on your computer."
 
@@ -22,9 +22,9 @@ Section ""
 
   writeUninstaller "$INSTDIR\uninstall.exe"
 
-  CreateDirectory "$SMPROGRAMS\EventManager2013B"
-  createShortCut "$SMPROGRAMS\EventManager2013B\EventManager.lnk" "$INSTDIR\EventManager.jar" "" "$INSTDIR\icon.ico"
-  createShortCut "$SMPROGRAMS\EventManager2013B\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+  CreateDirectory "$SMPROGRAMS\EventManager2013"
+  createShortCut "$SMPROGRAMS\EventManager2013\EventManager.lnk" "$INSTDIR\EventManager.jar" "" "$INSTDIR\icon.ico"
+  createShortCut "$SMPROGRAMS\EventManager2013\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager2013_B" \
                    "DisplayName" "EventManager"
@@ -41,13 +41,13 @@ UninstallText "This will uninstall EventManager 2013."
 
 Section "Uninstall"
 ; try user dir as well as all user dirs
-  RMDir /r "$SMPROGRAMS\EventManager2013B"
+  RMDir /r "$SMPROGRAMS\EventManager2013"
   SetShellVarContext all
-  RMDir /r "$SMPROGRAMS\EventManager2013B"
+  RMDir /r "$SMPROGRAMS\EventManager2013"
 
   RMDir /r "$INSTDIR"
 
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager2013_B"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\EventManager2013"
 SectionEnd
 
 Section "Install Java"
