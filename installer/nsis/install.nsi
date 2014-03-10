@@ -60,10 +60,10 @@ Section "Install Java"
 
   installjava:
 
-  File ..\thirdparty\jre-7u25-windows-i586.exe
-  ExecWait "$INSTDIR\jre-7u25-windows-i586.exe"
+  File ..\thirdparty\jre-7u51-windows-i586.exe
+  ExecWait "$INSTDIR\jre-7u51-windows-i586.exe"
 
   installjavadone:
 
-  Delete "$INSTDIR\jre-7u21-windows-i586.exe"
+  Delete "$INSTDIR\jre-7u51-windows-i586.exe"
 SectionEnd
