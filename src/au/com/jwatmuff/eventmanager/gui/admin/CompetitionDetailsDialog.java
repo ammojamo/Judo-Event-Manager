@@ -9,7 +9,7 @@ package au.com.jwatmuff.eventmanager.gui.admin;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
 import au.com.jwatmuff.eventmanager.gui.divisions.DivisionsDetailsDialog;
-import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
+import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
 import au.com.jwatmuff.eventmanager.permissions.Action;

@@ -9,7 +9,7 @@ import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
 import au.com.jwatmuff.eventmanager.db.SessionDAO;
 import au.com.jwatmuff.eventmanager.db.SessionFightDAO;
-import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
+import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.CodeInfo;

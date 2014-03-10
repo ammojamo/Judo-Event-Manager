@@ -11,7 +11,7 @@ package au.com.jwatmuff.eventmanager.model.misc;
 
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
-import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
+import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;

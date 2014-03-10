@@ -11,7 +11,7 @@ import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow;
-import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
+import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.AutoAssign;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;

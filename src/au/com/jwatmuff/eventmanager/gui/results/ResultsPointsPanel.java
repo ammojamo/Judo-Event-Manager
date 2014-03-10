@@ -9,7 +9,7 @@ package au.com.jwatmuff.eventmanager.gui.results;
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.ResultDAO;
 import au.com.jwatmuff.eventmanager.export.CSVExporter;
-import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
+import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.FightGradingPoints;

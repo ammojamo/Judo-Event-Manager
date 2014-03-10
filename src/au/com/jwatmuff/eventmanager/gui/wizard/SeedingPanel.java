@@ -13,7 +13,7 @@ package au.com.jwatmuff.eventmanager.gui.wizard;
 
 import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
-import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
+import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.*;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter.TooFewPlayersException;

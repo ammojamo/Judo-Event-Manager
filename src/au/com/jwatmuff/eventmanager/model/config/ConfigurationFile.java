@@ -1,4 +1,4 @@
-package au.com.jwatmuff.eventmanager.model.draw;
+package au.com.jwatmuff.eventmanager.model.config;
 
 import au.com.jwatmuff.eventmanager.util.FileExtensionFilter;
 import java.io.File;

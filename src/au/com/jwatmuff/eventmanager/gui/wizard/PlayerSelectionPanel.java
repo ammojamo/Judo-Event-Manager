@@ -16,7 +16,7 @@ import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.player.PlayerDetailsDialog;
 import au.com.jwatmuff.eventmanager.gui.wizard.DrawWizardWindow.Context;
-import au.com.jwatmuff.eventmanager.model.draw.ConfigurationFile;
+import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
