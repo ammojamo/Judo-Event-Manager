@@ -9,6 +9,7 @@ import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
+import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.genericdb.Database;
 import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
@@ -204,7 +205,20 @@ public class PoolPlayerSequencer {
         return newPlayers;
     }
     
-    public static void savePlayerSequence(final TransactionalDatabase database, int poolID, final List<PlayerPoolInfo> playerPoolInfolist) {
+    public static void savePlayerSequence(final TransactionalDatabase database, int poolID, final List<PlayerPoolInfo> playerPoolInfolist) throws DatabaseStateException {
+        Pool pool = database.get(Pool.class, poolID);
+        if(pool == null) {
+            throw new DatabaseStateException("Pool with id " + poolID + " does not exist");
+        }
+        if(pool.getLockedStatus() == Pool.LockedStatus.FIGHTS_LOCKED) {
+            throw new DatabaseStateException("Cannot change player sequence on a fight-locked pool");
+        }
+        for(PlayerPoolInfo ppi : playerPoolInfolist) {
+            if(ppi != null && ppi.getPlayerPool().getPoolID() != poolID) {
+                throw new DatabaseStateException("Player pool id (" + ppi.getPool().getID() + ") does not match: " + poolID);
+            }
+        }
+
         database.perform(new Transaction() {
 
             @Override

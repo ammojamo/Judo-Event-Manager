@@ -1,12 +1,14 @@
 package au.com.jwatmuff.eventmanager.gui.draw;
 
 import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
+import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.PlayerPool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
 import au.com.jwatmuff.eventmanager.util.BeanMapperTableModel;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionNotifier;
@@ -17,12 +19,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author James
  */
 public abstract class PlayerTableModel extends BeanMapperTableModel<PlayerPoolInfo> implements TransactionListener {
+    private static final Logger log = Logger.getLogger(PlayerTableModel.class);
+
     private List<PlayerPoolInfo> players = new ArrayList<PlayerPoolInfo>();
     private TransactionalDatabase database;
     private TransactionNotifier notifier;
@@ -90,7 +95,7 @@ public abstract class PlayerTableModel extends BeanMapperTableModel<PlayerPoolIn
         Collections.shuffle(unorderedPlayers);
         players.addAll(unorderedPlayers);
 
-        PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
+        savePlayerSequence(database, poolID, players);
     }
 
     public void moveUp(int index) {
@@ -100,7 +105,7 @@ public abstract class PlayerTableModel extends BeanMapperTableModel<PlayerPoolIn
 
         if((index > 0) && (index < players.size())) {
             Collections.swap(players, index, index - 1);
-            PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
+            savePlayerSequence(database, poolID, players);
         }
     }
 
@@ -111,7 +116,7 @@ public abstract class PlayerTableModel extends BeanMapperTableModel<PlayerPoolIn
 
         if((index >= 0) && (index < players.size()-1)) {
             Collections.swap(players, index, index+1);
-            PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
+            savePlayerSequence(database, poolID, players);
         }
     }
 
@@ -120,7 +125,16 @@ public abstract class PlayerTableModel extends BeanMapperTableModel<PlayerPoolIn
         if(pool == null) return;
         int poolID = pool.getID();
 
-        PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
+        savePlayerSequence(database, poolID, players);
+    }
+
+    private static void savePlayerSequence(TransactionalDatabase database, int poolID, List<PlayerPoolInfo> players) {
+        try {
+            PoolPlayerSequencer.savePlayerSequence(database, poolID, players);
+        } catch (DatabaseStateException e) {
+            log.error("Exception while saving player sequence", e);
+            GUIUtils.displayError(null, "Error while updating player order");
+        }
     }
 
     @Override

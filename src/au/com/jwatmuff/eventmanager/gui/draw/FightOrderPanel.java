@@ -233,6 +233,15 @@ public class FightOrderPanel extends javax.swing.JPanel {
         }
     }
     
+    public boolean checkPoolIsNotFightLocked(Pool p) {
+        if(p != null) p = database.get(Pool.class, p.getID());
+        if(p != null && p.getLockedStatus() == Pool.LockedStatus.FIGHTS_LOCKED) {
+            GUIUtils.displayError(this, "The selected pool is locked");
+            return false;
+        }
+        return true;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -451,6 +460,7 @@ public class FightOrderPanel extends javax.swing.JPanel {
         Pool pool = getSelectedPool();
 
         if(pool == null) return;
+        if(!checkPoolIsNotFightLocked(pool)) return;
         if(!GUIUtils.confirmLock(parentWindow, pool.getDescription())) return;
         if(!PermissionChecker.isAllowed(Action.LOCK_DRAW, database)) return;
         try {
@@ -463,6 +473,8 @@ public class FightOrderPanel extends javax.swing.JPanel {
 
     private void autoAssignButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoAssignButtonActionPerformed
         Pool pool = getSelectedPool();
+        if(!checkPoolIsNotFightLocked(pool)) return;
+
         /*
         try {
             FightGenerator.generateFightsForPool(database, pool);
@@ -530,6 +542,8 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_printButtonActionPerformed
 
 private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
+    if(!checkPoolIsNotFightLocked(getSelectedPool())) return;
+
     int index = playerTable.getSelectedRow();
     if(index < 1) return;
     playerTableModel.moveUp(index);
@@ -537,6 +551,8 @@ private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 }//GEN-LAST:event_upButtonActionPerformed
 
 private void downButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downButtonActionPerformed
+    if(!checkPoolIsNotFightLocked(getSelectedPool())) return;
+
     int index = playerTable.getSelectedRow();
     if((index < 0) || (index >= playerTableModel.getRowCount()-1)) return;
     playerTableModel.moveDown(index);
@@ -545,6 +561,8 @@ private void downButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
         Pool pool = getSelectedPool();
+
+        if(!checkPoolIsNotFightLocked(pool)) return;
         if(pool == null) return;
         
         JFileChooser fileChooser = new JFileChooser();
