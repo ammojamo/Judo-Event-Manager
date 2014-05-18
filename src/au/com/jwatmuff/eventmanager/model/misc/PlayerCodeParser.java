@@ -527,6 +527,7 @@ public class PlayerCodeParser {
         } else {
             List<PlayerRRScore> PlayerRRScore = roundRobinResults(codeType, roundRobinFightInfoList);
             if(PlayerRRScore.size()<number){
+// ToDo: should this be BYE or EMPTY
                 fightPlayer.type = PlayerType.BYE;
                 return fightPlayer;
             }
@@ -546,11 +547,13 @@ public class PlayerCodeParser {
 // Check for Tie with another player
                     isTie = false;
                     if(PlayerRRScore.size() >= number){
+                        // Is three a tie with player after
                         if(PlayerRRScore.size() > number){
                             if(PlayerRRScore.get(number-1).place == PlayerRRScore.get(number).place ){
                                 isTie = true;
                             }
                         }
+                        // Is three a tie with player before
                         if (number > 1){
                             if(PlayerRRScore.get(number-1).place == PlayerRRScore.get(number-2).place ){
                                 isTie = true;
@@ -572,11 +575,13 @@ public class PlayerCodeParser {
                 case 'P':
 // Check for Tie with another player
                     isTie = false;
+                    // Is three a tie with player after
                     if(PlayerRRScore.size() > number){
                         if(PlayerRRScore.get(number-1).place == PlayerRRScore.get(number).place ){
                             isTie = true;
                         }
                     }
+                    // Is three a tie with player before
                     if (number>1){
                         if(PlayerRRScore.get(number-1).place == PlayerRRScore.get(number-2).place ){
                             isTie = true;
@@ -718,25 +723,49 @@ public class PlayerCodeParser {
     }
 
     private List<PlayerRRScore> roundRobinResults(CodeType codeType, List<FightInfo> roundRobinFightInfoList) {
-
+        
         List<PlayerRRScore> playerRRScoresList = roundRobinScores(roundRobinFightInfoList);
-        Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR;
-        if (roundRobinSeperation.contentEquals("WinsPointsTimeWeight")) {
-            PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_RR_WPTW;
-        }else{
-            PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_RR_WP;
-        }
-        Comparator<PlayerRRScore> PLAYERS_POS_COMPARATOR = PLAYERS_POS2_COMPARATOR_RR;
         if(codeType == CodeType.BESTOFTHREE){
-            PLAYERS_SCORE_COMPARATOR = PLAYERS_SCORE_COMPARATOR_BT;
-            PLAYERS_POS_COMPARATOR = PLAYERS_POS_COMPARATOR_BT;
+            playerRRScoresList = roundRobinResultsOrder( roundRobinFightInfoList,  PLAYERS_SCORE_COMPARATOR_BT);
+        }else{
+            playerRRScoresList = roundRobinResultsOrder( roundRobinFightInfoList,  PLAYERS_SCORE_COMPARATOR_RR_WP);
+            if (roundRobinSeperation.contentEquals("WinsPointsTimeWeight")) {
+//find ties
+                List<PlayerRRScore> playerRRTieList = new ArrayList<PlayerRRScore>();
+                int i = 0;
+                while(i < playerRRScoresList.size()) {
+                    int j = i;
+                    playerRRTieList.clear();
+                    while(j < playerRRScoresList.size()-1 && playerRRScoresList.get(j).place == playerRRScoresList.get(j+1).place){
+                        j++;
+                    }
+                    if(j > i){
+                        for(int k = i; k <= j; k++)
+                            playerRRTieList.add(playerRRScoresList.get(k));
+                        
+                        List<FightInfo> pairsOfFightInfoList = roundRobinFightsFromRRScoreList(roundRobinFightInfoList, playerRRTieList);
+                        playerRRTieList = roundRobinResultsOrder(pairsOfFightInfoList, PLAYERS_SCORE_COMPARATOR_RR_WPTW);
+                        for(int k = 0; k < playerRRTieList.size(); k++){
+                            playerRRTieList.get(k).place = playerRRTieList.get(k).place+i;
+                            playerRRScoresList.set(i+k, playerRRTieList.get(k));
+                        }
+                        i = i + playerRRTieList.size()-1;
+                    }
+                    i++;
+                }
+            }
         }
-
+        return playerRRScoresList;
+    }
+    
+    private List<PlayerRRScore> roundRobinResultsOrder(List<FightInfo> roundRobinFightInfoList, Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR) {
+        
+        List<PlayerRRScore> playerRRScoresList = roundRobinScores(roundRobinFightInfoList);
+        
 //Sort List
         Collections.sort(playerRRScoresList, PLAYERS_SCORE_COMPARATOR);
-
-
-//find equals
+        
+//find ties
         List<PlayerRRScore> playerRRTieList = new ArrayList<PlayerRRScore>();
         int i = 0;
         while(i < playerRRScoresList.size()) {
@@ -750,15 +779,6 @@ public class PlayerCodeParser {
                     playerRRTieList.add(playerRRScoresList.get(k));
             }
 
-// Detect all withdrawn
-            boolean allWithdrawn = true;
-            for(PlayerRRScore playerRRTie : playerRRTieList){
-                if(!getPlayerPoolInfo(playerRRTie.playerID).isWithdrawn()){
-                    allWithdrawn = false;
-                    break;
-                }
-            }
-
 // Are ZERO players tied?
             if(playerRRTieList.isEmpty()){
                 playerRRScoresList.get(i).place = i;
@@ -769,47 +789,45 @@ public class PlayerCodeParser {
                 for(int k = 0; k < playerRRScoresList.size(); k++){
                     playerRRScoresList.get(k).place = 0;
                 }
-                Collections.sort(playerRRScoresList, PLAYERS_POS_COMPARATOR);
+                Collections.sort(playerRRScoresList, PLAYERS_POS2_COMPARATOR_RR);
                 return playerRRScoresList;
-
-// Are all players witdhrawn
-            }else if(allWithdrawn){
-                for(int k = i; k <= j; k++){
-                    playerRRScoresList.get(k).place = j;
-                }
-// Are SOME players tied?
+                
+// There are SOME players tied?
             }else{
-                List<FightInfo> pairsOfFightInfoList = new ArrayList<FightInfo>();
-                int matchedIDs;
-                for(FightInfo fightInfo : roundRobinFightInfoList){
-                    matchedIDs = 0;
-                    for(int k = 0; k < playerRRTieList.size(); k++){
-                        String[] codes = fightInfo.getAllPlayerCode();
-                        FightPlayer[] fightPlayers = new FightPlayer[] {
-                            parseCode(codes[0]),
-                            parseCode(codes[1])
-                        };
-                        if(playerRRTieList.get(k).playerID == fightPlayers[0].player.getID() || playerRRTieList.get(k).playerID == fightPlayers[1].player.getID()){
-                            matchedIDs++;
-                        }
-                    }
-                    if(matchedIDs == 2)
-                        pairsOfFightInfoList.add(fightInfo);
-                }
-                playerRRTieList = roundRobinResults(codeType, pairsOfFightInfoList);
+                List<FightInfo> pairsOfFightInfoList = roundRobinFightsFromRRScoreList(roundRobinFightInfoList, playerRRTieList);
+                playerRRTieList = roundRobinResultsOrder(pairsOfFightInfoList, PLAYERS_SCORE_COMPARATOR);
                 for(int k = 0; k < playerRRTieList.size(); k++){
                     playerRRTieList.get(k).place = playerRRTieList.get(k).place+i;
                     playerRRScoresList.set(i+k, playerRRTieList.get(k));
                 }
                 i = i + playerRRTieList.size()-1;
             }
-
             i++;
         }
-
         return playerRRScoresList;
     }
-
+    
+    private List<FightInfo> roundRobinFightsFromRRScoreList(List<FightInfo> roundRobinFightInfoList, List<PlayerRRScore> playerRRTieList) {
+        List<FightInfo> pairsOfFightInfoList = new ArrayList<FightInfo>();
+        int matchedIDs;
+        for(FightInfo fightInfo : roundRobinFightInfoList){
+            matchedIDs = 0;
+            for(int k = 0; k < playerRRTieList.size(); k++){
+                String[] codes = fightInfo.getAllPlayerCode();
+                FightPlayer[] fightPlayers = new FightPlayer[] {
+                    parseCode(codes[0]),
+                    parseCode(codes[1])
+                };
+                if(playerRRTieList.get(k).playerID == fightPlayers[0].player.getID() || playerRRTieList.get(k).playerID == fightPlayers[1].player.getID()){
+                    matchedIDs++;
+                }
+            }
+            if(matchedIDs == 2)
+                pairsOfFightInfoList.add(fightInfo);
+        }
+        return pairsOfFightInfoList;
+    }
+    
     private FightPlayer parsePLWCode(String code) {
         FightPlayer fightPlayer = new FightPlayer();
 
@@ -990,7 +1008,7 @@ public class PlayerCodeParser {
         if(!isValidCode(codes[0]) || !isValidCode(codes[1])){
             return false;
         }
-// System.out.print(codes[0]);
+// System.out.println(codes[0]);
         FightPlayer fightPlayer0 = parseCode(codes[0]);
         FightPlayer fightPlayer1 = parseCode(codes[1]);
         if(fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.type == PlayerType.NORMAL && fightPlayer0.player != null && fightPlayer1.player != null)
