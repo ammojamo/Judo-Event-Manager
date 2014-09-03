@@ -1,7 +1,7 @@
-Name "Event Manager 2014 Update 2"
-Caption "Event Manager 2014 Update 2"
+Name "Event Manager 2014 Update 3"
+Caption "Event Manager 2014 Update 3"
 ;Icon "YourProgram.ico"
-OutFile "EventManagerSetup-2014-Update2.exe"
+OutFile "EventManagerSetup-2014-Update3.exe"
 
 LicenseData eula.txt
 LicenseForceSelection checkbox
