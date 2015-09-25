@@ -129,7 +129,9 @@ public class TransactionNotifier implements DataEventListener {
     }
     
     private void notifyListeners() {
-        for(Entry<TransactionListener, Set<Class>> entry : listeners.entrySet()) {
+        Map<TransactionListener, Set<Class>> listenersCopy = new HashMap<>(listeners);
+        
+        for(Entry<TransactionListener, Set<Class>> entry : listenersCopy.entrySet()) {
             TransactionListener listener = entry.getKey();
             Set<Class> interestingClasses = entry.getValue();
             

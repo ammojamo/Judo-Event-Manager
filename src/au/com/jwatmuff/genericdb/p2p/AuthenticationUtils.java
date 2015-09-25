@@ -21,19 +21,18 @@ import org.apache.log4j.Logger;
 public class AuthenticationUtils {
     private static final Logger log = Logger.getLogger(AuthenticationUtils.class);
     private static SecureRandom generator = new SecureRandom();
-    private static MessageDigest digest;
-
-    static {
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch(NoSuchAlgorithmException e) {
-            log.error("Fatal error: ", e);
-        }
-    }
 
     private static int PREFIX_LENGTH = 16;
 
     private AuthenticationUtils() {}
+    
+    private static byte[] sha256(byte[] data) {
+        try {
+            return MessageDigest.getInstance("SHA-256").digest(data);
+        } catch(NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static AuthenticationPair getAuthenticationPair(int password) {
         byte[] prefix = generatePrefix();
@@ -42,14 +41,14 @@ public class AuthenticationUtils {
     
     public static AuthenticationPair getAuthenticationPair(byte[] prefix, int password) {
         byte[] data = concat(prefix, intToByte(password));
-        return new AuthenticationPair(prefix, digest.digest(data));
+        return new AuthenticationPair(prefix, sha256(data));
     }
 
     public static boolean checkAuthenticationPair(AuthenticationPair pair, int password) {
         if(pair == null) return false;
 
         byte[] data = concat(pair.getPrefix(), intToByte(password));        
-        byte[] hash = digest.digest(data);
+        byte[] hash = sha256(data);
 
         return Arrays.equals(hash, pair.getHash());
     }
