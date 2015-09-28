@@ -23,7 +23,13 @@ public class TransactionalDatabaseUpdater extends DatabaseUpdater {
         super(database);
         this.database = database;
     }
-    
+
+    // Expose the 'perform' method of the database so we can do a batch of updates
+    // in a single transaction if needed (e.g. for initial sync)
+    public void perform(Transaction t) {
+        this.database.perform(t);
+    }
+
     @Override
     public void handleDataEvent(DataEvent event) {
         if(!inTransaction) {

@@ -6,6 +6,7 @@
 
 package au.com.jwatmuff.eventmanager.gui.main;
 
+import au.com.jwatmuff.eventmanager.util.EventBus;
 import java.awt.Color;
 import javax.swing.border.LineBorder;
 
@@ -14,14 +15,32 @@ import javax.swing.border.LineBorder;
  * @author  James
  */
 public class SynchronizingWindow extends javax.swing.JFrame {
-
+    private EventBus.Listener listener;
+    
     /** Creates new form SynchronizingWindow */
     public SynchronizingWindow() {
         initComponents();
         // center window on screen
         setLocationRelativeTo(null);
         getRootPane().setBorder(new LineBorder(Color.BLACK, 1));
+        
+        listener = new EventBus.Listener() {
+            @Override
+            public void receive(String key, Object value) {
+                if(key.equals("sync-status")) {
+                    statusLabel.setText((String)value);
+                }
+            }
+        };
+        EventBus.addListener(listener);
     }
+
+    @Override
+    public void dispose() {
+        EventBus.removeListener(listener);
+        super.dispose();
+    }
+
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -33,6 +52,7 @@ public class SynchronizingWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
+        statusLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Synchronizing");
@@ -43,13 +63,17 @@ public class SynchronizingWindow extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/famfamfam/icons/silk/arrow_refresh_small.png"))); // NOI18N
         jLabel1.setText("Synchronizing with other computers on the network. Please wait...");
 
+        statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -57,7 +81,9 @@ public class SynchronizingWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -65,6 +91,7 @@ public class SynchronizingWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -5,10 +5,12 @@
 
 package au.com.jwatmuff.genericdb.p2p;
 
+import au.com.jwatmuff.eventmanager.util.EventBus;
 import au.com.jwatmuff.genericdb.distributed.Clock;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.distributed.Timestamp;
 import au.com.jwatmuff.genericdb.p2p.AuthenticationUtils.AuthenticationPair;
+import au.com.jwatmuff.genericdb.transaction.Transaction;
 import au.com.jwatmuff.genericdb.transaction.TransactionListener;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabaseUpdater;
 import au.com.jwatmuff.genericp2p.NoSuchServiceException;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -94,8 +97,18 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
          * Initially do a sequential sync with each peer. Future syncing
          * is done in a multithreaded fashion.
          */
-        for(Peer peer : peerManager.getPeers())
-            syncWithPeer(peer);
+        for(final Peer peer : peerManager.getPeers()) {
+            try {
+                databaseUpdater.perform(new Transaction() {
+                    @Override
+                    public void perform() {
+                        syncWithPeer(peer);
+                    }
+                });
+            } catch(Exception e) {
+                log.error("Exception performing initial sync with peer", e);
+            }
+        }
 
         syncBumpThread.start();
         syncControlThread.start();
@@ -164,6 +177,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
 
         log.info("Syncing with peer " + peer + " (Stage 1)");
 
+        EventBus.send("sync-status", "Receiving update");
+        
         DatabaseUpdateService updateService;
         try {
             updateService = peer.getService(DatabaseUpdateService.class);
@@ -302,15 +317,63 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
 
         /* add to update table */
         Update mergedUpdate = update.mergeWith(updateFromPeer);
+        
+//        for(Entry<UUID,EventList> entry : mergedUpdate.updateMap.entrySet()) {
+//            if(!verifyTransactionStates(entry.getValue())) {
+//                log.warn("Invalid transaction state detected for peer: " + entry.getKey());
+//            }
+//        }
+//        
+//        if(!verifyTransactionStates(update.getAllEventsOrdered())) {
+//            log.warn("Failed to validate transaction states for all ordered events");
+//        }
 
         /* update the database */
-        for(DataEvent event : mergedUpdate.getAllEventsOrdered()) {
+        int i = 0;
+        List<DataEvent> allEvents = mergedUpdate.getAllEventsOrdered();
+        for(DataEvent event : allEvents) {
+            i++;
+            if(i % 47 == 0) {
+                EventBus.send("sync-status", String.format("Processing update %d / %d", i, allEvents.size()));
+            }
+
             try {
                 databaseUpdater.handleDataEvent(event);
             } catch(Exception e) {
                 log.error("Exception while applying a peer update to database", e);
             }
         }
+    }
+    
+    private boolean verifyTransactionStates(List<DataEvent> events) {
+        boolean inTransaction = false;
+        for(DataEvent event : events) {
+            switch(event.getTransactionStatus()) {
+                case BEGIN:
+                case NONE:
+                    if(inTransaction) {
+                        return false;
+                    }
+                    break;
+                case CURRENT:
+                case END:
+                    if(!inTransaction) {
+                        return false;
+                    }
+                    break;
+            }
+            switch(event.getTransactionStatus()) {
+                case BEGIN:
+                case CURRENT:
+                    inTransaction = true;
+                    break;
+                case NONE:
+                case END:
+                    inTransaction = false;
+                    break;
+            }
+        }
+        return true;
     }
 
     @Override
