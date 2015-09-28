@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.eventmanager;
 
+import au.com.jwatmuff.genericdb.distributed.DataEvent;
 import au.com.jwatmuff.genericdb.p2p.Update;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +14,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.apache.log4j.Logger;
 
 /**
@@ -58,7 +62,14 @@ public class DumpUpdates {
         try {
             File f = new File(args[1]);
             PrintStream out = new PrintStream(new FileOutputStream(f));
-            out.print(update.dumpTable());
+            
+            Map<DataEvent,UUID> uuidMap = new HashMap<>();
+            
+            for(DataEvent event : update.getAllEventsOrdered(uuidMap)) {
+                UUID id = uuidMap.get(event);
+                out.println(event.getTimestamp().getTime() + ": " + id.toString().substring(0, 5) + " " + event.getTransactionStatus() + " " + event.getType() + " " + event.getDataClass() + " " + event.getData().getID());
+            }
+//            out.print(update.dumpTable());
         } catch(Exception e) {
             log.error("Error writing to file", e);
         }

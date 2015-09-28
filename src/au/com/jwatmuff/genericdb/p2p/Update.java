@@ -34,7 +34,7 @@ public class Update implements Serializable {
 
     private static final Logger log = Logger.getLogger(Update.class);
 
-    private Map<UUID, EventList> updateMap = Collections.synchronizedMap(new HashMap<UUID, EventList>());
+    protected Map<UUID, EventList> updateMap = Collections.synchronizedMap(new HashMap<UUID, EventList>());
 
     /**
      * Appends events to a given peer's list
@@ -48,7 +48,6 @@ public class Update implements Serializable {
         else
             updateMap.get(peerID).addAll(events);
     }
-
 
     /**
      * Adds events from the supplied update that are not already present in
@@ -111,13 +110,17 @@ public class Update implements Serializable {
         return update;
     }
 
+    public synchronized List<DataEvent> getAllEventsOrdered() {
+        return getAllEventsOrdered(null);
+    }
+    
     /**
      * Orders all events for all peers by timestamp and returns them in one
      * unified list
      *
      * @return
      */
-    public synchronized List<DataEvent> getAllEventsOrdered() {
+    public synchronized List<DataEvent> getAllEventsOrdered(Map<DataEvent,UUID> uuidMap) {
         List<DataEvent> events = new ArrayList<DataEvent>();
 
         /* keep track of our position in each list of the table, starting at
@@ -166,6 +169,7 @@ public class Update implements Serializable {
                 event = eventList.get(eventPos - eventList.base);
                 eventPos++;
                 events.add(event);
+                if(uuidMap != null) uuidMap.put(event, earliestID);
             } while((event.getTransactionStatus() == TransactionStatus.BEGIN) ||
                     (event.getTransactionStatus() == TransactionStatus.CURRENT));
 
