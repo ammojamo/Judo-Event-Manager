@@ -32,6 +32,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -41,12 +42,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -791,7 +798,21 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 if(result != JOptionPane.YES_OPTION) return;
             }
             try {
-                ZipUtils.zipFolder(info.localDirectory, file, false);
+                File tempDir = Files.createTempDirectory("event-manager").toFile();
+                FileUtils.copyDirectory(info.localDirectory, tempDir);
+                
+                /* change id */
+                Properties props = new Properties();
+                FileReader fr = new FileReader(new File(tempDir, "info.dat"));
+                props.load(fr);
+                fr.close();
+                props.setProperty("old-UUID", props.getProperty("UUID", "none"));
+                props.setProperty("UUID", UUID.randomUUID().toString());
+                FileWriter fw = new FileWriter(new File(tempDir, "info.dat"));
+                props.store(fw, "");
+                fw.close();
+                
+                ZipUtils.zipFolder(tempDir, file, false);
             } catch(Exception e) {
                 GUIUtils.displayError(this, "Failed to save file: " + e.getMessage());
             }
@@ -802,6 +823,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         File databaseStore = new File(Main.getWorkingDirectory(), "comps");
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new FileNameExtensionFilter("Event Manager Files", "evm"));
+        
+        
+        JPanel optionsPanel = new JPanel();
+        
+        optionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0,10,0,10), new TitledBorder("Load backup options")));
+        JCheckBox preserveIDCheckbox = new JCheckBox("Preserve competition ID");
+        optionsPanel.add(preserveIDCheckbox);
+        
+        chooser.setAccessory(optionsPanel);
+        
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             /* input zip file */
             File file = chooser.getSelectedFile();
@@ -821,7 +852,9 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 FileReader fr = new FileReader(new File(dir, "info.dat"));
                 props.load(fr);
                 fr.close();
-                props.setProperty("UUID", UUID.randomUUID().toString());
+                if(!preserveIDCheckbox.isSelected()) {
+                    props.setProperty("UUID", UUID.randomUUID().toString());
+                }
                 props.setProperty("name", props.getProperty("name") + " - " + dateFormat.format(new Date()));
                 FileWriter fw = new FileWriter(new File(dir, "info.dat"));
                 props.store(fw, "");
