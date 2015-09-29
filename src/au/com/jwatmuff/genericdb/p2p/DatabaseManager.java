@@ -185,6 +185,12 @@ public abstract class DatabaseManager {
     
     protected abstract TransactionalDatabase getLocalDatabase(DatabaseInfo database);
     
+    public boolean checkLock(UUID databaseID) {
+        DatabaseInfo database = databases.get(databaseID);
+        File updateFile = new File(database.localDirectory, "update.dat");
+        return UpdateManager.checkLockFile(updateFile);
+    }
+    
     public DistributedDatabase activateDatabase(UUID databaseID, int passwordHash) {
         DatabaseInfo database = databases.get(databaseID);
         if(database == null)
@@ -199,7 +205,7 @@ public abstract class DatabaseManager {
         TransactionalDatabase localDb = getLocalDatabase(database);
         
         TransactionalDatabase localCachedDb = new CachingDatabase(localDb);
-        
+
         DistributedDatabase distDb = new DistributedDatabase(
                 database.id,
                 database.name,

@@ -76,6 +76,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         this.updateFileName = updateFileName;
         this.databaseID = databaseID;
         this.passwordHash = passwordHash;
+        
+        createLockFile();
 
         ourID = peerManager.getUUID();
 
@@ -112,6 +114,26 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
 
         syncBumpThread.start();
         syncControlThread.start();
+    }
+    
+    private File lockFile() {
+        return new File(this.updateFileName + ".lock");
+    }
+    
+    public static boolean checkLockFile(File updateFile) {
+        return !new File(updateFile.getPath() + ".lock").exists();
+    }
+    
+    private void createLockFile() {
+        try {
+            lockFile().createNewFile();
+        } catch(IOException e) {
+            log.error("Error creating lock file", e);
+        }
+    }
+    
+    private void deleteLockFile() {
+        lockFile().delete();
     }
 
     private Thread syncBumpThread = new Thread() {
@@ -413,7 +435,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         return null;
     }
 
-    public void saveUpdatesToFile() {
+    private boolean saveUpdatesToFile() {
         try {
             log.info("Saving updates to file");
             File updateFile = new File(updateFileName);
@@ -424,12 +446,18 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
             }
             writer.close();
             fos.close();
+            return true;
         } catch(Throwable e) { // we really don't want this thread to die due to uncaught throwable
             log.error("Unable to write updates to file", e);
+            return false;
         }
     }
 
     void shutdown() {
+        if(saveUpdatesToFile()) {
+            deleteLockFile();
+        }
+        
         shutdown = true;
 
         syncControlThread.interrupt();

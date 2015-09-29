@@ -253,9 +253,34 @@ public class Main {
                 if(loadCompetitionWindow.getSuccess()) {
                     DatabaseInfo info = loadCompetitionWindow.getSelectedDatabaseInfo();
 
+                    if(!databaseManager.checkLock(info.id)) {
+                        String message = "EventManager did not shut down correctly the last time this competition was open. To avoid potential data corruption, you are advised to take the following steps:\n" +
+                                "1) Do NOT open this competition\n" +
+                                "2) Create a backup of this competition\n" +
+                                "3) Delete the competition from this computer\n" +
+                                "4) If possible, reload this competition from another computer on the network\n" +
+                                "5) Alternatively, you may manually load the backup onto all computers on the network, ensuring the 'Preserve competition ID' option is checked.";
+                        String title = "WARNING: Potential Data Corruption Detected";
+                        
+                        int status = JOptionPane.showOptionDialog(
+                                null,
+                                message,
+                                title,
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.ERROR_MESSAGE,
+                                null,
+                                new Object[] { "Cancel (recommended)", "Open anyway" },
+                                "Cancel (recommended)");
+                        
+                        if(status == 0) continue; // return to load competition window
+                    }
+                    
                     SynchronizingWindow syncWindow = new SynchronizingWindow();
                     syncWindow.setVisible(true);
+                    long t = System.nanoTime();
                     DistributedDatabase database = databaseManager.activateDatabase(info.id, info.passwordHash);
+                    long dt = System.nanoTime() - t;
+                    log.debug(String.format("Initial sync in %dms", TimeUnit.MILLISECONDS.convert(dt, TimeUnit.NANOSECONDS)));
                     syncWindow.dispose();
 
                     if(loadCompetitionWindow.isNewDatabase()) {

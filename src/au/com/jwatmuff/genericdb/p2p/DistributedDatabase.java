@@ -74,7 +74,6 @@ public class DistributedDatabase extends NotifyingTransactionalDatabase {
     }
     
     public void shutdown() {
-        updateManager.saveUpdatesToFile();
         updateManager.shutdown();
     }
 }
