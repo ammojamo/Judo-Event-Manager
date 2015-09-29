@@ -77,10 +77,14 @@
 
     <property name="nsis.path" value="C:/Program Files (x86)/NSIS/makensis.exe"/>
     <!-- Uncomment the following line to build on Mac -->
-    <!--<property name="nsis.path" value="/usr/local/bin/makensis"/>-->
+    <!-- <property name="nsis.path" value="/usr/local/bin/makensis"/> -->
 
     <target name="build-installer" description="Create Installer" depends="clean,jar">
       <exec executable="${nsis.path}">
+        <arg value="installer/nsis/install.nsi"/>
+      </exec>
+      <exec executable="${nsis.path}">
+        <arg value="-DNO_JAVA_INSTALLER"/>
         <arg value="installer/nsis/install.nsi"/>
       </exec>
     </target>
