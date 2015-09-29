@@ -3,7 +3,10 @@ comps
 build
 dist
 *.log
+eventmanager.log*
 nbproject/private
 *.run.lock
 .DS_Store
 /JavaApplication1/nbproject/private/
+/installer/nsis/EventManagerSetup*.exe
+/installer/thirdparty/*.exe
