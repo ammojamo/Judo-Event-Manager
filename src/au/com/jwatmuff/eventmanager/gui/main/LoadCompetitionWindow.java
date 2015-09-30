@@ -801,6 +801,9 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 File tempDir = Files.createTempDirectory("event-manager").toFile();
                 FileUtils.copyDirectory(info.localDirectory, tempDir);
                 
+                File lockFile = new File(tempDir, "update.dat.lock");
+                lockFile.delete();
+                
                 /* change id */
                 Properties props = new Properties();
                 FileReader fr = new FileReader(new File(tempDir, "info.dat"));
