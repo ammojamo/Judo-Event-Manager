@@ -64,7 +64,7 @@ public class PersonalDetailsPanel extends javax.swing.JPanel {
         });
         for(Grade b : Player.Grade.values())
             model2.addElement(b);
-        model.setSelectedItem(Player.Grade.UNSPECIFIED);
+        model2.setSelectedItem(Player.Grade.UNSPECIFIED);
         
         dobDatePicker.setDateFormat(new SimpleDateFormat("dd/MM/yyyy"));
 
