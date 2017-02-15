@@ -7,6 +7,8 @@ package au.com.jwatmuff.eventmanager.db.sqlite;
 
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
+import au.com.jwatmuff.genericdb.p2p.DatabaseUpdateStore;
+import au.com.jwatmuff.genericdb.p2p.UpdateStore;
 import au.com.jwatmuff.genericdb.transaction.TransactionalDatabase;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import java.io.File;
@@ -41,6 +43,11 @@ public class SQLiteDatabaseManager extends DatabaseManager {
         localDb.afterPropertiesSet();
         
         return localDb;
+    }
+
+    @Override
+    protected UpdateStore getUpdateStore() {
+        return DatabaseUpdateStore.withDataSource(dataSource);
     }
 
     @Override

@@ -11,6 +11,7 @@ package au.com.jwatmuff.eventmanager.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -27,24 +28,33 @@ public class ObjectCopier {
     
     @SuppressWarnings("unchecked")
     public static <T extends Serializable> T copy(T object) {
-      ObjectOutputStream oos;
-      ObjectInputStream ois;
-      try
-      {
-         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-         oos = new ObjectOutputStream(bos);
-         oos.writeObject(object);
-         oos.flush();
-         ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray());
-         ois = new ObjectInputStream(bin);
-         T copy = (T)ois.readObject();
-         oos.close();
-         ois.close();
-         return copy;
-      }
-      catch(Exception e)
-      {
-         throw(new RuntimeException("Exception while copying object", e));
-      }
+        try {
+            return bytesToObject(objectToBytes(object));
+        }catch(IOException | ClassNotFoundException e) {
+            throw(new RuntimeException("Exception while copying object", e));
+        }
+    }
+    
+    public static byte[] objectToBytes(Serializable object) throws IOException {
+        try (
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+        ) {
+            oos.writeObject(object);
+            oos.flush();
+            return bos.toByteArray();
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T extends Serializable> T bytesToObject(byte[] bytes)
+            throws ClassNotFoundException, IOException {
+        try (
+            ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+            ObjectInputStream ois = new ObjectInputStream(bin);
+        ) {
+            T copy = (T)ois.readObject();
+            return copy;
+        }
     }
 }

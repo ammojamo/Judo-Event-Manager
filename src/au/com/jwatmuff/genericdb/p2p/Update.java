@@ -21,9 +21,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.apache.log4j.Logger;
 
-
-
-
 /**
  * Maintains a list of updates for each of a set of peers
  *
@@ -109,6 +106,14 @@ public class Update implements Serializable {
 
         return update;
     }
+    
+    public synchronized Update forPeer(UUID peerID) {
+        Update update = new Update();
+        if(updateMap.containsKey(peerID)) {
+            update.updateMap.put(peerID, updateMap.get(peerID));
+        }
+        return update;
+    }
 
     public synchronized List<DataEvent> getAllEventsOrdered() {
         return getAllEventsOrdered(null);
@@ -121,6 +126,10 @@ public class Update implements Serializable {
      * @return
      */
     public synchronized List<DataEvent> getAllEventsOrdered(Map<DataEvent,UUID> uuidMap) {
+        if(updateMap.size() == 1 && uuidMap == null) {
+            return updateMap.entrySet().iterator().next().getValue();
+        }
+        
         List<DataEvent> events = new ArrayList<DataEvent>();
 
         /* keep track of our position in each list of the table, starting at
@@ -182,22 +191,6 @@ public class Update implements Serializable {
         }
         
         return events;
-        /*
-        List<DataEvent> events = new ArrayList<DataEvent>();
-        for(EventList eventList : updateMap.values())
-            events.addAll(eventList);
-        Collections.sort(events, new Comparator<DataEvent>() {
-            @Override
-            public int compare(DataEvent o1, DataEvent o2) {
-                return o1.getTimestamp().compareTo(o2.getTimestamp());
-            }
-        });
-
-        for(DataEvent event : events)
-            event.setTransactionStatus(TransactionStatus.NONE);
-
-        return events;
-         */
     }
 
     /**
@@ -217,19 +210,6 @@ public class Update implements Serializable {
         return position;
     }
 
-    /*
-    public void adjustTimestamps(long amount) {
-        for(EventList list : updateMap.values())
-            for(DataEvent event : list) {
-                Timestamp oldTime = event.getTimestamp();
-                Timestamp newTime = new Timestamp(oldTime.getTime() + amount);
-                log.debug(oldTime + " -> " + newTime);
-                event.getData().setTimestamp(newTime);
-            }
-            //event.getTimestamp().setTime(event.getTimestamp().getTime() + amount);
-    }
-    */
-
     /**
      * Updates the clock using timestamps all events we ever received
      */
@@ -237,6 +217,74 @@ public class Update implements Serializable {
         for(EventList list : updateMap.values())
             for(DataEvent event : list)
                 Clock.setEarliestTime(event.getTimestamp());
+    }
+    
+    /**
+     * For debugging purposes
+     * 
+     * @param events
+     * @return 
+     */
+    private static boolean verifyTransactionStates(List<DataEvent> events) {
+        boolean inTransaction = false;
+        for(DataEvent event : events) {
+            switch(event.getTransactionStatus()) {
+                case BEGIN:
+                case NONE:
+                    if(inTransaction) {
+                        return false;
+                    }
+                    break;
+                case CURRENT:
+                case END:
+                    if(!inTransaction) {
+                        return false;
+                    }
+                    break;
+            }
+            switch(event.getTransactionStatus()) {
+                case BEGIN:
+                case CURRENT:
+                    inTransaction = true;
+                    break;
+                case NONE:
+                case END:
+                    inTransaction = false;
+                    break;
+            }
+        }
+        return true;
+    }
+    
+    public void verifyTransactionStates() {
+        for(Map.Entry<UUID,EventList> entry : updateMap.entrySet()) {
+            if(!verifyTransactionStates(entry.getValue())) {
+                log.warn("Invalid transaction state detected for peer: " + entry.getKey());
+            }
+        }
+
+        if(!verifyTransactionStates(getAllEventsOrdered())) {
+            log.warn("Failed to validate transaction states for all ordered events");
+        }
+    }
+    
+    /**
+     * @return the total number of events in this update
+     */
+    public int size() {
+        int size = 0;
+        for(EventList list : updateMap.values()) {
+            size += list.size();
+        }
+        return size;
+    }
+    
+    public String toString() {
+        List<String> strings = new ArrayList<>();
+        for(UUID id : updateMap.keySet()) {
+            strings.add(id.toString().substring(0, 8) + ": " + updateMap.get(id));
+        }
+        return "Update( " + String.join(", ", strings) + " )";
     }
 
     private String makeWidth(String s, int n) {
@@ -339,5 +387,9 @@ class EventList extends ArrayList<DataEvent> implements Serializable {
         list.base = index;
         list.addAll(subList(index-base, size()));
         return list;
+    }
+    
+    public String toString() {
+        return "[" + base + ".." + (base + size()) + "]";
     }
 }

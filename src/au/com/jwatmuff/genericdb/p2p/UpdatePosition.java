@@ -5,7 +5,9 @@
 
 package au.com.jwatmuff.genericdb.p2p;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,15 +17,10 @@ import java.util.UUID;
 public class UpdatePosition extends HashMap<UUID, Integer> {
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Update Table Position: \n");
+        List<String> strings = new ArrayList<>();
         for(UUID id : keySet()) {
-            sb.append("  " + id + ": " + get(id) + "\n");
+            strings.add(id.toString().substring(0, 8) + ": " + get(id));
         }
-        if(keySet().size() == 0) {
-            sb.append("  empty\n");
-        }
-        return sb.toString();
+        return "UpdatePosition( " + String.join(",", strings) + " )";
     }
 }

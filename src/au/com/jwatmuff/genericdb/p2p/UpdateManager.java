@@ -17,12 +17,7 @@ import au.com.jwatmuff.genericp2p.NoSuchServiceException;
 import au.com.jwatmuff.genericp2p.Peer;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -47,11 +42,11 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
 
     private static final int VERSION = 1;
 
-    private final Update update;
+    private final Update updateTable;
+    private final UpdateStore updateStore;
 
     private PeerManager peerManager;
     private TransactionalDatabaseUpdater databaseUpdater;
-    private String updateFileName;
     private UUID databaseID;
     private int passwordHash;
 
@@ -68,29 +63,39 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
     public UpdateManager(
             PeerManager     peerManager,
             TransactionalDatabaseUpdater databaseUpdater,
-            String          updateFileName,
+            UpdateStore     updateStore,
             UUID            databaseID,
             int             passwordHash) {
         this.peerManager = peerManager;
         this.databaseUpdater = databaseUpdater;
-        this.updateFileName = updateFileName;
+        this.updateStore = updateStore;
         this.databaseID = databaseID;
         this.passwordHash = passwordHash;
         
-        createLockFile();
-
         ourID = peerManager.getUUID();
-
-        Update updateFromFile = loadUpdatesFromFile();
-        if(updateFromFile != null) {
-            updateFromFile.updateClock();
+        
+        Update updateFromStore = null;
+        try {
+            updateFromStore = updateStore.loadUpdate();
+        } catch(IOException e) {
+            log.error("Unable to load update store");
+        }
+        
+        if(updateFromStore == null) {
+            updateTable = new Update();
+        } else {
+            updateTable = updateFromStore;
         }
 
-        if(updateFromFile == null) {
-            log.info("Creating new update store");
-            update = new Update();
-        } else {
-            update = updateFromFile;
+        updateTable.updateClock();
+        
+        /* Write any uncommitted events from the update store */
+        Update uncommitted = updateTable.afterPosition(updateStore.getCommittedPosition());
+        log.debug("Uncommitted: " + uncommitted);
+        if(uncommitted.size() > 0) {
+            log.info("Recovering uncommitted data");
+            handleUpdate(uncommitted, true, true);
+            log.info("Finished recovery");
         }
 
         peerManager.registerService(DatabaseUpdateService.class, this);
@@ -114,26 +119,6 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
 
         syncBumpThread.start();
         syncControlThread.start();
-    }
-    
-    private File lockFile() {
-        return new File(this.updateFileName + ".lock");
-    }
-    
-    public static boolean checkLockFile(File updateFile) {
-        return !new File(updateFile.getPath() + ".lock").exists();
-    }
-    
-    private void createLockFile() {
-        try {
-            lockFile().createNewFile();
-        } catch(IOException e) {
-            log.error("Error creating lock file", e);
-        }
-    }
-    
-    private void deleteLockFile() {
-        lockFile().delete();
     }
 
     private Thread syncBumpThread = new Thread() {
@@ -253,9 +238,9 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         syncInfo.senderID = ourID;
         syncInfo.senderTime = new Timestamp();
         syncInfo.databaseID = databaseID;
-        syncInfo.update = update.afterPosition(peerSyncInfo.position);
+        syncInfo.update = updateTable.afterPosition(peerSyncInfo.position);
         syncInfo.authHash = AuthenticationUtils.getAuthenticationPair(peerSyncInfo.authPrefix, passwordHash).getHash();
-        syncInfo.position = update.getPosition();
+        syncInfo.position = updateTable.getPosition();
 
         log.info("Received reply position:\n" + peerSyncInfo.position);
         log.info("Sending update:\n" + syncInfo.update.dumpTable());
@@ -301,7 +286,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
             syncInfo.authHash = AuthenticationUtils.getAuthenticationPair(peerSyncInfo.authPrefix, passwordHash).getHash();
             syncInfo.authPrefix = AuthenticationUtils.generatePrefix();
             peerPrefixes.put(peerSyncInfo.senderID, syncInfo.authPrefix);
-            syncInfo.position = update.getPosition();
+            syncInfo.position = updateTable.getPosition();
             log.info("Returning position:\n" + syncInfo.position);
             syncInfo.status = UpdateSyncInfo.Status.OK;
             return syncInfo;
@@ -314,7 +299,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
                 Clock.setEarliestTime(peerSyncInfo.senderTime);
 
                 syncInfo.status = UpdateSyncInfo.Status.OK;
-                syncInfo.update = update.afterPosition(peerSyncInfo.position);
+                syncInfo.update = updateTable.afterPosition(peerSyncInfo.position);
 
                 log.info("Received update:\n" + peerSyncInfo.update.dumpTable());
                 log.info("Received position:\n" + peerSyncInfo.position);
@@ -330,32 +315,32 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         throw new RuntimeException("Should never happen");
     }
 
+    private void handleUpdate(Update update, boolean trackProgress, boolean recovering) {
+        if(!recovering) {
+            /* add to update table */
+            /* update will now only contain events that were not already present in the update table */
+            update = updateTable.mergeWith(update);
+        }
 
-    private void handlePeerUpdate(UUID peerID, Date peerTime, Update updateFromPeer) {
-        /*
-        long timeDiff = (new Date().getTime()) - peerTime.getTime();
-        updateFromPeer.adjustTimestamps(timeDiff);
-         */
+        /* verification checks - for debugging, disable for deployment */
+        update.verifyTransactionStates();
 
-        /* add to update table */
-        Update mergedUpdate = update.mergeWith(updateFromPeer);
-        
-//        for(Entry<UUID,EventList> entry : mergedUpdate.updateMap.entrySet()) {
-//            if(!verifyTransactionStates(entry.getValue())) {
-//                log.warn("Invalid transaction state detected for peer: " + entry.getKey());
-//            }
-//        }
-//        
-//        if(!verifyTransactionStates(update.getAllEventsOrdered())) {
-//            log.warn("Failed to validate transaction states for all ordered events");
-//        }
+        /* write to update file */
+        if(!recovering) {
+            try {
+                updateStore.writePartialUpdate(update);
+            } catch(IOException e) {
+                log.error("Critical error - failed to write update to file");
+            }
+        }
 
         /* update the database */
         int i = 0;
-        List<DataEvent> allEvents = mergedUpdate.getAllEventsOrdered();
+        List<DataEvent> allEvents = update.getAllEventsOrdered();
         for(DataEvent event : allEvents) {
+            // Update progress bar (if any)
             i++;
-            if(i % 47 == 0) {
+            if(trackProgress && i % 47 == 0) {
                 EventBus.send("sync-status", String.format("Processing update %d / %d", i, allEvents.size()));
             }
 
@@ -364,100 +349,36 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
             } catch(Exception e) {
                 log.error("Exception while applying a peer update to database", e);
             }
+            
+            // For Testing only - Simulate random failure
+            // if(!recovering && Math.random() > 0.995) System.exit(1);
+        }
+
+        /* write committed position */
+        try {
+            updateStore.writeCommitedPosition(update.getPosition());
+        } catch(IOException e) {
+            log.error("Critical error - failed to write committed position");
         }
     }
-    
-    private boolean verifyTransactionStates(List<DataEvent> events) {
-        boolean inTransaction = false;
-        for(DataEvent event : events) {
-            switch(event.getTransactionStatus()) {
-                case BEGIN:
-                case NONE:
-                    if(inTransaction) {
-                        return false;
-                    }
-                    break;
-                case CURRENT:
-                case END:
-                    if(!inTransaction) {
-                        return false;
-                    }
-                    break;
-            }
-            switch(event.getTransactionStatus()) {
-                case BEGIN:
-                case CURRENT:
-                    inTransaction = true;
-                    break;
-                case NONE:
-                case END:
-                    inTransaction = false;
-                    break;
-            }
-        }
-        return true;
+
+    private void handlePeerUpdate(UUID peerID, Date peerTime, Update updateFromPeer) {
+        handleUpdate(updateFromPeer, true, false);
     }
 
     @Override
     public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
-        /* add to update table */
+        /* Convert events to an update object so we can send to handleUpdate */
+        Update update = updateTable.forPeer(ourID).afterPosition(updateTable.getPosition());
         update.addEvents(ourID, events);
-
-        /* update the database */
-        try {
-            for(DataEvent event : events)
-                databaseUpdater.handleDataEvent(event);
-        } catch(Exception e) {
-            log.error("Exception while applying local update to database", e);
-        }
+        
+        handleUpdate(update, false, false);
 
         /* sync with peers */
         syncWithPeers();
     }
 
-    private Update loadUpdatesFromFile() {
-        try {
-            File updateFile = new File(updateFileName);
-            FileInputStream fis = new FileInputStream(updateFile);
-            ObjectInputStream reader = new ObjectInputStream(fis);
-            Update loadedUpdate = (Update)reader.readObject();
-            reader.close();
-            fis.close();
-            return loadedUpdate;
-        } catch (ClassNotFoundException cnfe) {
-            log.error("Couldn't deserialize update object - class unknown", cnfe);
-        } catch (FileNotFoundException fnfe) {
-            log.info("Updates file not found");
-        } catch (IOException ioe) {
-            log.error("Input/output error while loading updates file", ioe);
-        }
-
-        return null;
-    }
-
-    private boolean saveUpdatesToFile() {
-        try {
-            log.info("Saving updates to file");
-            File updateFile = new File(updateFileName);
-            FileOutputStream fos = new FileOutputStream(updateFile);
-            ObjectOutputStream writer = new ObjectOutputStream(fos);
-            synchronized(update) {
-                writer.writeObject(update);
-            }
-            writer.close();
-            fos.close();
-            return true;
-        } catch(Throwable e) { // we really don't want this thread to die due to uncaught throwable
-            log.error("Unable to write updates to file", e);
-            return false;
-        }
-    }
-
-    void shutdown() {
-        if(saveUpdatesToFile()) {
-            deleteLockFile();
-        }
-        
+    void shutdown() {        
         shutdown = true;
 
         syncControlThread.interrupt();

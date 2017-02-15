@@ -184,11 +184,12 @@ public abstract class DatabaseManager {
     }
     
     protected abstract TransactionalDatabase getLocalDatabase(DatabaseInfo database);
+    protected abstract UpdateStore getUpdateStore();
     
     public boolean checkLock(UUID databaseID) {
-        DatabaseInfo database = databases.get(databaseID);
-        File updateFile = new File(database.localDirectory, "update.dat");
-        return UpdateManager.checkLockFile(updateFile);
+        // Note - locking is no longer necessary now that we have a
+        // recovery mechanism for when crashes occur
+        return true;
     }
     
     public DistributedDatabase activateDatabase(UUID databaseID, int passwordHash) {
@@ -203,6 +204,8 @@ public abstract class DatabaseManager {
             createDatabaseDirectory(database);
         
         TransactionalDatabase localDb = getLocalDatabase(database);
+        UpdateStore updateStore = getUpdateStore();
+//        UpdateStore updateStore = FileUpdateStore.withFile(new File(database.localDirectory, "update.dat"));
         
         TransactionalDatabase localCachedDb = new CachingDatabase(localDb);
 
@@ -212,7 +215,7 @@ public abstract class DatabaseManager {
                 passwordHash,
                 localCachedDb,
                 peerManager,
-                new File(database.localDirectory, "update.dat"));
+                updateStore);
         
         activeDatabase = distDb;
         

@@ -27,7 +27,7 @@ public class DistributedDatabase extends NotifyingTransactionalDatabase {
                                int passwordHash,
                                TransactionalDatabase localDatabase,
                                PeerManager peerManager,
-                               File updateFile) {
+                               UpdateStore updateStore) {
         super(localDatabase);
         super.setReadOnly(true);
         super.setUpdateTimestamps(true);
@@ -42,7 +42,7 @@ public class DistributedDatabase extends NotifyingTransactionalDatabase {
         updateManager = new UpdateManager(
                 peerManager,
                 updater,
-                updateFile.getPath(),
+                updateStore,
                 id,
                 passwordHash);
 
