@@ -659,7 +659,7 @@ public class RMIPeerManager implements PeerManager, PeerDiscoveryListener, Annou
 
         @Override
         public String toString() {
-            return getName() + " @ " + address + " : " + uuid;
+            return getName() + " @ " + address + " : " + getUUID();
         }
     }
 }
