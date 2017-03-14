@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.genericdb.p2p;
 
+import au.com.jwatmuff.eventmanager.test.TestUtil;
 import au.com.jwatmuff.eventmanager.util.EventBus;
 import au.com.jwatmuff.genericdb.distributed.Clock;
 import au.com.jwatmuff.genericdb.distributed.DataEvent;
@@ -350,8 +351,8 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
                 log.error("Exception while applying a peer update to database", e);
             }
             
-            // For Testing only - Simulate random failure
-            // if(!recovering && Math.random() > 0.995) System.exit(1);
+//             For Testing only - Simulate random failure
+             if(TestUtil.SIMULATE_FLAKINESS && !recovering && Math.random() > 0.995) System.exit(1);
         }
 
         /* write committed position */

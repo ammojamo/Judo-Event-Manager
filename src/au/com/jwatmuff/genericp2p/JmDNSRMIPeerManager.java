@@ -18,19 +18,17 @@ import org.apache.log4j.Logger;
  * Convenience class to instantiate and configure an RMI based PeerManager
  * using JmDNS to discover peers on the network.
  * 
- * TODO: refactor common code between this class and BonjourRMIPeerManager
- * 
  * @author James
  */
 public class JmDNSRMIPeerManager implements PeerManager {
     private static final Logger log = Logger.getLogger(JmDNSRMIPeerManager.class);
 
-    private JmDNSRegistrationService registrar;
-    private JmDNSDiscoveryService discoverer;
+    private final JmDNSRegistrationService registrar;
+    private final JmDNSDiscoveryService discoverer;
     
-    private WindowsNetDiscoveryService winDiscoverer;
+    private final WindowsNetDiscoveryService winDiscoverer;
 
-    private RMIPeerManager manager;
+    private final RMIPeerManager manager;
     
     public JmDNSRMIPeerManager(int port, File idFile) {
         registrar = new JmDNSRegistrationService(port);

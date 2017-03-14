@@ -19,6 +19,7 @@ import au.com.jwatmuff.eventmanager.permissions.License;
 import au.com.jwatmuff.eventmanager.permissions.LicenseManager;
 import au.com.jwatmuff.eventmanager.permissions.LicenseType;
 import au.com.jwatmuff.eventmanager.permissions.PermissionChecker;
+import au.com.jwatmuff.eventmanager.test.TestUtil;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.LogUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
@@ -54,13 +55,13 @@ public class Main {
     private static Logger log = Logger.getLogger(Main.class);
 
     //internal version - bump this up whenever making a database change
-    public static final String VERSION = "9";
-    public static final String WINDOW_TITLE = "Event Manager 2015 Update 1";
-    public static final String VISIBLE_VERSION = "Event Manager 2015 Update 1";
+    public static final String VERSION = "10";
+    public static final String WINDOW_TITLE = "Event Manager 2017 Update 1";
+    public static final String VISIBLE_VERSION = "Event Manager 2017 Update 1";
 
     private static File workingDir = new File(".");
 
-    private static final int LOCK_PORT = 58536;
+    private static final int LOCK_PORT = Integer.valueOf(System.getProperty("eventmanager.lockport", "58536")); // 58536;
 
     /**
      * Binds to a TCP port to ensure we are the only instance of Event Manager
@@ -320,6 +321,8 @@ public class Main {
                     mainWindow.setManualDiscoveryService(manualDiscoveryService);
                     mainWindow.setTitle(WINDOW_TITLE);
                     mainWindow.afterPropertiesSet();
+                    
+                    TestUtil.setActivatedDatabase(database);
 
                     // show main window (modally)
                     GUIUtils.runModalJFrame(mainWindow);
@@ -338,6 +341,7 @@ public class Main {
                         info.localDirectory.deleteOnExit();
                     }
                 } else {
+                    // This can cause an RuntimeException - Peer is disconnected
                     peerManager.stop();
                     System.exit(0);
                 }
