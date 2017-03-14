@@ -9,9 +9,9 @@ import au.com.jwatmuff.eventmanager.db.SessionFightDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.GoldenScoreMode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Mode;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardModelListener;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardUpdate;
-import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModelWrapper.ShutdownHandler;
 import au.com.jwatmuff.eventmanager.gui.scoring.ManualFightDialog;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
@@ -128,6 +128,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                     playSiren();
             }
         });
+        
+        showTeamsMenuItem.setSelected(model.showTeams());
     }
 
     /*
@@ -140,8 +142,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         setupMenu();
         this.title = title;
         setTitle(title);
-        scoreboard = new DefaultScoreboardDisplayPanel();
-        fullscreen = new DefaultScoreboardDisplayPanel();
+        scoreboard = new ScoreboardDisplayPanel();
+        fullscreen = new ScoreboardDisplayPanel();
         setModel(new ScoreboardModelWrapper(model), false);
 
         getContentPane().setLayout(new GridLayout(1,1));
@@ -152,7 +154,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
     }
 
     /* creates a window to DISPLAY the scoreboard for the given mat */
-    public ScoreboardWindow(Session mat, PeerManager peerManager, ScoringSystem system) {
+    public ScoreboardWindow(Session mat, PeerManager peerManager) {
         interactive = false;
 
         initComponents();
@@ -162,8 +164,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         setTitle(title);
 
         /* create scoreboard panels */
-        scoreboard = new DefaultScoreboardDisplayPanel();
-        fullscreen = new DefaultScoreboardDisplayPanel();
+        scoreboard = new ScoreboardDisplayPanel();
+        fullscreen = new ScoreboardDisplayPanel();
         
         /* put scoreboard panel into window */
         getContentPane().setLayout(new GridLayout(1,1));
@@ -183,7 +185,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         new Thread(findPeerScoreboard, "findPeerScoreboard").start();
     }
 
-    private ScoreboardWindow(ScoringSystem system) {
+    private ScoreboardWindow() {
         interactive = true;
 
         initComponents();
@@ -192,8 +194,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         optionsMenu.remove(showImagesMenuItem);
 
         /* create scoreboard panels (one for windowed, one for fullscreen) */
-        scoreboard = new ScoreboardEntryPanel(true, system);
-        fullscreen = new ScoreboardEntryPanel(true, system);
+        scoreboard = ScoreboardEntryPanel.getInstance();
+        fullscreen = ScoreboardEntryPanel.getInstance();
 
         /* add the scoreboard panel to the window */
         getContentPane().setLayout(new GridLayout(1,1));
@@ -241,15 +243,15 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         this.addKeyListener(keyListener);
     }
 
-    public ScoreboardWindow(String title, ScoringSystem system, PeerManager peerManager, String serviceName) {
-        this(title, system);
+    public ScoreboardWindow(String title, PeerManager peerManager, String serviceName) {
+        this(title);
         this.peerManager = peerManager;
         this.serviceName = serviceName;
         peerManager.registerService(serviceName, ScoreboardModel.class, model);
     }
 
-    public ScoreboardWindow(String title, ScoringSystem system) {
-        this(system);
+    public ScoreboardWindow(String title) {
+        this();
 
         setTitle(title);
 
@@ -265,7 +267,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                    (model.getMode() == Mode.NO_FIGHT)) {
                     ManualFightDialog mfd = new ManualFightDialog(ScoreboardWindow.this, true);
                     mfd.setVisible(true);
-                    model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()}, null);
+                    model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()}, null, null);
                 }
             }
         });
@@ -274,15 +276,15 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             public void run() {
                 ManualFightDialog mfd = new ManualFightDialog(ScoreboardWindow.this, true);
                 mfd.setVisible(true);
-                model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()}, null);
+                model.reset(mfd.getFightTime(), mfd.getGoldenScoreTime(), new String[] { mfd.getPlayerName1(), mfd.getPlayerName2()}, null, null);
             }
         });
     }
     
     /** Creates new ScoreboardWindow which gets fights from the given database
       for the given mat. */
-    public ScoreboardWindow(Database database, TransactionNotifier notifier, Session mat, PeerManager peerManager, String serviceName, ScoringSystem system) {
-        this(system);
+    public ScoreboardWindow(Database database, TransactionNotifier notifier, Session mat, PeerManager peerManager, String serviceName) {
+        this();
         interactive = true;
         this.mat = mat;
         this.database = database;
@@ -321,11 +323,9 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                         FullScore[] scores = new FullScore[2];
                         for(int i=0; i<2; i++) {
                             FullScore score = new FullScore();
-                            score.setIppon(model.getScore(i, ScoreboardModel.Score.IPPON));
-                            score.setWazari(model.getScore(i, ScoreboardModel.Score.WAZARI));
-                            score.setYuko(model.getScore(i, ScoreboardModel.Score.YUKO));
-                            score.setShido(model.getShido(i));
-                            if(model.getWin() == ScoreboardModel.Win.BY_DECISION && model.getWinningPlayer() == i) score.setDecision(1);
+                            for(Score s : Score.values()) {
+                                score.set(s, model.getScore(i, s));
+                            }
                             scores[i] = score;
                         }
                         
@@ -469,22 +469,25 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             currentFight = fights.iterator().next();
 
             String[] playerNames = new String[2];
+            String[] teamNames = new String[2];
             Date[] lastFightTimes = new Date[2];
             for(int i=0; i<2; i++) {
                 try {
                     currentPlayers[i] = PlayerCodeParser.parseCode(database, currentFight.getPlayerCodes()[i], currentFight.getPoolID());
                     playerNames[i] = currentPlayers[i].toString();
+                    teamNames[i] = currentPlayers[i].player.getTeam();
                     if(currentPlayers[i].player != null)
                         lastFightTimes[i] = PlayerTimer.lastFightTime(currentPlayers[i].player.getID(), database);
                 } catch(DatabaseStateException e) {
                     currentPlayers[i] = null;
                     playerNames[i] = currentFight.getPlayerCodes()[i];
+                    teamNames[i] = "";
                 }
             }
 
             Pool pool = database.get(Pool.class, currentFight.getPoolID());
 
-            model.reset(pool.getMatchTime(), pool.getGoldenScoreTime(), playerNames, lastFightTimes, pool.getMinimumBreakTime(), pool.getShortName());
+            model.reset(pool.getMatchTime(), pool.getGoldenScoreTime(), playerNames, teamNames, lastFightTimes, pool.getMinimumBreakTime(), pool.getShortName());
 
             SessionFight sf = database.find(SessionFight.class, SessionFightDAO.FOR_FIGHT, currentFight.getID());
             int fightNumber = SessionFightSequencer.getFightMatInfo(database, sf).fightNumber;
@@ -511,6 +514,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         swapPlayersMenuItem = new javax.swing.JCheckBoxMenuItem();
         chooseColorsMenuItem = new javax.swing.JMenuItem();
         showImagesMenuItem = new javax.swing.JCheckBoxMenuItem();
+        showTeamsMenuItem = new javax.swing.JCheckBoxMenuItem();
         scoreboardStyleMenu = new javax.swing.JMenu();
         jSeparator3 = new javax.swing.JSeparator();
         chooseSirenMenuItem = new javax.swing.JMenuItem();
@@ -582,6 +586,15 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             }
         });
         optionsMenu.add(showImagesMenuItem);
+
+        showTeamsMenuItem.setSelected(true);
+        showTeamsMenuItem.setText("Show Teams");
+        showTeamsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showTeamsMenuItemActionPerformed(evt);
+            }
+        });
+        optionsMenu.add(showTeamsMenuItem);
 
         scoreboardStyleMenu.setText("Scoreboard Style");
         optionsMenu.add(scoreboardStyleMenu);
@@ -762,6 +775,10 @@ private void showImagesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     fullscreen.setImagesEnabled(showImagesMenuItem.isSelected());
 }//GEN-LAST:event_showImagesMenuItemActionPerformed
 
+    private void showTeamsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showTeamsMenuItemActionPerformed
+        model.setShowTeams(showTeamsMenuItem.isSelected());
+    }//GEN-LAST:event_showTeamsMenuItemActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem chooseColorsMenuItem;
@@ -778,6 +795,7 @@ private void showImagesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JMenu scoreboardStyleMenu;
     private javax.swing.JMenuItem setTimeMenuItem;
     private javax.swing.JCheckBoxMenuItem showImagesMenuItem;
+    private javax.swing.JCheckBoxMenuItem showTeamsMenuItem;
     private javax.swing.JCheckBoxMenuItem swapPlayersMenuItem;
     private javax.swing.JMenuItem testSirenMenuItem;
     // End of variables declaration//GEN-END:variables

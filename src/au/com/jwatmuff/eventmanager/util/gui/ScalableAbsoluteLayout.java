@@ -19,36 +19,86 @@ import java.util.Map;
  * @author James
  */
 public class ScalableAbsoluteLayout implements LayoutManager {
-    private Map<Component,Rectangle.Double> bounds = new HashMap<Component, Rectangle.Double>();
+        public static class Point {
+            double x, y;
+            public Point(double x, double y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
+        public static class Rect {
+            public double x, y, width, height;
+            public Rect(double x, double y, double width, double height) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+            }
+
+            public Rect offsetBy(Point p) {
+                return new Rect(x + p.x, y + p.y, width, height);
+            }
+            
+            public Rect topFraction(double f) {
+                return new Rect(x, y, width, height * f);
+            }
+            
+            public Rect bottomFraction(double f) {
+                return new Rect(x, y + height * (1 - f), width, height * f);
+            }
+            
+            public boolean intersects(Rect f) {
+                return (x < f.x + f.width) && (x + width > f.x) &&
+                    (y < f.y + f.width) && (y + width > f.y);
+            }
+            
+            Rectangle.Double rect() {
+                return new Rectangle.Double(x, y, width, height);
+            }
+        }
+
+    private Map<Component,Rect> bounds = new HashMap<Component, Rect>();
 
     private double width = 1.0;
     private double height = 1.0;
-    private Rectangle.Double containerBounds;
-    private Container parent;
+    private final Rect containerBounds;
+    private final Container parent;
 
     public ScalableAbsoluteLayout(Container parent) {
         this.parent = parent;
-        containerBounds = new Rectangle.Double(0, 0, width, height);
+        containerBounds = new Rect(0, 0, width, height);
     }
 
     public ScalableAbsoluteLayout(Container parent, double width, double height) {
         this.parent = parent;
         this.width = width;
         this.height = height;
-        containerBounds = new Rectangle.Double(0, 0, width, height);
+        containerBounds = new Rect(0, 0, width, height);
     }
     
-    public void addComponent(Component c, Rectangle.Double bounds) {
+    public void addComponent(Component c, Rect bounds) {
         if(!containerBounds.intersects(bounds))
             throw new IllegalArgumentException("Supplied constraint is outside container bounds: " + bounds);
         this.bounds.put(c, bounds);
-        parent.add(c);
+        if(c.getParent() != parent) {
+            parent.add(c);
+        }
     }
     
     public void addComponent(Component c, double x, double y, double w, double h) {
-        addComponent(c, new Rectangle.Double(x,y,w,h));
+        addComponent(c, new Rect(x,y,w,h));
     }
-
+    
+    public Rect getRect(Component c) {
+        return bounds.get(c);
+    }
+    
+    public void updateRect(Component c, Rect r) {
+        if(bounds.containsKey(c)) {
+            bounds.put(c, r);
+        }
+    }
 
     @Override
     public void addLayoutComponent(String name, Component comp) {
@@ -78,8 +128,8 @@ public class ScalableAbsoluteLayout implements LayoutManager {
         int parentWidth = parent.getWidth() - insets.left - insets.right;
         int parentHeight = parent.getHeight() - insets.top - insets.bottom;
 
-        double parentAspect = (double)parentWidth / (double)parentHeight;
-        double aspect = width / height;
+//        double parentAspect = (double)parentWidth / (double)parentHeight;
+//        double aspect = width / height;
 
         int xOffset = 0;
         int yOffset = 0;
@@ -107,11 +157,11 @@ public class ScalableAbsoluteLayout implements LayoutManager {
             Component comp = parent.getComponent(i);
             if(!bounds.containsKey(comp))
                 throw new RuntimeException("No bounds present for component " + comp);
-            Rectangle.Double b = bounds.get(comp);
-            int bx = (int) (xOffset + b.getX() * usableWidth / width);
-            int by = (int) (yOffset + b.getY() * usableHeight / height);
-            int bw = (int) ((b.getX() + b.getWidth()) * usableWidth / width - bx + xOffset);
-            int bh = (int) ((b.getY() + b.getHeight()) * usableHeight / height - by + yOffset);
+            Rect b = bounds.get(comp);
+            int bx = (int) (xOffset + b.x * usableWidth / width);
+            int by = (int) (yOffset + b.y * usableHeight / height);
+            int bw = (int) ((b.x + b.width) * usableWidth / width - bx + xOffset);
+            int bh = (int) ((b.y + b.height) * usableHeight / height - by + yOffset);
 //                log.debug("Bounds for " + comp.getName() + ": " + bx + ", " + by + ", " + bw + ", " + bh);
             comp.setBounds(bx, by, bw, bh);
         }

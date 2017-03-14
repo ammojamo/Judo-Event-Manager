@@ -1,13 +1,13 @@
 package au.com.jwatmuff.eventmanager.model.vo;
 
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FullScore implements Comparable<FullScore>, Serializable {
-    private int ippon;
-    private int wazari;
-    private int yuko;
-    private int shido;
-    private int decision;
+public final class FullScore implements Comparable<FullScore>, Serializable {
+    private int scores[] = new int[Score.values().length];
 
     public FullScore() {}
 
@@ -18,55 +18,28 @@ public class FullScore implements Comparable<FullScore>, Serializable {
                 throw new IllegalArgumentException("Invalid score format '" + score + "'");
             char p = pair[0].charAt(0);
             int i = Integer.valueOf(pair[1]);
-            switch(p) {
-                case 'I': ippon = i; break;
-                case 'W': wazari = i; break;
-                case 'Y': yuko = i; break;
-                case 'S': shido = i; break;
-                case 'D': decision = i; break;
-                default: throw new IllegalArgumentException("Invalid score format '" + score + "'");
+            
+            boolean found = false;
+            for(Score s : Score.values()) {
+                if(s.initial == p) {
+                    set(s, i);
+                    found = true;
+                    break;
+                }
+            }
+            
+            if(!found) {
+                throw new IllegalArgumentException("Invalid score format '" + score + "'");
             }
         }
     }
-
-    public int getIppon() {
-        return ippon;
+    
+    public int get(Score score) {
+        return scores[score.ordinal()];
     }
-
-    public void setIppon(int ippon) {
-        this.ippon = ippon;
-    }
-
-    public int getWazari() {
-        return wazari;
-    }
-
-    public void setWazari(int wazari) {
-        this.wazari = wazari;
-    }
-
-    public int getYuko() {
-        return yuko;
-    }
-
-    public void setYuko(int yuko) {
-        this.yuko = yuko;
-    }
-
-    public int getShido() {
-        return shido;
-    }
-
-    public void setShido(int shido) {
-        this.shido = shido;
-    }
-
-    public int getDecision() {
-        return decision;
-    }
-
-    public void setDecision(int decision) {
-        this.decision = decision;
+    
+    public final void set(Score score, int s) {
+        scores[score.ordinal()] = s;
     }
 
     /**
@@ -76,38 +49,50 @@ public class FullScore implements Comparable<FullScore>, Serializable {
      * An example of an invalid score would be multiple Ippons
      */
     public boolean isValid() {
-        if(ippon > 1) return false;
-        if(wazari > 2) return false;
-        if(ippon == 1 && wazari == 2) return false;
+        if(get(IPPON) > 1) return false;
+        if(get(HANSAKUMAKE) > 1) return false;
+        if(get(SHIDO) + get(LEG_SHIDO) > 3) return false;
+        if(get(LEG_SHIDO) > 2) return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return String.format("I:%d,W:%d,Y:%d,S:%d,D:%d", ippon, wazari, yuko, shido, decision);
+        List<String> elements = new ArrayList<>();
+        for(Score score : Score.values()) {
+            elements.add(score.initial + ":" + get(score));
+        }
+        return String.join(",", elements);
     }
 
     public String displayString() {
-        if(shido > 0 && decision > 0 ) {
-            return String.format("%d%d%ds%dd%d", ippon, wazari, yuko, shido, decision);
-        } else if(shido > 0 && decision == 0 ) {
-            return String.format("%d%d%ds%d", ippon, wazari, yuko, shido);
-        } else if(shido == 0 && decision > 0 ) {
-            return String.format("%d%d%dd%d", ippon, wazari, yuko, decision);
-        } else {
-            return String.format("%d%d%d", ippon, wazari, yuko);
+        StringBuilder sb = new StringBuilder();
+        for(Score s : Score.values()) {
+            if(s == IPPON || s == WAZARI) { // Always include ippon and wazari, without prefix
+                sb.append(get(s));
+            } else if(get(s) > 0) { // Include other non-zero scores, with prefix
+                sb.append(Character.toLowerCase(s.initial));
+                sb.append(get(s));
+            }
         }
+        return sb.toString();
+    }
+    
+    public Score getWinningScore(FullScore o) {
+        if(get(IPPON) > o.get(IPPON)) return IPPON;
+        if(get(WAZARI) > o.get(WAZARI)) return WAZARI;
+        
+        int shido = get(SHIDO) + get(LEG_SHIDO);
+        int otherShido = o.get(SHIDO) + o.get(LEG_SHIDO);
+        if(shido < otherShido) return SHIDO;
+
+        if(get(DECISION) > o.get(DECISION)) return DECISION;
+        return null;
     }
 
     public int compareTo(FullScore o) {
-        if (getIppon() != o.getIppon())
-            return getIppon() - o.getIppon();
-        if (getWazari() != o.getWazari())
-            return getWazari() - o.getWazari();
-        if (getYuko() != o.getYuko())
-            return getYuko() - o.getYuko();
-        if (getShido() != o.getShido())
-            return o.getShido() - getShido();
-        return getDecision() - o.getDecision();
+        if(this.getWinningScore(o) != null) return 1;
+        if(o.getWinningScore(this) != null) return -1;
+        return 0;
     }
 }

@@ -6,15 +6,18 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.ScoreboardLayout;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.DefaultScoreboardLayout;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.GoldenScoreMode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Mode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardUpdate;
-import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.IJFScoreboardLayout;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors.Area;
 import au.com.jwatmuff.eventmanager.util.FileExtensionFilter;
 import au.com.jwatmuff.eventmanager.util.gui.ScalableAbsoluteLayout;
+import au.com.jwatmuff.eventmanager.util.gui.ScalableAbsoluteLayout.Rect;
 import au.com.jwatmuff.eventmanager.util.gui.ScalableLabel;
 import java.awt.Color;
 import java.awt.Component;
@@ -24,8 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
@@ -39,109 +44,83 @@ import org.jdesktop.swingx.JXImagePanel;
  *
  * @author  James
  */
-public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements ScoreboardModel.ScoreboardModelListener {
+public class ScoreboardDisplayPanel extends ScoreboardPanel implements ScoreboardModel.ScoreboardModelListener {
     private static final Logger log = Logger.getLogger(ScoreboardEntryPanel.class);
     
-//    private ScoreboardModel model = new ScoreboardModelImpl(ScoringSystem.OLD);
-    private ScoreboardModel model = new ScoreboardModelImpl(ScoringSystem.NEW);
+    public static final Score[] SHIDO_TYPES = new Score[] { Score.SHIDO, Score.LEG_SHIDO, Score.HANSAKUMAKE };
     
-    protected static class LayoutValues {
-        double[] SCORE_GROUP_X = new double[]{0.25, 8.25}; // Player 1, Player 2
-        double[] SCORE_GROUP_Y = new double[]{4, 4}; // P1, P2
+    static final Color CLEAR = new Color(0,0,0,0);
+    
+    protected ScoreboardModel model = new ScoreboardModelImpl();
+    
+    protected ScoreboardLayout scoreboardLayout;
+    
+    protected final JLayeredPane layeredPane;
+    
+    protected final JPanel bottomLayer;
+    protected final ScalableLabel timer;
+    protected final ScalableLabel[] player;
+    protected final ScalableLabel[] team;
+    protected final ScalableLabel[][] scoreLabels;
+    protected final ScalableLabel[][] score;
+    protected final ScalableLabel division;
+    
+    protected final JPanel backgroundLayer;
+    protected final ScalableLabel[] playerBackground;
+    protected final ScalableLabel timerBackground;
+
+    protected final ScalableLabel[] pendingPlayer;
+    protected final ScalableLabel[] pendingFightTimer;
+    protected final ScalableLabel pendingDivision;
         
-        double[] SCORE_X = new double[] {0, 1.5, 4}; // I, W, Y
-        double[] SCORE_Y = new double[] {1, 1, 1}; // I, W, Y
-        double[] SCORE_WIDTHS = new double[] {1, 2, 2}; // I, W, Y
-        double[] SCORE_HEIGHTS = new double[] {2, 4, 4}; // I, W, Y
+    protected final ScalableLabel[][] shido;
+    
+    protected final ScalableLabel holddownTimer;
+    
+    protected final ScalableLabel[][] pendingScores;
+    
+    protected final JPanel resultLayer;
+    protected final ScalableLabel result;
+    protected final ScalableLabel goldenScore;
+    protected final ScalableLabel goldenScoreApprove;
+    
+    protected final JPanel noFightLayer;
+    protected final JPanel pendingFightLayer;
 
-        double[] SCORE_LABEL_X = new double[] {0, 1.5, 4}; // I, W, Y
-        double[] SCORE_LABEL_Y = new double[] {0, 0, 0}; // I, W, Y
-        double[] SCORE_LABEL_WIDTHS = new double[] {1, 2, 2}; // I, W, Y
-        double[] SCORE_LABEL_HEIGHTS = new double[] {1, 1, 1}; // I, W, Y
-        
-        boolean SCORE_SHOW_IPON = false; 
+    protected final ScalableLabel vsPlayer[];
+    protected final ScalableLabel vs;
+    protected final ScalableLabel vsDivision;
+    protected final JPanel vsLayer;
+    
+    protected boolean swapPlayers;
 
-        double[] PLAYER_LABEL_Y = new double[] {2.5, 2.5}; // P1, P2
-        double[] PLAYER_LABEL_X = new double[] {0.25, 8.25}; // P1, P2
-        double PLAYER_LABEL_WIDTH = 7.5;
-        double PLAYER_LABEL_HEIGHT = 1.5;
+    protected final int imageDisplayTime = 5000;
+    protected File[] imageFiles = findImageFiles();
+    protected int lastImageIndex = -1;
+    protected final JXImagePanel imageLayer;
 
-        double[] HD_SCORE_GROUP_X = new double[]{0.5, 10.5}; // P1, P2
-        double[] HD_SCORE_GROUP_Y = new double[]{8, 8}; // P1, P2
-        double[] HD_SCORE_X = new double[]{0, 1.5, 3}; // S,S,S,H
-        double[] HD_SCORE_Y = new double[]{0, 0, 0}; // S,S,S,H
-        double HD_SCORE_WIDTH = 2;
-        double HD_SCORE_HEIGHT = 2;
-
-        double[] SHIDO_GROUP_X = new double[]{1.5, 9.5}; // P1, P2
-        double[] SHIDO_GROUP_Y = new double[]{9.5, 9.5}; // P1, P2
-        double[] SHIDO_X = new double[]{4, 2, 0, 0}; // S,S,S,H
-        double[] SHIDO_Y = new double[]{0, 0, 0, 0}; // S,S,S,H
-        double SHIDO_WIDTH = 1;
-        double SHIDO_HEIGHT = 2;
-
-        double TIMER_X = 5;
-        double TIMER_Y = 0;
-        double TIMER_WIDTH = 6;
-        double TIMER_HEIGHT = 2.5;
-
-        double HOLD_DOWN_X = 6;
-        double HOLD_DOWN_Y = 8;
-        double HOLD_DOWN_WIDTH = 4;
-        double HOLD_DOWN_HEIGHT = 4;
-        
-        double DIVISION_X = 12;
-        double DIVISION_Y = 0;
-        double DIVISION_WIDTH = 4;
-        double DIVISION_HEIGHT = 1.5;
+    public static ScoreboardDisplayPanel getInstance() {
+        return getInstance(new DefaultScoreboardLayout());
+    }
+    
+    public static ScoreboardDisplayPanel getInstance(ScoreboardLayout scoreboardLayout) {
+        ScoreboardDisplayPanel panel = new ScoreboardDisplayPanel(scoreboardLayout);
+        panel.init();
+        return panel;
     }
 
-    private ScalableLabel timer;
-    private ScalableLabel[] player;
-    private ScalableLabel[][] scoreLabels;
-    private ScalableLabel[][] score;
-    private ScalableLabel division;
-
-    private ScalableLabel[] pendingPlayer;
-    private ScalableLabel[] pendingFightTimer;
-    private ScalableLabel pendingDivision;
-        
-    private ScalableLabel[][] shido;
-    
-    private ScalableLabel holddownTimer;
-    
-    private ScalableLabel[][] pendingScores;
-    
-    private ScalableLabel result;
-    private ScalableLabel goldenScore;
-    private ScalableLabel goldenScoreApprove;
-    
-    private JPanel noFightLayer;
-    private JPanel pendingFightLayer;
-
-    private ScalableLabel vsPlayer[];
-    private ScalableLabel vs;
-    private ScalableLabel vsDivision;
-    private JPanel vsLayer;
-    
-    private boolean swapPlayers;
-
-    private int imageDisplayTime = 5000;
-    private File[] imageFiles = findImageFiles();
-    private int lastImageIndex = -1;
-    private JXImagePanel imageLayer;
-
-    /** Creates new form ScoreboardPanel */
-    public DefaultScoreboardDisplayPanel() {
-        this(new LayoutValues());
+    protected ScoreboardDisplayPanel() {
+        this(new DefaultScoreboardLayout());
     }
-
-    public DefaultScoreboardDisplayPanel(LayoutValues lv) {
+    
+    private ScoreboardDisplayPanel(ScoreboardLayout scoreboardLayout) {
+        this.scoreboardLayout = scoreboardLayout;
+        
         ScalableAbsoluteLayout layout;
         
         setLayout(new GridLayout(1,1));
         
-        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane = new JLayeredPane();
         layeredPane.setLayout(new OverlayLayout(layeredPane));
         add(layeredPane);
 
@@ -183,7 +162,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         layout.addComponent(vsPlayer[0], 1, 1, 11, 3);
         layout.addComponent(vsPlayer[1], 4, 8, 11, 3);
         layout.addComponent(vs, 7, 5, 2, 2);
-        layout.addComponent(vsDivision, lv.DIVISION_X, lv.DIVISION_Y, lv.DIVISION_WIDTH, lv.DIVISION_HEIGHT);
+        layout.addComponent(vsDivision, scoreboardLayout.getDivisionRect());
 
         /*
          * Pending fight layer
@@ -207,12 +186,12 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         layout.addComponent(pendingPlayer[1], 9, 2.5, 6, 1.5);
         layout.addComponent(pendingFightTimer[0], 2, 5, 4, 2);
         layout.addComponent(pendingFightTimer[1], 10, 5, 4, 2);
-        layout.addComponent(pendingDivision, lv.DIVISION_X, lv.DIVISION_Y, lv.DIVISION_WIDTH, lv.DIVISION_HEIGHT);
+        layout.addComponent(pendingDivision, scoreboardLayout.getDivisionRect());
         
         /*
          * Winning result layer
          */
-        JPanel resultLayer = new JPanel();
+        resultLayer = new JPanel();
         resultLayer.setOpaque(false);
         layeredPane.add(resultLayer, new Integer(9));
         layout = new ScalableAbsoluteLayout(resultLayer, 16, 12);
@@ -224,11 +203,11 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         
         goldenScore = new ScalableLabel("Golden Score");
         goldenScore.setVisible(false);
-        layout.addComponent(goldenScore, 5, 0, 6, 0.5);
+        layout.addComponent(goldenScore, scoreboardLayout.getGoldenScoreRect());
         
         goldenScoreApprove = new ScalableLabel("Golden Score");
         goldenScoreApprove.setVisible(false);
-        layout.addComponent(goldenScoreApprove, 4, 0, 8, 2.5);
+        layout.addComponent(goldenScoreApprove, scoreboardLayout.getGoldenScoreApproveRect());
         
         /*
          * Pending score layers
@@ -241,11 +220,12 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
             layeredPane.add(psLayer[i], new Integer(8-i));
             layout = new ScalableAbsoluteLayout(psLayer[i], 16, 12);
             psLayer[i].setLayout(layout);
-
+            
             for(int j=0; j<2; j++) {
                 ScalableLabel label = new ScalableLabel("");
                 label.setVisible(false);
-                layout.addComponent(label, lv.HD_SCORE_GROUP_X[j] + lv.HD_SCORE_X[i], lv.HD_SCORE_GROUP_Y[j] + lv.HD_SCORE_Y[i], lv.HD_SCORE_WIDTH, lv.HD_SCORE_HEIGHT);
+                
+                layout.addComponent(label, scoreboardLayout.getHolddownScoreRect(j, i));
                 pendingScores[j][i] = label;
             }
         }
@@ -261,13 +241,13 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         
         holddownTimer = new ScalableLabel(" ");
         holddownTimer.setVisible(false);
-        layout.addComponent(holddownTimer, lv.HOLD_DOWN_X, lv.HOLD_DOWN_Y, lv.HOLD_DOWN_WIDTH, lv.HOLD_DOWN_HEIGHT);
+        layout.addComponent(holddownTimer, scoreboardLayout.getHolddownRect());
 
         /*
          * Bottom layer - background and core elements such as timer, player
          *                names and scores
          */
-        JPanel bottomLayer = new JPanel();
+        bottomLayer = new JPanel();
         layeredPane.add(bottomLayer, new Integer(1));
         layout = new ScalableAbsoluteLayout(bottomLayer, 16, 12);
         bottomLayer.setLayout(layout);
@@ -278,45 +258,91 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
             new ScalableLabel("Player 1"),
             new ScalableLabel("Player 2")
         };
+        team = new ScalableLabel[] {
+            new ScalableLabel("Team A"),
+            new ScalableLabel("Team B")
+        };
+        
+        if(scoreboardLayout instanceof IJFScoreboardLayout) {
+            player[0].setHorizontalAlignment(JLabel.LEFT);
+            player[1].setHorizontalAlignment(JLabel.LEFT);
+            team[0].setHorizontalAlignment(JLabel.LEFT);
+            team[1].setHorizontalAlignment(JLabel.LEFT);
+        }
 
-        layout.addComponent(timer, lv.TIMER_X, lv.TIMER_Y, lv.TIMER_WIDTH, lv.TIMER_HEIGHT);
+        layout.addComponent(timer, scoreboardLayout.getTimerRect());
         for(int i = 0; i < 2; i++) {
-            layout.addComponent(player[i], lv.PLAYER_LABEL_X[i], lv.PLAYER_LABEL_Y[i], lv.PLAYER_LABEL_WIDTH, lv.PLAYER_LABEL_HEIGHT);
+            layout.addComponent(player[i], scoreboardLayout.getPlayerLabelRect(i));
+            layout.addComponent(team[i], scoreboardLayout.getTeamLabelRect(i));
         }
         
-        scoreLabels = new ScalableLabel[2][3];
-        score = new ScalableLabel[2][3];
-        String[] iwyk = new String[]{"I","W","Y"};
+        scoreLabels = new ScalableLabel[2][2];
+        score = new ScalableLabel[2][2];
+        String[] iwyk = new String[]{"I","W"};
         for(int i=0;i<2;i++) {
-            for(int j=0;j<3;j++) {
+            for(int j=0;j<2;j++) {
+                Score s = Score.values()[j];
                 scoreLabels[i][j] = new ScalableLabel(iwyk[j]);
-                layout.addComponent(scoreLabels[i][j], lv.SCORE_GROUP_X[i] + lv.SCORE_LABEL_X[j], lv.SCORE_GROUP_Y[i] + lv.SCORE_LABEL_Y[j], lv.SCORE_LABEL_WIDTHS[j], lv.SCORE_LABEL_HEIGHTS[j]);
+                Rect rect = scoreboardLayout.getScoreLabelRect(i, s);
+                if(rect != null) layout.addComponent(scoreLabels[i][j], rect);
+
                 score[i][j] = new ScalableLabel("0");
-                layout.addComponent(score[i][j], lv.SCORE_GROUP_X[i] + lv.SCORE_X[j], lv.SCORE_GROUP_Y[i] + lv.SCORE_Y[j], lv.SCORE_WIDTHS[j], lv.SCORE_HEIGHTS[j]);
+                layout.addComponent(score[i][j], scoreboardLayout.getScoreRect(i, s));
             }
         }
         
         shido = new ScalableLabel[2][4];
         for(int i=0; i<2; i++) {
             for(int j=0; j<4; j++) {
-                shido[i][j] = new ScalableLabel(j<3?"S":"H");
+                shido[i][j] = new ScalableLabel("");
                 shido[i][j].setVisible(false);
-                layout.addComponent(shido[i][j], lv.SHIDO_GROUP_X[i] + lv.SHIDO_X[j], lv.SHIDO_GROUP_Y[i] + lv.SHIDO_Y[j], lv.SHIDO_WIDTH, lv.SHIDO_HEIGHT);
+                // shidos get laid out dynamically in updateShidos
+//                layout.addComponent(shido[i][j], scoreboardLayout.getShidoRect(i, index, s, model));
             }
         }
         division = new ScalableLabel(" ");
-        layout.addComponent(division, lv.DIVISION_X, lv.DIVISION_Y, lv.DIVISION_WIDTH, lv.DIVISION_HEIGHT);
+        layout.addComponent(division, scoreboardLayout.getDivisionRect());
         
-        // remove ippon
-        if(!lv.SCORE_SHOW_IPON) {
-            scoreLabels[0][0].setVisible(false);
-            scoreLabels[1][0].setVisible(false);
-            score[0][0].setVisible(false);
-            score[1][0].setVisible(false);
+        // IJF Scoreboard has no borders on core components
+        if(scoreboardLayout instanceof IJFScoreboardLayout) {
+            // Remove borders
+            for(Component c : bottomLayer.getComponents()) {
+                if(c instanceof ScalableLabel) {
+                    ScalableLabel l = (ScalableLabel)c;
+                    l.setBorder(new EmptyBorder(0,0,0,0));
+                }
+            }
         }
-
-        updateColors();
         
+        /*
+         * Background layer - purely for background colours as used by IJF
+         *                    scoreboard
+         */
+        backgroundLayer = new JPanel();
+        layeredPane.add(backgroundLayer, new Integer(0));
+        layout = new ScalableAbsoluteLayout(backgroundLayer, 16, 12);
+        backgroundLayer.setLayout(layout);
+        backgroundLayer.setOpaque(false);
+        
+        // Add background last
+        playerBackground = new ScalableLabel[2];
+        for(int i = 0; i < 2; i++) {
+            playerBackground[i] = new ScalableLabel("");
+            playerBackground[i].setBorder(new EmptyBorder(0,0,0,0));
+            Rect r = scoreboardLayout.getPlayerBackgroundRect(i);
+            if(r != null) layout.addComponent(playerBackground[i], r);
+        }
+        
+        {
+            Rect r = scoreboardLayout.getTimerBackgroundRect();
+            timerBackground = new ScalableLabel("");
+            timerBackground.setBorder(new EmptyBorder(0,0,0,0));
+            if(r != null) layout.addComponent(timerBackground, r);
+        }
+    }
+    
+    protected void init() {
+        updateColors();
         model.addListener(this);
     }
 
@@ -339,10 +365,10 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
     public void setImagesEnabled(boolean enabled) {
         imageFiles = enabled ? findImageFiles() : new File[0];
         updateNoFight();
-        updateImages(false);
+        updateImages(false); // X
     }
     
-    private void updateColors() {
+    void updateColors() {
         ScoringColors colors = model.getColors();
 
         switch(model.getHolddownPlayer()) {
@@ -358,7 +384,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
                 holddownTimer.setBackground(colors.getColor(Area.IDLE_BACKGROUND));
                 holddownTimer.setForeground(colors.getColor(Area.IDLE_FOREGROUND));
         }
-
+        
         for(ScalableLabel label : new ScalableLabel[] {
                 timer,
                 goldenScore, goldenScoreApprove, vs,
@@ -367,11 +393,12 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
             label.setBackground(Color.WHITE);
         }
         
-        for(ScalableLabel[] labels : shido)
+        for(ScalableLabel[] labels : shido) {
             for(ScalableLabel label : labels) {
                 label.setForeground(Color.BLACK);
                 label.setBackground(Color.WHITE);
             }
+        }
         
         Color mainBg;
         Color mainFg;
@@ -405,8 +432,6 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
 
             c.setBackground(mainBg);
             c.setForeground(mainFg);
-            //if(c instanceof ScalableLabel)
-            //    ((ScalableLabel)c).setBorder(new EmptyBorder(0,0,0,0));
         }
         
         for(int i=0; i<2; i++) {
@@ -414,35 +439,54 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
             Color fg = colors.getColor((playerPnt==0)?Area.PLAYER1_FOREGROUND:Area.PLAYER2_FOREGROUND);
             Color bg = colors.getColor((playerPnt==0)?Area.PLAYER1_BACKGROUND:Area.PLAYER2_BACKGROUND);
             
-            player[i].setForeground(fg);
-            player[i].setBackground(bg);
+            for(Component c : Arrays.asList(
+                    player[i],
+                    team[i],
+                    playerBackground[i],
+                    pendingFightTimer[i],
+                    pendingPlayer[i],
+                    vsPlayer[playerPnt])) {
+                c.setForeground(fg);
+                c.setBackground(bg);
+            }
 
-            pendingFightTimer[i].setForeground(fg);
-            pendingFightTimer[i].setBackground(bg);
-
-            pendingPlayer[i].setForeground(fg);
-            pendingPlayer[i].setBackground(bg);
-            
-            vsPlayer[playerPnt].setForeground(fg);
-            vsPlayer[playerPnt].setBackground(bg);
-
-            for(int j=0; j<3; j++) {
+            for(int j=0; j<2; j++) {
                 score[i][j].setForeground(fg);
                 score[i][j].setBackground(bg);
-            }
-            
-            for(int j=0; j<3; j++) {
                 pendingScores[i][j].setForeground(fg);
                 pendingScores[i][j].setBackground(bg);
             }
         }
         
-        for(int i=0; i<2; i++)
-            for(int j=0; j<3; j++) {
+        for(int i=0; i<2; i++) {
+            for(int j=0; j<2; j++) {
                 scoreLabels[i][j].setBackground(mainBg);
                 scoreLabels[i][j].setForeground(mainFg);
                 scoreLabels[i][j].setBorder(new EmptyBorder(0,0,0,0));
             }
+        }
+        
+        // Special colours for IJF
+        if(this.scoreboardLayout instanceof IJFScoreboardLayout) {
+            clearBackground(timer);
+            timerBackground.setBackground(Color.BLACK);
+            timer.setForeground(model.getMode() == Mode.IDLE ? Color.RED : Color.GREEN);
+            for(ScalableLabel[] ls : score) {
+                for(ScalableLabel l : ls) {
+                    clearBackground(l);
+                }
+            }
+            for(int i = 0; i < 2; i++) {
+                clearBackground(player[i], team[i]);
+            }
+        }
+    }
+    
+    static void clearBackground(JLabel... labels) {
+        for(JLabel label : labels) {
+            label.setBackground(CLEAR);
+            label.setOpaque(false);
+        }
     }
     
     @Override
@@ -470,22 +514,33 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
 
     private void updateScore() {
         for(int i=0; i<2; i++)
-            for(int j=0; j<3; j++)
+            for(int j=0; j<2; j++)
                 score[i][j].setText(String.valueOf(model.getScore(swapPlayers?1-i:i, Score.values()[j])));
     }
     
-    private void updateShido() {
-        for(int i=0; i<2; i++) {
-            int s = model.getShido(swapPlayers?1-i:i);
+    void updateShido() {
+        ScalableAbsoluteLayout layout = (ScalableAbsoluteLayout)bottomLayer.getLayout();
 
-            for(int j=0; j<4; j++) {
-                shido[i][j].setVisible((s>=j+1) && (j!=2 || s!=4)); /* complicated stuff to make H appear, gah! */
+        for(int i=0; i<2; i++) {
+            int j = 0;
+            for(Score s : SHIDO_TYPES) {
+                for(int k = 0; k < model.getScore(swapPlayers?1-i:i, s) && j < 4; k++, j++) {
+                    log.info(i + ", " + j + ", " + k);
+                    ScalableLabel label = shido[i][j];
+                    label.setText("" + s.initial);
+                    // It's OK to add something twice
+                    layout.addComponent(label, scoreboardLayout.getShidoRect(i, k, j, s, model));
+                    label.setVisible(true);
+                }
             }
-            
+            // Hide remaining shidos
+            while(j < 4) {
+                shido[i][j++].setVisible(false);
+            }
         }
     }
     
-    private void showHolddownTimer(boolean b) {
+    void showHolddownTimer(boolean b) {
         holddownTimer.setVisible(b);
     }
     
@@ -519,7 +574,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         }
     }
     
-    private void updateResult() {
+    void updateResult() {
         if(model.getGoldenScoreMode() != GoldenScoreMode.INACTIVE)
             updateGoldenScore();
 
@@ -532,18 +587,11 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
                 result.setForeground(model.getColors().getColor(Area.PLAYER2_FOREGROUND));
             }
             if(model.getWin() != null) {
-                Score winScore = model.getWin().score;
                 String displayed;
-                if(winScore == Score.IPPON) {
-                        if(model.getShido(1 - model.getWinningPlayer()) == 4)
-                            displayed = "H";
-                        else if(model.getShido(1 - model.getWinningPlayer()) == 3 &&
-                                model.getScore(model.getWinningPlayer(), Score.WAZARI) == 2)
-                            displayed = "S";
-                        else
-                            displayed = "I";
+                if(model.isHansakumake(1 - model.getWinningPlayer())) {
+                    displayed = "H";
                 } else {
-                    displayed = winScore.toString().substring(0, 1);
+                    displayed = model.getWin().score.toString().substring(0, 1);
                 }
                 result.setText(displayed);
             } else {
@@ -555,12 +603,27 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         }
     }
     
-    private void updatePlayers() {
-        for(int i=0; i<2; i++)
-            player[i].setText(model.getPlayerName(swapPlayers?1-i:i));
+    String formatPlayerName(int player) {
+        String name = model.getPlayerName(player);
+        if(scoreboardLayout instanceof IJFScoreboardLayout) {
+            name = name.toUpperCase();
+        }
+        return name;
     }
     
-    private void updateDivision() {
+    void updatePlayers() {
+        for(int i=0; i<2; i++) {
+            player[i].setText(formatPlayerName(swapPlayers?1-i:i));
+            String teamText = model.getTeamName(swapPlayers?1-i:i);
+            if(teamText == null) {
+                teamText = "";
+            }
+            team[i].setText(teamText);
+            team[i].setVisible(model.showTeams() && !teamText.isEmpty());
+        }
+    }
+    
+    void updateDivision() {
         String divisionName = model.getDivisionName();
         boolean showDivision = !StringUtils.isEmpty(divisionName);
         for(ScalableLabel label : new ScalableLabel[] { division, vsDivision, pendingDivision} ) {
@@ -569,7 +632,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         }
     }
     
-    private void updateGoldenScore() {
+    void updateGoldenScore() {
         switch(model.getGoldenScoreMode()) {
             case ACTIVE:
             case FINISHED:
@@ -666,7 +729,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
                     Thread.sleep(imageDisplayTime);
                 } catch(InterruptedException e) {}
                 if(!run) break;
-                updateImages(true);
+                updateImages(true); // X
             }
         }
 
@@ -683,7 +746,7 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
         return files == null ? new File[0] : files;
     }
 
-    private void updatePendingFight() {
+    void updatePendingFight() {
         if(model.getMode().equals(Mode.FIGHT_PENDING)) {
             if(model.getPendingFightTime(0) > 0 ||
                model.getPendingFightTime(1) > 0) {
@@ -710,6 +773,17 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
     
     @Override
     public void handleScoreboardUpdate(ScoreboardUpdate update, ScoreboardModel model) {
+        
+//        log.info("handleScoreboardUpdate");
+        
+        // Force updates onto the GUI thread
+        if(!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(() -> handleScoreboardUpdate(update, model));
+            return;
+        }
+
+        updateColors();
+        
         switch(update) {
             case TIMER:
                 updateTimer();
@@ -730,15 +804,11 @@ public class DefaultScoreboardDisplayPanel extends ScoreboardPanel implements Sc
                 break;
             case SCORE:
                 updateScore();
+                updateShido();
                 updateResult();
                 break;
             case PENDING_SCORE:
                 updatePendingScores();
-                break;
-            case SHIDO:
-                updateScore();
-                updateShido();
-                updateResult();
                 break;
             case UNDO_AVAILABLE:
                 break;

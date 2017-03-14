@@ -132,6 +132,11 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
+    public String getTeamName(int player) {
+        return model.getTeamName(player);
+    }
+
+    @Override
     public String getDivisionName() {
         return model.getDivisionName();
     }
@@ -142,8 +147,8 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
-    public int getShido(int player) {
-        return model.getShido(player);
+    public boolean isHansakumake(int player) {
+        return model.isHansakumake(player);
     }
 
     @Override
@@ -174,7 +179,12 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     @Override
     public ScoringColors getColors() {
         return model.getColors();
-    }    
+    }
+
+    @Override
+    public boolean showTeams() {
+        return model.showTeams();
+    }
 
     @Override
     public boolean undoCancelHolddownAvailable() {
@@ -182,13 +192,13 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
-    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String divisionName) {
-        model.reset(fightTime, goldenScoreTime, playerNames, divisionName);
+    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, String divisionName) {
+        model.reset(fightTime, goldenScoreTime, playerNames, teamNames, divisionName);
     }
 
     @Override
-    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date[] lastFights, int minimumBreak, String divisionName) {
-        model.reset(fightTime, goldenScoreTime, playerNames, lastFights, minimumBreak, divisionName);
+    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, Date[] lastFights, int minimumBreak, String divisionName) {
+        model.reset(fightTime, goldenScoreTime, playerNames, teamNames, lastFights, minimumBreak, divisionName);
     }
 
     @Override
@@ -252,11 +262,6 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     }
 
     @Override
-    public void changeShido(int player, boolean up) {
-        model.changeShido(player, up);
-    }
-
-    @Override
     public void endFight() {
         model.endFight();
     }
@@ -285,14 +290,14 @@ public class ScoreboardModelWrapper implements ScoreboardModel {
     public int getPendingFightTime(int player) {
         return model.getPendingFightTime(player);
     }
-
-    @Override
-    public ScoringSystem getSystem() {
-        return model.getSystem();
-    }
     
     @Override
     public void setColors(ScoringColors colors) {
         model.setColors(colors);
+    }
+
+    @Override
+    public void setShowTeams(boolean show) {
+        model.setShowTeams(show);
     }
 }

@@ -8,7 +8,6 @@ package au.com.jwatmuff.eventmanager.gui.scoring;
 
 import au.com.jwatmuff.eventmanager.db.SessionDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
-import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardWindow;
 import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
@@ -305,11 +304,7 @@ private void scoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//
     else {
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
         ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
-        if (configurationFile.getBooleanProperty("defaultUseNewScoreboard", true)) {
-            openWindow(new ScoreboardWindow(database, notifier, mat, peerManager, serviceName, ScoringSystem.NEW));
-        } else {
-            openWindow(new ScoreboardWindow(database, notifier, mat, peerManager, serviceName, ScoringSystem.OLD));
-        }
+        openWindow(new ScoreboardWindow(database, notifier, mat, peerManager, serviceName));
     }
 }//GEN-LAST:event_scoreboardButtonActionPerformed
 
@@ -317,12 +312,8 @@ private void displayScoreboardButtonActionPerformed(java.awt.event.ActionEvent e
     Session mat = chooseMat("Scoreboard");
     if(mat == null) return;
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
-        if (configurationFile.getBooleanProperty("defaultUseNewScoreboard", true)) {
-            openWindow(new ScoreboardWindow(mat, peerManager, ScoringSystem.NEW));
-        } else {
-            openWindow(new ScoreboardWindow(mat, peerManager, ScoringSystem.OLD));
-        }
+//        ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
+        openWindow(new ScoreboardWindow(mat, peerManager));
 }//GEN-LAST:event_displayScoreboardButtonActionPerformed
 
 private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualScoreboardButtonActionPerformed
@@ -346,11 +337,7 @@ private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent ev
     scoreboardName = "Scoreboard/" + scoreboardName;
     CompetitionInfo ci = database.get(CompetitionInfo.class, null);
     ConfigurationFile configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
-    if (configurationFile.getBooleanProperty("defaultUseNewScoreboard", true)) {
-        openWindow(new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.NEW, peerManager, scoreboardName));
-    } else {
-        openWindow(new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.OLD, peerManager, scoreboardName));
-    }
+    openWindow(new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, peerManager, scoreboardName));
 }//GEN-LAST:event_manualScoreboardButtonActionPerformed
 
 private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

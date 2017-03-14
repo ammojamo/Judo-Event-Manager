@@ -4,13 +4,19 @@
  */
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.DefaultScoreboardLayout;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.IJFScoreboardLayout;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.ScoreboardLayout;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.VerticalScoreboardLayout;
+
 /**
  *
  * @author james
  */
 public enum ScoreboardDisplayType {
     DEFAULT("Default Display"),
-    VERTICAL("Vertical Display");
+    VERTICAL("Vertical Display"),
+    IJF("IJF Display");
     
     public String description;  
     
@@ -18,11 +24,15 @@ public enum ScoreboardDisplayType {
         this.description = description;
     }
     
-    public static ScoreboardPanel getPanel(ScoreboardDisplayType type) {
+    private static ScoreboardLayout getLayout(ScoreboardDisplayType type) {
         switch(type) {
-            case DEFAULT: return new DefaultScoreboardDisplayPanel();
-            case VERTICAL: return new VerticalScoreboardDisplayPanel();
-            default: return new DefaultScoreboardDisplayPanel();
+            case VERTICAL: return new VerticalScoreboardLayout();
+            case IJF: return new IJFScoreboardLayout();
+            default: return new DefaultScoreboardLayout();
         }
+    }
+    
+    public static ScoreboardPanel getPanel(ScoreboardDisplayType type) {
+        return ScoreboardDisplayPanel.getInstance(getLayout(type));
     }
 }

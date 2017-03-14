@@ -5,7 +5,6 @@
 
 package au.com.jwatmuff.eventmanager;
 
-import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardWindow;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -34,8 +33,7 @@ public class ManualScoreboard {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-//                ScoreboardWindow window = new ScoreboardWindow("Manual Scoreboard", ScoringSystem.OLD);
-                ScoreboardWindow window = new ScoreboardWindow("Manual Scoreboard", ScoringSystem.NEW);
+                ScoreboardWindow window = new ScoreboardWindow("Manual Scoreboard");
 
                 window.addWindowListener(new WindowAdapter() {
                     @Override

@@ -9,6 +9,8 @@
 
 package au.com.jwatmuff.eventmanager.model.vo;
 
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.*;
 import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.util.IDGenerator;
 import au.com.jwatmuff.genericdb.Database;
@@ -81,32 +83,16 @@ public class Result extends DistributableObject<Integer> {
 
     public double[] getSimpleScores(ConfigurationFile configurationFile) {
         double[] simple = {0,0};
-        double simpleScore = 0;
-
-        if (scores[0].getDecision() != scores[1].getDecision()) {
-            simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsDecision", 0.5);
-        }
-        else if (scores[0].getIppon() != scores[1].getIppon()) {
-            simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 100);
-        }
-        else if(scores[0].getWazari() != scores[1].getWazari()) {
-            if(Math.max(scores[0].getWazari(),scores[1].getWazari()) == 2) {
-                simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 100);
+        
+        for(int i = 0; i < 2; i++) {
+            Score score = scores[i].getWinningScore(scores[1-i]);
+            if(score == IPPON) {
+                simple[i] = configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 100);
+            } else if(score == WAZARI) {
+                simple[i] = configurationFile.getDoubleProperty("defaultVictoryPointsWazari", 10);
+            } else if(score == SHIDO || score == DECISION) {
+                simple[i] = configurationFile.getDoubleProperty("defaultVictoryPointsShido", 0.5);
             }
-            else {
-                simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsWazari", 10);
-            }
-        }
-        else if (scores[0].getYuko() != scores[1].getYuko()) {
-            simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsYuko", 1);
-        }
-        else if (scores[0].getShido() != scores[1].getShido()) {
-            simpleScore  = configurationFile.getDoubleProperty("defaultVictoryPointsShido", 0.5);
-        }
-        if (scores[0].compareTo(scores[1])>0) {
-            simple[0] = simpleScore;
-        } else {
-            simple[1] = simpleScore;
         }
 
         return simple;

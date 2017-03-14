@@ -14,18 +14,10 @@ import java.util.List;
  * @author James
  */
 public interface ScoreboardModel {
-    enum ScoringSystem {
-        NEW, OLD
-    }
-
     enum Score {
-        IPPON(10), WAZARI(7), YUKO(5), SHIDO(3), DECISION(1);
+        IPPON, WAZARI, SHIDO, LEG_SHIDO, HANSAKUMAKE, DECISION;
         
-        int points;
-
-        Score(int points) {
-            this.points = points;
-        }
+        public char initial = name().charAt(0);
     }
     
     enum Mode {
@@ -41,24 +33,20 @@ public interface ScoreboardModel {
     }
     
     enum ScoreboardUpdate {
-        TIMER, HOLDDOWN, MODE, SCORE, SHIDO, PENDING_SCORE, UNDO_AVAILABLE,
+        TIMER, HOLDDOWN, MODE, SCORE, PENDING_SCORE, UNDO_AVAILABLE,
         GOLDEN_SCORE, SIREN, FIGHT_PENDING, ALL
     }
-    
+
     enum Win {
-        BY_IPPON(Score.IPPON, ""),
-        WAZA_ARI_AWESETE_IPPON(Score.IPPON, "Waza-ari-awesete-ippon"),
-        BY_WAZARI(Score.WAZARI, ""),
-        BY_YUKO(Score.YUKO, ""),
-        BY_SHIDO(Score.SHIDO, ""),
-        BY_DECISION(Score.DECISION, "");
+        BY_IPPON(Score.IPPON),
+        BY_WAZARI(Score.WAZARI),
+        BY_SHIDO(Score.SHIDO),
+        BY_DECISION(Score.DECISION);
         
         public final Score score;
-        public final String description;
-        
-        Win(Score score, String description) {
+
+        Win(Score score) {
             this.score = score;
-            this.description = description;
         }
     }
     
@@ -70,8 +58,6 @@ public interface ScoreboardModel {
     
     void removeListener(ScoreboardModelListener listener);
 
-    ScoringSystem getSystem();
-    
     ScoreboardUpdate getUpdateEvent(Object id, int timeout);
 
     String getEventLog();
@@ -92,11 +78,13 @@ public interface ScoreboardModel {
 
     String getPlayerName(int player);
     
+    String getTeamName(int player);
+    
     String getDivisionName();
 
     int getScore(int player, Score type);
-
-    int getShido(int player);
+    
+    boolean isHansakumake(int player);
 
     int getTime();
 
@@ -114,9 +102,11 @@ public interface ScoreboardModel {
     
     ScoringColors getColors();
     
-    void reset(int fightTime, int goldenScoreTime, String[] playerNames, String divisionName);
+    boolean showTeams();
+    
+    void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, String divisionName);
 
-    void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date lastFights[], int minimumBreak, String divisionName);
+    void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, Date lastFights[], int minimumBreak, String divisionName);
 
     void declarePlayerReady(int player);
 
@@ -140,8 +130,6 @@ public interface ScoreboardModel {
 
     void changeScore(int player, Score type, boolean up);
 
-    void changeShido(int player, boolean up);
-
     void endFight();
 
     void undoCancelHolddown();
@@ -155,4 +143,6 @@ public interface ScoreboardModel {
     void decideWinner(int player);
     
     void setColors(ScoringColors colors);
+    
+    void setShowTeams(boolean show);
 }

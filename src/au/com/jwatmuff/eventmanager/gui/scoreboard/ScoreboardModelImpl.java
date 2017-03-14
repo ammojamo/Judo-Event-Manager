@@ -5,6 +5,7 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.*;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.util.Stopwatch;
 import au.com.jwatmuff.genericdb.distributed.Timestamp;
@@ -40,14 +41,14 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     private Map<Object, LinkedBlockingQueue<ScoreboardUpdate>> queues =  new HashMap<Object, LinkedBlockingQueue<ScoreboardUpdate>>();
     
     /* main stuff */
-    private ScoringSystem system;
     private Stopwatch mainTimer;
     private Mode mode = Mode.NO_FIGHT;
     private int score[][] = new int[2][Score.values().length];
-    private int shido[] = new int[2];
+    private int scoreAtStartOfGoldenScore[][] = new int[2][Score.values().length];
     private int fightTime;
     private int goldenScoreTime;
     private String[] playerNames = new String[2];
+    private String[] teamNames = new String[2];
     private String divisionName;
 
     /* hold down related stuff */
@@ -58,7 +59,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     private List<Score>[] pendingScores;                        // stores scores from holddowns which have been assigned to a player but not yet awarded
     private int holddownTimeIpon;
     private int holddownTimeWazari;
-    private int holddownTimeYoko;
 
     /* cancel holddown undo stuff */
     private Stopwatch shadowTimer = new Stopwatch(10, true);    
@@ -76,15 +76,14 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     private Stopwatch[] pendingFightTimers = new Stopwatch[2];
     
     private ScoringColors colors = new ScoringColors();
+    private boolean showTeams = true;
 
     private StringBuilder eventLog = new StringBuilder();
         
     private Collection<ScoreboardModelListener> listeners = new ArrayList<ScoreboardModelListener>();
     
     @SuppressWarnings("unchecked")
-    public ScoreboardModelImpl(ScoringSystem system) {
-        this.system = system;
-
+    public ScoreboardModelImpl() {
         addListener(new ScoreboardModelListener() {
             @Override
             public void handleScoreboardUpdate(ScoreboardUpdate update, ScoreboardModel model) {
@@ -132,15 +131,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     stopTimer();
                     holddownTimer.stop();
                     handleHolddownTimerEnd();
-                } else if(holddownTimer.getTime()/1000 >= holddownTimeWazari &&
-                          holddownPlayer != UNKNOWN_PLAYER &&
-                          getScore(holddownPlayer, Score.WAZARI) == 1) {
-                    stopTimer();
-                    holddownTimer.stop();
-                    setHolddownMode(HolddownMode.INACTIVE);
-                    notifyListeners(ScoreboardUpdate.SIREN);
-                    pendingScores[holddownPlayer].add(Score.WAZARI);
-                    notifyListeners(ScoreboardUpdate.PENDING_SCORE);
                 }
                 notifyListeners(ScoreboardUpdate.HOLDDOWN);
             }
@@ -148,23 +138,15 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     }
     
     @Override
-    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String divisionName) {
+    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, String divisionName) {
         this.fightTime = fightTime;
-        if (this.fightTime > 90 && system == ScoringSystem.NEW) {
+        if (this.fightTime > 90) {
             holddownTimeIpon = 20;
-            holddownTimeWazari = 15;
-            holddownTimeYoko = 10;
-        } else if (this.fightTime > 90 && system == ScoringSystem.OLD) {
-            holddownTimeIpon = 25;
-            holddownTimeWazari = 20;
-            holddownTimeYoko = 15;
-        } else {
-            holddownTimeIpon = 20;
-            holddownTimeWazari = 15;
-            holddownTimeYoko = 10;
+            holddownTimeWazari = 10;
         }
         this.goldenScoreTime = goldenScoreTime;
         this.playerNames = playerNames;
+        this.teamNames = teamNames;
         this.divisionName = divisionName;
         stopTimer();
         cancelHolddownTimer();
@@ -172,7 +154,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         mainTimer.direction(false);
         holddownTimer.reset(0);
         for(int i=0; i<2; i++) {
-            shido[i] = 0;
             for(int j=0; j<Score.values().length; j++)
                 score[i][j] = 0;
         }
@@ -185,8 +166,8 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     }
 
     @Override
-    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, Date lastFights[], int minimumBreak, String divisionName) {
-        reset(fightTime, goldenScoreTime, playerNames, divisionName);
+    public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, Date lastFights[], int minimumBreak, String divisionName) {
+        reset(fightTime, goldenScoreTime, playerNames, teamNames, divisionName);
         for(int i=0; i<2; i++) {
             final int j = i;
             if(lastFights[i] == null) continue;
@@ -270,19 +251,19 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return;
 
         notifyListeners(ScoreboardUpdate.SCORE);
-        notifyListeners(ScoreboardUpdate.SHIDO);
         
-        if(system == ScoringSystem.NEW) {
-            if (goldenScoreTime == 0) {
-                mainTimer.direction(true);
-                mainTimer.reset(0);
-            } else {
-                mainTimer.direction(false);
-                mainTimer.reset(goldenScoreTime * 1000);
-            }
+        if (goldenScoreTime == 0) {
+            mainTimer.direction(true);
+            mainTimer.reset(0);
         } else {
-            mainTimer.reset(goldenScoreTime * 1000);
             mainTimer.direction(false);
+            mainTimer.reset(goldenScoreTime * 1000);
+        }
+        
+        for(int i = 0; i < score.length; i++) {
+            for(int j = 0; j < score[i].length; j++) {
+                scoreAtStartOfGoldenScore[i][j] = score[i][j];
+            }
         }
         notifyListeners(ScoreboardUpdate.TIMER);
         setGoldenScoreMode(GoldenScoreMode.ACTIVE);
@@ -349,7 +330,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         
     @Override
     public int getTime() {
-        return (int) (mainTimer.getTime() / 1000);
+        return (int) Math.round(mainTimer.getTime() / 1000.0);
     }
     
     @Override
@@ -366,7 +347,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     }
     
     /*
-     * Called when the hold down timer reaches 25 seconds
+     * Called when the hold down timer reaches Ippon
      */
     private void handleHolddownTimerEnd() {
         notifyListeners(ScoreboardUpdate.SIREN);
@@ -537,17 +518,13 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return Score.IPPON;
         } else if (time >= holddownTimeWazari) {
             return Score.WAZARI;
-        } else if (time >= holddownTimeYoko) {
-            return Score.YUKO;
-//        } else if (time >= 10 && system != ScoringSystem.NEW) {
-//            return Score.KOKA;
         } else {
             return null;
         }
     }
     
     @Override
-    public void changeScore(int player, Score type, boolean up) {
+        public void changeScore(int player, Score type, boolean up) {
         disableCancelHolddownUndo();
         int olds = score[player][type.ordinal()];
         
@@ -558,8 +535,18 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         
         if(s < 0) scoreok = false;
         else switch(type) {
-            case IPPON:  if(getScore(player,type) > 1) scoreok = false; break;
-            case WAZARI: if(getScore(player,type) > 2) scoreok = false; break;
+            case IPPON: 
+                if(getScore(player,type) > 1) scoreok = false;
+                break;
+            case SHIDO: 
+            case LEG_SHIDO:
+            case HANSAKUMAKE:
+                if(getScore(player, SHIDO) + getScore(player, LEG_SHIDO) > 3 ||
+                        getScore(player, LEG_SHIDO) > 2 ||
+                        getScore(player, HANSAKUMAKE) > 1) {
+                    scoreok = false;
+                }
+                break;
         }
         
         if(!scoreok) {
@@ -571,54 +558,29 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         checkForWin();
         notifyListeners(ScoreboardUpdate.SCORE);
     }
-    
-    @Override
-    public void changeShido(int player, boolean up) {
-        disableCancelHolddownUndo();
-        int s = shido[player];
-        s += up?1:-1;
-        if(s < 0 || s > 4) return;
-        shido[player] = s;
-        
-        logEvent(playerNames[player] + " " + (up?"+":"-") + "S");
-        checkForWin();
-        notifyListeners(ScoreboardUpdate.SHIDO);
-    }
-    
+
     @Override
     public int getScore(int player, Score type) {
-        /* disable koka for new scoring system */
-//        if(system == ScoringSystem.NEW && type == Score.KOKA)
-//            return 0;
-        if(type == Score.SHIDO) {
-            return 0;
-        }
-
         int s = score[player][type.ordinal()];
-
-        if(system == ScoringSystem.OLD){
-            /* adjust for other players shido */
-            int otherPlayer = 1 - player;
-            if((shido[otherPlayer] == 2 && type == Score.YUKO) ||
-               (shido[otherPlayer] == 3 && type == Score.WAZARI) ||
-               (shido[otherPlayer] == 4 && type == Score.IPPON)) {
-                s++;
-            }
-        } else {
-            /* adjust for other players shido */
-            int otherPlayer = 1 - player;
-            if(shido[otherPlayer] == 4 && type == Score.IPPON) {
-                s++;
-            }
+        
+        if(type == Score.IPPON && isHansakumake(1 - player)) {
+            s++;
         }
+
         return s;
     }
-    
+
     @Override
-    public int getShido(int player) {
-        return shido[player];
+    public boolean isHansakumake(int player) {
+        // 3 Ways to get Hansakumake:
+        // - direct hansakumake
+        // - 2 leg shidos
+        // - 3 shidos of any kind
+        return shidoCount(player) == 3 ||
+                getScore(player, Score.LEG_SHIDO) == 2 ||
+                getScore(player, Score.HANSAKUMAKE) == 1;
     }
-    
+
     @Override
     public List<Score> getPendingScores(int player) {
         return Collections.unmodifiableList(pendingScores[player]);
@@ -642,55 +604,40 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         
         for(int i=0; i<2; i++) {
             if(getScore(i, Score.IPPON) == 1) {
-                if((getScore(i, Score.WAZARI) == 2) ||
-                   (getScore(1-i, Score.IPPON) == 1) ||
-                   (getScore(1-i, Score.WAZARI) == 2) ||
-                   (!pendingScores[i].isEmpty()) ||
-                   (!pendingScores[1-i].isEmpty())) {
-                    setMode(Mode.IDLE);
-                    return;
-                }
-                winningPlayer = i;
-                win = Win.BY_IPPON;
-                stopTimer();
-                setMode(Mode.WIN);
-                return;
-            }
-            if(getScore(i, Score.WAZARI) == 2) {
                 if((getScore(1-i, Score.IPPON) == 1) ||
-                   (getScore(1-i, Score.WAZARI) == 2) ||
                    (!pendingScores[i].isEmpty()) ||
                    (!pendingScores[1-i].isEmpty())) {
+                    // Stop timer until ippon / pending scores are sorted out
                     setMode(Mode.IDLE);
-                    return;
+                } else {
+                    winningPlayer = i;
+                    win = Win.BY_IPPON;
+                    stopTimer();
+                    setMode(Mode.WIN);
                 }
-                winningPlayer = i;
-                win = Win.WAZA_ARI_AWESETE_IPPON;
-                stopTimer();
-                setMode(Mode.WIN);
                 return;
-            }            
+            }           
         }
         
-        if(goldenScoreMode == GoldenScoreMode.ACTIVE || mainTimer.getTime() <= 0) {
-            if(getScore(0, Score.WAZARI) > getScore(1, Score.WAZARI)) {
-                win = Win.BY_WAZARI;
-                winningPlayer = 0;
-            } else if(getScore(0, Score.WAZARI) < getScore(1, Score.WAZARI)) {
-                win = Win.BY_WAZARI;
-                winningPlayer = 1;
-            } else if(getScore(0, Score.YUKO) > getScore(1, Score.YUKO)) {
-                win = Win.BY_YUKO;
-                winningPlayer = 0;
-            } else if(getScore(0, Score.YUKO) < getScore(1, Score.YUKO)) {
-                win = Win.BY_YUKO;
-                winningPlayer = 1;
-            } else if(shido[0] < shido[1] && system == ScoringSystem.NEW) {
-                win = Win.BY_SHIDO;
-                winningPlayer = 0;
-            } else if(shido[0] > shido[1] && system == ScoringSystem.NEW) {
-                win = Win.BY_SHIDO;
-                winningPlayer = 1;
+        boolean goldenScoreStarted = goldenScoreMode == GoldenScoreMode.ACTIVE || goldenScoreMode == GoldenScoreMode.FINISHED;
+        boolean mainTimeFinished = goldenScoreStarted || goldenScoreMode == GoldenScoreMode.READY;
+
+        if(mainTimeFinished) {
+            for(int player = 0; player < 2; player++) {
+                if(getScore(player, Score.WAZARI) > getScore(1-player, Score.WAZARI)) {
+                    win = Win.BY_WAZARI;
+                    winningPlayer = player;
+                    break;
+                }
+                if(goldenScoreStarted && shidoCount(player) > shidoCount(1 - player)) {
+                    // Need to also check that player has scored at least one
+                    // shido since golden score
+                    if(shidoCount(player) > shidoCountAtStartOfGoldenScore(player)) {
+                        win = Win.BY_SHIDO;
+                        winningPlayer = player;
+                        break;
+                    }
+                }
             }
             
             if(win != null) {
@@ -707,6 +654,16 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         }
     }
     
+    private int shidoCount(int player) {
+        return score[player][Score.SHIDO.ordinal()] +
+                score[player][Score.LEG_SHIDO.ordinal()];
+    }
+    
+    private int shidoCountAtStartOfGoldenScore(int player) {
+        return scoreAtStartOfGoldenScore[player][Score.SHIDO.ordinal()] +
+                score[player][Score.LEG_SHIDO.ordinal()];
+    }
+    
     @Override
     public int getWinningPlayer() {
         return winningPlayer;
@@ -717,18 +674,15 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         return win;
     }
     
+    @Override
     public void setGoldenScoreMode(GoldenScoreMode goldenScoreMode) {
         if(this.goldenScoreMode != goldenScoreMode) {
             this.goldenScoreMode = goldenScoreMode;
             if(this.goldenScoreMode == GoldenScoreMode.INACTIVE) {
                 mainTimer.direction(false);
             }else{
-                if(system == ScoringSystem.NEW) {
-                    if (goldenScoreTime == 0) {
-                        mainTimer.direction(true);
-                    } else {
-                        mainTimer.direction(false);
-                    }
+                if (goldenScoreTime == 0) {
+                    mainTimer.direction(true);
                 } else {
                     mainTimer.direction(false);
                 }
@@ -745,6 +699,11 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public String getPlayerName(int player) {
         return playerNames[player];
+    }
+
+    @Override
+    public String getTeamName(int player) {
+        return teamNames == null ? null : teamNames[player];
     }
 
     @Override
@@ -843,6 +802,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         assert(win == null);
         assert(player == 0 || player == 1);
 
+        score[player][Score.DECISION.ordinal()] = 1;
+        score[1 - player][Score.DECISION.ordinal()] = 0;
+
         win = Win.BY_DECISION;
         winningPlayer = player;
 
@@ -861,11 +823,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     }
 
     @Override
-    public ScoringSystem getSystem() {
-        return system;
-    }
-
-    @Override
     public ScoringColors getColors() {
         return colors;
     }
@@ -875,5 +832,15 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         this.colors = colors;
         notifyListeners(ScoreboardUpdate.ALL);
     }
-}
 
+    @Override
+    public boolean showTeams() {
+        return showTeams;
+    }
+
+    @Override
+    public void setShowTeams(boolean show) {
+        this.showTeams = show;
+        notifyListeners(ScoreboardUpdate.ALL);
+    }
+}

@@ -87,9 +87,9 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
         double cellStart;
         double frameHight;
         double frameWidth;
-        double cellHight;
+        double cellHeight;
         double cellWidth;
-        double textHight;
+        double textHeight;
         double borderWidth;
         double numberWidth;
         double textWidth;
@@ -103,36 +103,36 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
             }
             frameHight = screenHight - cellStart;
             frameWidth = screenWidth;
-            cellHight = frameHight/(noVertCells);
+            cellHeight = frameHight/(noVertCells);
             cellWidth = frameWidth/noHorizCells;
-            textHight = cellHight/(2.0*(1+borderRatio));
-            borderWidth = borderRatio*textHight;
-            numberWidth = textHight*numberRatio;
+            textHeight = cellHeight/(2.0*(1+borderRatio));
+            borderWidth = borderRatio*textHeight;
+            numberWidth = textHeight*numberRatio;
             textWidth = cellWidth-(2.0*borderWidth+numberWidth);
 
             if (displayMatName) {
-                layout.addComponent(matTitle, new Rectangle.Double(borderWidth, borderWidth, screenWidth-2.0*borderWidth, 2.0*textHight));
+                layout.addComponent(matTitle, borderWidth, borderWidth, screenWidth-2.0*borderWidth, 2.0*textHeight);
                 matTitle.setBorder(new EmptyBorder(0,0,0,0));
             }
 
             now = new ScalableLabel("Now", impact);
 
-            layout.addComponent(now, new Rectangle.Double(borderWidth, cellStart+borderWidth, numberWidth, textHight * 0.75));
+            layout.addComponent(now, borderWidth, cellStart+borderWidth, numberWidth, textHeight * 0.75);
             now.setBorder(new EmptyBorder(0,0,0,0));
             numbers[0].setBorder(new EmptyBorder(0,0,0,0));
             divisions[0].setBorder(new EmptyBorder(0,0,0,0));
-            layout.addComponent(player1s[0], new Rectangle.Double(borderWidth+numberWidth, cellStart+borderWidth, textWidth, textHight));
-            layout.addComponent(player2s[0], new Rectangle.Double(borderWidth+numberWidth, cellStart+borderWidth+textHight, textWidth, textHight));
-            layout.addComponent(numbers[0], new Rectangle.Double(borderWidth, cellStart+borderWidth+textHight * 0.75, numberWidth, textHight * 0.75));
-            layout.addComponent(divisions[0], new Rectangle.Double(borderWidth, cellStart+borderWidth+textHight * 1.5, numberWidth, textHight * 0.5));
+            layout.addComponent(player1s[0], borderWidth+numberWidth, cellStart+borderWidth, textWidth, textHeight);
+            layout.addComponent(player2s[0], borderWidth+numberWidth, cellStart+borderWidth+textHeight, textWidth, textHeight);
+            layout.addComponent(numbers[0], borderWidth, cellStart+borderWidth+textHeight * 0.75, numberWidth, textHeight * 0.75);
+            layout.addComponent(divisions[0], borderWidth, cellStart+borderWidth+textHeight * 1.5, numberWidth, textHeight * 0.5);
 
             for(int a = 0; a < noVertCells; a++){
                 for(int b = 0; b < noHorizCells; b++){
                     if( a > 0 || b > 0){
-                        layout.addComponent(player1s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHight+borderWidth, textWidth, textHight));
-                        layout.addComponent(player2s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHight+borderWidth+textHight, textWidth, textHight));
-                        layout.addComponent(numbers[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth, cellStart+a*cellHight+borderWidth, numberWidth, 1.5*textHight));
-                        layout.addComponent(divisions[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth, cellStart+a*cellHight+borderWidth + 1.5*textHight, numberWidth, 0.5*textHight));
+                        layout.addComponent(player1s[a+noVertCells*b], b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHeight+borderWidth, textWidth, textHeight);
+                        layout.addComponent(player2s[a+noVertCells*b], b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHeight+borderWidth+textHeight, textWidth, textHeight);
+                        layout.addComponent(numbers[a+noVertCells*b], b*cellWidth+borderWidth, cellStart+a*cellHeight+borderWidth, numberWidth, 1.5*textHeight);
+                        layout.addComponent(divisions[a+noVertCells*b], b*cellWidth+borderWidth, cellStart+a*cellHeight+borderWidth + 1.5*textHeight, numberWidth, 0.5*textHeight);
                     }
                 }
             }
@@ -145,35 +145,35 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
             }
             frameHight = screenHight - cellStart;
             frameWidth = screenWidth;
-            cellHight = frameHight/(noVertCells);
+            cellHeight = frameHight/(noVertCells);
             cellWidth = frameWidth/noHorizCells;
-            textHight = cellHight/(1+2.0*borderRatio);
-            borderWidth = borderRatio*textHight;
-            numberWidth = textHight*numberRatio;
+            textHeight = cellHeight/(1+2.0*borderRatio);
+            borderWidth = borderRatio*textHeight;
+            numberWidth = textHeight*numberRatio;
             divisionWidth = numberWidth;
             textWidth = (cellWidth-(2.0*borderWidth+numberWidth+divisionWidth))/2.0;
 
             if (displayMatName) {
-                layout.addComponent(matTitle, new Rectangle.Double(borderWidth, borderWidth, screenWidth-2.0*borderWidth, 2.0*textHight));
+                layout.addComponent(matTitle, borderWidth, borderWidth, screenWidth-2.0*borderWidth, 2.0*textHeight);
                 matTitle.setBorder(new EmptyBorder(0,0,0,0));
             }
 
             now = new ScalableLabel("Now", impact);
 
-            layout.addComponent(now, new Rectangle.Double(borderWidth, cellStart+borderWidth, numberWidth, textHight));
+            layout.addComponent(now, borderWidth, cellStart+borderWidth, numberWidth, textHeight);
             now.setBorder(new EmptyBorder(0,0,0,0));
             numbers[0].setBorder(new EmptyBorder(0,0,0,0));
-            layout.addComponent(player1s[0], new Rectangle.Double(borderWidth+numberWidth+divisionWidth, cellStart+borderWidth, textWidth, textHight));
-            layout.addComponent(player2s[0], new Rectangle.Double(borderWidth+numberWidth+divisionWidth+textWidth, cellStart+borderWidth, textWidth, textHight));
-            layout.addComponent(divisions[0], new Rectangle.Double(borderWidth+numberWidth, cellStart+borderWidth, divisionWidth, textHight));
+            layout.addComponent(player1s[0], borderWidth+numberWidth+divisionWidth, cellStart+borderWidth, textWidth, textHeight);
+            layout.addComponent(player2s[0], borderWidth+numberWidth+divisionWidth+textWidth, cellStart+borderWidth, textWidth, textHeight);
+            layout.addComponent(divisions[0], borderWidth+numberWidth, cellStart+borderWidth, divisionWidth, textHeight);
 
             for(int a = 0; a < noVertCells; a++){
                 for(int b = 0; b < noHorizCells; b++){
                     if( a > 0 || b > 0){
-                        layout.addComponent(player1s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth+divisionWidth, cellStart+a*cellHight+borderWidth, textWidth, textHight));
-                        layout.addComponent(player2s[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth+divisionWidth+textWidth, cellStart+a*cellHight+borderWidth, textWidth, textHight));
-                        layout.addComponent(numbers[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth, cellStart+a*cellHight+borderWidth, numberWidth, textHight));
-                        layout.addComponent(divisions[a+noVertCells*b], new Rectangle.Double(b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHight+borderWidth, numberWidth, textHight));
+                        layout.addComponent(player1s[a+noVertCells*b], b*cellWidth+borderWidth+numberWidth+divisionWidth, cellStart+a*cellHeight+borderWidth, textWidth, textHeight);
+                        layout.addComponent(player2s[a+noVertCells*b], b*cellWidth+borderWidth+numberWidth+divisionWidth+textWidth, cellStart+a*cellHeight+borderWidth, textWidth, textHeight);
+                        layout.addComponent(numbers[a+noVertCells*b], b*cellWidth+borderWidth, cellStart+a*cellHeight+borderWidth, numberWidth, textHeight);
+                        layout.addComponent(divisions[a+noVertCells*b], b*cellWidth+borderWidth+numberWidth, cellStart+a*cellHeight+borderWidth, numberWidth, textHeight);
                     }
                 }
             }
@@ -185,7 +185,7 @@ public class FightProgressionPanel extends javax.swing.JPanel implements Transac
         layout = new ScalableAbsoluteLayout(back, screenWidth, screenHight);
         f1highlight = new ScalableLabel(" ");
         f1highlight.setBorder(new EmptyBorder(0,0,0,0));
-        layout.addComponent(f1highlight, new Rectangle.Double(0.0, cellStart, cellWidth, cellHight));
+        layout.addComponent(f1highlight, 0.0, cellStart, cellWidth, cellHeight);
         back.setLayout(layout);
 
         layeredPane.setLayout(new OverlayLayout(layeredPane));

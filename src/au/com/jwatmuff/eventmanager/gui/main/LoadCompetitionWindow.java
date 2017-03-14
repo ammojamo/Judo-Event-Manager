@@ -9,7 +9,6 @@ package au.com.jwatmuff.eventmanager.gui.main;
 import au.com.jwatmuff.eventmanager.Main;
 import au.com.jwatmuff.eventmanager.gui.admin.EnterPasswordDialog;
 import au.com.jwatmuff.eventmanager.gui.license.LicenseKeyDialog;
-import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardWindow;
 import au.com.jwatmuff.eventmanager.permissions.Action;
 import au.com.jwatmuff.eventmanager.permissions.License;
@@ -772,7 +771,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         
         scoreboardName = "Scoreboard/" + scoreboardName;
 //        new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.OLD, peerManager, scoreboardName).setVisible(true);
-        new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.NEW, peerManager, scoreboardName).setVisible(true);
+        new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, peerManager, scoreboardName).setVisible(true);
     }//GEN-LAST:event_manualScoreboardButtonActionPerformed
 
     private void competitionListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_competitionListValueChanged

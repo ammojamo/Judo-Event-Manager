@@ -6,7 +6,6 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoring;
 
-import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoringSystem;
 import au.com.jwatmuff.eventmanager.model.vo.Session;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.PanelDisplayFrame;
@@ -49,8 +48,7 @@ public class SimpleScoringWindow extends javax.swing.JFrame {
     }
     
     private SimpleScoringPanel getScoringPanel() {
-//        SimpleScoringPanel sp = new SimpleScoringPanel(matSession, ScoringSystem.OLD);
-        SimpleScoringPanel sp = new SimpleScoringPanel(matSession, ScoringSystem.NEW);
+        SimpleScoringPanel sp = new SimpleScoringPanel(matSession);
         sp.setDatabase(database);
         sp.setNotifier(notifier);
         sp.setParentWindow(this);

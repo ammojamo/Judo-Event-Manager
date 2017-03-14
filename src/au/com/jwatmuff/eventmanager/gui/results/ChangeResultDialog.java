@@ -11,6 +11,7 @@
 
 package au.com.jwatmuff.eventmanager.gui.results;
 
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.*;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.vo.FullScore;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
@@ -34,16 +35,18 @@ public class ChangeResultDialog extends javax.swing.JDialog {
         playerTextField2.setText(ri.getPlayerName()[1]);
         FullScore score1 = ri.getResult().getScores()[0];
         FullScore score2 = ri.getResult().getScores()[1];
-        iSpinner1.setValue(score1.getIppon());
-        wSpinner1.setValue(score1.getWazari());
-        ySpinner1.setValue(score1.getYuko());
-        dSpinner1.setValue(score1.getDecision());
-        sSpinner1.setValue(score1.getShido());
-        iSpinner2.setValue(score2.getIppon());
-        wSpinner2.setValue(score2.getWazari());
-        ySpinner2.setValue(score2.getYuko());
-        dSpinner2.setValue(score2.getDecision());
-        sSpinner2.setValue(score2.getShido());
+        iSpinner1.setValue(score1.get(IPPON));
+        wSpinner1.setValue(score1.get(WAZARI));
+        dSpinner1.setValue(score1.get(DECISION));
+        sSpinner1.setValue(score1.get(SHIDO));
+        lSpinner1.setValue(score1.get(LEG_SHIDO));
+        hSpinner1.setValue(score1.get(HANSAKUMAKE));
+        iSpinner2.setValue(score2.get(IPPON));
+        wSpinner2.setValue(score2.get(WAZARI));
+        dSpinner2.setValue(score2.get(DECISION));
+        sSpinner2.setValue(score2.get(SHIDO));
+        lSpinner2.setValue(score2.get(LEG_SHIDO));
+        hSpinner2.setValue(score2.get(HANSAKUMAKE));
     }
 
     public boolean getSuccess() {
@@ -52,17 +55,19 @@ public class ChangeResultDialog extends javax.swing.JDialog {
 
     public FullScore[] getScores() {
         FullScore score1 = new FullScore();
-        score1.setIppon((Integer)iSpinner1.getValue());
-        score1.setWazari((Integer)wSpinner1.getValue());
-        score1.setYuko((Integer)ySpinner1.getValue());
-        score1.setDecision((Integer)dSpinner1.getValue());
-        score1.setShido((Integer)sSpinner1.getValue());
+        score1.set(IPPON, (Integer)iSpinner1.getValue());
+        score1.set(WAZARI, (Integer)wSpinner1.getValue());
+        score1.set(DECISION, (Integer)dSpinner1.getValue());
+        score1.set(SHIDO, (Integer)sSpinner1.getValue());
+        score1.set(LEG_SHIDO, (Integer)lSpinner1.getValue());
+        score1.set(HANSAKUMAKE, (Integer)hSpinner1.getValue());
         FullScore score2 = new FullScore();
-        score2.setIppon((Integer)iSpinner2.getValue());
-        score2.setWazari((Integer)wSpinner2.getValue());
-        score2.setYuko((Integer)ySpinner2.getValue());
-        score2.setDecision((Integer)dSpinner2.getValue());
-        score2.setShido((Integer)sSpinner2.getValue());
+        score2.set(IPPON, (Integer)iSpinner2.getValue());
+        score2.set(WAZARI, (Integer)wSpinner2.getValue());
+        score2.set(DECISION, (Integer)dSpinner2.getValue());
+        score2.set(SHIDO, (Integer)sSpinner2.getValue());
+        score2.set(LEG_SHIDO, (Integer)lSpinner2.getValue());
+        score2.set(HANSAKUMAKE, (Integer)hSpinner2.getValue());
         return new FullScore[] {
             score1,
             score2
@@ -89,21 +94,25 @@ public class ChangeResultDialog extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         wSpinner1 = new javax.swing.JSpinner();
         jLabel5 = new javax.swing.JLabel();
-        ySpinner1 = new javax.swing.JSpinner();
-        jLabel6 = new javax.swing.JLabel();
         dSpinner1 = new javax.swing.JSpinner();
-        jLabel7 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         sSpinner1 = new javax.swing.JSpinner();
+        jLabel7 = new javax.swing.JLabel();
+        lSpinner1 = new javax.swing.JSpinner();
         jLabel8 = new javax.swing.JLabel();
-        ySpinner2 = new javax.swing.JSpinner();
+        dSpinner2 = new javax.swing.JSpinner();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         iSpinner2 = new javax.swing.JSpinner();
-        dSpinner2 = new javax.swing.JSpinner();
-        jLabel11 = new javax.swing.JLabel();
         sSpinner2 = new javax.swing.JSpinner();
+        jLabel11 = new javax.swing.JLabel();
+        lSpinner2 = new javax.swing.JSpinner();
         jLabel12 = new javax.swing.JLabel();
         wSpinner2 = new javax.swing.JSpinner();
+        jLabel13 = new javax.swing.JLabel();
+        hSpinner1 = new javax.swing.JSpinner();
+        jLabel14 = new javax.swing.JLabel();
+        hSpinner2 = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Change Result");
@@ -135,25 +144,29 @@ public class ChangeResultDialog extends javax.swing.JDialog {
 
         jLabel4.setText("W:");
 
-        jLabel5.setText("Y:");
+        jLabel5.setText("D:");
 
-        ySpinner1.setModel(new javax.swing.SpinnerNumberModel(0, 0, 99, 1));
+        dSpinner1.setModel(new javax.swing.SpinnerNumberModel(0, 0, 99, 1));
 
-        jLabel6.setText("D:");
+        jLabel6.setText("S:");
 
-        jLabel7.setText("S:");
+        jLabel7.setText("LS:");
 
         jLabel8.setText("W:");
 
-        ySpinner2.setModel(new javax.swing.SpinnerNumberModel(0, 0, 99, 1));
+        dSpinner2.setModel(new javax.swing.SpinnerNumberModel(0, 0, 99, 1));
 
         jLabel9.setText("I:");
 
-        jLabel10.setText("D:");
+        jLabel10.setText("S:");
 
-        jLabel11.setText("S:");
+        jLabel11.setText("LS:");
 
-        jLabel12.setText("Y:");
+        jLabel12.setText("D:");
+
+        jLabel13.setText("H:");
+
+        jLabel14.setText("H:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -165,31 +178,16 @@ public class ChangeResultDialog extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(playerTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(iSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(wSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ySpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(24, 24, 24)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(dSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(sSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(playerTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(playerTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE))
+                        .addComponent(playerTextField2))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(cancelButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(okButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -201,25 +199,49 @@ public class ChangeResultDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel12)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ySpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(dSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(24, 24, 24)
                         .addComponent(jLabel10)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(dSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(sSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel11)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(sSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(cancelButton)
+                        .addComponent(lSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel14)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(okButton)))
+                        .addComponent(hSpinner2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(iSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(wSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(24, 24, 24)
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel13)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(hSpinner1)))
                 .addContainerGap())
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {dSpinner1, dSpinner2, iSpinner1, iSpinner2, sSpinner1, sSpinner2, wSpinner1, wSpinner2, ySpinner1, ySpinner2});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {dSpinner1, dSpinner2, iSpinner1, iSpinner2, lSpinner1, lSpinner2, sSpinner1, sSpinner2, wSpinner1, wSpinner2});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -235,11 +257,14 @@ public class ChangeResultDialog extends javax.swing.JDialog {
                     .addComponent(jLabel4)
                     .addComponent(wSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(ySpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6)
                     .addComponent(dSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6)
+                    .addComponent(sSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
-                    .addComponent(sSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel13)
+                        .addComponent(hSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -251,11 +276,14 @@ public class ChangeResultDialog extends javax.swing.JDialog {
                     .addComponent(jLabel8)
                     .addComponent(wSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12)
-                    .addComponent(ySpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10)
                     .addComponent(dSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel10)
+                    .addComponent(sSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11)
-                    .addComponent(sSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel14)
+                        .addComponent(hSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(okButton)
@@ -263,7 +291,7 @@ public class ChangeResultDialog extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {dSpinner1, dSpinner2, iSpinner1, iSpinner2, sSpinner1, sSpinner2, wSpinner1, wSpinner2, ySpinner1, ySpinner2});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {dSpinner1, dSpinner2, iSpinner1, iSpinner2, lSpinner1, lSpinner2, sSpinner1, sSpinner2, wSpinner1, wSpinner2});
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -294,12 +322,16 @@ public class ChangeResultDialog extends javax.swing.JDialog {
     private javax.swing.JButton cancelButton;
     private javax.swing.JSpinner dSpinner1;
     private javax.swing.JSpinner dSpinner2;
+    private javax.swing.JSpinner hSpinner1;
+    private javax.swing.JSpinner hSpinner2;
     private javax.swing.JSpinner iSpinner1;
     private javax.swing.JSpinner iSpinner2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -308,6 +340,8 @@ public class ChangeResultDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JSpinner lSpinner1;
+    private javax.swing.JSpinner lSpinner2;
     private javax.swing.JButton okButton;
     private javax.swing.JTextField playerTextField1;
     private javax.swing.JTextField playerTextField2;
@@ -315,8 +349,6 @@ public class ChangeResultDialog extends javax.swing.JDialog {
     private javax.swing.JSpinner sSpinner2;
     private javax.swing.JSpinner wSpinner1;
     private javax.swing.JSpinner wSpinner2;
-    private javax.swing.JSpinner ySpinner1;
-    private javax.swing.JSpinner ySpinner2;
     // End of variables declaration//GEN-END:variables
 
 }
