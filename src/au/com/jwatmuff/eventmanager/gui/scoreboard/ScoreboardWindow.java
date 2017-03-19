@@ -142,8 +142,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         setupMenu();
         this.title = title;
         setTitle(title);
-        scoreboard = new ScoreboardDisplayPanel();
-        fullscreen = new ScoreboardDisplayPanel();
+        scoreboard = ScoreboardDisplayPanel.getInstance();
+        fullscreen = ScoreboardDisplayPanel.getInstance();
         setModel(new ScoreboardModelWrapper(model), false);
 
         getContentPane().setLayout(new GridLayout(1,1));
@@ -164,8 +164,8 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         setTitle(title);
 
         /* create scoreboard panels */
-        scoreboard = new ScoreboardDisplayPanel();
-        fullscreen = new ScoreboardDisplayPanel();
+        scoreboard = ScoreboardDisplayPanel.getInstance();
+        fullscreen = ScoreboardDisplayPanel.getInstance();
         
         /* put scoreboard panel into window */
         getContentPane().setLayout(new GridLayout(1,1));
@@ -410,9 +410,9 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                     buttonGroup.setSelected(menuItem.getModel(), true);
                 }
             });
-            if(first) {
+            // Select IJF by default
+            if(type == ScoreboardDisplayType.IJF) {
                 buttonGroup.setSelected(menuItem.getModel(), true);
-                first = false;
             }
             scoreboardStyleMenu.add(menuItem);
         }

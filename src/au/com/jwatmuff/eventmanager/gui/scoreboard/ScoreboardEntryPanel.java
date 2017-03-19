@@ -10,6 +10,8 @@ import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.GoldenScoreMo
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Mode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardUpdate;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.ScoreboardLayout;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.SideBySideScoreboardLayout;
 import au.com.jwatmuff.eventmanager.util.gui.ScalableAbsoluteLayout;
 import au.com.jwatmuff.eventmanager.util.gui.ScalableAbsoluteLayout.Rect;
 import au.com.jwatmuff.eventmanager.util.gui.ScalableLabel;
@@ -54,13 +56,16 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
     private final ScalableLabel endFight;
     
     public static ScoreboardEntryPanel getInstance() {
-        ScoreboardEntryPanel panel = new ScoreboardEntryPanel();
+        ScoreboardEntryPanel panel = new ScoreboardEntryPanel(new SideBySideScoreboardLayout());
         panel.init();
         return panel;
     }
     
-    private ScoreboardEntryPanel() {
+    private ScoreboardEntryPanel(ScoreboardLayout scoreboardLayout) {
+        super(scoreboardLayout);
         // Only default scoreboard layout is allowed
+//        super(new SideBySideScoreboardLayout());
+        
         imageFiles = new File[0];
 
         ScalableAbsoluteLayout layout;

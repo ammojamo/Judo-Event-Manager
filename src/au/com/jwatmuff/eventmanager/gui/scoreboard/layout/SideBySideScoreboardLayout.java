@@ -15,7 +15,7 @@ import au.com.jwatmuff.eventmanager.util.gui.ScalableAbsoluteLayout.Rect;
  *
  * @author james
  */
-public class DefaultScoreboardLayout implements ScoreboardLayout {
+public class SideBySideScoreboardLayout implements ScoreboardLayout {
     private Point getScorePosition(int player) {
         return (player == 0) ?
                 new Point(0.25, 4) :
@@ -110,5 +110,10 @@ public class DefaultScoreboardLayout implements ScoreboardLayout {
     @Override
     public Rect getGoldenScoreApproveRect() {
         return new Rect(4, 0, 8, 2.5);
+    }
+
+    @Override
+    public Rect getResultRect() {
+        return new Rect(6, 8, 4, 4);
     }
 }

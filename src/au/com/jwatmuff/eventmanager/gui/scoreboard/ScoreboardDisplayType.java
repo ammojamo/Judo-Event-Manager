@@ -4,7 +4,7 @@
  */
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
-import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.DefaultScoreboardLayout;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.SideBySideScoreboardLayout;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.IJFScoreboardLayout;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.ScoreboardLayout;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.VerticalScoreboardLayout;
@@ -14,8 +14,8 @@ import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.VerticalScoreboardLayo
  * @author james
  */
 public enum ScoreboardDisplayType {
-    DEFAULT("Default Display"),
-    VERTICAL("Vertical Display"),
+    SIDE_BY_SIDE("Side by Side Display"),
+//    VERTICAL("Vertical Display"),
     IJF("IJF Display");
     
     public String description;  
@@ -26,9 +26,13 @@ public enum ScoreboardDisplayType {
     
     private static ScoreboardLayout getLayout(ScoreboardDisplayType type) {
         switch(type) {
-            case VERTICAL: return new VerticalScoreboardLayout();
-            case IJF: return new IJFScoreboardLayout();
-            default: return new DefaultScoreboardLayout();
+//            case VERTICAL:
+//                return new VerticalScoreboardLayout();            
+            case IJF:
+            default:
+                return new IJFScoreboardLayout();
+            case SIDE_BY_SIDE:
+                return new SideBySideScoreboardLayout();
         }
     }
     

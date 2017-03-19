@@ -34,4 +34,5 @@ public interface ScoreboardLayout {
     Rect getTimerBackgroundRect();
     Rect getGoldenScoreRect();
     Rect getGoldenScoreApproveRect();
+    Rect getResultRect();
 }

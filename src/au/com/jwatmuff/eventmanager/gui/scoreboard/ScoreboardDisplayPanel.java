@@ -7,7 +7,6 @@
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
 import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.ScoreboardLayout;
-import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.DefaultScoreboardLayout;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.GoldenScoreMode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Mode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
@@ -100,7 +99,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
     protected final JXImagePanel imageLayer;
 
     public static ScoreboardDisplayPanel getInstance() {
-        return getInstance(new DefaultScoreboardLayout());
+        return getInstance(new IJFScoreboardLayout());
     }
     
     public static ScoreboardDisplayPanel getInstance(ScoreboardLayout scoreboardLayout) {
@@ -109,11 +108,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         return panel;
     }
 
-    protected ScoreboardDisplayPanel() {
-        this(new DefaultScoreboardLayout());
-    }
-    
-    private ScoreboardDisplayPanel(ScoreboardLayout scoreboardLayout) {
+    protected ScoreboardDisplayPanel(ScoreboardLayout scoreboardLayout) {
         this.scoreboardLayout = scoreboardLayout;
         
         ScalableAbsoluteLayout layout;
@@ -199,7 +194,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         
         result = new ScalableLabel("");
         result.setVisible(false);
-        layout.addComponent(result, 6, 8, 4, 4);
+        layout.addComponent(result, scoreboardLayout.getResultRect());
         
         goldenScore = new ScalableLabel("Golden Score");
         goldenScore.setVisible(false);

@@ -97,11 +97,16 @@ public class VerticalScoreboardLayout implements ScoreboardLayout {
     
     @Override
     public Rect getGoldenScoreRect() {
-        return new Rect(0.25, 9.25, 4, 1.5);
+        return new Rect(0, 9, 4, 1.5);
     }
 
     @Override
     public Rect getGoldenScoreApproveRect() {
         return getGoldenScoreRect();
+    }
+
+    @Override
+    public Rect getResultRect() {
+        return getHolddownRect();
     }
 }
