@@ -657,7 +657,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
     public void updateTimer() {
         int sec = model.getTime();
         String str = sec/60 + ":" + format.format(sec%60);
-        timer.setText(str);        
+        timer.setText(str);
     }
     
     private void updateNoFight() {
@@ -833,6 +833,10 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             default:
                 log.info("Unknown update event: " + update);
         }
+        this.repaint(); // Hoping this will fix intermittent delay issue - very hard to test
+        // delay seems to be due to render issue because resizing window brings it into sync
+        // only seems to affect entry scoreboard
+        // maybe something else is updating gui off the main thread?
     }
 
     /** This method is called from within the constructor to
