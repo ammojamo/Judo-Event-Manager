@@ -608,6 +608,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                    (!pendingScores[i].isEmpty()) ||
                    (!pendingScores[1-i].isEmpty())) {
                     // Stop timer until ippon / pending scores are sorted out
+                    stopTimer();
                     setMode(Mode.IDLE);
                 } else {
                     winningPlayer = i;
