@@ -465,7 +465,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         if(this.scoreboardLayout instanceof IJFScoreboardLayout) {
             clearBackground(timer);
             timerBackground.setBackground(Color.BLACK);
-            timer.setForeground(model.getMode() == Mode.IDLE ? Color.RED : Color.GREEN);
+            timer.setForeground(model.getMode() == Mode.FIGHTING ? Color.GREEN : Color.RED);
             for(ScalableLabel[] ls : score) {
                 for(ScalableLabel l : ls) {
                     clearBackground(l);
