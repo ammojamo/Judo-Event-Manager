@@ -75,7 +75,7 @@ public class ManualFightDialog extends javax.swing.JDialog {
 
         playerTextField2.setText("Player 2");
 
-        fightTimeTextField.setText("300");
+        fightTimeTextField.setText("240");
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
