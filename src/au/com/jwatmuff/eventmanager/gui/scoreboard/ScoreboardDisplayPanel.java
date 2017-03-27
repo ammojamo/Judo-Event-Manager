@@ -600,7 +600,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
     
     String formatPlayerName(int player) {
         String name = model.getPlayerName(player);
-        if(scoreboardLayout instanceof IJFScoreboardLayout) {
+        if(scoreboardLayout instanceof IJFScoreboardLayout && name != null) {
             name = name.toUpperCase();
         }
         return name;
