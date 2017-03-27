@@ -229,6 +229,7 @@ public class MainWindow extends javax.swing.JFrame {
         notifier.addListener(competitionInfoListener);
         updateMasterPasswordLock();
         pack();
+        setMinimumSize(getSize());
     }
     
     /**
