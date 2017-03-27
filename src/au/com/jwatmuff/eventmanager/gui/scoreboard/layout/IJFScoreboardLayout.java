@@ -41,8 +41,8 @@ public class IJFScoreboardLayout implements ScoreboardLayout {
     @Override
     public Rect getTeamLabelRect(int player) {
         return player == 0 ?
-                new Rect(0.25, 1, 4.5, 1.5) :
-                new Rect(0.25, 6, 4.5, 1.5);
+                new Rect(0.25, 1.5, 5.25, 1) :
+                new Rect(0.25, 6.5, 5.25, 1);
     }
     
     @Override
