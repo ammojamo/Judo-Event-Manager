@@ -8,14 +8,18 @@ package au.com.jwatmuff.eventmanager.gui.draw;
 
 import au.com.jwatmuff.eventmanager.db.FightDAO;
 import au.com.jwatmuff.eventmanager.db.PlayerDAO;
+import au.com.jwatmuff.eventmanager.db.PlayerPoolDAO;
 import au.com.jwatmuff.eventmanager.db.PoolDAO;
 import au.com.jwatmuff.eventmanager.gui.main.Icons;
 import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
+import au.com.jwatmuff.eventmanager.model.info.PlayerPoolInfo;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter;
 import au.com.jwatmuff.eventmanager.model.misc.CSVImporter.TooFewPlayersException;
 import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
+import au.com.jwatmuff.eventmanager.model.misc.PoolDraw;
 import au.com.jwatmuff.eventmanager.model.misc.PoolLocker;
+import au.com.jwatmuff.eventmanager.model.misc.PoolPlayerSequencer;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
@@ -503,14 +507,31 @@ public class FightOrderPanel extends javax.swing.JPanel {
         File csvFile = new File("resources/draw/" + fileName + ".csv");
 
         try {
-            int result = CSVImporter.importFightDraw(csvFile, database, pool, numPlayers);
-            //GUIUtils.displayMessage(this, result + " entries succesfully imported.", "Import Complete");
-            playerTableModel.shuffle();
+            CSVImporter.importFightDraw(csvFile, database, pool, numPlayers);
         } catch(TooFewPlayersException tfpe) {
             GUIUtils.displayError(this, "The specified fight draw is to small for the number of players in this pool");
+            return;
         } catch(Exception e) {
             log.error("Exception while importing fights from CSV file", e);
             GUIUtils.displayError(this, "Automatic fight import failed:" + e.getMessage());
+            return;
+        }
+        
+        try {
+            // Populate seed map
+            Map<Integer, Integer> seeds = new HashMap<>();
+            for(PlayerPool playerInPool : database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID())) {
+                seeds.put(playerInPool.getPlayerID(), playerInPool.getSeed());
+            }
+            
+            // Generate correct player ordering based on seeds
+            PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), seeds);
+            List<PlayerPoolInfo> orderedPlayers = poolDraw.getOrderedPlayers();
+
+            PoolPlayerSequencer.savePlayerSequence(database, pool.getID(), orderedPlayers);
+        } catch(Exception e) {
+            GUIUtils.displayError(this, "Failed to order players based on seeding");
+            log.error("Failed to order players based on seeding", e);
         }
     }//GEN-LAST:event_autoAssignButtonActionPerformed
 
