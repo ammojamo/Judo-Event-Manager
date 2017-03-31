@@ -245,6 +245,25 @@ public class FightOrderPanel extends javax.swing.JPanel {
         }
         return true;
     }
+    
+    private void applySeeds(Pool pool) {
+        try {
+            // Populate seed map
+            Map<Integer, Integer> seeds = new HashMap<>();
+            for(PlayerPool playerInPool : database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID())) {
+                seeds.put(playerInPool.getPlayerID(), playerInPool.getSeed());
+            }
+            
+            // Generate correct player ordering based on seeds
+            PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), seeds);
+            List<PlayerPoolInfo> orderedPlayers = poolDraw.getOrderedPlayers();
+
+            PoolPlayerSequencer.savePlayerSequence(database, pool.getID(), orderedPlayers);
+        } catch(Exception e) {
+            GUIUtils.displayError(this, "Failed to order players based on seeding");
+            log.error("Failed to order players based on seeding", e);
+        }
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -508,6 +527,7 @@ public class FightOrderPanel extends javax.swing.JPanel {
 
         try {
             CSVImporter.importFightDraw(csvFile, database, pool, numPlayers);
+            applySeeds(pool);
         } catch(TooFewPlayersException tfpe) {
             GUIUtils.displayError(this, "The specified fight draw is to small for the number of players in this pool");
             return;
@@ -515,23 +535,6 @@ public class FightOrderPanel extends javax.swing.JPanel {
             log.error("Exception while importing fights from CSV file", e);
             GUIUtils.displayError(this, "Automatic fight import failed:" + e.getMessage());
             return;
-        }
-        
-        try {
-            // Populate seed map
-            Map<Integer, Integer> seeds = new HashMap<>();
-            for(PlayerPool playerInPool : database.findAll(PlayerPool.class, PlayerPoolDAO.FOR_POOL, pool.getID())) {
-                seeds.put(playerInPool.getPlayerID(), playerInPool.getSeed());
-            }
-            
-            // Generate correct player ordering based on seeds
-            PoolDraw poolDraw = PoolDraw.getInstance( database, pool.getID(), seeds);
-            List<PlayerPoolInfo> orderedPlayers = poolDraw.getOrderedPlayers();
-
-            PoolPlayerSequencer.savePlayerSequence(database, pool.getID(), orderedPlayers);
-        } catch(Exception e) {
-            GUIUtils.displayError(this, "Failed to order players based on seeding");
-            log.error("Failed to order players based on seeding", e);
         }
     }//GEN-LAST:event_autoAssignButtonActionPerformed
 
@@ -603,8 +606,8 @@ private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
             try {
                 int result = CSVImporter.importFightDraw(csvFile, database, pool, numPlayers);
+                applySeeds(pool);
                 GUIUtils.displayMessage(this, result + " entries succesfully imported.", "Import Complete");
-                playerTableModel.shuffle();
             } catch(TooFewPlayersException tfpe) {
                 GUIUtils.displayError(this, "The specified fight draw is to small for the number of players in this pool");
             } catch(Exception e) {
