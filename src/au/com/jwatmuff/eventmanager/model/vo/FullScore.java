@@ -71,7 +71,7 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
             if(s == IPPON || s == WAZARI) { // Always include ippon and wazari, without prefix
                 sb.append(get(s));
             } else if(get(s) > 0) { // Include other non-zero scores, with prefix
-                sb.append(Character.toLowerCase(s.initial));
+                sb.append(Character.toUpperCase(s.initial));
                 sb.append(get(s));
             }
         }
@@ -80,13 +80,17 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
     
     public Score getWinningScore(FullScore o) {
         if(get(IPPON) > o.get(IPPON)) return IPPON;
+        if(get(IPPON) < o.get(IPPON)) return null;
         if(get(WAZARI) > o.get(WAZARI)) return WAZARI;
+        if(get(WAZARI) < o.get(WAZARI)) return null;
         
         int shido = get(SHIDO) + get(LEG_SHIDO);
         int otherShido = o.get(SHIDO) + o.get(LEG_SHIDO);
         if(shido < otherShido) return SHIDO;
+        if(shido > otherShido) return null;
 
         if(get(DECISION) > o.get(DECISION)) return DECISION;
+        if(get(DECISION) < o.get(DECISION)) return null;
         return null;
     }
 
