@@ -19,6 +19,13 @@
 package au.com.jwatmuff.eventmanager.gui.main;
 
 import au.com.jwatmuff.eventmanager.Main;
+import au.com.jwatmuff.eventmanager.util.GUIUtils;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -31,16 +38,26 @@ public class AboutDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         setLocationRelativeTo(parent);
-        
+
         aboutTextPane.setText("<html><head></head><body>" +
                 "<h1>" + Main.VISIBLE_VERSION + "</h1>" +
-                "<p style=\"margin-top: 0\">&copy; 2008 - 2017 James Watmuff and Leonard Hall</p>" +
+                "<p style=\"margin-top: 0\">Copyright &copy; 2008 - 2017 James Watmuff and Leonard Hall</p>" +
+                "<p>Released under the GNU General Public License, Version 3.0</p>" +
                 "<h3>Acknowledgements</h3>" +
                 "<p style=\"margin-top: 0\">All icons from the \"Silk\" icon set by famfamfam.<br>" +
                 "<href=\"http://www.famfamfam.com\">http://famfamfam.com</a></p>" +
+                "<p>This software uses a number of third-party libraries. Click below for a list of libraries and their respective licenses.</p>" +
                 "</body></html>");
         
         versionLabel.setText(Main.VISIBLE_VERSION);
+    }
+    
+    private void open(String filename) {
+        try {
+            Desktop.getDesktop().open(new File(filename));
+        } catch(IOException e) {
+            GUIUtils.displayError(this, "Failed to open file " + filename + ": " + e.getMessage());
+        }
     }
     
     /** This method is called from within the constructor to
@@ -55,6 +72,8 @@ public class AboutDialog extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         aboutTextPane = new javax.swing.JTextPane();
         versionLabel = new javax.swing.JLabel();
+        licenseButton = new javax.swing.JButton();
+        thirdPartyLicenseButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About");
@@ -76,21 +95,37 @@ public class AboutDialog extends javax.swing.JDialog {
 
         versionLabel.setText("Event Manager Version:");
 
+        licenseButton.setText("View License");
+        licenseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                licenseButtonActionPerformed(evt);
+            }
+        });
+
+        thirdPartyLicenseButton.setText("Third Party Licenses");
+        thirdPartyLicenseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                thirdPartyLicenseButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(176, 176, 176)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(licenseButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(thirdPartyLicenseButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                         .addComponent(okButton))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(versionLabel)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1)
+                            .addComponent(versionLabel))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -101,7 +136,10 @@ public class AboutDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(versionLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(okButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(okButton)
+                    .addComponent(licenseButton)
+                    .addComponent(thirdPartyLicenseButton))
                 .addContainerGap())
         );
 
@@ -111,11 +149,21 @@ public class AboutDialog extends javax.swing.JDialog {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         this.dispose();
     }//GEN-LAST:event_okButtonActionPerformed
+
+    private void thirdPartyLicenseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_thirdPartyLicenseButtonActionPerformed
+        open("THIRD-PARTY.txt");
+    }//GEN-LAST:event_thirdPartyLicenseButtonActionPerformed
+
+    private void licenseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_licenseButtonActionPerformed
+        open("LICENSE.txt");
+    }//GEN-LAST:event_licenseButtonActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextPane aboutTextPane;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton licenseButton;
     private javax.swing.JButton okButton;
+    private javax.swing.JButton thirdPartyLicenseButton;
     private javax.swing.JLabel versionLabel;
     // End of variables declaration//GEN-END:variables
     

@@ -1169,7 +1169,7 @@ exception as provided by Oracle in the LICENSE file that accompanied this code."
 
 
 ------------------
-Notes:
-Approach based on https://softwareengineering.stackexchange.com/questions/234511/what-is-the-best-practice-for-arranging-third-party-library-licenses-paperwork
-TODO: ColorChooser - https://javagraphics.java.net/doc/com/bric/swing/ColorPicker.html - claims to be under BSD License but could not find actual license text
+
+This document was prepared based on the following resource:
+https://softwareengineering.stackexchange.com/questions/234511/what-is-the-best-practice-for-arranging-third-party-library-licenses-paperwork
 
