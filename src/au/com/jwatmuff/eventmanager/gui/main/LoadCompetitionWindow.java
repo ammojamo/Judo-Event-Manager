@@ -32,20 +32,20 @@ import au.com.jwatmuff.eventmanager.util.ZipUtils;
 import au.com.jwatmuff.genericdb.p2p.DatabaseInfo;
 import au.com.jwatmuff.genericdb.p2p.DatabaseManager;
 import au.com.jwatmuff.genericp2p.PeerManager;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -78,14 +78,14 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private static Logger log = Logger.getLogger(LoadCompetitionWindow.class);
     private SimpleDateFormat dateFormat = new SimpleDateFormat();
     private PeerManager peerManager;
-    
+
     private DatabaseManager dbManager;
     private LicenseManager licenseManager;
-    
+
     private DatabaseInfo selected;
     private boolean isNew = false;
     private boolean success = false;
-    
+
     private DefaultListModel<DatabaseInfo> dbListModel = new DefaultListModel<DatabaseInfo>();
 
     private static final int CHECK_DATABASES_PERIOD = 5000; //milliseconds
@@ -100,7 +100,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     };
 
     private ScheduledExecutorService checkDatabasesExecutor;
-    
+
     /** Creates new form LoadCompetitionWindow */
     public LoadCompetitionWindow(DatabaseManager dbManager, LicenseManager licenseManager, PeerManager peerManager) {
         initComponents();
@@ -126,15 +126,15 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 }
                 return super.getListCellRendererComponent(list, obj, arg2, arg3, arg4);
             }
-            
+
         });
-        
-        this.competitionList.setModel(dbListModel);        
+
+        this.competitionList.setModel(dbListModel);
         updateDatabaseList();
         updateLicenseInfo();
-        
+
         updateOkButton();
-        
+
         // center window on screen
         setLocationRelativeTo(null);
     }
@@ -158,7 +158,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         }
         super.setVisible(visible);
     }
-    
+
     private void updateDatabaseList() {
         log.debug("Attempting to update database list");
         dbManager.updateAllDatabaseInfo();
@@ -175,7 +175,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 });
                 for(DatabaseInfo info : dbinfo)
                     dbListModel.addElement(info);
-                
+
                 boolean compsPresent = dbListModel.size() > 0;
                 existingCompRadioButton.setEnabled(compsPresent);
 
@@ -183,7 +183,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                     competitionList.setSelectedValue(oldSelected, true);
                 }
             }
-        });   
+        });
     }
 
     private void updateLicenseInfo() {
@@ -212,15 +212,15 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         }
         this.pack();
     }
-    
+
     public boolean getSuccess() {
         return success;
     }
-    
+
     public DatabaseInfo getSelectedDatabaseInfo() {
         return selected;
     }
-    
+
     public boolean isNewDatabase() {
         return isNew;
     }
@@ -241,7 +241,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         if(checkDatabasesExecutor != null) checkDatabasesExecutor.shutdownNow();
         super.dispose();
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -673,11 +673,11 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         if(evt.getClickCount() == 2 && existingCompRadioButton.isSelected())
             okButtonActionPerformed(null);
 }//GEN-LAST:event_competitionListMouseClicked
-    
+
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         this.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
-    
+
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         if(newCompRadioButton.isSelected()) {
             if(!PermissionChecker.isAllowed(Action.CREATE_COMPETITION, null)) return;
@@ -691,7 +691,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 return;
             }
         }
-        
+
         if(existingCompRadioButton.isSelected()) {
             selected = (DatabaseInfo)competitionList.getSelectedValue();
             if(selected == null) return;
@@ -726,7 +726,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             this.dispose();
         }
     }//GEN-LAST:event_okButtonActionPerformed
-    
+
     private void competitionListFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_competitionListFocusGained
         if(existingCompRadioButton.isEnabled())
             existingCompRadioButton.setSelected(true);
@@ -765,22 +765,22 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
 
     private void manualScoreboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualScoreboardButtonActionPerformed
         List<String> errors = new ArrayList<String>();
-        
+
         if(!PermissionChecker.isAllowed(Action.MANUAL_SCOREBOARD, null)) return;
-        
+
         String scoreboardName = JOptionPane.showInputDialog(this, "Enter a name for this scoreboard", "Manual Scoreboard", JOptionPane.QUESTION_MESSAGE);
-        
+
         if(scoreboardName == null) return;
         else if(scoreboardName.isEmpty())
             errors.add("Scoreboard name must not be empty");
         else if(!scoreboardName.matches("[a-zA-Z0-9]*"))
             errors.add("Scoreboard name must only consist of letters and numbers, with no spaces");
-        
+
         if(errors.size() > 0) {
             GUIUtils.displayErrors(this, errors);
             return;
         }
-        
+
         scoreboardName = "Scoreboard/" + scoreboardName;
 //        new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, ScoringSystem.OLD, peerManager, scoreboardName).setVisible(true);
         new ScoreboardWindow("Manual Scoreboard - " + scoreboardName, peerManager, scoreboardName).setVisible(true);
@@ -811,10 +811,10 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             try {
                 File tempDir = Files.createTempDirectory("event-manager").toFile();
                 FileUtils.copyDirectory(info.localDirectory, tempDir);
-                
+
                 File lockFile = new File(tempDir, "update.dat.lock");
                 lockFile.delete();
-                
+
                 /* change id */
                 Properties props = new Properties();
                 FileReader fr = new FileReader(new File(tempDir, "info.dat"));
@@ -825,7 +825,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
                 FileWriter fw = new FileWriter(new File(tempDir, "info.dat"));
                 props.store(fw, "");
                 fw.close();
-                
+
                 ZipUtils.zipFolder(tempDir, file, false);
             } catch(Exception e) {
                 GUIUtils.displayError(this, "Failed to save file: " + e.getMessage());
@@ -837,16 +837,16 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
         File databaseStore = new File(Main.getWorkingDirectory(), "comps");
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new FileNameExtensionFilter("Event Manager Files", "evm"));
-        
-        
+
+
         JPanel optionsPanel = new JPanel();
-        
+
         optionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0,10,0,10), new TitledBorder("Load backup options")));
         JCheckBox preserveIDCheckbox = new JCheckBox("Preserve competition ID");
         optionsPanel.add(preserveIDCheckbox);
-        
+
         chooser.setAccessory(optionsPanel);
-        
+
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             /* input zip file */
             File file = chooser.getSelectedFile();
@@ -913,7 +913,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             GUIUtils.displayError(this, "This competition is only compatible with version " + selected.version + ".\nThis copy of EventManager is version " + Main.VERSION + ".");
             return;
         }
-        
+
         String newName = (String)JOptionPane.showInputDialog(null,
                     "Enter a new competition name",
                     "Rename Competition",
@@ -939,7 +939,7 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
             checkDatabasesExecutor.schedule(checkDatabasesTask, 0, TimeUnit.MILLISECONDS);
         }
     }//GEN-LAST:event_renameCompButtonActionPerformed
-        
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton cancelButton;
@@ -974,5 +974,5 @@ public class LoadCompetitionWindow extends javax.swing.JFrame {
     private javax.swing.JButton renameCompButton;
     private javax.swing.JButton saveBackupButton;
     // End of variables declaration//GEN-END:variables
-    
+
 }

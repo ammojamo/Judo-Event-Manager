@@ -119,7 +119,7 @@ public class Update implements Serializable {
 
         return update;
     }
-    
+
     public synchronized Update forPeer(UUID peerID) {
         Update update = new Update();
         if(updateMap.containsKey(peerID)) {
@@ -131,7 +131,7 @@ public class Update implements Serializable {
     public synchronized List<DataEvent> getAllEventsOrdered() {
         return getAllEventsOrdered(null);
     }
-    
+
     /**
      * Orders all events for all peers by timestamp and returns them in one
      * unified list
@@ -142,7 +142,7 @@ public class Update implements Serializable {
         if(updateMap.size() == 1 && uuidMap == null) {
             return updateMap.entrySet().iterator().next().getValue();
         }
-        
+
         List<DataEvent> events = new ArrayList<DataEvent>();
 
         /* keep track of our position in each list of the table, starting at
@@ -166,7 +166,7 @@ public class Update implements Serializable {
                 EventList eventList = updateMap.get(id);
 
                 //log.debug(id + " : " + eventPos);
-                
+
                 if(eventPos >= eventList.base + eventList.size()) {
                     //log.debug("Removing id");
                     pos.remove(id);
@@ -202,7 +202,7 @@ public class Update implements Serializable {
             else
                 pos.put(earliestID, eventPos);
         }
-        
+
         return events;
     }
 
@@ -231,12 +231,12 @@ public class Update implements Serializable {
             for(DataEvent event : list)
                 Clock.setEarliestTime(event.getTimestamp());
     }
-    
+
     /**
      * For debugging purposes
-     * 
+     *
      * @param events
-     * @return 
+     * @return
      */
     private static boolean verifyTransactionStates(List<DataEvent> events) {
         boolean inTransaction = false;
@@ -268,7 +268,7 @@ public class Update implements Serializable {
         }
         return true;
     }
-    
+
     public void verifyTransactionStates() {
         for(Map.Entry<UUID,EventList> entry : updateMap.entrySet()) {
             if(!verifyTransactionStates(entry.getValue())) {
@@ -280,7 +280,7 @@ public class Update implements Serializable {
             log.warn("Failed to validate transaction states for all ordered events");
         }
     }
-    
+
     /**
      * @return the total number of events in this update
      */
@@ -291,7 +291,7 @@ public class Update implements Serializable {
         }
         return size;
     }
-    
+
     public String toString() {
         List<String> strings = new ArrayList<>();
         for(UUID id : updateMap.keySet()) {
@@ -381,7 +381,7 @@ class EventList extends ArrayList<DataEvent> implements Serializable {
 
     public void mergeWith(EventList list) {
         if((base + size()) < list.base)
-            throw new RuntimeException("Merging lists failed (" + base + ", " + size() + ") + ( " + list.base + ", " + list.size() + ")");
+            throw new RuntimeException("Merging lists failed (" + base + ", " + size() + ") + (" + list.base + ", " + list.size() + ")");
 
         if((base + size()) < (list.base + list.size()))
             addAll(list.subList( (base + size() - list.base), list.size()));
@@ -390,9 +390,16 @@ class EventList extends ArrayList<DataEvent> implements Serializable {
     public EventList after(int index) {
         if(index < base)
             throw new IllegalArgumentException("Index out of bounds. [index: " + index + "] < [base:" + base + "]");
-        
+
         EventList list = new EventList();
 
+        /*
+         * This could be a greater than or equal check, but would result in
+         * slightly different behaviour because list.base is not always set.
+         * I think the base should always be set, however I am worried that
+         * something might depend on this strange behaviour. Should be fixed but
+         * requires extensive testing.
+        */
         if(index > (base + size())) {
             return list;
         }
@@ -401,7 +408,7 @@ class EventList extends ArrayList<DataEvent> implements Serializable {
         list.addAll(subList(index-base, size()));
         return list;
     }
-    
+
     public String toString() {
         return "[" + base + ".." + (base + size()) + "]";
     }

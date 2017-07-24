@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 
 /**
  * Proof-of-concept only - not battle tested!
- * 
+ *
  * @author james
  */
 public class FileUpdateStore implements UpdateStore {
@@ -44,11 +44,11 @@ public class FileUpdateStore implements UpdateStore {
     public static FileUpdateStore withFile(File file) {
         return new FileUpdateStore(file);
     }
-            
+
     private FileUpdateStore(File file) {
         this.file = file;
     }
-    
+
     private ObjectOutputStream writer() throws IOException {
         if(writer == null) {
             // Appending to an existing file is a bit different, because we need
@@ -63,7 +63,7 @@ public class FileUpdateStore implements UpdateStore {
         }
         return writer;
     }
-    
+
     @Override
     public Update loadUpdate() throws IOException {
         Update update = new Update();
@@ -92,8 +92,8 @@ public class FileUpdateStore implements UpdateStore {
                 }
             }
             log.debug("Finished update load");
-        
-            
+
+
         } catch (FileNotFoundException fnfe) {
             log.info("Updates file not found");
         } catch (IOException ioe) {
@@ -113,7 +113,7 @@ public class FileUpdateStore implements UpdateStore {
         committedPosition = position;
         writeObjectAndSync(position);
     }
-    
+
     private void writeObjectAndSync(Object object) throws IOException {
         writer().writeObject(object);
         writer().flush();
