@@ -31,14 +31,14 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 /**
  * UpdateStore implementation that uses the database to store data.
  * See UpdateStore.java for more information.
- * 
+ *
  * @author james
  */
 public class DatabaseUpdateStore implements UpdateStore {
     private static final Logger log = Logger.getLogger(DatabaseUpdateStore.class);
     private UpdatePosition committedPosition = new UpdatePosition();
     private final JdbcTemplate template;
-    
+
     // FST is an alternative to Java serialization method that is much more
     // efficient.
     static final FSTConfiguration FST_CONFIG = FSTConfiguration.createDefaultConfiguration();
@@ -46,9 +46,9 @@ public class DatabaseUpdateStore implements UpdateStore {
     public static DatabaseUpdateStore withDataSource(BasicDataSource dataSource) {
         return new DatabaseUpdateStore(dataSource);
     }
-            
+
     private DatabaseUpdateStore(BasicDataSource dataSource) {
-        template = new JdbcTemplate(dataSource);        
+        template = new JdbcTemplate(dataSource);
         template.update("CREATE TABLE IF NOT EXISTS update_log (" +
                 "data BLOB" +
                 ")");
@@ -57,7 +57,7 @@ public class DatabaseUpdateStore implements UpdateStore {
     @Override
     public Update loadUpdate() throws IOException {
         Update update = new Update();
-        
+
         log.debug("Loading update data");
         SqlRowSet rows = template.queryForRowSet("SELECT data FROM update_log");
         while(rows.next()) {
@@ -68,7 +68,15 @@ public class DatabaseUpdateStore implements UpdateStore {
 
                 if(object instanceof Update) {
                     log.debug(object);
-                    update.mergeWith((Update)object);
+                    try {
+                        update.mergeWith((Update)object);
+                    } catch(RuntimeException e) {
+                        if(update.size() > 0) {
+                            log.error("POSSIBLE DATA CORRUPTION - Failed to merge update during load, may be due to out-of-order updates", e);
+                        } else {
+                            log.error("Failed to merge update during load, but update was empty so no harm was done (check for other error messages though)");
+                        }
+                    }
                 }
                 if(object instanceof UpdatePosition) {
                     log.debug(object);
@@ -94,7 +102,7 @@ public class DatabaseUpdateStore implements UpdateStore {
         committedPosition = position;
         writeObject(position);
     }
-    
+
     private void writeObject(Serializable object) {
         try {
 //            byte[] bytes = ObjectCopier.objectToBytes(object);
