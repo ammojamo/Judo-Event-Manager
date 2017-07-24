@@ -30,7 +30,6 @@ import au.com.jwatmuff.genericdb.transaction.TransactionalDatabaseUpdater;
 import au.com.jwatmuff.genericp2p.NoSuchServiceException;
 import au.com.jwatmuff.genericp2p.Peer;
 import au.com.jwatmuff.genericp2p.PeerManager;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,7 +38,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -85,16 +83,16 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         this.updateStore = updateStore;
         this.databaseID = databaseID;
         this.passwordHash = passwordHash;
-        
+
         ourID = peerManager.getUUID();
-        
+
         Update updateFromStore = null;
         try {
             updateFromStore = updateStore.loadUpdate();
         } catch(IOException e) {
             log.error("Unable to load update store");
         }
-        
+
         if(updateFromStore == null) {
             updateTable = new Update();
         } else {
@@ -102,7 +100,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         }
 
         updateTable.updateClock();
-        
+
         /* Write any uncommitted events from the update store */
         Update uncommitted = updateTable.afterPosition(updateStore.getCommittedPosition());
         log.debug("Uncommitted: " + uncommitted);
@@ -199,7 +197,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         log.info("Syncing with peer " + peer + " (Stage 1)");
 
         EventBus.send("sync-status", "Receiving update");
-        
+
         DatabaseUpdateService updateService;
         try {
             updateService = peer.getService(DatabaseUpdateService.class);
@@ -330,21 +328,27 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
     }
 
     private void handleUpdate(Update update, boolean trackProgress, boolean recovering) {
-        if(!recovering) {
-            /* add to update table */
-            /* update will now only contain events that were not already present in the update table */
-            update = updateTable.mergeWith(update);
-        }
+        /* Synchronization is necessary here to ensure that updates are written
+         * to the update store in the same order as they are processed.
+         * This caused a problem during a tournament in July 2017.
+         */
+        synchronized(this) {
+            if(!recovering) {
+                /* add to update table */
+                /* update will now only contain events that were not already present in the update table */
+                update = updateTable.mergeWith(update);
+            }
 
-        /* verification checks - for debugging, disable for deployment */
-        update.verifyTransactionStates();
+            /* verification checks - for debugging, disable for deployment */
+    //        update.verifyTransactionStates();
 
-        /* write to update file */
-        if(!recovering) {
-            try {
-                updateStore.writePartialUpdate(update);
-            } catch(IOException e) {
-                log.error("Critical error - failed to write update to file");
+            /* write to update file */
+            if(!recovering) {
+                try {
+                    updateStore.writePartialUpdate(update);
+                } catch(IOException e) {
+                    log.error("Critical error - failed to write update to file");
+                }
             }
         }
 
@@ -363,7 +367,7 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
             } catch(Exception e) {
                 log.error("Exception while applying a peer update to database", e);
             }
-            
+
 //             For Testing only - Simulate random failure
              if(TestUtil.SIMULATE_FLAKINESS && !recovering && Math.random() > 0.995) System.exit(1);
         }
@@ -385,14 +389,14 @@ public class UpdateManager implements TransactionListener, DatabaseUpdateService
         /* Convert events to an update object so we can send to handleUpdate */
         Update update = updateTable.forPeer(ourID).afterPosition(updateTable.getPosition());
         update.addEvents(ourID, events);
-        
+
         handleUpdate(update, false, false);
 
         /* sync with peers */
         syncWithPeers();
     }
 
-    void shutdown() {        
+    void shutdown() {
         shutdown = true;
 
         syncControlThread.interrupt();
