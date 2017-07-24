@@ -1,6 +1,6 @@
 # EventManager
 
-EventManager is a desktop application to assist with running of Judo tournaments.
+EventManager is a desktop application to assist with running Judo tournaments.
 
 ## Installation
 
