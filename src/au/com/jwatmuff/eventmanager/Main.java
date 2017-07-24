@@ -65,8 +65,8 @@ public class Main {
 
     //internal version - bump this up whenever making a database change
     public static final String VERSION = "10";
-    public static final String WINDOW_TITLE = "Event Manager 2017 Update 5";
-    public static final String VISIBLE_VERSION = "Event Manager 2017 Update 5";
+    public static final String WINDOW_TITLE = "Event Manager 2017 Update 6";
+    public static final String VISIBLE_VERSION = "Event Manager 2017 Update 6";
 
     private static File workingDir = new File(".");
 
@@ -95,14 +95,14 @@ public class Main {
             log.info("Run lock is present");
             return false;
         }
-        
+
         return true;
     }
 
     public static File getWorkingDirectory() {
         return workingDir;
     }
-    
+
     private static boolean updateRmiHostName() {
         try {
             String existingHostName = System.getProperty("java.rmi.server.hostname");
@@ -148,7 +148,7 @@ public class Main {
          */
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } 
+        }
         catch (Exception e) {
            log.info("Failed to set system look and feel");
         }
@@ -271,7 +271,7 @@ public class Main {
                                 "4) If possible, reload this competition from another computer on the network\n" +
                                 "5) Alternatively, you may manually load the backup onto all computers on the network, ensuring the 'Preserve competition ID' option is checked.";
                         String title = "WARNING: Potential Data Corruption Detected";
-                        
+
                         int status = JOptionPane.showOptionDialog(
                                 null,
                                 message,
@@ -281,10 +281,10 @@ public class Main {
                                 null,
                                 new Object[] { "Cancel (recommended)", "Open anyway" },
                                 "Cancel (recommended)");
-                        
+
                         if(status == 0) continue; // return to load competition window
                     }
-                    
+
                     SynchronizingWindow syncWindow = new SynchronizingWindow();
                     syncWindow.setVisible(true);
                     long t = System.nanoTime();
@@ -330,7 +330,7 @@ public class Main {
                     mainWindow.setManualDiscoveryService(manualDiscoveryService);
                     mainWindow.setTitle(WINDOW_TITLE);
                     mainWindow.afterPropertiesSet();
-                    
+
                     TestUtil.setActivatedDatabase(database);
 
                     // show main window (modally)
