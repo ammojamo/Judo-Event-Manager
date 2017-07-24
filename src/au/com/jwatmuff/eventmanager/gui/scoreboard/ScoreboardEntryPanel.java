@@ -42,20 +42,20 @@ import org.apache.log4j.Logger;
  *
  * @author  James
  */
-public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {    
+public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
     private static final Logger log = Logger.getLogger(ScoreboardEntryPanel.class);
-    
+
     private final JPanel topLayer;
     private final JPanel glassLayer;
-    
+
     private final ScalableLabel[][][] scoreRegions;
     private final ScalableLabel[][][] scoreArrows;
-    
+
     private final ScalableLabel[][][] shidoButton; // 2 players * 3 types * 2 sizes (big/small)
     private final ScalableLabel[][] shidoButtonRegion;
     private final ScalableLabel[][] shidoCross;
     private final ScalableLabel[][] shidoRegion;
-    
+
     private final ScalableLabel[] holddownIcon;
     private final ScalableLabel holddownRegion;
 
@@ -63,21 +63,21 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
 
     private final ScalableLabel[] holddownArrowRegion;
     private final ScalableLabel[] holddownArrow;
-    
+
     private final ScalableLabel undo;
     private final ScalableLabel endFight;
-    
+
     public static ScoreboardEntryPanel getInstance() {
         ScoreboardEntryPanel panel = new ScoreboardEntryPanel(new SideBySideScoreboardLayout());
         panel.init();
         return panel;
     }
-    
+
     private ScoreboardEntryPanel(ScoreboardLayout scoreboardLayout) {
         super(scoreboardLayout);
         // Only default scoreboard layout is allowed
 //        super(new SideBySideScoreboardLayout());
-        
+
         imageFiles = new File[0];
 
         ScalableAbsoluteLayout layout;
@@ -85,7 +85,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
         /*
          * Pending fight layer
          */
-        
+
         for(int i = 0; i < 2; i++) {
             final int ii = i;
             onClick(pendingFightTimer[i], () -> {
@@ -95,19 +95,19 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                         "Player Ready",
                         JOptionPane.YES_NO_OPTION);
                 if(status == JOptionPane.YES_OPTION)
-                    model.declarePlayerReady(swapPlayers?(1-ii):ii);                
+                    model.declarePlayerReady(swapPlayers?(1-ii):ii);
             });
         }
         // Don't let clicks pass through this layer to layers below
         pendingFightLayer.addMouseListener(new MouseAdapter() { });
-        
+
         /*
          * Winning result layer
          */
         layout = (ScalableAbsoluteLayout) resultLayer.getLayout();
 
         onClick(goldenScoreApprove, () -> model.approveGoldenScore());
-        
+
         // Undo button
         undo = new ScalableLabel("U");
         undo.setVisible(false);
@@ -115,7 +115,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
             model.undoCancelHolddown();
         });
         layout.addComponent(undo, 15, 0, 1, 1);
-        
+
         // End fight button
         endFight = new ScalableLabel("E");
         endFight.setVisible(false);
@@ -151,7 +151,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 });
             }
         }
-    
+
         /*
          * Holddown glass layer
          */
@@ -183,14 +183,14 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 @Override
                 public void mouseExited(MouseEvent arg0) {
                     holddownArrow[ii].setVisible(false);
-                }                
+                }
             });
             holddownArrowRegion[i] = label;
         }
         layout.addComponent(holddownArrowRegion[0], 6, 8,  2, 3);
         layout.addComponent(holddownArrowRegion[1], 8, 8,  2, 3);
         layout.addComponent(holddownArrowRegion[2], 6, 11, 4, 1);
-        
+
         /*
          * Holddown arrow layer
          */
@@ -210,7 +210,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
         layout.addComponent(holddownArrow[0], 6, 8, 1, 1);
         layout.addComponent(holddownArrow[1], 9, 8, 1, 1);
         layout.addComponent(holddownArrow[2], 6, 11, 4, 1);
-        
+
         /*
          * Top layer - for displaying arrows etc. over the top of other
          *             components
@@ -241,7 +241,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 }
             }
         }
-        
+
         /*
          * Glass layer - for detecting mouse over certain regions
          */
@@ -300,7 +300,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                     @Override
                     public void mouseReleased(MouseEvent arg0) {
                         model.changeScore(swapPlayers?1-ii:ii, shidoType, true);
-                    }                        
+                    }
                     @Override
                     public void mouseEntered(MouseEvent arg0) {
                         shidoButton[ii][jj][0].setVisible(false);
@@ -311,14 +311,14 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                         shidoButton[ii][jj][0].setVisible(true);
                         shidoButton[ii][jj][1].setVisible(false);
                     }
-                    
+
                 });
                 shidoButtonRegion[i][j] = label;
                 double x = (i == 0) ? j : 15 - j;
                 layout.addComponent(shidoButtonRegion[i][j], x, 11, 1, 1);
             }
         }
-        
+
 
         holddownRegion = new ScalableLabel("");
         holddownRegion.setOpaque(false);
@@ -328,7 +328,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 public void mouseReleased(MouseEvent arg0) {
                     if(model.getMode() == Mode.FIGHTING)
                         model.startHolddownTimer();
-                }                        
+                }
                 @Override
                 public void mouseEntered(MouseEvent arg0) {
                     holddownIcon[0].setVisible(false);
@@ -340,7 +340,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                     if(!model.isHolddownActivated())
                         holddownIcon[0].setVisible(true);
                     holddownIcon[1].setVisible(false);
-                } 
+                }
         });
         layout.addComponent(holddownRegion, 7.5, 11, 1, 1);
 
@@ -349,7 +349,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
          *                names and scores
          */
         layout = (ScalableAbsoluteLayout)bottomLayer.getLayout();
-        
+
         holddownIcon = new ScalableLabel[2];
         holddownIcon[0] = new ScalableLabel("O");
         layout.addComponent(holddownIcon[0], 7.75, 11.5, 0.5, 0.5);
@@ -371,7 +371,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 }
             }
         }
-        
+
         /*
          * Shidos below are laid out dynamically inside updateShido
          */
@@ -386,12 +386,12 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 cross.setBorder(new EmptyBorder(0,0,0,0));
                 clearBackground(cross);
                 shidoCross[i][j] = cross;
-                
+
                 ScalableLabel region = new ScalableLabel("");
                 region.setBorder(new EmptyBorder(0,0,0,0));
                 clearBackground(region);
                 shidoRegion[i][j] = region;
-                
+
                 region.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseReleased(MouseEvent e) {
@@ -421,7 +421,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
 
         wireEvents();
     }
-    
+
     private void onClick(JComponent c, final Consumer<MouseEvent> handler) {
         c.addMouseListener(new MouseAdapter() {
             @Override
@@ -430,7 +430,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
             }
         });
     }
-    
+
     private void onClick(JComponent c, final Runnable handler) {
         onClick(c, e -> handler.run());
     }
@@ -444,18 +444,18 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 model.toggleTimer();
             }
         });
-        
+
         onClick(holddownTimer, event -> {
             if(event.getClickCount() == 1) {
                 model.cancelHolddownTimer();
             }
         });
     }
-    
+
     @Override
     void updateColors() {
         super.updateColors();
-        
+
         for(ScalableLabel label : new ScalableLabel[] {
                 holddownIcon[0], holddownIcon[1],
                 holddownArrow[0], holddownArrow[1], holddownArrow[2],
@@ -472,7 +472,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 }
             }
         }
-        
+
         // Make sure score arrows match score colors
         for(int i = 0; i < 2; i++) { // player
             for(int j = 0; j < 2; j++) { // score
@@ -485,7 +485,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
             }
         }
     }
-    
+
     @Override
     void showHolddownTimer(boolean b) {
         super.showHolddownTimer(b);
@@ -496,17 +496,17 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
             label.setVisible(b);
         }
     }
-    
+
     @Override
     void updateResult() {
         super.updateResult();
         endFight.setVisible(model.getMode() == Mode.WIN);
-    }    
-    
+    }
+
     @Override
     void updateGoldenScore() {
         super.updateGoldenScore();
-        
+
         boolean gsFinished = model.getGoldenScoreMode() == GoldenScoreMode.FINISHED;
         boolean noWinner = model.getMode() != Mode.WIN;
 
@@ -529,14 +529,14 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
     void updatePendingFight() {
         super.updatePendingFight();
         vsLayer.setVisible(false); // Never show P1 vs P2 screen
-        
+
         if(model.getMode().equals(Mode.FIGHT_PENDING)) {
             // Note - timer will not be visible if pendingFight layer is
             // active
             timer.setText("Click when Ready");
         }
     }
-    
+
     @Override
     public void handleScoreboardUpdate(ScoreboardUpdate update, ScoreboardModel model) {
         super.handleScoreboardUpdate(update, model);
@@ -549,7 +549,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
     @Override
     void updateShido() {
         super.updateShido();
-        
+
         ScalableAbsoluteLayout bottomLayout = (ScalableAbsoluteLayout) bottomLayer.getLayout();
         ScalableAbsoluteLayout topLayout = (ScalableAbsoluteLayout) topLayer.getLayout();
         ScalableAbsoluteLayout glassLayout = (ScalableAbsoluteLayout) glassLayer.getLayout();
@@ -570,13 +570,6 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
                 }
             }
         }
-    }
-    
-    @Override
-    void updateDivision() {
-        super.updateDivision();
-        // Don't show division label
-        division.setVisible(false);
     }
 
     /** This method is called from within the constructor to
