@@ -25,12 +25,10 @@ import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.cache.ResultInfoCache;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.misc.FightGradingPoints;
-import au.com.jwatmuff.eventmanager.model.misc.PoolChecker;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
 import au.com.jwatmuff.eventmanager.model.vo.Fight;
 import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Player.Grade;
-import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Result;
 import au.com.jwatmuff.eventmanager.print.GradingPointsHTMLGenerator;
 import au.com.jwatmuff.eventmanager.util.BeanMapper;
@@ -71,12 +69,12 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class ResultsPointsPanel extends javax.swing.JPanel implements TransactionListener {
     public static final Logger log = Logger.getLogger(ResultsPanel.class);
-    
+
     private Database database;
     private TransactionNotifier notifier;
     private Frame parentWindow;
     private ResultInfoCache cache;
-    
+
     private String competitionName;
 
     private ResultTableModel resultTableModel = new ResultTableModel();
@@ -86,31 +84,31 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
             updateFromDatabase();
         }
     }, 2000);
-    
+
     /** Creates new form FightProgressionPanel */
     public ResultsPointsPanel() {
         initComponents();
         resultTable.setModel(resultTableModel);
     }
-    
+
     @Required
     public void setDatabase(Database database) {
         this.database = database;
     }
-    
+
     @Required
     public void setNotifier(TransactionNotifier notifier) {
         this.notifier = notifier;
     }
-    
+
     public void setResultInfoCache(ResultInfoCache cache) {
         this.cache = cache;
     }
-    
+
     public void setParentWindow(Frame parentWindow) {
         this.parentWindow = parentWindow;
     }
-    
+
     public void afterPropertiesSet() {
         notifier.addListener(this, Result.class);
         updater.run(true);
@@ -155,7 +153,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
     private class ResultTableModel extends BeanMapperTableModel<ResultInfo> {
         NumberFormat format = new DecimalFormat();
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        
+
         public ResultTableModel() {
             super();
             format.setMinimumIntegerDigits(2);
@@ -165,7 +163,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                     Map<String, Object> map = new HashMap<String, Object>();
                     map.put("date", dateFormat.format(bean.getResult().getTimestamp()));
                     map.put("compname", competitionName);
-                    
+
                     FightGradingPoints points = new FightGradingPoints(bean, database);
 
                     map.put("pool", points.pool.getDescription());
@@ -179,8 +177,8 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                     Grade loserGrade = null;
 
                     if(scores[0] != scores[1]) {
-                        Player winner = points.losingPlayer;
-                        Player loser = points.winningPlayer;
+                        Player winner = points.winningPlayer;
+                        Player loser = points.losingPlayer;
                         map.put("winner", winner.toString());
                         map.put("loser", loser.toString());
                         winnerGrade = (winner == null) ? null : winner.getGrade();
@@ -199,14 +197,14 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
                         map.put("loserId", "N/A");
                     }
 
-                    
+
                     map.put("points", FightGradingPoints.calculatePoints(bean, loserGrade, winnerGrade, configurationFile));
                     map.put("signature", " ");
 
                     return map;
-                } 
+                }
             });
-        
+
 //        public ResultTableModel() {
 //            super();
 //            format.setMinimumIntegerDigits(2);
@@ -216,7 +214,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 //                    Map<String, Object> map = new HashMap<String, Object>();
 //                    map.put("date", dateFormat.format(bean.getResult().getTimestamp()));
 //                    map.put("compname", competitionName);
-//                    
+//
 //                    Pool pool = database.get(Pool.class, bean.getFight().getPoolID());
 //
 //                    map.put("pool", pool.getDescription());
@@ -252,12 +250,12 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 //                        map.put("loserId", "N/A");
 //                    }
 //
-//                    
+//
 //                    map.put("points", calculatePoints(bean, loserGrade));
 //                    map.put("signature", " ");
 //
 //                    return map;
-//                } 
+//                }
 //            });
 
             addColumn("Date", "date");
@@ -291,7 +289,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
 //            Grade winnerGrade = info.getPlayer()[w].getGrade();
 //
 //            int rankDifference = loserGrade.ordinal() - winnerGrade.ordinal();
-//            
+//
 //            if(rankDifference < -2) return 0;
 //            rankDifference = Math.min(rankDifference, 2);
 //
@@ -308,7 +306,7 @@ public class ResultsPointsPanel extends javax.swing.JPanel implements Transactio
     public void handleTransactionEvents(List<DataEvent> events, Collection<Class> dataClasses) {
         updater.run();
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -412,7 +410,7 @@ private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     }
 }//GEN-LAST:event_exportButtonActionPerformed
 
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JToolBar jToolBar1;
@@ -421,5 +419,5 @@ private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.JScrollPane scrollPane1;
     // End of variables declaration//GEN-END:variables
 
-    
+
 }
