@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;	
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -51,22 +51,22 @@ public class PlayerCodeParser {
     // matches all possible player codes
     static String matcherPlayer = "P";
     static String matcherWinnerLooser = "[LW]+";
-    static String matcherRoundRobin = "RAP?|RAT?|RBT?|RBP?|RFT?|RFP?";
+    static String matcherRoundRobin = "R[ABF][PTM]?";// R = Round Robin, A/B/F = Pool A/B/Final, PTM = Place/Tie/Medal
     static String matcherBestOfThree = "TAP?|TAT?";
     static String matcherTieBreak = "RAT?|RBT?|RFT?|TAT?";
-    private static Pattern codePattern = Pattern.compile("(P|[LW]+|RAP?|RAT?|RBP?|RBT?|RFP?|RFT?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
-    
+    private static Pattern codePattern = Pattern.compile("(P|[LW]+|R[ABF][PTM]?|TAP?|TAT?)([0-9]+)(?:-([0-9]+(?:-[0-9]+)*))?");
+
     public static enum PlayerType {
         NORMAL, BYE, UNDECIDED, EMPTY, ERROR
     }
-    
+
     public static class FightPlayer {
         public PlayerType type;
         public Player player;
         public PlayerPoolInfo playerPoolInfo;
         public String code;
         public Pool division;
-        
+
         @Override
         public String toString() {
             switch(type) {
@@ -100,7 +100,7 @@ public class PlayerCodeParser {
             return "Error";
         }
     }
-    
+
     public static enum CodeType {
         PLAYER, WINNERLOOSER, ROUNDROBIN, BESTOFTHREE, ERROR
     }
@@ -112,7 +112,7 @@ public class PlayerCodeParser {
         public int number;
         public int[] params;
     }
-    
+
     public static class PlayerRRScore {
         int playerID;
         int playerPos1;
@@ -143,7 +143,7 @@ public class PlayerCodeParser {
                         return -1;
                     }else{
                         return 1;
-                    }                        
+                    }
                 }else{
                     return 0;
                 }
@@ -160,7 +160,7 @@ public class PlayerCodeParser {
                         return 1;
                     }else{
                         return -1;
-                    }          
+                    }
                 }else{
                     return 0;
                 }
@@ -195,9 +195,9 @@ public class PlayerCodeParser {
             }
         };
 
-        
+
     private PlayerCodeParser() {}
-    
+
     public static boolean isValidCode(String code) {
         String[] orCodes = getORCodes(code);
         for(String orCode:orCodes){
@@ -206,7 +206,7 @@ public class PlayerCodeParser {
         }
         return true;
     }
-    
+
     public static String getPrefix(String code) {
         String[] orCodes = getORCodes(code);
         Matcher matcher = codePattern.matcher(orCodes[0]);
@@ -215,7 +215,7 @@ public class PlayerCodeParser {
         else
             throw new IllegalArgumentException("Invalid player code: " + code);
     }
-    
+
     public static int getNumber(String code) {
         String[] orCodes = getORCodes(code);
         Matcher matcher = codePattern.matcher(orCodes[0]);
@@ -243,7 +243,7 @@ public class PlayerCodeParser {
             throw new IllegalArgumentException("Invalid player code: " + code);
         }
     }
-    
+
     public static List<Integer> getAscendant(String code) {
         List<Integer> fightNumbers = new ArrayList<Integer>();
         String[] codes = getORCodes(code);
@@ -328,7 +328,7 @@ public class PlayerCodeParser {
             throw new IllegalArgumentException("Must supply a non-empty list of PlayerPoolInfos");
 
         String[] codes = getORCodes(code);
-        
+
         if(codes.length == 1){
             if(parseredCodes.containsKey(codes[0])){
 // System.out.println(codes[0]);
@@ -389,7 +389,7 @@ public class PlayerCodeParser {
         List<FightInfo> roundRobinFightInfoList = new ArrayList<FightInfo>();
         List<String> allCodes = new ArrayList<String>();
         List<Integer> allPlayerIDs = new ArrayList<Integer>();
-        
+
         int[] params = getParameters(code);//      3,4,5
 
         for(int roundRobinFight : params) {
@@ -515,6 +515,7 @@ public class PlayerCodeParser {
                             fightPlayer.type = PlayerType.EMPTY;
                             return fightPlayer;
                         case 'P':
+                        case 'M':
                             fightPlayer.type = PlayerType.UNDECIDED;
                             return fightPlayer;
                         default:
@@ -531,6 +532,7 @@ public class PlayerCodeParser {
                     fightPlayer.type = PlayerType.EMPTY;
                     return fightPlayer;
                 case 'P':
+                case 'M':
                     fightPlayer.type = PlayerType.UNDECIDED;
                     return fightPlayer;
                 default:
@@ -586,6 +588,15 @@ public class PlayerCodeParser {
                     }
 
                 case 'P':
+                case 'M':
+                    if(prefix.charAt(2) == 'M') {
+                        if(PlayerRRScore.size() >= number) {
+                            if(PlayerRRScore.get(number - 1).wins == 0) {
+                                fightPlayer.type = PlayerType.EMPTY;
+                                return fightPlayer;
+                            }
+                        }
+                    }
 // Check for Tie with another player
                     isTie = false;
                     // Is three a tie with player after
@@ -619,6 +630,7 @@ public class PlayerCodeParser {
         }
     }
 
+    // Calculates points for players based on round robin rules and returns players sorted by scores
     private List<PlayerRRScore> roundRobinScores(List<FightInfo> roundRobinFightInfoList) {
 
 //Add all playerPoolInfoList in fights to map
@@ -721,7 +733,7 @@ public class PlayerCodeParser {
                 c.put("R" + prefix.charAt(1) + "P" + (i+1) , player.getLastName() + ", " + player.getFirstName() + " (FG)" );
             else
                 c.put("R" + prefix.charAt(1) + "P" + (i+1) , player.getLastName() + ", " + player.getFirstName() );
-            
+
             c.put("R" + prefix.charAt(1) + "PRegion" + (i+1) , player.getTeam() + " (" + player.getShortGrade() + ")" );
             if(showResults){
                 for(int j = 0; j < playerRRScoresList.size(); j++ ){
@@ -736,7 +748,7 @@ public class PlayerCodeParser {
     }
 
     private List<PlayerRRScore> roundRobinResults(CodeType codeType, List<FightInfo> roundRobinFightInfoList) {
-        
+
         List<PlayerRRScore> playerRRScoresList = roundRobinScores(roundRobinFightInfoList);
         if(codeType == CodeType.BESTOFTHREE){
             playerRRScoresList = roundRobinResultsOrder( roundRobinFightInfoList,  PLAYERS_SCORE_COMPARATOR_BT);
@@ -755,12 +767,23 @@ public class PlayerCodeParser {
                     if(j > i){
                         for(int k = i; k <= j; k++)
                             playerRRTieList.add(playerRRScoresList.get(k));
-                        
+
                         List<FightInfo> pairsOfFightInfoList = roundRobinFightsFromRRScoreList(roundRobinFightInfoList, playerRRTieList);
-                        playerRRTieList = roundRobinResultsOrder(pairsOfFightInfoList, PLAYERS_SCORE_COMPARATOR_RR_WPTW);
-                        for(int k = 0; k < playerRRTieList.size(); k++){
-                            playerRRTieList.get(k).place = playerRRTieList.get(k).place+i;
-                            playerRRScoresList.set(i+k, playerRRTieList.get(k));
+                        List<PlayerRRScore> sortedPlayerRRTieList = roundRobinResultsOrder(pairsOfFightInfoList, PLAYERS_SCORE_COMPARATOR_RR_WPTW);
+
+                        // TODO - code duplication (see roundRobinResultsOrder)
+                        for(int k = 0; k < sortedPlayerRRTieList.size(); k++){
+                            // This item only records wins etc. for the tied players, not the division as a whole
+                            PlayerRRScore tiePlayerScore = sortedPlayerRRTieList.get(k);
+                            // Find the corresponding item that has wins etc. for the whole division
+                            for(PlayerRRScore divisionPlayerScore : playerRRTieList) {
+                                if(divisionPlayerScore.playerPos1 == tiePlayerScore.playerPos1) {
+                                    // Found it - use that item to update the result list
+                                    divisionPlayerScore.place = tiePlayerScore.place + i;
+                                    playerRRScoresList.set(i+k, divisionPlayerScore);
+                                    break;
+                                }
+                            }
                         }
                         i = i + playerRRTieList.size()-1;
                     }
@@ -770,14 +793,14 @@ public class PlayerCodeParser {
         }
         return playerRRScoresList;
     }
-    
+
     private List<PlayerRRScore> roundRobinResultsOrder(List<FightInfo> roundRobinFightInfoList, Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR) {
-        
+
         List<PlayerRRScore> playerRRScoresList = roundRobinScores(roundRobinFightInfoList);
-        
+
 //Sort List
         Collections.sort(playerRRScoresList, PLAYERS_SCORE_COMPARATOR);
-        
+
 //find ties
         List<PlayerRRScore> playerRRTieList = new ArrayList<PlayerRRScore>();
         int i = 0;
@@ -804,14 +827,24 @@ public class PlayerCodeParser {
                 }
                 Collections.sort(playerRRScoresList, PLAYERS_POS2_COMPARATOR_RR);
                 return playerRRScoresList;
-                
+
 // There are SOME players tied?
             }else{
                 List<FightInfo> pairsOfFightInfoList = roundRobinFightsFromRRScoreList(roundRobinFightInfoList, playerRRTieList);
-                playerRRTieList = roundRobinResultsOrder(pairsOfFightInfoList, PLAYERS_SCORE_COMPARATOR);
-                for(int k = 0; k < playerRRTieList.size(); k++){
-                    playerRRTieList.get(k).place = playerRRTieList.get(k).place+i;
-                    playerRRScoresList.set(i+k, playerRRTieList.get(k));
+                List<PlayerRRScore> sortedPlayerRRTieList = roundRobinResultsOrder(pairsOfFightInfoList, PLAYERS_SCORE_COMPARATOR);
+
+                for(int k = 0; k < sortedPlayerRRTieList.size(); k++){
+                    // This item only records wins etc. for the tied players, not the division as a whole
+                    PlayerRRScore tiePlayerScore = sortedPlayerRRTieList.get(k);
+                    // Find the corresponding item that has wins etc. for the whole division
+                    for(PlayerRRScore divisionPlayerScore : playerRRTieList) {
+                        if(divisionPlayerScore.playerPos1 == tiePlayerScore.playerPos1) {
+                            // Found it - use that item to update the result list
+                            playerRRScoresList.set(i+k, divisionPlayerScore);
+                            divisionPlayerScore.place = tiePlayerScore.place + i;
+                            break;
+                        }
+                    }
                 }
                 i = i + playerRRTieList.size()-1;
             }
@@ -819,7 +852,7 @@ public class PlayerCodeParser {
         }
         return playerRRScoresList;
     }
-    
+
     private List<FightInfo> roundRobinFightsFromRRScoreList(List<FightInfo> roundRobinFightInfoList, List<PlayerRRScore> playerRRTieList) {
         List<FightInfo> pairsOfFightInfoList = new ArrayList<FightInfo>();
         int matchedIDs;
@@ -840,7 +873,7 @@ public class PlayerCodeParser {
         }
         return pairsOfFightInfoList;
     }
-    
+
     private FightPlayer parsePLWCode(String code) {
         FightPlayer fightPlayer = new FightPlayer();
 
@@ -851,7 +884,7 @@ public class PlayerCodeParser {
                 break;
             }
         }
-        
+
         String prefix = getPrefix(code);
         int number = getNumber(code);
 
@@ -964,7 +997,7 @@ public class PlayerCodeParser {
                         return fightPlayer;
                 }
             }
-            
+
             if(!isValidCode(code) || getPrefix(code).equals("P")) {
                 fightPlayer.type = PlayerType.ERROR;
                 return fightPlayer;
@@ -976,10 +1009,10 @@ public class PlayerCodeParser {
                 fightPlayer.type = PlayerType.ERROR;
                 return fightPlayer;
             }
-                    
+
             prefix = prefix.substring(0, prefix.length()-1);
         }
-        
+
         fightPlayer.type = PlayerType.ERROR;
         return fightPlayer;
     }
@@ -1047,7 +1080,7 @@ public class PlayerCodeParser {
     public ArrayList<Integer> getContingentFights(int fightPosition) {
         ArrayList<Integer> contingentFights = new ArrayList<Integer>();
         contingentFights.add(fightPosition);
-        
+
         for (int i = fightPosition; i < fightInfoList.size(); i++) {
             for(String code : fightInfoList.get(i-1).getAllPlayerCode()) {
                 List<Integer> ascendantNumbers = PlayerCodeParser.getAscendant(code);
@@ -1075,17 +1108,17 @@ public class PlayerCodeParser {
 
     public boolean hasCommonPlayers(int fightPosition1, int fightPosition2) {
         if(fightPosition1 < fightPosition2) { int k = fightPosition1; fightPosition1 = fightPosition2; fightPosition2 = k; } //swap
-        
+
         List<String> codesFightPosition1 = new ArrayList<String>();
         for(String code : fightInfoList.get(fightPosition1-1).getAllPlayerCode()) {
             codesFightPosition1.addAll(Arrays.asList(getORCodes(code)));
         }
-        
+
         List<String> codesFightPosition2 = new ArrayList<String>();
         for(String code : fightInfoList.get(fightPosition2-1).getAllPlayerCode()) {
             codesFightPosition2.addAll(Arrays.asList(getORCodes(code)));
         }
-        
+
         for(String codeFightPosition1 : codesFightPosition1) {
             CodeInfo codeInfo = getCodeInfo(codeFightPosition1);
             switch(codeInfo.type) {
@@ -1175,13 +1208,13 @@ public class PlayerCodeParser {
         }
         return minimumNumberOfFights;
     }
-    
+
     /* Parser instance stuff */
 
     private Pool pool;
     private List<PlayerPoolInfo> playerInfoList;
     private List<FightInfo> fightInfoList;
-    private ConfigurationFile configurationFile;    
+    private ConfigurationFile configurationFile;
     private String roundRobinSeperation;
     private boolean isRoundRobinDraw = false;
     private ArrayList<Integer> sameTeamFights = new ArrayList<Integer>();
@@ -1190,7 +1223,7 @@ public class PlayerCodeParser {
 
     private PlayerCodeParser(Database database, int poolID) {
         pool = database.get(Pool.class, poolID);
-        
+
         playerInfoList = PoolPlayerSequencer.getPlayerSequence(database, poolID);
         List<Fight> fights = new ArrayList<Fight>(database.findAll(Fight.class, FightDAO.FOR_POOL, poolID));
 
@@ -1217,10 +1250,10 @@ public class PlayerCodeParser {
             }
         }
 
-                    
+
 
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
-        
+
 // initiate fights with same team and check for round robin.
         configurationFile = ConfigurationFile.getConfiguration(ci.getDrawConfiguration());
         roundRobinSeperation = configurationFile.getProperty("defaultRoundRobinSeperation");
@@ -1248,7 +1281,7 @@ public class PlayerCodeParser {
                 if(codeInfo.type == CodeType.ROUNDROBIN)
                     isRoundRobinDraw = true;
             }
-            
+
             if(isSameTeam(codes))
                 sameTeamFights.add(fightInfo.getFightPostion());
         }
