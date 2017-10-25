@@ -18,7 +18,10 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
-import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.*;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.HANSAKUMAKE;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.IPPON;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.LEG_SHIDO;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.SHIDO;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.util.Stopwatch;
 import au.com.jwatmuff.genericdb.distributed.Timestamp;
@@ -45,14 +48,14 @@ import org.apache.log4j.Logger;
  */
 public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     private static final Logger log = Logger.getLogger(ScoreboardModel.class);
-    
+
     /* constants */
     private static final int UNKNOWN_PLAYER = -1;
     private static final int HOLD_DOWN_UNDO_DELAY = 5000;
-    
+
     /* queues for blocking event notification */
     private Map<Object, LinkedBlockingQueue<ScoreboardUpdate>> queues =  new HashMap<Object, LinkedBlockingQueue<ScoreboardUpdate>>();
-    
+
     /* main stuff */
     private Stopwatch mainTimer;
     private Mode mode = Mode.NO_FIGHT;
@@ -74,27 +77,27 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     private int holddownTimeWazari;
 
     /* cancel holddown undo stuff */
-    private Stopwatch shadowTimer = new Stopwatch(10, true);    
+    private Stopwatch shadowTimer = new Stopwatch(10, true);
     private Timer undoDisableTimer;                             // timer for disabling the undo facility after a few seconds have elapsed
     private int undoPendingScorePlayer;                         // if an cancel hold down is done, tells us which player has a pending score which must be removed
 
     /* winning player stuff */
     private int winningPlayer = UNKNOWN_PLAYER;
     private Win win = null;
-    
+
     /* golden rule */
     private GoldenScoreMode goldenScoreMode = GoldenScoreMode.INACTIVE;
 
     /* pending fight timers */
     private Stopwatch[] pendingFightTimers = new Stopwatch[2];
-    
+
     private ScoringColors colors = new ScoringColors();
     private boolean showTeams = true;
 
     private StringBuilder eventLog = new StringBuilder();
-        
+
     private Collection<ScoreboardModelListener> listeners = new ArrayList<ScoreboardModelListener>();
-    
+
     @SuppressWarnings("unchecked")
     public ScoreboardModelImpl() {
         addListener(new ScoreboardModelListener() {
@@ -109,7 +112,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         pendingScores =  (List<Score>[])new List[] {
             new LinkedList<Score>(), new LinkedList<Score>()
         };
-        
+
         mainTimer = new Stopwatch(10, false, new Runnable() {
             @Override
             public void run() {
@@ -125,7 +128,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                             setGoldenScoreMode(GoldenScoreMode.FINISHED);
                             break;
                     }
-                    
+
                     if(holddownMode != HolddownMode.ACTIVE)
                         notifyListeners(ScoreboardUpdate.SIREN);
 
@@ -135,7 +138,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                 notifyListeners(ScoreboardUpdate.TIMER);
             }
         }, 1000);
-        
+
         holddownTimer = new Stopwatch(10, true, new Runnable() {
 
             @Override
@@ -149,7 +152,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             }
         }, 1000);
     }
-    
+
     @Override
     public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, String divisionName) {
         this.fightTime = fightTime;
@@ -225,12 +228,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     public void addListener(ScoreboardModelListener listener) {
         listeners.add(listener);
     }
-    
+
     @Override
     public void removeListener(ScoreboardModelListener listener) {
         listeners.remove(listener);
     }
-    
+
     private void notifyListeners(ScoreboardUpdate update) {
         for(ScoreboardModelListener listener : listeners)
             listener.handleScoreboardUpdate(update, this);
@@ -242,17 +245,17 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             notifyListeners(ScoreboardUpdate.MODE);
         }
     }
-    
+
     private void setHolddownMode(HolddownMode mode) {
         this.holddownMode = mode;
         notifyListeners(ScoreboardUpdate.MODE);
     }
-    
+
     @Override
     public Mode getMode() {
         return mode;
     }
-    
+
     @Override
     public void approveGoldenScore() {
         /* must be ready to start golden rule */
@@ -264,7 +267,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return;
 
         notifyListeners(ScoreboardUpdate.SCORE);
-        
+
         if (goldenScoreTime == 0) {
             mainTimer.direction(true);
             mainTimer.reset(0);
@@ -272,7 +275,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             mainTimer.direction(false);
             mainTimer.reset(goldenScoreTime * 1000);
         }
-        
+
         for(int i = 0; i < score.length; i++) {
             for(int j = 0; j < score[i].length; j++) {
                 scoreAtStartOfGoldenScore[i][j] = score[i][j];
@@ -283,7 +286,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         logEvent("Start Golden Score");
     }
-    
+
     @Override
     public void startTimer() {
         /* ignore if one player has already won */
@@ -300,17 +303,17 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         if(mode == Mode.NO_FIGHT) {
             return;
         }
-        
+
         /* ignore if the timer has run out and golden rule is active */
         if(mainTimer.getTime() < 0 || (!mainTimer.getDirection() && mainTimer.getTime() == 0)) {
             return;
         }
-        
+
         /* ignore if an ippon from a holddown is pending assignment to a player */
         if(holddownMode == HolddownMode.PENDING && pendingHolddownScore == Score.IPPON) {
             return;
         }
-        
+
         disableCancelHolddownUndo();
         mainTimer.start();
         if(holddownMode == HolddownMode.ACTIVE) {
@@ -320,7 +323,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         logEvent("Start timer");
     }
-    
+
     @Override
     public void stopTimer() {
         disableCancelHolddownUndo();
@@ -332,7 +335,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         logEvent("Stop timer");
     }
-    
+
     @Override
     public void toggleTimer() {
         if(mainTimer.isRunning())
@@ -340,12 +343,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         else
             startTimer();
     }
-        
+
     @Override
     public int getTime() {
         return (int) Math.round(mainTimer.getTime() / 1000.0);
     }
-    
+
     @Override
     public void startHolddownTimer() {
         if(mode != Mode.FIGHTING) return;
@@ -358,7 +361,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         logEvent("Start holddown");
     }
-    
+
     /*
      * Called when the hold down timer reaches Ippon
      */
@@ -374,7 +377,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             setHolddownMode(HolddownMode.PENDING);
         }
     }
-    
+
     @Override
     public void cancelHolddownTimer() {
         /* ignore if hold down timer is not active */
@@ -386,7 +389,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         if(mainTimer.isRunning())
             enableCancelHolddownUndo();
-        
+
         if(mainTimer.getTime() <= 0)
             notifyListeners(ScoreboardUpdate.SIREN);
 
@@ -398,14 +401,14 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
              * holddown was not long enough to result in score
              */
             setHolddownMode(HolddownMode.INACTIVE);
-            
+
         } else if(holddownScore == Score.IPPON) {
              /*
               * this should already have been picked up by the holddown timer
               * handler, but in rare cases this may be possible
               */
             handleHolddownTimerEnd();
-            
+
         } else if(holddownPlayer == UNKNOWN_PLAYER) {
             /*
              * holddown resulted in score but the player has not been
@@ -413,7 +416,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
              */
             pendingHolddownScore = holddownScore;
             setHolddownMode(HolddownMode.PENDING);
-            
+
         } else {
             /*
              * holddown score is added to list of pending scores for the
@@ -427,7 +430,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         logEvent("End holddown (" + holddownTime + "s)");
     }
-    
+
     private void enableCancelHolddownUndo() {
         shadowTimer.reset(holddownTimer.getTime());
         shadowTimer.start();
@@ -440,7 +443,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         }, HOLD_DOWN_UNDO_DELAY);
         notifyListeners(ScoreboardUpdate.UNDO_AVAILABLE);
     }
-    
+
     private void disableCancelHolddownUndo() {
         shadowTimer.stop();
         if(undoDisableTimer != null) {
@@ -450,7 +453,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             notifyListeners(ScoreboardUpdate.UNDO_AVAILABLE);
         }
     }
-    
+
     @Override
     public void undoCancelHolddown() {
         if(undoCancelHolddownAvailable()) {
@@ -465,7 +468,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             if(sTime < 25 * 1000) {
                 holddownTimer.reset(sTime);
                 holddownTimer.start();
-                setHolddownMode(HolddownMode.ACTIVE);                
+                setHolddownMode(HolddownMode.ACTIVE);
             } else {
                 /* TODO: adjust main timer if necessary? */
                 handleHolddownTimerEnd();
@@ -475,37 +478,37 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         logEvent("Undo holddown end");
     }
-    
+
     @Override
     public boolean undoCancelHolddownAvailable() {
         return shadowTimer.isRunning();
     }
-    
+
     @Override
     public int getHolddownTime() {
         return (int) (holddownTimer.getTime() / 1000);
     }
-    
+
     @Override
     public Score getPendingHolddownScore() {
         return pendingHolddownScore;
     }
-    
+
     @Override
     public boolean isHolddownActivated() {
         return holddownMode != HolddownMode.INACTIVE;
     }
-    
+
     @Override
     public boolean isHolddownPending() {
         return holddownMode == HolddownMode.PENDING;
     }
-    
+
     @Override
     public int getHolddownPlayer() {
         return holddownPlayer;
     }
-    
+
     @Override
     public void setHolddownPlayer(int player) {
         switch(holddownMode) {
@@ -525,7 +528,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         }
         logEvent("Set Holddown Player: " + playerNames[player]);
     }
-    
+
     private Score holddownScore(int time) {
         if(time == holddownTimeIpon) {
             return Score.IPPON;
@@ -535,23 +538,23 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return null;
         }
     }
-    
+
     @Override
         public void changeScore(int player, Score type, boolean up) {
         disableCancelHolddownUndo();
         int olds = score[player][type.ordinal()];
-        
+
         int s = olds + (up?1:-1);
         score[player][type.ordinal()] = s;
-        
+
         boolean scoreok = true;
-        
+
         if(s < 0) scoreok = false;
         else switch(type) {
-            case IPPON: 
+            case IPPON:
                 if(getScore(player,type) > 1) scoreok = false;
                 break;
-            case SHIDO: 
+            case SHIDO:
             case LEG_SHIDO:
             case HANSAKUMAKE:
                 if(getScore(player, SHIDO) + getScore(player, LEG_SHIDO) > 3 ||
@@ -561,12 +564,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                 }
                 break;
         }
-        
+
         if(!scoreok) {
             score[player][type.ordinal()] = olds;
             return;
         }
-        
+
         logEvent(playerNames[player] + " " + (up?"+":"-") + type.toString().substring(0,1));
         checkForWin();
         notifyListeners(ScoreboardUpdate.SCORE);
@@ -575,7 +578,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public int getScore(int player, Score type) {
         int s = score[player][type.ordinal()];
-        
+
         if(type == Score.IPPON && isHansakumake(1 - player)) {
             s++;
         }
@@ -598,7 +601,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     public List<Score> getPendingScores(int player) {
         return Collections.unmodifiableList(pendingScores[player]);
     }
-    
+
     @Override
     public void awardPendingScore(int player, int index) {
         disableCancelHolddownUndo();
@@ -606,15 +609,15 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         changeScore(player, s, true);
         notifyListeners(ScoreboardUpdate.PENDING_SCORE);
     }
-    
+
     private void checkForWin() {
         win = null;
         winningPlayer = UNKNOWN_PLAYER;
-        
+
         if(holddownMode == HolddownMode.ACTIVE) {
             return;
         }
-        
+
         for(int i=0; i<2; i++) {
             if(getScore(i, Score.IPPON) == 1) {
                 if((getScore(1-i, Score.IPPON) == 1) ||
@@ -630,9 +633,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     setMode(Mode.WIN);
                 }
                 return;
-            }           
+            }
         }
-        
+
         boolean goldenScoreStarted = goldenScoreMode == GoldenScoreMode.ACTIVE || goldenScoreMode == GoldenScoreMode.FINISHED;
         boolean mainTimeFinished = goldenScoreStarted || goldenScoreMode == GoldenScoreMode.READY;
 
@@ -648,12 +651,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     // shido since golden score
                     if(shidoCount(player) > shidoCountAtStartOfGoldenScore(player)) {
                         win = Win.BY_SHIDO;
-                        winningPlayer = player;
+                        winningPlayer = 1 - player; // other player wins
                         break;
                     }
                 }
             }
-            
+
             if(win != null) {
                 stopTimer();
                 setMode(Mode.WIN);
@@ -667,27 +670,27 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             setMode(Mode.IDLE);
         }
     }
-    
+
     private int shidoCount(int player) {
         return score[player][Score.SHIDO.ordinal()] +
                 score[player][Score.LEG_SHIDO.ordinal()];
     }
-    
+
     private int shidoCountAtStartOfGoldenScore(int player) {
         return scoreAtStartOfGoldenScore[player][Score.SHIDO.ordinal()] +
                 score[player][Score.LEG_SHIDO.ordinal()];
     }
-    
+
     @Override
     public int getWinningPlayer() {
         return winningPlayer;
     }
-    
+
     @Override
     public Win getWin() {
         return win;
     }
-    
+
     @Override
     public void setGoldenScoreMode(GoldenScoreMode goldenScoreMode) {
         if(this.goldenScoreMode != goldenScoreMode) {
@@ -704,12 +707,12 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             notifyListeners(ScoreboardUpdate.GOLDEN_SCORE);
         }
     }
-    
+
     @Override
     public GoldenScoreMode getGoldenScoreMode() {
         return goldenScoreMode;
     }
-    
+
     @Override
     public String getPlayerName(int player) {
         return playerNames[player];
@@ -731,20 +734,20 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         logEvent("End fight");
         setMode(Mode.NO_FIGHT);
     }
-    
+
     private void logEvent(String eventString) {
         eventLog.append(getTimeString() + ":" + eventString + "\n");
     }
-    
+
     private static DecimalFormat format = new DecimalFormat("00");
-    
+
     private String getTimeString() {
         int time = (int)(mainTimer.getTime()/1000);
         int min = time / 60;
         int sec = time % 60;
         return format.format(min) + ":" + format.format(sec) + ((goldenScoreMode == GoldenScoreMode.ACTIVE)?"[GS]":"    ");
     }
-    
+
     @Override
     public String getEventLog() {
         return eventLog.toString();
@@ -760,7 +763,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             return null;
         }
     }
-    
+
     @Override
     public void shutdown() {
         mainTimer.stop();
@@ -840,7 +843,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     public ScoringColors getColors() {
         return colors;
     }
-    
+
     @Override
     public void setColors(ScoringColors colors) {
         this.colors = colors;
