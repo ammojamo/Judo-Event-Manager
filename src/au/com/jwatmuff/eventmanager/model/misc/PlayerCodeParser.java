@@ -123,7 +123,8 @@ public class PlayerCodeParser {
         int time;
         double weight;
         int place;
-        }
+        List<Integer> beatenPlayerIDs = new ArrayList<>();
+    }
 
     private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_RR_WPTW = new Comparator<PlayerRRScore>(){
             @Override
@@ -132,6 +133,12 @@ public class PlayerCodeParser {
                     return (p1.wins - p0.wins);
                 }else if(p1.points - p0.points != 0){
                     if(p1.points - p0.points > 0){
+                        return 1;
+                    }else{
+                        return -1;
+                    }
+                }else if(p1.beatenPlayerIDs.contains(p0.playerID) != p0.beatenPlayerIDs.contains(p1.playerID)) {
+                    if(p1.beatenPlayerIDs.contains(p0.playerID)){
                         return 1;
                     }else{
                         return -1;
@@ -666,6 +673,7 @@ public class PlayerCodeParser {
                 winPlayerRRScore.points = winPlayerRRScore.points + winningPlayerSimpleScore;
                 winPlayerRRScore.fightPoints.put(fightInfo.getLosingPlayerID(),winningPlayerSimpleScore);
                 winPlayerRRScore.time = winPlayerRRScore.time + fightInfo.getFightTime();
+                winPlayerRRScore.beatenPlayerIDs.add(fightInfo.getLosingPlayerID());
                 playerRRScoresMap.put(fightInfo.getWinningPlayerID(), winPlayerRRScore);
 
                 PlayerRRScore losePlayerRRScore = playerRRScoresMap.get(fightInfo.getLosingPlayerID());
