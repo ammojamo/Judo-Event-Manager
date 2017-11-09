@@ -28,6 +28,8 @@ Section ""
   File /r ..\..\resources
   File /r ..\..\dist\*.*
   File ..\..\license.lic
+  File ..\..\LICENSE.txt
+  File ..\..\THIRD-PARTY.txt
   File icon.ico
 
   writeUninstaller "$INSTDIR\uninstall.exe"
