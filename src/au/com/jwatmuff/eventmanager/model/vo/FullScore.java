@@ -72,6 +72,8 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
      */
     public boolean isValid() {
         if(get(IPPON) > 1) return false;
+        if(get(WAZARI) > 2) return false;
+        if(get(WAZARI) == 2 && get(IPPON) == 1) return false;
         if(get(HANSAKUMAKE) > 1) return false;
         if(get(SHIDO) > 3) return false;
         return true;
@@ -100,8 +102,8 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
     }
 
     public Score getWinningScore(FullScore o) {
-        if(get(IPPON) > o.get(IPPON)) return IPPON;
-        if(get(IPPON) < o.get(IPPON)) return null;
+        if(get(IPPON) >= 1 || get(WAZARI) >= 2) return IPPON;
+        if(o.get(IPPON) >= 1 || o.get(WAZARI) >= 2) return null;
         if(get(WAZARI) > o.get(WAZARI)) return WAZARI;
         if(get(WAZARI) < o.get(WAZARI)) return null;
         if(get(SHIDO) < o.get(SHIDO)) return SHIDO;

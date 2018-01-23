@@ -146,6 +146,15 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     stopTimer();
                     holddownTimer.stop();
                     handleHolddownTimerEnd();
+                } else if(holddownTimer.getTime()/1000 >= holddownTimeWazari &&
+                          holddownPlayer != UNKNOWN_PLAYER &&
+                          getScore(holddownPlayer, Score.WAZARI) == 1) {
+                    stopTimer();
+                    holddownTimer.stop();
+                    setHolddownMode(HolddownMode.INACTIVE);
+                    notifyListeners(ScoreboardUpdate.SIREN);
+                    pendingScores[holddownPlayer].add(Score.WAZARI);
+                    notifyListeners(ScoreboardUpdate.PENDING_SCORE);
                 }
                 notifyListeners(ScoreboardUpdate.HOLDDOWN);
             }
@@ -553,6 +562,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             case IPPON:
                 if(getScore(player,type) > 1) scoreok = false;
                 break;
+            case WAZARI:
+                if(getScore(player, type) > 2) scoreok = false;
+                break;
             case SHIDO:
             case HANSAKUMAKE:
                 if(getScore(player, SHIDO) > 3 ||
@@ -615,7 +627,25 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         for(int i=0; i<2; i++) {
             if(getScore(i, Score.IPPON) == 1) {
+                if((getScore(i, Score.WAZARI) == 2) ||
+                   (getScore(1-i, Score.IPPON) == 1) ||
+                   (getScore(1-i, Score.WAZARI) == 2) ||
+                   (!pendingScores[i].isEmpty()) ||
+                   (!pendingScores[1-i].isEmpty())) {
+                    // Stop timer until ippon / pending scores are sorted out
+                    stopTimer();
+                    setMode(Mode.IDLE);
+                } else {
+                    winningPlayer = i;
+                    win = Win.BY_IPPON;
+                    stopTimer();
+                    setMode(Mode.WIN);
+                }
+                return;
+            }
+            if(getScore(i, Score.WAZARI) == 2) {
                 if((getScore(1-i, Score.IPPON) == 1) ||
+                   (getScore(1-i, Score.WAZARI) == 2) ||
                    (!pendingScores[i].isEmpty()) ||
                    (!pendingScores[1-i].isEmpty())) {
                     // Stop timer until ippon / pending scores are sorted out
