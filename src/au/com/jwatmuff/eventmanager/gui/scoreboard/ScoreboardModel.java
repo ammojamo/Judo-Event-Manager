@@ -28,23 +28,23 @@ import java.util.List;
  */
 public interface ScoreboardModel {
     enum Score {
-        IPPON, WAZARI, SHIDO, LEG_SHIDO, HANSAKUMAKE, DECISION;
-        
+        IPPON, WAZARI, SHIDO, HANSAKUMAKE, DECISION;
+
         public char initial = name().charAt(0);
     }
-    
+
     enum Mode {
         IDLE, FIGHTING, WIN, NO_FIGHT, FIGHT_PENDING
     }
-    
+
     enum HolddownMode {
         INACTIVE, ACTIVE, PENDING
     }
-    
+
     enum GoldenScoreMode {
         INACTIVE, READY, ACTIVE, FINISHED
     }
-    
+
     enum ScoreboardUpdate {
         TIMER, HOLDDOWN, MODE, SCORE, PENDING_SCORE, UNDO_AVAILABLE,
         GOLDEN_SCORE, SIREN, FIGHT_PENDING, ALL
@@ -55,20 +55,20 @@ public interface ScoreboardModel {
         BY_WAZARI(Score.WAZARI),
         BY_SHIDO(Score.SHIDO),
         BY_DECISION(Score.DECISION);
-        
+
         public final Score score;
 
         Win(Score score) {
             this.score = score;
         }
     }
-    
+
     interface ScoreboardModelListener {
         public void handleScoreboardUpdate(ScoreboardUpdate update, ScoreboardModel model);
     }
 
     void addListener(ScoreboardModelListener listener);
-    
+
     void removeListener(ScoreboardModelListener listener);
 
     ScoreboardUpdate getUpdateEvent(Object id, int timeout);
@@ -90,13 +90,13 @@ public interface ScoreboardModel {
     List<Score> getPendingScores(int player);
 
     String getPlayerName(int player);
-    
+
     String getTeamName(int player);
-    
+
     String getDivisionName();
 
     int getScore(int player, Score type);
-    
+
     boolean isHansakumake(int player);
 
     int getTime();
@@ -108,15 +108,15 @@ public interface ScoreboardModel {
     boolean isHolddownActivated();
 
     boolean isHolddownPending();
-    
+
     boolean undoCancelHolddownAvailable();
 
     int getPendingFightTime(int player);
-    
+
     ScoringColors getColors();
-    
+
     boolean showTeams();
-    
+
     void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, String divisionName);
 
     void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, Date lastFights[], int minimumBreak, String divisionName);
@@ -136,7 +136,7 @@ public interface ScoreboardModel {
     void stopTimer();
 
     void toggleTimer();
-    
+
     void awardPendingScore(int player, int index);
 
     void cancelHolddownTimer();
@@ -146,16 +146,16 @@ public interface ScoreboardModel {
     void endFight();
 
     void undoCancelHolddown();
-    
+
     void shutdown();
-    
+
     void setTimer(int seconds);
-    
+
     void setHolddownTimer(int seconds);
 
     void decideWinner(int player);
-    
+
     void setColors(ScoringColors colors);
-    
+
     void setShowTeams(boolean show);
 }

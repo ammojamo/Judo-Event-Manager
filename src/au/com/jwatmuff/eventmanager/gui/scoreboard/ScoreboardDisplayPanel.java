@@ -18,12 +18,12 @@
 
 package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
-import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.ScoreboardLayout;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.GoldenScoreMode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Mode;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.ScoreboardUpdate;
 import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.IJFScoreboardLayout;
+import au.com.jwatmuff.eventmanager.gui.scoreboard.layout.ScoreboardLayout;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors.Area;
 import au.com.jwatmuff.eventmanager.util.FileExtensionFilter;
@@ -57,17 +57,17 @@ import org.jdesktop.swingx.JXImagePanel;
  */
 public class ScoreboardDisplayPanel extends ScoreboardPanel implements ScoreboardModel.ScoreboardModelListener {
     private static final Logger log = Logger.getLogger(ScoreboardEntryPanel.class);
-    
-    public static final Score[] SHIDO_TYPES = new Score[] { Score.SHIDO, Score.LEG_SHIDO, Score.HANSAKUMAKE };
-    
+
+    public static final Score[] SHIDO_TYPES = new Score[] { Score.SHIDO, Score.HANSAKUMAKE };
+
     static final Color CLEAR = new Color(0,0,0,0);
-    
+
     protected ScoreboardModel model = new ScoreboardModelImpl();
-    
+
     protected ScoreboardLayout scoreboardLayout;
-    
+
     protected final JLayeredPane layeredPane;
-    
+
     protected final JPanel bottomLayer;
     protected final ScalableLabel timer;
     protected final ScalableLabel[] player;
@@ -75,7 +75,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
     protected final ScalableLabel[][] scoreLabels;
     protected final ScalableLabel[][] score;
     protected final ScalableLabel division;
-    
+
     protected final JPanel backgroundLayer;
     protected final ScalableLabel[] playerBackground;
     protected final ScalableLabel timerBackground;
@@ -83,18 +83,18 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
     protected final ScalableLabel[] pendingPlayer;
     protected final ScalableLabel[] pendingFightTimer;
     protected final ScalableLabel pendingDivision;
-        
+
     protected final ScalableLabel[][] shido;
-    
+
     protected final ScalableLabel holddownTimer;
-    
+
     protected final ScalableLabel[][] pendingScores;
-    
+
     protected final JPanel resultLayer;
     protected final ScalableLabel result;
     protected final ScalableLabel goldenScore;
     protected final ScalableLabel goldenScoreApprove;
-    
+
     protected final JPanel noFightLayer;
     protected final JPanel pendingFightLayer;
 
@@ -102,7 +102,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
     protected final ScalableLabel vs;
     protected final ScalableLabel vsDivision;
     protected final JPanel vsLayer;
-    
+
     protected boolean swapPlayers;
 
     protected final int imageDisplayTime = 5000;
@@ -113,7 +113,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
     public static ScoreboardDisplayPanel getInstance() {
         return getInstance(new IJFScoreboardLayout());
     }
-    
+
     public static ScoreboardDisplayPanel getInstance(ScoreboardLayout scoreboardLayout) {
         ScoreboardDisplayPanel panel = new ScoreboardDisplayPanel(scoreboardLayout);
         panel.init();
@@ -122,11 +122,11 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
 
     protected ScoreboardDisplayPanel(ScoreboardLayout scoreboardLayout) {
         this.scoreboardLayout = scoreboardLayout;
-        
+
         ScalableAbsoluteLayout layout;
-        
+
         setLayout(new GridLayout(1,1));
-        
+
         layeredPane = new JLayeredPane();
         layeredPane.setLayout(new OverlayLayout(layeredPane));
         add(layeredPane);
@@ -149,7 +149,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         layeredPane.add(noFightLayer, new Integer(12));
         layout = new ScalableAbsoluteLayout(noFightLayer, 16, 12);
         noFightLayer.setLayout(layout);
-        
+
         layout.addComponent(new ScalableLabel("No Fight"), 4, 4, 8, 4);
         /*
          * Player vs Player layer
@@ -194,7 +194,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         layout.addComponent(pendingFightTimer[0], 2, 5, 4, 2);
         layout.addComponent(pendingFightTimer[1], 10, 5, 4, 2);
         layout.addComponent(pendingDivision, scoreboardLayout.getDivisionRect());
-        
+
         /*
          * Winning result layer
          */
@@ -203,19 +203,19 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         layeredPane.add(resultLayer, new Integer(9));
         layout = new ScalableAbsoluteLayout(resultLayer, 16, 12);
         resultLayer.setLayout(layout);
-        
+
         result = new ScalableLabel("");
         result.setVisible(false);
         layout.addComponent(result, scoreboardLayout.getResultRect());
-        
+
         goldenScore = new ScalableLabel("Golden Score");
         goldenScore.setVisible(false);
         layout.addComponent(goldenScore, scoreboardLayout.getGoldenScoreRect());
-        
+
         goldenScoreApprove = new ScalableLabel("Golden Score");
         goldenScoreApprove.setVisible(false);
         layout.addComponent(goldenScoreApprove, scoreboardLayout.getGoldenScoreApproveRect());
-        
+
         /*
          * Pending score layers
          */
@@ -227,16 +227,16 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             layeredPane.add(psLayer[i], new Integer(8-i));
             layout = new ScalableAbsoluteLayout(psLayer[i], 16, 12);
             psLayer[i].setLayout(layout);
-            
+
             for(int j=0; j<2; j++) {
                 ScalableLabel label = new ScalableLabel("");
                 label.setVisible(false);
-                
+
                 layout.addComponent(label, scoreboardLayout.getHolddownScoreRect(j, i));
                 pendingScores[j][i] = label;
             }
         }
-        
+
         /*
          * Holddown layer
          */
@@ -245,7 +245,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         layeredPane.add(hdLayer, new Integer(3));
         layout = new ScalableAbsoluteLayout(hdLayer, 16, 12);
         hdLayer.setLayout(layout);
-        
+
         holddownTimer = new ScalableLabel(" ");
         holddownTimer.setVisible(false);
         layout.addComponent(holddownTimer, scoreboardLayout.getHolddownRect());
@@ -269,7 +269,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             new ScalableLabel("Team A"),
             new ScalableLabel("Team B")
         };
-        
+
         if(scoreboardLayout instanceof IJFScoreboardLayout) {
             player[0].setHorizontalAlignment(JLabel.LEFT);
             player[1].setHorizontalAlignment(JLabel.LEFT);
@@ -282,7 +282,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             layout.addComponent(player[i], scoreboardLayout.getPlayerLabelRect(i));
             layout.addComponent(team[i], scoreboardLayout.getTeamLabelRect(i));
         }
-        
+
         scoreLabels = new ScalableLabel[2][2];
         score = new ScalableLabel[2][2];
         String[] iwyk = new String[]{"I","W"};
@@ -297,7 +297,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
                 layout.addComponent(score[i][j], scoreboardLayout.getScoreRect(i, s));
             }
         }
-        
+
         shido = new ScalableLabel[2][4];
         for(int i=0; i<2; i++) {
             for(int j=0; j<4; j++) {
@@ -309,7 +309,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         }
         division = new ScalableLabel(" ");
         layout.addComponent(division, scoreboardLayout.getDivisionRect());
-        
+
         // IJF Scoreboard has no borders on core components
         if(scoreboardLayout instanceof IJFScoreboardLayout) {
             // Remove borders
@@ -320,7 +320,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
                 }
             }
         }
-        
+
         /*
          * Background layer - purely for background colours as used by IJF
          *                    scoreboard
@@ -330,7 +330,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         layout = new ScalableAbsoluteLayout(backgroundLayer, 16, 12);
         backgroundLayer.setLayout(layout);
         backgroundLayer.setOpaque(false);
-        
+
         // Add background last
         playerBackground = new ScalableLabel[2];
         for(int i = 0; i < 2; i++) {
@@ -339,7 +339,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             Rect r = scoreboardLayout.getPlayerBackgroundRect(i);
             if(r != null) layout.addComponent(playerBackground[i], r);
         }
-        
+
         {
             Rect r = scoreboardLayout.getTimerBackgroundRect();
             timerBackground = new ScalableLabel("");
@@ -347,7 +347,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             if(r != null) layout.addComponent(timerBackground, r);
         }
     }
-    
+
     protected void init() {
         updateColors();
         model.addListener(this);
@@ -356,14 +356,14 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
     // for overriding in subclasses
     protected void setLayoutValues() {
     }
-    
+
     @Override
     public void swapPlayers() {
         swapPlayers = !swapPlayers;
 
         this.handleScoreboardUpdate(ScoreboardUpdate.ALL, model);
     }
-        
+
     public void setPlayerName(String playerName, int n) {
         player[swapPlayers?1-n:n].setText(playerName);
     }
@@ -374,7 +374,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         updateNoFight();
         updateImages(false); // X
     }
-    
+
     void updateColors() {
         ScoringColors colors = model.getColors();
 
@@ -391,7 +391,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
                 holddownTimer.setBackground(colors.getColor(Area.IDLE_BACKGROUND));
                 holddownTimer.setForeground(colors.getColor(Area.IDLE_FOREGROUND));
         }
-        
+
         for(ScalableLabel label : new ScalableLabel[] {
                 timer,
                 goldenScore, goldenScoreApprove, vs,
@@ -399,25 +399,25 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             label.setForeground(Color.BLACK);
             label.setBackground(Color.WHITE);
         }
-        
+
         for(ScalableLabel[] labels : shido) {
             for(ScalableLabel label : labels) {
                 label.setForeground(Color.BLACK);
                 label.setBackground(Color.WHITE);
             }
         }
-        
+
         Color mainBg;
         Color mainFg;
-        
+
         switch(model.getMode()) {
             case FIGHTING:
                 if(!model.isHolddownActivated()) {
                     mainBg = colors.getColor(Area.FIGHTING_BACKGROUND);
-                    mainFg = colors.getColor(Area.FIGHTING_FOREGROUND);                
+                    mainFg = colors.getColor(Area.FIGHTING_FOREGROUND);
                 } else {
                     mainBg = colors.getColor(Area.HOLDDOWN_BACKGROUND);
-                    mainFg = colors.getColor(Area.HOLDDOWN_FOREGROUND);                                    
+                    mainFg = colors.getColor(Area.HOLDDOWN_FOREGROUND);
                 }
                 break;
             default:
@@ -440,12 +440,12 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             c.setBackground(mainBg);
             c.setForeground(mainFg);
         }
-        
+
         for(int i=0; i<2; i++) {
             int playerPnt = swapPlayers?(1-i):i;
             Color fg = colors.getColor((playerPnt==0)?Area.PLAYER1_FOREGROUND:Area.PLAYER2_FOREGROUND);
             Color bg = colors.getColor((playerPnt==0)?Area.PLAYER1_BACKGROUND:Area.PLAYER2_BACKGROUND);
-            
+
             for(Component c : Arrays.asList(
                     player[i],
                     team[i],
@@ -464,7 +464,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
                 pendingScores[i][j].setBackground(bg);
             }
         }
-        
+
         for(int i=0; i<2; i++) {
             for(int j=0; j<2; j++) {
                 scoreLabels[i][j].setBackground(mainBg);
@@ -472,7 +472,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
                 scoreLabels[i][j].setBorder(new EmptyBorder(0,0,0,0));
             }
         }
-        
+
         // Special colours for IJF
         if(this.scoreboardLayout instanceof IJFScoreboardLayout) {
             clearBackground(timer);
@@ -488,19 +488,19 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             }
         }
     }
-    
+
     static void clearBackground(JLabel... labels) {
         for(JLabel label : labels) {
             label.setBackground(CLEAR);
             label.setOpaque(false);
         }
     }
-    
+
     @Override
     public ScoreboardModel getModel() {
         return model;
     }
-    
+
     @Override
     public void setModel(ScoreboardModel m) {
         if(model != null)
@@ -516,7 +516,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             }
         });
     }
-    
+
     NumberFormat format = new DecimalFormat("00");
 
     private void updateScore() {
@@ -524,7 +524,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             for(int j=0; j<2; j++)
                 score[i][j].setText(String.valueOf(model.getScore(swapPlayers?1-i:i, Score.values()[j])));
     }
-    
+
     void updateShido() {
         ScalableAbsoluteLayout layout = (ScalableAbsoluteLayout)bottomLayer.getLayout();
 
@@ -546,30 +546,30 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             }
         }
     }
-    
+
     void showHolddownTimer(boolean b) {
         holddownTimer.setVisible(b);
     }
-    
+
     private void updateHolddownTimer() {
         if(model.getGoldenScoreMode() != GoldenScoreMode.INACTIVE)
             updateGoldenScore();
-        
+
         if(model.isHolddownPending()) {
             holddownTimer.setText(model.getPendingHolddownScore().toString().substring(0,1));
         } else {
-            holddownTimer.setText(format.format(model.getHolddownTime()));        
+            holddownTimer.setText(format.format(model.getHolddownTime()));
         }
     }
-    
+
     private void updatePendingScores() {
-        
+
         if(model.getGoldenScoreMode() != GoldenScoreMode.INACTIVE)
             updateGoldenScore();
 
         for(int i=0; i<2; i++) {
             List<Score> scores = model.getPendingScores(swapPlayers?1-i:i);
-            
+
             for(int j=0; j<3; j++) {
                 if(j >= scores.size()) {
                     pendingScores[i][j].setVisible(false);
@@ -580,7 +580,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             }
         }
     }
-    
+
     void updateResult() {
         if(model.getGoldenScoreMode() != GoldenScoreMode.INACTIVE)
             updateGoldenScore();
@@ -609,7 +609,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             result.setVisible(false);
         }
     }
-    
+
     String formatPlayerName(int player) {
         String name = model.getPlayerName(player);
         if(scoreboardLayout instanceof IJFScoreboardLayout && name != null) {
@@ -617,7 +617,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         }
         return name;
     }
-    
+
     void updatePlayers() {
         for(int i=0; i<2; i++) {
             player[i].setText(formatPlayerName(swapPlayers?1-i:i));
@@ -629,7 +629,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             team[i].setVisible(model.showTeams() && !teamText.isEmpty());
         }
     }
-    
+
     void updateDivision() {
         String divisionName = model.getDivisionName();
         boolean showDivision = !StringUtils.isEmpty(divisionName);
@@ -638,7 +638,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             label.setText(showDivision ? divisionName : " ");
         }
     }
-    
+
     void updateGoldenScore() {
         switch(model.getGoldenScoreMode()) {
             case ACTIVE:
@@ -658,20 +658,20 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
                 } else {
                     goldenScoreApprove.setVisible(true);
                 }
-                
+
                 break;
             default:
                 goldenScore.setVisible(false);
                 goldenScoreApprove.setVisible(false);
         }
     }
-    
+
     public void updateTimer() {
         int sec = model.getTime();
         String str = sec/60 + ":" + format.format(sec%60);
         timer.setText(str);
     }
-    
+
     private void updateNoFight() {
         boolean visible = (model.getMode() == Mode.NO_FIGHT) && imageFiles.length == 0;
         noFightLayer.setVisible(visible);
@@ -777,12 +777,12 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
             vsLayer.setVisible(false);
         }
     }
-    
+
     @Override
     public void handleScoreboardUpdate(ScoreboardUpdate update, ScoreboardModel model) {
-        
+
 //        log.info("handleScoreboardUpdate");
-        
+
         // Force updates onto the GUI thread
         if(!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(() -> handleScoreboardUpdate(update, model));
@@ -790,7 +790,7 @@ public class ScoreboardDisplayPanel extends ScoreboardPanel implements Scoreboar
         }
 
         updateColors();
-        
+
         switch(update) {
             case TIMER:
                 updateTimer();

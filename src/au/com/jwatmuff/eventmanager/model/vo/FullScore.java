@@ -19,7 +19,11 @@
 package au.com.jwatmuff.eventmanager.model.vo;
 
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
-import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.*;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.DECISION;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.HANSAKUMAKE;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.IPPON;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.SHIDO;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.WAZARI;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +40,7 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
                 throw new IllegalArgumentException("Invalid score format '" + score + "'");
             char p = pair[0].charAt(0);
             int i = Integer.valueOf(pair[1]);
-            
+
             boolean found = false;
             for(Score s : Score.values()) {
                 if(s.initial == p) {
@@ -45,17 +49,17 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
                     break;
                 }
             }
-            
+
             if(!found) {
                 throw new IllegalArgumentException("Invalid score format '" + score + "'");
             }
         }
     }
-    
+
     public int get(Score score) {
         return scores[score.ordinal()];
     }
-    
+
     public final void set(Score score, int s) {
         scores[score.ordinal()] = s;
     }
@@ -69,8 +73,7 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
     public boolean isValid() {
         if(get(IPPON) > 1) return false;
         if(get(HANSAKUMAKE) > 1) return false;
-        if(get(SHIDO) + get(LEG_SHIDO) > 3) return false;
-        if(get(LEG_SHIDO) > 2) return false;
+        if(get(SHIDO) > 3) return false;
         return true;
     }
 
@@ -95,18 +98,14 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
         }
         return sb.toString();
     }
-    
+
     public Score getWinningScore(FullScore o) {
         if(get(IPPON) > o.get(IPPON)) return IPPON;
         if(get(IPPON) < o.get(IPPON)) return null;
         if(get(WAZARI) > o.get(WAZARI)) return WAZARI;
         if(get(WAZARI) < o.get(WAZARI)) return null;
-        
-        int shido = get(SHIDO) + get(LEG_SHIDO);
-        int otherShido = o.get(SHIDO) + o.get(LEG_SHIDO);
-        if(shido < otherShido) return SHIDO;
-        if(shido > otherShido) return null;
-
+        if(get(SHIDO) < o.get(SHIDO)) return SHIDO;
+        if(get(SHIDO) > o.get(SHIDO)) return null;
         if(get(DECISION) > o.get(DECISION)) return DECISION;
         if(get(DECISION) < o.get(DECISION)) return null;
         return null;

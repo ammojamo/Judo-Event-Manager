@@ -20,7 +20,6 @@ package au.com.jwatmuff.eventmanager.gui.scoreboard;
 
 import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.HANSAKUMAKE;
 import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.IPPON;
-import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.LEG_SHIDO;
 import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.SHIDO;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.util.Stopwatch;
@@ -555,11 +554,9 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                 if(getScore(player,type) > 1) scoreok = false;
                 break;
             case SHIDO:
-            case LEG_SHIDO:
             case HANSAKUMAKE:
-                if(getScore(player, SHIDO) + getScore(player, LEG_SHIDO) > 3 ||
-                        getScore(player, LEG_SHIDO) > 2 ||
-                        getScore(player, HANSAKUMAKE) > 1) {
+                if(getScore(player, SHIDO) > 3 ||
+                    getScore(player, HANSAKUMAKE) > 1) {
                     scoreok = false;
                 }
                 break;
@@ -588,13 +585,11 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
     @Override
     public boolean isHansakumake(int player) {
-        // 3 Ways to get Hansakumake:
+        // 2 Ways to get Hansakumake:
         // - direct hansakumake
-        // - 2 leg shidos
         // - 3 shidos of any kind
         return shidoCount(player) == 3 ||
-                getScore(player, Score.LEG_SHIDO) == 2 ||
-                getScore(player, Score.HANSAKUMAKE) == 1;
+            getScore(player, Score.HANSAKUMAKE) == 1;
     }
 
     @Override
@@ -672,13 +667,11 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     }
 
     private int shidoCount(int player) {
-        return score[player][Score.SHIDO.ordinal()] +
-                score[player][Score.LEG_SHIDO.ordinal()];
+        return score[player][Score.SHIDO.ordinal()];
     }
 
     private int shidoCountAtStartOfGoldenScore(int player) {
-        return scoreAtStartOfGoldenScore[player][Score.SHIDO.ordinal()] +
-                score[player][Score.LEG_SHIDO.ordinal()];
+        return scoreAtStartOfGoldenScore[player][Score.SHIDO.ordinal()];
     }
 
     @Override

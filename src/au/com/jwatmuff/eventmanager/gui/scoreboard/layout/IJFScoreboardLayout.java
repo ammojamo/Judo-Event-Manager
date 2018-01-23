@@ -57,7 +57,7 @@ public class IJFScoreboardLayout implements ScoreboardLayout {
                 new Rect(0.25, 1.5, 5.25, 1) :
                 new Rect(0.25, 6.5, 5.25, 1);
     }
-    
+
     @Override
     public Rect getHolddownScoreRect(int player, int index) {
         Point position = (player == 0) ?
@@ -72,19 +72,18 @@ public class IJFScoreboardLayout implements ScoreboardLayout {
     public Rect getShidoRect(int player, int shido, int globalIndex, Score shidoType, ScoreboardModel model) {
         int size = 1;
         double sp = 1.5 / 4; // spacing
-        
+
         double y;
         switch(shidoType) {
             default:
             case SHIDO: y = sp; break;
-            case LEG_SHIDO: y = sp * 2 + size; break;
-            case HANSAKUMAKE: y = sp * 3 + size * 2; break;
+            case HANSAKUMAKE: y = sp * 2 + size; break;
         }
-        
+
         double x = 16 - (shido + 1) * (size + sp);
-        
+
         y = (player == 0) ? 4.5 - y - size : 4.5 + y; // Mirror layout around line between P1 & P2
-        
+
         return new Rect(x, y, size, size);
     }
 
@@ -112,7 +111,7 @@ public class IJFScoreboardLayout implements ScoreboardLayout {
     public Rect getTimerBackgroundRect() {
         return new Rect(0, 9, 16, 4);
     }
-    
+
     @Override
     public Rect getGoldenScoreRect() {
         return new Rect(0, 9, 4, 1.5);

@@ -51,7 +51,7 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
     private final ScalableLabel[][][] scoreRegions;
     private final ScalableLabel[][][] scoreArrows;
 
-    private final ScalableLabel[][][] shidoButton; // 2 players * 3 types * 2 sizes (big/small)
+    private final ScalableLabel[][][] shidoButton; // 2 players * SHIDO_TYPES.length types * 2 sizes (big/small)
     private final ScalableLabel[][] shidoButtonRegion;
     private final ScalableLabel[][] shidoCross;
     private final ScalableLabel[][] shidoRegion;
@@ -287,9 +287,9 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
             }
         }
 
-        shidoButtonRegion = new ScalableLabel[2][3];
+        shidoButtonRegion = new ScalableLabel[2][SHIDO_TYPES.length];
         for(int i = 0; i < 2; i++) {
-            for(int j = 0; j < 3; j++) {
+            for(int j = 0; j < SHIDO_TYPES.length; j++) {
                 final Score shidoType = SHIDO_TYPES[j];
                 final int ii = i;
                 final int jj = j;
@@ -357,9 +357,9 @@ public class ScoreboardEntryPanel extends ScoreboardDisplayPanel {
         holddownIcon[1].setVisible(false);
         layout.addComponent(holddownIcon[1], 7.5, 11, 1, 1);
 
-        shidoButton = new ScalableLabel[2][3][2];
+        shidoButton = new ScalableLabel[2][SHIDO_TYPES.length][2];
         for(int i=0; i<2; i++) { // player
-            for(int j = 0; j < 3; j++) { // score
+            for(int j = 0; j < SHIDO_TYPES.length; j++) { // score
                 Score s = SHIDO_TYPES[j];
                 for(int k = 0; k < 2; k++) { // size
                     ScalableLabel label = new ScalableLabel("" + s.initial);
