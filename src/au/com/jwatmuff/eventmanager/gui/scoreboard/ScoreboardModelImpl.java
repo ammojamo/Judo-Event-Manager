@@ -641,15 +641,6 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
                     winningPlayer = player;
                     break;
                 }
-                if(goldenScoreStarted && shidoCount(player) > shidoCount(1 - player)) {
-                    // Need to also check that player has scored at least one
-                    // shido since golden score
-                    if(shidoCount(player) > shidoCountAtStartOfGoldenScore(player)) {
-                        win = Win.BY_SHIDO;
-                        winningPlayer = 1 - player; // other player wins
-                        break;
-                    }
-                }
             }
 
             if(win != null) {
