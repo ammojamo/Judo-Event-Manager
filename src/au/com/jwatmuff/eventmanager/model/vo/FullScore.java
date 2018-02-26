@@ -27,8 +27,11 @@ import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 public final class FullScore implements Comparable<FullScore>, Serializable {
+    private static final Logger log = Logger.getLogger(FullScore.class);
+
     private int scores[] = new int[Score.values().length];
 
     public FullScore() {}
@@ -51,7 +54,8 @@ public final class FullScore implements Comparable<FullScore>, Serializable {
             }
 
             if(!found) {
-                throw new IllegalArgumentException("Invalid score format '" + score + "'");
+                log.warn("Invalid score: '" + score + "' - unrecognized character " + p);
+//                throw new IllegalArgumentException("Invalid score format '" + score + "'");
             }
         }
     }
