@@ -1,7 +1,7 @@
 !include x64.nsh
 
 !define YEAR 2018
-!define UPDATE 1
+!define UPDATE 2
 
 Name "Event Manager ${YEAR} Update ${UPDATE}"
 Caption "Event Manager ${YEAR} Update ${UPDATE}"
