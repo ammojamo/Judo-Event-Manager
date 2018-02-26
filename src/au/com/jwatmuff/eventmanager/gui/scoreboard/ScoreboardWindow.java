@@ -28,10 +28,20 @@ import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModelWrapper.Shutdo
 import au.com.jwatmuff.eventmanager.gui.scoring.ManualFightDialog;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColors;
 import au.com.jwatmuff.eventmanager.gui.scoring.ScoringColorsDialog;
+import au.com.jwatmuff.eventmanager.model.misc.DatabaseStateException;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.FightPlayer;
 import au.com.jwatmuff.eventmanager.model.misc.PlayerCodeParser.PlayerType;
-import au.com.jwatmuff.eventmanager.model.misc.*;
-import au.com.jwatmuff.eventmanager.model.vo.*;
+import au.com.jwatmuff.eventmanager.model.misc.PlayerTimer;
+import au.com.jwatmuff.eventmanager.model.misc.ResultRecorder;
+import au.com.jwatmuff.eventmanager.model.misc.SessionFightSequencer;
+import au.com.jwatmuff.eventmanager.model.misc.UpcomingFightFinder;
+import au.com.jwatmuff.eventmanager.model.vo.Fight;
+import au.com.jwatmuff.eventmanager.model.vo.FullScore;
+import au.com.jwatmuff.eventmanager.model.vo.Pool;
+import au.com.jwatmuff.eventmanager.model.vo.Result;
+import au.com.jwatmuff.eventmanager.model.vo.Session;
+import au.com.jwatmuff.eventmanager.model.vo.SessionFight;
 import au.com.jwatmuff.eventmanager.util.GUIUtils;
 import au.com.jwatmuff.eventmanager.util.gui.ListDialog;
 import au.com.jwatmuff.eventmanager.util.gui.PanelDisplayFrame;
@@ -44,14 +54,33 @@ import au.com.jwatmuff.genericp2p.NoSuchServiceException;
 import au.com.jwatmuff.genericp2p.Peer;
 import au.com.jwatmuff.genericp2p.PeerManager;
 import au.com.jwatmuff.genericp2p.rmi.LookupService;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 
@@ -64,33 +93,35 @@ public class ScoreboardWindow extends javax.swing.JFrame {
 
     private ScoreboardPanel scoreboard;
     private ScoreboardPanel fullscreen;
-    
+
     private Database database;
     private TransactionNotifier notifier;
     private Session mat;
     private Fight currentFight;
     private FightPlayer[] currentPlayers = new FightPlayer[2];
-    
+
     private ScoreboardModel model;
-    
+
     private Clip siren;
-    
+
     private ScoringColors colors = new ScoringColors();
-    
+
     private String serviceName;
     private PeerManager peerManager;
-    
+
     private boolean interactive;
     private KeyListener keyListener;
-    
+
     private String title;
 
     private boolean findThreadRunning;
+    private boolean closing;
 
     /* searches all connected peers for a scoreboard corresponding to current mat */
     private Runnable findPeerScoreboard = new Runnable() {
         @Override
         public void run() {
+            if(closing) return;
             findThreadRunning = true;
             while(findThreadRunning) {
                 log.debug("Looking for scoreboard");
@@ -140,7 +171,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                     playSiren();
             }
         });
-        
+
         showTeamsMenuItem.setSelected(model.showTeams());
     }
 
@@ -171,14 +202,14 @@ public class ScoreboardWindow extends javax.swing.JFrame {
 
         initComponents();
         setupMenu();
-        
+
         title = "Event Manager - Scoreboard Display - [" + mat.getMat() + "]";
         setTitle(title);
 
         /* create scoreboard panels */
         scoreboard = ScoreboardDisplayPanel.getInstance();
         fullscreen = ScoreboardDisplayPanel.getInstance();
-        
+
         /* put scoreboard panel into window */
         getContentPane().setLayout(new GridLayout(1,1));
         getContentPane().add(scoreboard);
@@ -292,7 +323,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             }
         });
     }
-    
+
     /** Creates new ScoreboardWindow which gets fights from the given database
       for the given mat. */
     public ScoreboardWindow(Database database, TransactionNotifier notifier, Session mat, PeerManager peerManager, String serviceName) {
@@ -340,7 +371,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
                             }
                             scores[i] = score;
                         }
-                        
+
                         // Work out fight duration
                         Pool pool = ScoreboardWindow.this.database.get(Pool.class, currentFight.getPoolID());
                         int fightDuration = pool.getMatchTime() - model.getTime();
@@ -380,7 +411,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             }
         }, Result.class, Fight.class, SessionFight.class, Session.class);
     }
-    
+
     private void openSirenFile(File sirenFile) {
         Clip oldSiren = siren;
 
@@ -394,14 +425,14 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             siren = oldSiren;
         }
     }
-    
+
     private void playSiren() {
         if(siren != null) {
             siren.setFramePosition(0);
             siren.start();
         }
     }
-    
+
     // Builds the menu of scoreboard styles
     private void setupMenu() {
         // Only show style menu for display scoreboard, not entry
@@ -429,23 +460,23 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             scoreboardStyleMenu.add(menuItem);
         }
     }
-    
+
     private void updateStyle(ScoreboardDisplayType type) {
         // set models to null to de-register model listeners
         scoreboard.setModel(null);
         fullscreen.setModel(null);
         // remove from GUI
         getContentPane().remove(scoreboard);
-        
+
         // create new panels
         scoreboard = ScoreboardDisplayType.getPanel(type);
         fullscreen = ScoreboardDisplayType.getPanel(type);
         scoreboard.setModel(model);
         fullscreen.setModel(model);
-        
+
         // add to GUI
         getContentPane().add(scoreboard);
-        
+
         // apply settings
         if(swapPlayersMenuItem.isSelected()) {
             scoreboard.swapPlayers();
@@ -454,7 +485,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
         scoreboard.setImagesEnabled(showImagesMenuItem.isSelected());
         fullscreen.setImagesEnabled(showImagesMenuItem.isSelected());
     }
-    
+
     private void updateFightFromDatabase() {
         if(mat == null) return;
 
@@ -665,7 +696,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
 
     private void fullScreenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fullScreenMenuItemActionPerformed
         final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        
+
         if(gd.isFullScreenSupported()) {
             final ScoreboardPanel sp = fullscreen;
             final Frame w = new PanelDisplayFrame(sp);
@@ -684,7 +715,7 @@ public class ScoreboardWindow extends javax.swing.JFrame {
             if(interactive) {
                 w.addKeyListener(keyListener);
             }
-    
+
             w.removeNotify();
             w.setUndecorated(true);
             w.addNotify();
@@ -700,7 +731,7 @@ private void chooseSirenMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
         fileChooser.setCurrentDirectory(GUIUtils.lastSirenChooserDirectory);
     fileChooser.setFileFilter(new FileFilter() {
             String[] endings = new String[]{".wav", ".aiff", ".au"};
-        
+
             @Override
             public boolean accept(File f) {
                 if(f.isDirectory()) return true;
@@ -718,7 +749,7 @@ private void chooseSirenMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     int result = fileChooser.showOpenDialog(this);
     if(result == JFileChooser.APPROVE_OPTION) {
         openSirenFile(fileChooser.getSelectedFile());
-    }       
+    }
 }//GEN-LAST:event_chooseSirenMenuItemActionPerformed
 
 private void testSirenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testSirenMenuItemActionPerformed
@@ -739,12 +770,15 @@ private void swapPlayersMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 }//GEN-LAST:event_swapPlayersMenuItemActionPerformed
 
 private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+    closing = true;
     if(serviceName != null)
         peerManager.unregisterService(serviceName);
     // signal find peer scoreboard thread to stop if running
     findThreadRunning = false;
     if(model != null)
         model.shutdown();
+    scoreboard.setModel(null);
+    fullscreen.setModel(null);
 }//GEN-LAST:event_formWindowClosed
 
 private void setTimeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTimeMenuItemActionPerformed
@@ -815,7 +849,7 @@ private void showImagesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     public static void selectAndDisplayRemoteScoreboard(Component parent, PeerManager peerManager) {
         selectAndDisplayRemoteScoreboard(parent, peerManager, null);
     }
-    
+
     public static void selectAndDisplayRemoteScoreboard(Component parent, PeerManager peerManager,
                                                         Frame parentWindow) {
         Map<String, Peer> scoreboardNames = new HashMap<String, Peer>();

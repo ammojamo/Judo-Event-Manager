@@ -172,6 +172,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
         this.playerNames = playerNames;
         this.teamNames = teamNames;
         this.divisionName = divisionName;
+        shutdownPendingTimers();
         stopTimer();
         cancelHolddownTimer();
         mainTimer.reset(fightTime * 1000);
@@ -354,7 +355,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
     @Override
     public int getTime() {
-        return (int) Math.round(mainTimer.getTime() / 1000.0);
+        return mainTimer.getSeconds();
     }
 
     @Override
@@ -393,7 +394,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
         holddownTimer.stop();
 
-        int holddownTime = (int)(holddownTimer.getTime() / 1000);
+        int holddownTime = holddownTimer.getSeconds();
 
         if(mainTimer.isRunning())
             enableCancelHolddownUndo();
@@ -494,7 +495,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
     @Override
     public int getHolddownTime() {
-        return (int) (holddownTimer.getTime() / 1000);
+        return holddownTimer.getSeconds();
     }
 
     @Override
@@ -756,7 +757,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     private static DecimalFormat format = new DecimalFormat("00");
 
     private String getTimeString() {
-        int time = (int)(mainTimer.getTime()/1000);
+        int time = mainTimer.getSeconds();
         int min = time / 60;
         int sec = time % 60;
         return format.format(min) + ":" + format.format(sec) + ((goldenScoreMode == GoldenScoreMode.ACTIVE)?"[GS]":"    ");
@@ -786,6 +787,16 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
             undoDisableTimer.cancel();
         if(shadowTimer != null)
             shadowTimer.stop();
+        shutdownPendingTimers();
+    }
+
+    private void shutdownPendingTimers() {
+        for(int i = 0; i < 2; i++) {
+            if(pendingFightTimers[i] != null) {
+                pendingFightTimers[i].stop();
+                pendingFightTimers[i] = null;
+            }
+        }
     }
 
     @Override
@@ -800,7 +811,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
 
     @Override
     public void setHolddownTimer(int seconds) {
-        int oldTime = (int) holddownTimer.getTime() / 1000;
+        int oldTime = holddownTimer.getSeconds();
         logEvent("Set holddown (" + seconds + "s, was " + oldTime + "s)");
         switch(holddownMode) {
             case ACTIVE:
@@ -848,7 +859,7 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     public int getPendingFightTime(int player) {
         if(pendingFightTimers != null &&
            pendingFightTimers[player] != null) {
-            return (int) (pendingFightTimers[player].getTime() / 1000);
+            return pendingFightTimers[player].getSeconds();
         }
         return 0;
     }

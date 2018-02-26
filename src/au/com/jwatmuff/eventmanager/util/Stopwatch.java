@@ -20,19 +20,22 @@ package au.com.jwatmuff.eventmanager.util;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author James
  */
 public class Stopwatch {
+    private static final Logger log = Logger.getLogger(Stopwatch.class);
+
     private Timer timer;
     private long time, period;
     private boolean direction;
-    
+
     private Runnable runnable;
     private int runperiod = 1;
-    
+
     private class StopwatchTask extends TimerTask {
         boolean firstRun = true;
 
@@ -53,12 +56,12 @@ public class Stopwatch {
                 runnable.run();
         }
     };
-    
+
     public Stopwatch(long period, boolean direction) {
         this.direction = direction;
         this.period = period;
     }
-    
+
     public Stopwatch(long period, boolean direction, Runnable runnable, int runperiod) {
         this(period, direction);
         this.runperiod = runperiod;
@@ -68,12 +71,12 @@ public class Stopwatch {
     public boolean isRunning() {
         return timer != null;
     }
-    
+
     public void reset(long time) {
         stop();
         this.time = (time / runperiod) * runperiod;
     }
-    
+
     public void direction(boolean direction) {
         stop();
         this.direction = direction;
@@ -82,7 +85,7 @@ public class Stopwatch {
     public synchronized void start() {
         if(timer == null) {
             timer = new Timer();
-            timer.scheduleAtFixedRate(new StopwatchTask(), 0, period);            
+            timer.scheduleAtFixedRate(new StopwatchTask(), 0, period);
         }
     }
 
@@ -99,5 +102,9 @@ public class Stopwatch {
 
     public long getTime() {
         return time;
+    }
+
+    public int getSeconds() {
+        return (int) Math.round(time / 1000.0);
     }
 }
