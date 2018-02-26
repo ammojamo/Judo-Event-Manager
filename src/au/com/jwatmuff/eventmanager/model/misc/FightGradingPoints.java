@@ -18,6 +18,7 @@
 
 package au.com.jwatmuff.eventmanager.model.misc;
 
+import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
 import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.model.info.ResultInfo;
 import au.com.jwatmuff.eventmanager.model.vo.CompetitionInfo;
@@ -52,14 +53,14 @@ public class FightGradingPoints {
         double[] scores = ri.getResult().getSimpleScores(database);
         int winner = scores[0] > scores[1] ? 0 : 1;
         int loser = 1 - winner;
-        
+
         winningPlayer = ri.getPlayer()[winner];
         losingPlayer = ri.getPlayer()[loser];
-        
+
         pool = database.get(Pool.class, ri.getFight().getPoolID());
         effectiveLoserGrade = losingPlayer.getGrade();
         effectiveWinningGrade = winningPlayer.getGrade();
-        
+
         points = calculatePoints(ri, effectiveLoserGrade, effectiveWinningGrade, configurationFile);
     }
 
@@ -88,19 +89,27 @@ public class FightGradingPoints {
     }
 
     public static int calculatePoints(ResultInfo info, Grade loserGrade, Grade winningGrade, ConfigurationFile configurationFile) {
+        // Source: JFA National Grading Policy, Version 1
+        // https://assets.sportstg.com/assets/console/document/documents/BBA6FBD7-5056-BD36-A33F7B1F32E5DB9D.pdf
+        // Accessed 16/2/2018
+        Score winningScore =  info.getResult().getWinningScore();
 
-        double[] scores = info.getResult().getSimpleScores(configurationFile);
-        int winner = scores[0] > scores[1] ? 0 : 1;
+        if(winningScore == null) {
+            return 0;
+        }
+
         int rankDifference = loserGrade.ordinal() - winningGrade.ordinal();
-        
-        if(rankDifference < -2) return 0;
-        rankDifference = Math.min(rankDifference, 2);
+        rankDifference = Math.max(Math.min(rankDifference, 2), -2);
 
-        if(scores[winner] == configurationFile.getDoubleProperty("defaultVictoryPointsIppon", 100))
-            return POINTS[4 + rankDifference];
-        else if(scores[winner] == configurationFile.getDoubleProperty("defaultVictoryPointsWazari", 10))
-            return POINTS[3 + rankDifference];
-        else
-            return POINTS[2 + rankDifference];
+        switch(winningScore) {
+            case IPPON:
+                return POINTS[rankDifference + 4];
+            case WAZARI:
+                return POINTS[rankDifference + 3];
+            case DECISION:
+                return 0;
+            default:
+                return rankDifference + 3;
+        }
     }
 }

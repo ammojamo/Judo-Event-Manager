@@ -19,7 +19,10 @@
 package au.com.jwatmuff.eventmanager.model.vo;
 
 import au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score;
-import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.*;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.DECISION;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.IPPON;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.SHIDO;
+import static au.com.jwatmuff.eventmanager.gui.scoreboard.ScoreboardModel.Score.WAZARI;
 import au.com.jwatmuff.eventmanager.model.config.ConfigurationFile;
 import au.com.jwatmuff.eventmanager.util.IDGenerator;
 import au.com.jwatmuff.genericdb.Database;
@@ -67,7 +70,7 @@ public class Result extends DistributableObject<Integer> {
     public void setEventLog(String eventLog) {
         this.eventLog = eventLog;
     }
-    
+
     public String getEventLog() {
         return eventLog;
     }
@@ -83,6 +86,13 @@ public class Result extends DistributableObject<Integer> {
         this.scores = scores;
     }
 
+    public Score getWinningScore() {
+        Score score = scores[0].getWinningScore(scores[1]);
+        if(score == null) {
+            score = scores[1].getWinningScore(scores[0]);
+        }
+        return score;
+    }
 
     public double[] getSimpleScores(Database database) {
         CompetitionInfo ci = database.get(CompetitionInfo.class, null);
@@ -92,7 +102,7 @@ public class Result extends DistributableObject<Integer> {
 
     public double[] getSimpleScores(ConfigurationFile configurationFile) {
         double[] simple = {0,0};
-        
+
         for(int i = 0; i < 2; i++) {
             Score score = scores[i].getWinningScore(scores[1-i]);
             if(score == IPPON) {
