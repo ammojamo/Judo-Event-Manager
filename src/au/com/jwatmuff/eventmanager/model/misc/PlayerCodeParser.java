@@ -28,13 +28,8 @@ import au.com.jwatmuff.eventmanager.model.vo.Player;
 import au.com.jwatmuff.eventmanager.model.vo.Pool;
 import au.com.jwatmuff.eventmanager.model.vo.Pool.Place;
 import au.com.jwatmuff.genericdb.Database;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -123,7 +118,7 @@ public class PlayerCodeParser {
         int time;
         double weight;
         int place;
-        List<Integer> beatenPlayerIDs = new ArrayList<>();
+        Set<Integer> beatenPlayerIDs = new HashSet<>();
     }
 
     private static Comparator<PlayerRRScore> PLAYERS_SCORE_COMPARATOR_RR_WPTW = new Comparator<PlayerRRScore>(){
@@ -712,16 +707,33 @@ public class PlayerCodeParser {
             }
         }
 
-//Convert map to a list for sorting
-        List<PlayerRRScore> playerRRScoresList = new ArrayList<PlayerRRScore>();
-        for(Integer playerID : playerRRScoresMap.keySet()) {
-            playerRRScoresList.add(playerRRScoresMap.get(playerID));
+        // Propagate beatenPlayerIDs so that if A beat B beat C, then C is added to A's beaten player list
+        // Without this step, 'Who beat who' logic will not handle cycles like A beat B beat C beat A
+        for(PlayerRRScore s : playerRRScoresMap.values()) {
+            for(int id : s.beatenPlayerIDs) {
+                addTransitivelyBeatenPlayerIDs(s.beatenPlayerIDs, id, playerRRScoresMap);
+            }
         }
+
+//Convert map to a list for sorting
+        List<PlayerRRScore> playerRRScoresList = new ArrayList<>(playerRRScoresMap.values());
 
 //Sort List
         Collections.sort(playerRRScoresList, PLAYERS_POS1_COMPARATOR_RR);
 
         return playerRRScoresList;
+    }
+
+    private void addTransitivelyBeatenPlayerIDs(Set<Integer> ids, int id, Map<Integer,PlayerRRScore> playerRRScoresMap) {
+        PlayerRRScore p = playerRRScoresMap.get(id);
+        if(p != null) {
+            for(Integer beatenID : p.beatenPlayerIDs) {
+                if(!ids.contains(beatenID)) {
+                    ids.add(beatenID);
+                    addTransitivelyBeatenPlayerIDs(ids, beatenID, playerRRScoresMap);
+                }
+            }
+        }
     }
 
     public Context roundRobinContext(String code, Context c, Boolean showResults) {
