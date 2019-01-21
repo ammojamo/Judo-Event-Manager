@@ -3,6 +3,7 @@ comps
 build
 dist
 *.log
+*.log.*
 eventmanager.log*
 nbproject/private
 *.run.lock
@@ -11,3 +12,5 @@ nbproject/private
 /installer/nsis/EventManagerSetup*.exe
 /installer/thirdparty/*.exe
 tmp
+out
+.idea
