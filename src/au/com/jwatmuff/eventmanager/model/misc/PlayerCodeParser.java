@@ -710,7 +710,7 @@ public class PlayerCodeParser {
         // Propagate beatenPlayerIDs so that if A beat B beat C, then C is added to A's beaten player list
         // Without this step, 'Who beat who' logic will not handle cycles like A beat B beat C beat A
         for(PlayerRRScore s : playerRRScoresMap.values()) {
-            for(int id : s.beatenPlayerIDs) {
+            for(int id : new ArrayList<>(s.beatenPlayerIDs)) { // Iterate copy
                 addTransitivelyBeatenPlayerIDs(s.beatenPlayerIDs, id, playerRRScoresMap);
             }
         }
@@ -727,7 +727,7 @@ public class PlayerCodeParser {
     private void addTransitivelyBeatenPlayerIDs(Set<Integer> ids, int id, Map<Integer,PlayerRRScore> playerRRScoresMap) {
         PlayerRRScore p = playerRRScoresMap.get(id);
         if(p != null) {
-            for(Integer beatenID : p.beatenPlayerIDs) {
+            for(Integer beatenID : new ArrayList<>(p.beatenPlayerIDs)) { // Iterate copy
                 if(!ids.contains(beatenID)) {
                     ids.add(beatenID);
                     addTransitivelyBeatenPlayerIDs(ids, beatenID, playerRRScoresMap);
