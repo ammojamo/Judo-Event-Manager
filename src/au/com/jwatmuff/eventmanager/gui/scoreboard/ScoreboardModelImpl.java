@@ -164,10 +164,8 @@ public class ScoreboardModelImpl implements ScoreboardModel, Serializable {
     @Override
     public void reset(int fightTime, int goldenScoreTime, String[] playerNames, String[] teamNames, String divisionName) {
         this.fightTime = fightTime;
-        if (this.fightTime > 90) {
-            holddownTimeIpon = 20;
-            holddownTimeWazari = 10;
-        }
+        holddownTimeIpon = 20;
+        holddownTimeWazari = 10;
         this.goldenScoreTime = goldenScoreTime;
         this.playerNames = playerNames;
         this.teamNames = teamNames;
