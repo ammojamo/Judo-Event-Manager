@@ -1,7 +1,3 @@
 p.break {
     page-break-before:always;
 }
-
-@page {
-    size: landscape;
-}
