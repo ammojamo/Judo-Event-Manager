@@ -65,7 +65,7 @@ public class Main {
 
     //internal version - bump this up whenever making a database change
     public static final String VERSION = "10";
-    public static final String VISIBLE_VERSION = "Event Manager 2020 Update 1";
+    public static final String VISIBLE_VERSION = "Event Manager 2022 Update 1";
     public static final String WINDOW_TITLE = VISIBLE_VERSION;
 
     private static File workingDir = new File(".");

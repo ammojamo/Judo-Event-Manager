@@ -1,6 +1,6 @@
 !include x64.nsh
 
-!define YEAR 2020
+!define YEAR 2022
 !define UPDATE 1
 
 Name "Event Manager ${YEAR} Update ${UPDATE}"
